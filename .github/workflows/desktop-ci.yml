@@ -1,0 +1,36 @@
+name: Desktop App CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'apps/insighthunter-desktop/**'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [macos-latest, ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Tauri deps
+        run: |
+          if [[ "$RUNNER_OS" == "macOS" ]]; then brew install tauri-cli; fi
+          if [[ "$RUNNER_OS" == "Linux" ]]; then sudo apt install libwebkit2gtk-4.0-dev; fi
+
+      - run: npm install
+
+      - name: Build Desktop App
+        working-directory: apps/insighthunter-desktop
+        run: npm run tauri build

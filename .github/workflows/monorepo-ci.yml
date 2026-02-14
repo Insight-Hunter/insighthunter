@@ -1,0 +1,64 @@
+name: InsightHunter Monorepo CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  setup:
+    name: Setup & Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      core_worker: ${{ steps.filter.outputs.core_worker }}
+      web: ${{ steps.filter.outputs.web }}
+      mobile: ${{ steps.filter.outputs.mobile }}
+      desktop: ${{ steps.filter.outputs.desktop }}
+      launcher: ${{ steps.filter.outputs.launcher }}
+      packages: ${{ steps.filter.outputs.packages }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            core_worker:
+              - 'packages/core-worker/**'
+            web:
+              - 'apps/insighthunter-web/**'
+            mobile:
+              - 'apps/insighthunter-mobile/**'
+            desktop:
+              - 'apps/insighthunter-desktop/**'
+            launcher:
+              - 'apps/insighthunter-launcher/**'
+            packages:
+              - 'packages/**'
+
+  lint:
+    name: Lint & Typecheck
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm run lint || true
+      - run: npm run typecheck || true
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm test --if-present

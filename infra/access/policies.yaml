@@ -1,0 +1,5 @@
+policies:
+  - name: InsightHunter Login
+    decision: allow
+    include:
+      - email: "*@insighthunter.com"
