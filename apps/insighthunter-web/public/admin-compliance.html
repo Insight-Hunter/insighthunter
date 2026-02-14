@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Admin · Compliance · InsightHunter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="page">
+    <header class="topbar">
+      <div class="brand">InsightHunter</div>
+      <nav class="nav">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./compliance.html">Compliance</a>
+        <a href="./admin-compliance.html" class="active">Admin</a>
+        <a href="./settings.html">Settings</a>
+      </nav>
+    </header>
+
+    <main class="main">
+      <h1>Admin · Compliance</h1>
+
+      <section class="card">
+        <h2>Generate Engagement Letter</h2>
+        <button class="btn-primary" id="btn-generate-engagement">
+          Generate PDF
+        </button>
+      </section>
+
+      <section class="card">
+        <h2>Storage Usage</h2>
+        <p id="storage-usage">—</p>
+        <button class="btn-secondary" id="btn-cleanup-uploads">
+          Cleanup old uploads
+        </button>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
