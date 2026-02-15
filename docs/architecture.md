@@ -18,6 +18,17 @@ InsightHunter is designed as a Cloudflare‑native, horizontally scalable platfo
 ## High-Level Diagram
 
 You’re ready to build
+docs/
+├── README.md
+├── architecture.md
+├── developer-guide.md
+├── api-reference.md
+├── app-structure.md
+├── deployment.md
+├── contributing.md
+├── security.md
+├── design-system.md
+└── troubleshooting.md
 
 
 ## Components
