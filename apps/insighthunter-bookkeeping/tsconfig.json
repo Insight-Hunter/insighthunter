@@ -1,4 +1,4 @@
-// tsconfig.json
+
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
