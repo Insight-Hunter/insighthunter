@@ -1,0 +1,20 @@
+---
+// src/pages/reconciliation.astro
+import AppLayout from '../layouts/AppLayout.astro';
+import ReconciliationWizard from '../components/ReconciliationWizard';
+---
+
+<AppLayout title="Bank Reconciliation">
+  <div class="reconciliation-page">
+    <h1>Bank Reconciliation</h1>
+    <ReconciliationWizard client:load companyId="default" />
+  </div>
+</AppLayout>
+
+<style>
+  .reconciliation-page {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+</style>
