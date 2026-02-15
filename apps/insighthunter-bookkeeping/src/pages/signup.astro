@@ -1,0 +1,88 @@
+---
+// src/pages/signup.astro
+import '../styles/globals.css';
+import SignupForm from '@/components/auth/SignupForm';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - InsightHunter Bookkeeping</title>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>InsightHunter</h1>
+        <h2>Create your account</h2>
+        <p>Start your 14-day free trial</p>
+      </div>
+      
+      <SignupForm client:load />
+      
+      <div class="auth-footer">
+        <p>Already have an account? <a href="/login">Log in</a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+<style>
+  .auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem;
+  }
+
+  .auth-card {
+    background: white;
+    border-radius: 16px;
+    padding: 3rem;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .auth-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+  }
+
+  .auth-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .auth-header p {
+    color: #6b7280;
+  }
+
+  .auth-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .auth-footer a {
+    color: #667eea;
+    font-weight: 600;
+    text-decoration: none;
+  }
+</style>
