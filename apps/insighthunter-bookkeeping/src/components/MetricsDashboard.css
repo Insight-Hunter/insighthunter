@@ -1,0 +1,54 @@
+/* src/components/MetricsDashboard.css */
+.metrics-dashboard {
+  padding: 2rem;
+}
+
+.key-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.metric-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.metric-card.highlight {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.metric-card h3 {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.metrics-loading {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-secondary);
+}
+
+.trends-chart {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.trends-chart h3 {
+  margin-bottom: 1.5rem;
+}
