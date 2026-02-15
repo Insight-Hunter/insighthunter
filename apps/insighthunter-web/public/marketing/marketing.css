@@ -1,72 +1,118 @@
+/* ============================================================
+   InsightHunter Marketing Theme — Phase 5
+   ============================================================ */
+
 .hero-marketing {
-    text-align: center;
-    padding: 80px 20px;
-    background: radial-gradient(circle at top, #111827, #020617);
-    border-bottom: 1px solid var(--border-subtle);
-  }
-  
-  .hero-marketing h1 {
-    font-size: 48px;
-    margin-bottom: 12px;
-  }
-  
-  .hero-marketing p {
-    color: var(--muted);
-    font-size: 18px;
-    margin-bottom: 32px;
-  }
-  
-  .hero-btn {
-    font-size: 18px;
-    padding: 14px 28px;
-  }
-  
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 24px;
-    padding: 40px 20px;
-  }
-  
-  .feature-card {
-    border: 1px solid var(--border-subtle);
-    border-radius: 16px;
-    padding: 24px;
-    background: rgba(2, 6, 23, 0.9);
-  }
-  
-  .pricing-grid {
-    display: flex;
-    gap: 24px;
-    justify-content: center;
-    margin-top: 40px;
-  }
-  
-  .pricing-card {
-    border: 1px solid var(--border-subtle);
-    border-radius: 16px;
-    padding: 24px;
-    width: 260px;
-    text-align: center;
-  }
-  
-  .price {
-    font-size: 32px;
-    margin: 12px 0;
-  }
-  
-  .contact-form {
-    display: flex;
-    flex-direction: colum6gitn;
-    gap: 12px;
-  }
-  
-  .contact-form input,
-  .contact-form textarea {
-    background: #020617;
-    border: 1px solid var(--border-subtle);
-    border-radius: 8px;
-    padding: 10px;
-    color: var(--text);
-  }
-  
+  text-align: center;
+  padding: 100px 20px;
+  background: radial-gradient(circle at top, #111827, #020617);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.hero-marketing h1 {
+  font-size: 52px;
+  margin-bottom: 16px;
+}
+
+.hero-marketing p {
+  color: var(--muted);
+  font-size: 20px;
+  margin-bottom: 32px;
+}
+
+.hero-btn {
+  font-size: 18px;
+  padding: 14px 32px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  padding: 40px 20px;
+}
+
+.feature-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 24px;
+  background: rgba(2, 6, 23, 0.9);
+  box-shadow: var(--shadow);
+}
+
+.cta-section {
+  text-align: center;
+  padding: 60px 20px;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(2, 6, 23, 0.9);
+  margin-top: 24px;
+}
+
+.pricing-grid {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.pricing-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 24px;
+  width: 260px;
+  text-align: center;
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow);
+}
+
+.price {
+  font-size: 36px;
+  margin: 12px 0;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.blog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.blog-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 16px;
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow);
+}
+
+.blog-card a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.blog-card a:hover {
+  text-decoration: underline;
+}
+
+.faq {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.faq-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 16px;
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow);
+}
