@@ -1,5 +1,8 @@
 { 
   "name": "insighthunter-bookkeeping",
+  "main": "src/backend/ind// wrangler.jsonc
+{
+  "name": "insighthunter-bookkeeping",
   "main": "src/backend/index.ts",
   "compatibility_date": "2025-03-07",
   "compatibility_flags": ["nodejs_compat"],
@@ -16,13 +19,21 @@
       {
         "name": "BOOKKEEPING_CLIENT",
         "class_name": "BookkeepingClient"
+      },
+      {
+        "name": "ENHANCED_LEDGER",
+        "class_name": "EnhancedLedger"
       }
     ]
   },
   "migrations": [
     {
       "tag": "v1",
-      "new_classes": ["BookkeepingLedger", "BookkeepingClient"]
+      "new_classes": ["BookkeepingLedger", "BookkeepingClient", "EnhancedLedger"]
     }
-  ]
+  ],
+  "vars": {
+    "QUICKBOOKS_ENVIRONMENT": "sandbox",
+    "QUICKBOOKS_REDIRECT_URI": "http://localhost:8787/api/quickbooks/callback"
+  }
 }
