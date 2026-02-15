@@ -1,6 +1,3 @@
-{ 
-  "name": "insighthunter-bookkeeping",
-  "main": "src/backend/ind// wrangler.jsonc
 {
   "name": "insighthunter-bookkeeping",
   "main": "src/backend/index.ts",
