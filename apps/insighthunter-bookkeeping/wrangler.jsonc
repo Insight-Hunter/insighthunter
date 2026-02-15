@@ -1,5 +1,4 @@
-// wrangler.jsonc
-{
+{ 
   "name": "insighthunter-bookkeeping",
   "main": "src/backend/index.ts",
   "compatibility_date": "2025-03-07",
