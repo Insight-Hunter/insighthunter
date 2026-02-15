@@ -1,0 +1,39 @@
+---
+// src/pages/reports.astro
+import AppLayout from '../layouts/AppLayout.astro';
+import ReportCard from '../components/ReportCard';
+---
+
+<AppLayout title="Financial Reports">
+  <div class="reports-page">
+    <h1>Financial Reports</h1>
+    
+    <div class="report-types">
+      <ReportCard 
+        client:load 
+        title="Balance Sheet" 
+        type="balance-sheet"
+        companyId="default"
+      />
+      <ReportCard 
+        client:load 
+        title="Profit & Loss" 
+        type="profit-loss"
+        companyId="default"
+      />
+    </div>
+  </div>
+</AppLayout>
+
+<style>
+  .reports-page {
+    padding: 2rem;
+  }
+
+  .report-types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+</style>

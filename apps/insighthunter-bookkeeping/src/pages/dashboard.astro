@@ -1,0 +1,88 @@
+---
+// src/pages/dashboard.astro
+import AppLayout from '../layouts/AppLayout.astro';
+import LedgerTable from '../components/LedgerTable';
+---
+
+<AppLayout title="Dashboard">
+  <div class="dashboard">
+    <h1>Dashboard</h1>
+    
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <h3>Total Revenue</h3>
+        <p class="metric-value" id="totalRevenue">$0</p>
+      </div>
+      <div class="metric-card">
+        <h3>Total Expenses</h3>
+        <p class="metric-value" id="totalExpenses">$0</p>
+      </div>
+      <div class="metric-card">
+        <h3>Net Income</h3>
+        <p class="metric-value" id="netIncome">$0</p>
+      </div>
+      <div class="metric-card">
+        <h3>Cash Balance</h3>
+        <p class="metric-value" id="cashBalance">$0</p>
+      </div>
+    </div>
+
+    <LedgerTable client:load companyId="default" />
+  </div>
+</AppLayout>
+
+<style>
+  .dashboard {
+    padding: 2rem;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .metric-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .metric-card h3 {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+  }
+
+  .metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+  }
+</style>
+
+<script>
+  const API_URL = 'http://localhost:8787';
+  const companyId = 'default';
+
+  async function loadMetrics() {
+    try {
+      const response = await fetch(`${API_URL}/api/ledger/${companyId}/profit-loss`);
+      const data = await response.json();
+
+      document.getElementById('totalRevenue')!.textContent = 
+        `$${data.totalRevenue.toLocaleString()}`;
+      document.getElementById('totalExpenses')!.textContent = 
+        `$${data.totalExpenses.toLocaleString()}`;
+      document.getElementById('netIncome')!.textContent = 
+        `$${data.netIncome.toLocaleString()}`;
+    } catch (error) {
+      console.error('Failed to load metrics:', error);
+    }
+  }
+
+  loadMetrics();
+</script>

@@ -1,0 +1,82 @@
+/* src/components/QuickBooksConnect.css */
+.quickbooks-connect {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.qb-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.qb-logo {
+  width: 40px;
+  height: 40px;
+}
+
+.qb-connect {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.qb-connected {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--bg-light);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #10b981;
+  color: white;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.qb-features {
+  margin-top: 2rem;
+}
+
+.qb-features h4 {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+}
+
+.qb-features ul {
+  list-style: none;
+  padding: 0;
+}
+
+.qb-features li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.qb-features li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--success-color);
+  font-weight: bold;
+}

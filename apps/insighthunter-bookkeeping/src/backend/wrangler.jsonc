@@ -1,3 +1,4 @@
+
 {
   "name": "insighthunter-bookkeeping",
   "main": "src/backend/index.ts",
@@ -16,21 +17,13 @@
       {
         "name": "BOOKKEEPING_CLIENT",
         "class_name": "BookkeepingClient"
-      },
-      {
-        "name": "ENHANCED_LEDGER",
-        "class_name": "EnhancedLedger"
       }
     ]
   },
   "migrations": [
     {
       "tag": "v1",
-      "new_classes": ["BookkeepingLedger", "BookkeepingClient", "EnhancedLedger"]
+      "new_classes": ["BookkeepingLedger", "BookkeepingClient"]
     }
-  ],
-  "vars": {
-    "QUICKBOOKS_ENVIRONMENT": "sandbox",
-    "QUICKBOOKS_REDIRECT_URI": "http://localhost:8787/api/quickbooks/callback"
-  }
+  ]
 }
