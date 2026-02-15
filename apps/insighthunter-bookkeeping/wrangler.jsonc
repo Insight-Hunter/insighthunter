@@ -20,13 +20,22 @@
       {
         "name": "ENHANCED_LEDGER",
         "class_name": "EnhancedLedger"
+      },
+      {
+        "name": "INVOICE_MANAGER",
+        "class_name": "InvoiceManager"
       }
     ]
   },
   "migrations": [
     {
       "tag": "v1",
-      "new_classes": ["BookkeepingLedger", "BookkeepingClient", "EnhancedLedger"]
+      "new_classes": [
+        "BookkeepingLedger",
+        "BookkeepingClient",
+        "EnhancedLedger",
+        "InvoiceManager"
+      ]
     }
   ],
   "vars": {
