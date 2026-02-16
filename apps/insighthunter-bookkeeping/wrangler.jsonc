@@ -1,36 +1,50 @@
-{
-  "name": "insighthunter-bookkeeping",
-  "main": "src/backend/index.ts",
-  "compatibility_date": "2025-03-07",
-  "compatibility_flags": ["nodejs_compat"],
-  "observability": {
-    "enabled": true,
-    "head_sampling_rate": 1
-  },
-  "durable_objects": {
-    "bindings": [
-      {
-        "name": "BOOKKEEPING_LEDGER",
-        "class_name": "BookkeepingLedger"
-      },
-      {
-        "name": "BOOKKEEPING_CLIENT",
-        "class_name": "BookkeepingClient"
-      },
-      {
-        "name": "ENHANCED_LEDGER",
-        "class_name": "EnhancedLedger"
-      }
-    ]
-  },
-  "migrations": [
-    {
-      "tag": "v1",
-      "new_classes": ["BookkeepingLedger", "BookkeepingClient", "EnhancedLedger"]
-    }
-  ],
-  "vars": {
-    "QUICKBOOKS_ENVIRONMENT": "sandbox",
-    "QUICKBOOKS_REDIRECT_URI": "http://localhost:8787/api/quickbooks/callback"
-  }
-}
+name = "insighthunter-bookkeeping"
+main = "src/backend/index.ts"
+compatibility_date = "2025-03-07"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[[durable_objects.bindings]]
+name = "BOOKKEEPING_LEDGER"
+class_name = "BookkeepingLedger"
+
+[[durable_objects.bindings]]
+name = "INVOICE_MANAGER"
+class_name = "InvoiceManager"
+
+[[durable_objects.bindings]]
+name = "SUBSCRIPTION_MANAGER"
+class_name = "SubscriptionManager"
+
+[[durable_objects.bindings]]
+name = "BANK_CONNECTION_MANAGER"
+class_name = "BankConnectionManager"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["BookkeepingLedger", "InvoiceManager", "SubscriptionManager", "BankConnectionManager"]
+
+[[r2_buckets]]
+binding = "SPREADSHEET_UPLOADS"
+bucket_name = "insighthunter-uploads"
+
+[[kv_namespaces]]
+binding = "AUTH_TOKENS"
+id = "your_kv_namespace_id"
+
+[vars]
+QUICKBOOKS_ENVIRONMENT = "sandbox"
+QUICKBOOKS_REDIRECT_URI = "https://dmco.workers.dev/api/quickbooks/callback"
+FRONTEND_URL = "https://insighthunter.app"
+
+# Secrets (set with: wrangler secret put SECRET_NAME)
+# QUICKBOOKS_CLIENT_ID
+# QUICKBOOKS_CLIENT_SECRET
+# STRIPE_SECRET_KEY
+# STRIPE_WEBHOOK_SECRET
+# PLAID_CLIENT_ID
+# PLAID_SECRET
+# OPENAI_API_KEY
