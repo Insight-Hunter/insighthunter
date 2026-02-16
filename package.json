@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@sentry/astro": "^10.38.0",
+    "@spotlightjs/astro": "^3.2.6"
+  }
+}
