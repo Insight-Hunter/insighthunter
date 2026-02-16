@@ -1,0 +1,158 @@
+---
+// src/pages/pricing.astro
+import '../styles/globals.css';
+import PricingCards from '@/components/payment/PricingCards';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing - InsightHunter Bookkeeping</title>
+</head>
+<body>
+  <nav class="simple-nav">
+    <div class="nav-container">
+      <a href="/" class="logo">InsightHunter</a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/login">Log In</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="pricing-hero">
+    <h1>Choose Your Plan</h1>
+    <p>Start with a 14-day free trial. No credit card required.</p>
+  </section>
+
+  <PricingCards client:load />
+
+  <section class="faq">
+    <div class="container">
+      <h2>Frequently Asked Questions</h2>
+      
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h3>Can I change plans later?</h3>
+          <p>Yes! You can upgrade or downgrade at any time. Changes take effect immediately and we'll prorate the difference.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>What happens after the free trial?</h3>
+          <p>Your card will be charged after 14 days. You can cancel anytime during the trial with no charge.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Do you offer refunds?</h3>
+          <p>Yes! We offer a 30-day money-back guarantee on all annual plans. Monthly plans can be cancelled anytime.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>What payment methods do you accept?</h3>
+          <p>We accept all major credit cards (Visa, Mastercard, Amex) and ACH bank transfers for annual plans.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Is my data secure?</h3>
+          <p>Absolutely. We use bank-level 256-bit encryption and are SOC 2 Type II certified. Your data is backed up daily.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Can I import my existing data?</h3>
+          <p>Yes! We support imports from QuickBooks, Excel, CSV, and other major accounting platforms.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
+
+<style>
+  .simple-nav {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1rem 0;
+  }
+
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-decoration: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    color: #4b5563;
+    font-weight: 500;
+  }
+
+  .pricing-hero {
+    text-align: center;
+    padding: 4rem 2rem 2rem;
+  }
+
+  .pricing-hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+  }
+
+  .pricing-hero p {
+    font-size: 1.25rem;
+    color: #6b7280;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+  }
+
+  .faq h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .faq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+
+  .faq-item {
+    padding: 2rem;
+    background: #f9fafb;
+    border-radius: 12px;
+  }
+
+  .faq-item h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .faq-item p {
+    color: #6b7280;
+    line-height: 1.6;
+  }
+</style>
