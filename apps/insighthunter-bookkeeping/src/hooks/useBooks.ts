@@ -1,359 +1,312 @@
-// src/hooks/useBooks.ts
-import { useState, useEffect, useCallback } from 'react';
+// src/components/QuickBooksConnect.tsx
+import { useState, useEffect, useCallback } from "react";
+import { FiCheck, FiRefreshCw, FiAlertTriangle, FiX } from "react-icons/fi";
+import "./QuickBooksConnect.css";
 
-const API_URL = 'http://localhost:8787';
-
-export interface Transaction {
-  id?: string;
-  date: string;
-  description: string;
-  entries: JournalEntry[];
-  status?: 'draft' | 'posted';
-  createdAt?: string;
-  memo?: string;
+interface QBConnection {
+  connected: boolean;
+  realmId: string | null;
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: number;
 }
 
-export interface JournalEntry {
-  accountId: string;
-  accountName: string;
-  type: 'debit' | 'credit';
-  amount: number;
-  memo?: string;
-}
-
-export interface Account {
-  id: string;
-  name: string;
-  type: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense' | 'cost-of-goods-sold';
-  subtype?: string;
-  description?: string;
-  balance?: number;
-}
-
-export interface BalanceSheet {
-  assets: {
-    currentAssets: LineItem[];
-    fixedAssets: LineItem[];
-    total: number;
-  };
-  liabilities: {
-    currentLiabilities: LineItem[];
-    longTermLiabilities: LineItem[];
-    total: number;
-  };
-  equity: {
-    items: LineItem[];
-    total: number;
-  };
-  date: string;
-}
-
-export interface ProfitLoss {
-  revenue: LineItem[];
-  costOfGoodsSold: LineItem[];
-  expenses: LineItem[];
-  totalRevenue: number;
-  totalCOGS: number;
-  grossProfit: number;
-  totalExpenses: number;
-  netIncome: number;
-  startDate: string;
-  endDate: string;
-}
-
-export interface LineItem {
-  name: string;
-  amount: number;
-}
-
-interface UseBooksOptions {
+interface QuickBooksConnectProps {
   companyId: string;
-  autoLoad?: boolean;
 }
 
-export function useBooks({ companyId, autoLoad = true }: UseBooksOptions) {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [loading, setLoading] = useState(false);
+export default function QuickBooksConnect({
+  companyId,
+}: QuickBooksConnectProps) {
+  const [connection, setConnection] = useState<QBConnection | null>(null);
+  const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [authenticating, setAuthenticating] = useState(false);
 
-  // Load transactions from the API
-  const loadTransactions = useCallback(
-    async (filters?: {
-      startDate?: string;
-      endDate?: string;
-      accountId?: string;
-    }) => {
-      setLoading(true);
-      setError(null);
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8787";
 
-      try {
-        const params = new URLSearchParams();
-        if (filters?.startDate) params.append('startDate', filters.startDate);
-        if (filters?.endDate) params.append('endDate', filters.endDate);
-        if (filters?.accountId) params.append('accountId', filters.accountId);
-
-        const response = await fetch(
-          `${API_URL}/api/ledger/${companyId}/transactions?${params.toString()}`
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to load transactions');
+  // Load connection from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`qb-${companyId}`);
+      if (saved) {
+        const QBConnection = JSON.parse(saved);
+        // Check if token expired
+        if (data.connected && data.expiresAt > Date.now()) {
+          setConnection(data);
+        } else {
+          // Clear expired token
+          localStorage.removeItem(`qb-${companyId}`);
         }
-
-        const data = await response.json();
-        setTransactions(data.transactions || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-        console.error('Error loading transactions:', err);
-      } finally {
-        setLoading(false);
       }
+    } catch {
+      localStorage.removeItem(`qb-${companyId}`);
+    }
+  }, [companyId]);
+
+  const saveConnection = useCallback(
+    (QBConnection) => {
+      setConnection(data);
+      localStorage.setItem(`qb-${companyId}`, JSON.stringify(data));
     },
     [companyId]
   );
 
-  // Create a new transaction
-  const createTransaction = useCallback(
-    async (transaction: Transaction) => {
-      setLoading(true);
-      setError(null);
+  const clearConnection = useCallback(() => {
+    setConnection(null);
+    localStorage.removeItem(`qb-${companyId}`);
+  }, [companyId]);
 
-      try {
-        const response = await fetch(
-          `${API_URL}/api/ledger/${companyId}/transaction`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(transaction),
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to create transaction');
-        }
-
-        const data = await response.json();
-        
-        // Add the new transaction to the state
-        setTransactions((prev) => [data.transaction, ...prev]);
-        
-        return data.transaction;
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-        console.error('Error creating transaction:', err);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [companyId]
-  );
-
-  // Load balance sheet
-  const getBalanceSheet = useCallback(async (): Promise<BalanceSheet | null> => {
-    setLoading(true);
+  const connectQuickBooks = async () => {
+    setAuthenticating(true);
     setError(null);
 
     try {
       const response = await fetch(
-        `${API_URL}/api/ledger/${companyId}/balance-sheet`
+        `${API_URL}/api/ledger/${companyId}/quickbooks/auth`,
+        {
+          credentials: "include",
+        }
       );
 
       if (!response.ok) {
-        throw new Error('Failed to load balance sheet');
+        throw new Error(`Auth init failed: ${response.status}`);
       }
 
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-      console.error('Error loading balance sheet:', err);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId]);
+      const { authUrl, state } = await response.json();
 
-  // Load profit & loss statement
-  const getProfitLoss = useCallback(
-    async (startDate?: string, endDate?: string): Promise<ProfitLoss | null> => {
-      setLoading(true);
-      setError(null);
+      // Store state for CSRF protection
+      sessionStorage.setItem(`qb-state-${companyId}`, state);
 
-      try {
-        const params = new URLSearchParams();
-        if (startDate) params.append('startDate', startDate);
-        if (endDate) params.append('endDate', endDate);
+      const popup = window.open(
+        authUrl,
+        "QuickBooksOAuth",
+        "width=600,height=700,noopener,noreferrer"
+      );
 
-        const response = await fetch(
-          `${API_URL}/api/ledger/${companyId}/profit-loss?${params.toString()}`
-        );
+      if (!popup) {
+        throw new Error("Popup blocked. Please allow popups.");
+      }
 
-        if (!response.ok) {
-          throw new Error('Failed to load profit & loss');
+      const handleMessage = (event: MessageEvent) => {
+        // Strict origin validation
+        const validOrigins = [
+          window.location.origin,
+          "https://appcenter.intuit.com",
+          "https://developer.api.intuit.com",
+          "http://localhost:3000",
+        ];
+
+        if (!validOrigins.includes(event.origin)) return;
+
+        const data = event.data as { type: string; payload?: any };
+
+        if (data.type === "quickbooks:callback") {
+          const storedState = sessionStorage.getItem(`qb-state-${companyId}`);
+          if (data.payload?.state !== storedState) {
+            setError("OAuth state mismatch - possible attack");
+            return;
+          }
+
+          if (data.payload?.error) {
+            setError(`QuickBooks error: ${data.payload.error_description}`);
+          } else if (data.payload?.realmId && data.payload?.access_token) {
+            const expiresAt = Date.now() + data.payload.expires_in * 1000;
+            saveConnection({
+              connected: true,
+              realmId: data.payload.realmId,
+              accessToken: data.payload.access_token,
+              refreshToken: data.payload.refresh_token || "",
+              expiresAt,
+            });
+          }
+
+          sessionStorage.removeItem(`qb-state-${companyId}`);
+          if (popup) popup.close();
         }
+      };
 
-        const data = await response.json();
-        return data;
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-        console.error('Error loading profit & loss:', err);
-        return null;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [companyId]
-  );
+      window.addEventListener("message", handleMessage);
 
-  // Get account balance
-  const getAccountBalance = useCallback(
-    (accountId: string): number => {
-      const account = accounts.find((a) => a.id === accountId);
-      return account?.balance || 0;
-    },
-    [accounts]
-  );
+      // Cleanup after 5 minutes or popup close
+      const timeout = setTimeout(() => {
+        window.removeEventListener("message", handleMessage);
+        setAuthenticating(false);
+      }, 300000);
 
-  // Calculate trial balance
-  const getTrialBalance = useCallback(() => {
-    let totalDebits = 0;
-    let totalCredits = 0;
-
-    accounts.forEach((account) => {
-      const balance = account.balance || 0;
-      
-      // Assets, Expenses, and COGS have debit balances
-      if (
-        account.type === 'asset' ||
-        account.type === 'expense' ||
-        account.type === 'cost-of-goods-sold'
-      ) {
-        totalDebits += balance;
-      } else {
-        // Liabilities, Equity, and Revenue have credit balances
-        totalCredits += balance;
-      }
-    });
-
-    return {
-      debits: totalDebits,
-      credits: totalCredits,
-      isBalanced: Math.abs(totalDebits - totalCredits) < 0.01,
-      difference: totalDebits - totalCredits,
-    };
-  }, [accounts]);
-
-  // Auto-load transactions on mount
-  useEffect(() => {
-    if (autoLoad) {
-      loadTransactions();
+      popup.onbeforeunload = () => {
+        clearTimeout(timeout);
+        window.removeEventListener("message", handleMessage);
+        setAuthenticating(false);
+      };
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Connection failed");
+      console.error("QB Connect error:", err);
+    } finally {
+      setAuthenticating(false);
     }
-  }, [autoLoad, loadTransactions]);
-
-  return {
-    transactions,
-    accounts,
-    loading,
-    error,
-    loadTransactions,
-    createTransaction,
-    getBalanceSheet,
-    getProfitLoss,
-    getAccountBalance,
-    getTrialBalance,
   };
-}
 
-// Hook for managing a single transaction draft
-export function useTransactionDraft() {
-  const [draft, setDraft] = useState<Transaction>({
-    date: new Date().toISOString().split('T')[0],
-    description: '',
-    entries: [
-      { accountId: '', accountName: '', type: 'debit', amount: 0 },
-      { accountId: '', accountName: '', type: 'credit', amount: 0 },
-    ],
-  });
+  const syncQuickBooks = async () => {
+    if (!connection?.realmId) {
+      setError("No QuickBooks connection");
+      return;
+    }
 
-  const updateField = useCallback((field: keyof Transaction, value: any) => {
-    setDraft((prev) => ({ ...prev, [field]: value }));
-  }, []);
+    setSyncing(true);
+    setError(null);
 
-  const updateEntry = useCallback(
-    (index: number, field: keyof JournalEntry, value: any) => {
-      setDraft((prev) => {
-        const entries = [...prev.entries];
-        entries[index] = { ...entries[index], [field]: value };
-        return { ...prev, entries };
+    try {
+      const response = await fetch(
+        `${API_URL}/api/ledger/${companyId}/quickbooks/sync`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            realmId: connection.realmId,
+            fullSync: false, // Incremental by default
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Sync failed");
+      }
+
+      // Optionally get sync results
+      const result = await response.json();
+      console.log("Sync result:", result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sync error");
+      console.error("QB Sync error:", err);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const disconnectQuickBooks = async () => {
+    try {
+      await fetch(`${API_URL}/api/ledger/${companyId}/quickbooks/disconnect`, {
+        method: "POST",
+        credentials: "include",
       });
-    },
-    []
-  );
-
-  const addEntry = useCallback((type: 'debit' | 'credit' = 'debit') => {
-    setDraft((prev) => ({
-      ...prev,
-      entries: [
-        ...prev.entries,
-        { accountId: '', accountName: '', type, amount: 0 },
-      ],
-    }));
-  }, []);
-
-  const removeEntry = useCallback((index: number) => {
-    setDraft((prev) => ({
-      ...prev,
-      entries: prev.entries.filter((_, i) => i !== index),
-    }));
-  }, []);
-
-  const reset = useCallback(() => {
-    setDraft({
-      date: new Date().toISOString().split('T')[0],
-      description: '',
-      entries: [
-        { accountId: '', accountName: '', type: 'debit', amount: 0 },
-        { accountId: '', accountName: '', type: 'credit', amount: 0 },
-      ],
-    });
-  }, []);
-
-  // Calculate if the transaction is balanced
-  const isBalanced = useCallback(() => {
-    const debits = draft.entries
-      .filter((e) => e.type === 'debit')
-      .reduce((sum, e) => sum + Number(e.amount), 0);
-
-    const credits = draft.entries
-      .filter((e) => e.type === 'credit')
-      .reduce((sum, e) => sum + Number(e.amount), 0);
-
-    return Math.abs(debits - credits) < 0.01;
-  }, [draft]);
-
-  const getTotals = useCallback(() => {
-    const debits = draft.entries
-      .filter((e) => e.type === 'debit')
-      .reduce((sum, e) => sum + Number(e.amount), 0);
-
-    const credits = draft.entries
-      .filter((e) => e.type === 'credit')
-      .reduce((sum, e) => sum + Number(e.amount), 0);
-
-    return { debits, credits, difference: debits - credits };
-  }, [draft]);
-
-  return {
-    draft,
-    updateField,
-    updateEntry,
-    addEntry,
-    removeEntry,
-    reset,
-    isBalanced: isBalanced(),
-    totals: getTotals(),
+    } catch (err) {
+      console.error("Disconnect error:", err);
+    } finally {
+      clearConnection();
+      setError(null);
+    }
   };
+
+  const dismissError = () => setError(null);
+
+  return (
+    <div className="quickbooks-connect">
+      <div className="qb-header">
+        <img
+          src="/quickbooks-logo.svg"
+          alt="QuickBooks"
+          className="qb-logo"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src =
+              "https://upload.wikimedia.org/wikipedia/commons/1/1a/QuickBooks_Logo.png";
+          }}
+        />
+        <div>
+          <h3>QuickBooks Online</h3>
+          <p className="qb-subtitle">
+            Sync accounts, customers, invoices & transactions
+          </p>
+        </div>
+      </div>
+
+      {error && (
+        <div className="error-banner">
+          <FiAlertTriangle />
+          {error}
+          <button
+            onClick={dismissError}
+            className="dismiss-btn"
+            aria-label="Dismiss error"
+          >
+            <FiX />
+          </button>
+        </div>
+      )}
+
+      {!connection?.connected ? (
+        <div className="qb-connect">
+          <div className="connect-info">
+            <p>Connect your QuickBooks company to automatically sync:</p>
+            <ul className="sync-features">
+              <li>✓ Chart of Accounts</li>
+              <li>✓ Customers &amp; Vendors</li>
+              <li>✓ Invoices &amp; Bills</li>
+              <li>✓ Bank Transactions</li>
+              <li>✓ Journal Entries</li>
+            </ul>
+          </div>
+          <button
+            onClick={connectQuickBooks}
+            disabled={authenticating}
+            className="btn-primary qb-connect-btn"
+          >
+            {authenticating ? (
+              <>
+                <FiRefreshCw className="spinning" />
+                Authorizing...
+              </>
+            ) : (
+              "Connect QuickBooks Online"
+            )}
+          </button>
+        </div>
+      ) : (
+        <div className="qb-connected">
+          <div className="status-section">
+            <div className="status-badge success">
+              <FiCheck />
+              <span>Connected</span>
+              <small>Realm ID: {connection.realmId?.slice(-8)}</small>
+            </div>
+            <div className="token-status">
+              {Date.now() > connection.expiresAt * 0.9 ? (
+                <span className="token-warning">Token expires soon</span>
+              ) : (
+                <span className="token-good">Token valid</span>
+              )}
+            </div>
+          </div>
+
+          <div className="action-buttons">
+            <button
+              onClick={syncQuickBooks}
+              disabled={syncing}
+              className="btn-primary qb-sync-btn"
+            >
+              {syncing ? (
+                <>
+                  <FiRefreshCw className="spinning" />
+                  Syncing...
+                </>
+              ) : (
+                <>
+                  <FiRefreshCw />
+                  Sync Now
+                </>
+              )}
+            </button>
+            <button
+              onClick={disconnectQuickBooks}
+              className="btn-secondary qb-disconnect"
+            >
+              Disconnect
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }

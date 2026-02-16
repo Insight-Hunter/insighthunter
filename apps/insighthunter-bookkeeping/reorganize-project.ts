@@ -1,8 +1,8 @@
-#!/usr/bin/env node
-// reorganize-project.js
+#!/usr/bin/env ts-node
+// reorganize-project.ts
 
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Color codes for terminal output
 const colors = {
@@ -12,18 +12,18 @@ const colors = {
   blue: '\x1b[34m',
   red: '\x1b[31m',
   cyan: '\x1b[36m',
-};
+} as const;
 
 const log = {
-  info: (msg) => console.log(`${colors.blue}ℹ${colors.reset} ${msg}`),
-  success: (msg) => console.log(`${colors.green}✓${colors.reset} ${msg}`),
-  warning: (msg) => console.log(`${colors.yellow}⚠${colors.reset} ${msg}`),
-  error: (msg) => console.log(`${colors.red}✗${colors.reset} ${msg}`),
-  section: (msg) => console.log(`\n${colors.cyan}━━━ ${msg} ━━━${colors.reset}\n`),
+  info: (msg: string) => console.log(`${colors.blue}ℹ${colors.reset} ${msg}`),
+  success: (msg: string) => console.log(`${colors.green}✓${colors.reset} ${msg}`),
+  warning: (msg: string) => console.log(`${colors.yellow}⚠${colors.reset} ${msg}`),
+  error: (msg: string) => console.log(`${colors.red}✗${colors.reset} ${msg}`),
+  section: (msg: string) => console.log(`\n${colors.cyan}━━━ ${msg} ━━━${colors.reset}\n`),
 };
 
-// Target directory structure (only directories, no duplicates)
-const DIRECTORIES = [
+// Target directory structure
+const DIRECTORIES: string[] = [
   'src/backend/durable-objects',
   'src/backend/integrations',
   'src/backend/utils',
@@ -45,9 +45,13 @@ const DIRECTORIES = [
   'docs',
 ];
 
-// Intelligent file mapping based on patterns
-const FILE_PATTERNS = {
-  // Backend patterns
+// File pattern mapping
+interface FilePattern {
+  pattern: RegExp;
+  target: string;
+}
+
+const FILE_PATTERNS: Record<string, FilePattern[]> = {
   backend: [
     { pattern: /^(src\/)?index\.ts$/, target: 'src/backend/index.ts' },
     { pattern: /^(src\/)?worker\.ts$/, target: 'src/backend/index.ts' },
@@ -60,9 +64,9 @@ const FILE_PATTERNS = {
     { pattern: /stripe\.ts$/, target: 'src/backend/integrations/stripe.ts' },
     { pattern: /ai-reconciliation\.ts$/, target: 'src/backend/integrations/ai-reconciliation.ts' },
     { pattern: /pricing\.ts$/, target: 'src/backend/utils/pricing.ts' },
+    { pattern: /validators\.ts$/, target: 'src/backend/utils/validators.ts' },
   ],
   
-  // Component patterns
   components: [
     { pattern: /SignupForm\.tsx$/, target: 'src/components/auth/SignupForm.tsx' },
     { pattern: /LoginForm\.tsx$/, target: 'src/components/auth/LoginForm.tsx' },
@@ -70,10 +74,18 @@ const FILE_PATTERNS = {
     { pattern: /PricingCards\.tsx$/, target: 'src/components/payment/PricingCards.tsx' },
     { pattern: /PricingCards\.css$/, target: 'src/components/payment/PricingCards.css' },
     { pattern: /CheckoutForm\.tsx$/, target: 'src/components/payment/CheckoutForm.tsx' },
+    { pattern: /CheckoutForm\.css$/, target: 'src/components/payment/CheckoutForm.css' },
+    { pattern: /SubscriptionStatus\.tsx$/, target: 'src/components/payment/SubscriptionStatus.tsx' },
+    { pattern: /PaymentMethod\.tsx$/, target: 'src/components/payment/PaymentMethod.tsx' },
     { pattern: /PlaidLink\.tsx$/, target: 'src/components/banking/PlaidLink.tsx' },
     { pattern: /BankAccountList\.tsx$/, target: 'src/components/banking/BankAccountList.tsx' },
+    { pattern: /BankAccountList\.css$/, target: 'src/components/banking/BankAccountList.css' },
+    { pattern: /TransactionSync\.tsx$/, target: 'src/components/banking/TransactionSync.tsx' },
+    { pattern: /BankingComponents\.css$/, target: 'src/components/banking/BankingComponents.css' },
     { pattern: /SpreadsheetUploader\.tsx$/, target: 'src/components/upload/SpreadsheetUploader.tsx' },
     { pattern: /SpreadsheetUploader\.css$/, target: 'src/components/upload/SpreadsheetUploader.css' },
+    { pattern: /FileProcessor\.tsx$/, target: 'src/components/upload/FileProcessor.tsx' },
+    { pattern: /ImportWizard\.tsx$/, target: 'src/components/upload/ImportWizard.tsx' },
     { pattern: /LedgerTable\.tsx$/, target: 'src/components/bookkeeping/LedgerTable.tsx' },
     { pattern: /LedgerTable\.css$/, target: 'src/components/bookkeeping/LedgerTable.css' },
     { pattern: /TransactionRow\.tsx$/, target: 'src/components/bookkeeping/TransactionRow.tsx' },
@@ -96,52 +108,81 @@ const FILE_PATTERNS = {
     { pattern: /AccountSelector\.css$/, target: 'src/components/bookkeeping/AccountSelector.css' },
     { pattern: /OnboardingWizard\.tsx$/, target: 'src/components/onboarding/OnboardingWizard.tsx' },
     { pattern: /OnboardingWizard\.css$/, target: 'src/components/onboarding/OnboardingWizard.css' },
+    { pattern: /CompanySetup\.tsx$/, target: 'src/components/onboarding/CompanySetup.tsx' },
+    { pattern: /StepIndicator\.tsx$/, target: 'src/components/onboarding/StepIndicator.tsx' },
     { pattern: /QuickBooksConnect\.tsx$/, target: 'src/components/quickbooks/QuickBooksConnect.tsx' },
     { pattern: /QuickBooksConnect\.css$/, target: 'src/components/quickbooks/QuickBooksConnect.css' },
+    { pattern: /SyncStatus\.tsx$/, target: 'src/components/quickbooks/SyncStatus.tsx' },
+    { pattern: /ImportExport\.tsx$/, target: 'src/components/quickbooks/ImportExport.tsx' },
     { pattern: /NavBar\.tsx$/, target: 'src/components/shared/NavBar.tsx' },
     { pattern: /NavBar\.css$/, target: 'src/components/shared/NavBar.css' },
+    { pattern: /Sidebar\.tsx$/, target: 'src/components/shared/Sidebar.tsx' },
+    { pattern: /Sidebar\.css$/, target: 'src/components/shared/Sidebar.css' },
+    { pattern: /LoadingSpinner\.tsx$/, target: 'src/components/shared/LoadingSpinner.tsx' },
+    { pattern: /Modal\.tsx$/, target: 'src/components/shared/Modal.tsx' },
+    { pattern: /Toast\.tsx$/, target: 'src/components/shared/Toast.tsx' },
+    { pattern: /ErrorBoundary\.tsx$/, target: 'src/components/shared/ErrorBoundary.tsx' },
   ],
   
-  // Hook patterns
   hooks: [
     { pattern: /useBooks\.ts$/, target: 'src/hooks/useBooks.ts' },
     { pattern: /useSubscription\.ts$/, target: 'src/hooks/useSubscription.ts' },
     { pattern: /useBankAccounts\.ts$/, target: 'src/hooks/useBankAccounts.ts' },
+    { pattern: /useUpload\.ts$/, target: 'src/hooks/useUpload.ts' },
+    { pattern: /useAuth\.ts$/, target: 'src/hooks/useAuth.ts' },
     { pattern: /useReconciliation\.ts$/, target: 'src/hooks/useReconciliation.ts' },
     { pattern: /useReports\.ts$/, target: 'src/hooks/useReports.ts' },
   ],
   
-  // Util patterns
   utils: [
     { pattern: /ledgerMath\.ts$/, target: 'src/utils/ledgerMath.ts' },
     { pattern: /dateUtils\.ts$/, target: 'src/utils/dateUtils.ts' },
     { pattern: /bookkeepingApi\.ts$/, target: 'src/utils/api.ts' },
+    { pattern: /formatting\.ts$/, target: 'src/utils/formatting.ts' },
   ],
   
-  // Type patterns
   types: [
     { pattern: /types\/bookkeeping\.ts$/, target: 'src/types/bookkeeping.ts' },
     { pattern: /types\/subscription\.ts$/, target: 'src/types/subscription.ts' },
     { pattern: /types\/banking\.ts$/, target: 'src/types/banking.ts' },
     { pattern: /types\/invoice\.ts$/, target: 'src/types/invoice.ts' },
+    { pattern: /types\/auth\.ts$/, target: 'src/types/auth.ts' },
     { pattern: /types\/index\.ts$/, target: 'src/types/index.ts' },
   ],
   
-  // Style patterns
   styles: [
     { pattern: /bookkeeping\.css$/, target: 'src/styles/bookkeeping.css' },
     { pattern: /tables\.css$/, target: 'src/styles/tables.css' },
     { pattern: /globals?\.css$/, target: 'src/styles/globals.css' },
+    { pattern: /forms\.css$/, target: 'src/styles/forms.css' },
+    { pattern: /variables\.css$/, target: 'src/styles/variables.css' },
   ],
   
-  // Layout patterns
   layouts: [
     { pattern: /AppLayout\.astro$/, target: 'src/layouts/AppLayout.astro' },
+    { pattern: /AuthLayout\.astro$/, target: 'src/layouts/AuthLayout.astro' },
+  ],
+  
+  pages: [
+    { pattern: /pages\/index\.astro$/, target: 'src/pages/index.astro' },
+    { pattern: /pages\/pricing\.astro$/, target: 'src/pages/pricing.astro' },
+    { pattern: /pages\/signup\.astro$/, target: 'src/pages/signup.astro' },
+    { pattern: /pages\/login\.astro$/, target: 'src/pages/login.astro' },
+    { pattern: /pages\/checkout\.astro$/, target: 'src/pages/checkout.astro' },
+    { pattern: /pages\/onboarding\.astro$/, target: 'src/pages/onboarding.astro' },
+    { pattern: /pages\/dashboard\.astro$/, target: 'src/pages/dashboard.astro' },
+    { pattern: /pages\/bank-connections\.astro$/, target: 'src/pages/bank-connections.astro' },
+    { pattern: /pages\/upload\.astro$/, target: 'src/pages/upload.astro' },
+    { pattern: /pages\/invoices\.astro$/, target: 'src/pages/invoices.astro' },
+    { pattern: /pages\/reconciliation\.astro$/, target: 'src/pages/reconciliation.astro' },
+    { pattern: /pages\/reports\.astro$/, target: 'src/pages/reports.astro' },
+    { pattern: /pages\/clients\.astro$/, target: 'src/pages/clients.astro' },
+    { pattern: /pages\/settings\.astro$/, target: 'src/pages/settings.astro' },
   ],
 };
 
-// Files to create if missing
-const REQUIRED_FILES = {
+// Required files to create
+const REQUIRED_FILES: Record<string, string> = {
   '.gitignore': `# Dependencies
 node_modules/
 .pnpm-store/
@@ -151,7 +192,7 @@ dist/
 .astro/
 .wrangler/
 
-# Environment variables
+# Environment
 .env
 .env.local
 .env.production
@@ -159,9 +200,8 @@ dist/
 
 # Logs
 *.log
-npm-debug.log*
 
-# OS files
+# OS
 .DS_Store
 Thumbs.db
 
@@ -169,9 +209,8 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
-*.swo
 
-# Temporary files
+# Temporary
 *.tmp
 .cache/
 
@@ -181,23 +220,23 @@ Thumbs.db
 `,
 
   '.env.example': `# QuickBooks
-QUICKBOOKS_CLIENT_ID=your_quickbooks_client_id
-QUICKBOOKS_CLIENT_SECRET=your_quickbooks_client_secret
+QUICKBOOKS_CLIENT_ID=your_client_id
+QUICKBOOKS_CLIENT_SECRET=your_client_secret
 QUICKBOOKS_REDIRECT_URI=https://your-domain.workers.dev/api/quickbooks/callback
 QUICKBOOKS_ENVIRONMENT=sandbox
 
 # Stripe
-STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
-STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
-STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+STRIPE_SECRET_KEY=sk_test_your_key
+STRIPE_PUBLISHABLE_KEY=pk_test_your_key
+STRIPE_WEBHOOK_SECRET=whsec_your_secret
 
 # Plaid
-PLAID_CLIENT_ID=your_plaid_client_id
-PLAID_SECRET=your_plaid_secret
+PLAID_CLIENT_ID=your_client_id
+PLAID_SECRET=your_secret
 PLAID_ENV=sandbox
 
 # OpenAI
-OPENAI_API_KEY=sk-your_openai_api_key
+OPENAI_API_KEY=sk-your_key
 
 # Frontend
 PUBLIC_API_URL=http://localhost:8787
@@ -210,11 +249,9 @@ set -e
 echo "🚀 Setting up InsightHunter Bookkeeping..."
 
 if ! command -v wrangler &> /dev/null; then
-    echo "Installing Wrangler CLI..."
     npm install -g wrangler
 fi
 
-echo "Logging in to Cloudflare..."
 wrangler login
 
 echo "Creating KV namespaces..."
@@ -232,7 +269,7 @@ wrangler r2 bucket create insighthunter-uploads-prod 2>/dev/null || true
 
 echo ""
 echo "✅ Setup complete!"
-echo "📋 Update wrangler.toml with the KV namespace IDs shown above"
+echo "Update wrangler.toml with the KV namespace IDs above"
 `,
 
   'deploy.sh': `#!/bin/bash
@@ -240,20 +277,15 @@ set -e
 
 echo "🚀 Deploying InsightHunter Bookkeeping..."
 
-if [ ! -d "node_modules" ]; then
-    npm install
-fi
+[ ! -d "node_modules" ] && npm install
 
-echo "Running type check..."
 npm run type-check || true
-
-echo "Building..."
 npm run build
 
 echo ""
 echo "Select environment:"
 echo "1) Development"
-echo "2) Staging"
+echo "2) Staging"  
 echo "3) Production"
 read -p "Choice (1-3): " choice
 
@@ -263,15 +295,51 @@ case $choice in
     3)
         ENV="production"
         read -p "Deploy to PRODUCTION? (yes/no): " confirm
-        [ "$confirm" != "yes" ] && echo "Cancelled" && exit 1
+        [ "$confirm" != "yes" ] && exit 1
         ;;
-    *) echo "Invalid choice" && exit 1 ;;
+    *) echo "Invalid" && exit 1 ;;
 esac
 
 echo "Deploying to $ENV..."
 [ "$ENV" = "production" ] && wrangler deploy || wrangler deploy --env $ENV
 
-echo "✅ Deployment complete!"
+echo "✅ Complete!"
+`,
+
+  'README.md': `# InsightHunter Bookkeeping
+
+AI-powered bookkeeping with bank integration and real-time insights.
+
+## Quick Start
+
+\`\`\`bash
+npm install
+./setup-resources.sh
+npm run worker:dev  # Backend
+npm run dev         # Frontend
+\`\`\`
+
+## Deployment
+
+\`\`\`bash
+./deploy.sh
+\`\`\`
+
+## Features
+
+- Double-entry bookkeeping
+- AI reconciliation
+- Bank integration (Plaid)
+- QuickBooks sync
+- Invoice management
+- Multi-tier pricing
+- Stripe payments
+
+## Docs
+
+- [API](./docs/API.md)
+- [Deployment](./docs/DEPLOYMENT.md)
+- [Development](./docs/DEVELOPMENT.md)
 `,
 
   'src/types/index.ts': `export * from './bookkeeping';
@@ -296,163 +364,8 @@ export interface Session {
 }
 `,
 
-  'src/components/auth/LoginForm.tsx': `import { useState } from 'react';
-import './AuthForms.css';
-
-export default function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Login:', { email, password });
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="auth-form">
-      <div className="form-group">
-        <label>Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label>Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
-      <button type="submit" className="submit-btn">
-        Log In
-      </button>
-    </form>
-  );
-}
-`,
-
-  'src/components/shared/LoadingSpinner.tsx': `export default function LoadingSpinner() {
-  return <div className="spinner"><div className="spinner-circle"></div></div>;
-}
-`,
-
-  'src/components/shared/Modal.tsx': `import { ReactNode } from 'react';
-
-interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: ReactNode;
-  title?: string;
-}
-
-export default function Modal({ isOpen, onClose, children, title }: ModalProps) {
-  if (!isOpen) return null;
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        {title && <h2>{title}</h2>}
-        {children}
-      </div>
-    </div>
-  );
-}
-`,
-
-  'src/components/shared/Toast.tsx': `import { useEffect } from 'react';
-
-interface ToastProps {
-  message: string;
-  type?: 'success' | 'error' | 'info';
-  onClose: () => void;
-}
-
-export default function Toast({ message, type = 'info', onClose }: ToastProps) {
-  useEffect(() => {
-    const timer = setTimeout(onClose, 3000);
-    return () => clearTimeout(timer);
-  }, [onClose]);
-
-  return <div className={\`toast toast-\${type}\`}>{message}</div>;
-}
-`,
-
-  'src/components/shared/ErrorBoundary.tsx': `import { Component, ReactNode } from 'react';
-
-interface Props {
-  children: ReactNode;
-}
-
-interface State {
-  hasError: boolean;
-  error?: Error;
-}
-
-export default class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="error-boundary">
-          <h2>Something went wrong</h2>
-          <p>{this.state.error?.message}</p>
-          <button onClick={() => window.location.reload()}>Reload</button>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-`,
-
-  'src/layouts/AuthLayout.astro': `---
-const { title } = Astro.props;
-import '../styles/globals.css';
----
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{title} - InsightHunter</title>
-</head>
-<body>
-  <slot />
-</body>
-</html>
-`,
-
-  'src/pages/login.astro': `---
-import AuthLayout from '@/layouts/AuthLayout.astro';
-import LoginForm from '@/components/auth/LoginForm';
----
-<AuthLayout title="Log In">
-  <div class="auth-container">
-    <div class="auth-card">
-      <h1>InsightHunter</h1>
-      <h2>Welcome back</h2>
-      <LoginForm client:load />
-      <p>Don't have an account? <a href="/signup">Sign up</a></p>
-    </div>
-  </div>
-</AuthLayout>
-`,
-
   'public/robots.txt': `User-agent: *
 Allow: /
-Sitemap: https://insighthunter.com/sitemap.xml
 `,
 
   'public/manifest.webmanifest': `{
@@ -461,49 +374,44 @@ Sitemap: https://insighthunter.com/sitemap.xml
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#667eea",
-  "icons": [
-    {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    }
-  ]
+  "theme_color": "#667eea"
 }
 `,
 
   'docs/API.md': `# API Documentation
 
-## Authentication
+## Endpoints
+
+### Auth
 - POST /api/auth/signup
 - POST /api/auth/login
 
-## Subscriptions
+### Subscriptions  
 - POST /api/subscriptions/create
 - GET /api/subscriptions/:userId
 
-## Banking
+### Banking
 - POST /api/bank/create-link-token
 - POST /api/bank/exchange-token
 
-## Ledger
+### Ledger
 - POST /api/ledger/:companyId/transaction
 - GET /api/ledger/:companyId/transactions
 `,
 
-  'docs/DEPLOYMENT.md': `# Deployment Guide
+  'docs/DEPLOYMENT.md': `# Deployment
 
-1. Run \`./setup-resources.sh\`
-2. Update \`wrangler.toml\` with KV IDs
-3. Run \`./deploy.sh\`
+1. \`./setup-resources.sh\`
+2. Update wrangler.toml with KV IDs
+3. \`./deploy.sh\`
 `,
 
-  'docs/DEVELOPMENT.md': `# Development Guide
+  'docs/DEVELOPMENT.md': `# Development
 
 \`\`\`bash
 npm install
-npm run worker:dev  # Backend
-npm run dev         # Frontend
+npm run worker:dev
+npm run dev
 \`\`\`
 `,
 
@@ -516,7 +424,7 @@ npm run dev         # Frontend
 };
 
 // Main function
-async function reorganizeProject() {
+async function reorganizeProject(): Promise<void> {
   const rootDir = process.cwd();
   
   log.section('InsightHunter Bookkeeping Reorganization');
@@ -532,17 +440,13 @@ async function reorganizeProject() {
     }
   }
   
-  // Step 2: Find and move files
+  // Step 2: Move files
   log.section('Moving Files');
-  const movedFiles = new Set();
-  
-  // Get all existing files
+  const movedFiles = new Set<string>();
   const allFiles = getAllFiles(rootDir);
   
-  // Process each pattern category
   for (const [category, patterns] of Object.entries(FILE_PATTERNS)) {
     for (const { pattern, target } of patterns) {
-      // Find matching files
       const matches = allFiles.filter(file => {
         const relativePath = path.relative(rootDir, file);
         return pattern.test(relativePath) && !movedFiles.has(file);
@@ -551,28 +455,25 @@ async function reorganizeProject() {
       for (const sourcePath of matches) {
         const targetPath = path.join(rootDir, target);
         
-        // Skip if source and target are the same
         if (path.resolve(sourcePath) === path.resolve(targetPath)) {
           continue;
         }
         
-        // Create target directory
         const targetDir = path.dirname(targetPath);
         if (!fs.existsSync(targetDir)) {
           fs.mkdirSync(targetDir, { recursive: true });
         }
         
-        // Move file
         try {
           if (fs.existsSync(targetPath)) {
-            log.warning(`Target exists, skipping: ${target}`);
+            log.warning(`Target exists: ${target}`);
           } else {
             fs.renameSync(sourcePath, targetPath);
             movedFiles.add(sourcePath);
             log.success(`Moved: ${path.relative(rootDir, sourcePath)} → ${target}`);
           }
         } catch (error) {
-          log.error(`Failed to move ${sourcePath}: ${error.message}`);
+          log.error(`Failed: ${(error as Error).message}`);
         }
       }
     }
@@ -601,26 +502,26 @@ async function reorganizeProject() {
     const scriptPath = path.join(rootDir, script);
     if (fs.existsSync(scriptPath)) {
       fs.chmodSync(scriptPath, '755');
-      log.success(`Made executable: ${script}`);
+      log.success(`Executable: ${script}`);
     }
   }
   
-  // Step 5: Summary
-  log.section('Reorganization Complete!');
+  // Summary
+  log.section('Complete!');
   log.info(`Files moved: ${movedFiles.size}`);
   log.info(`Directories created: ${DIRECTORIES.length}`);
   
   log.section('Next Steps');
-  console.log('1. Review changes: git status');
-  console.log('2. Update imports in your code');
-  console.log('3. Run: npm install');
-  console.log('4. Run: ./setup-resources.sh');
-  console.log('5. Update wrangler.toml with KV IDs');
-  console.log('6. Run: npm run worker:dev');
+  console.log('1. git status');
+  console.log('2. Update imports');
+  console.log('3. npm install');
+  console.log('4. ./setup-resources.sh');
+  console.log('5. Update wrangler.toml');
+  console.log('6. npm run worker:dev');
 }
 
-// Helper: Get all files recursively
-function getAllFiles(dirPath, arrayOfFiles = []) {
+// Helper function
+function getAllFiles(dirPath: string, arrayOfFiles: string[] = []): string[] {
   if (!fs.existsSync(dirPath)) return arrayOfFiles;
   
   const files = fs.readdirSync(dirPath);
@@ -628,9 +529,8 @@ function getAllFiles(dirPath, arrayOfFiles = []) {
   files.forEach((file) => {
     const fullPath = path.join(dirPath, file);
     
-    // Skip certain directories
-    if (file === 'node_modules' || file === 'dist' || file === '.git' || 
-        file === '.wrangler' || file === '.astro' || file.startsWith('.')) {
+    const skipDirs = ['node_modules', 'dist', '.git', '.wrangler', '.astro'];
+    if (skipDirs.includes(file) || file.startsWith('.')) {
       return;
     }
     
@@ -644,9 +544,8 @@ function getAllFiles(dirPath, arrayOfFiles = []) {
   return arrayOfFiles;
 }
 
-// Run
+// Execute
 reorganizeProject().catch((error) => {
-  log.error(`Fatal error: ${error.message}`);
-  console.error(error);
+  log.error(`Fatal: ${error.message}`);
   process.exit(1);
 });
