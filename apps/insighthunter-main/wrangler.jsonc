@@ -1,0 +1,93 @@
+// wrangler.jsonc
+{
+  "name": "cloud-pbx",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  // ── Workers AI ───────────────────────────────────────────────────────────────
+  // No external API key needed — billed through your Cloudflare account.
+  // Supports: @cf/meta/llama-3.1-8b-instruct (default, fast)
+  //           @cf/meta/llama-3.3-70b-instruct-fp8-fast (smarter, more tokens)
+  //           @cf/mistral/mistral-7b-instruct-v0.1
+  "ai": {
+    "binding": "AI"
+  },
+
+  // ── D1 Database ──────────────────────────────────────────────────────────────
+  "d1_databases": [
+    {
+      "binding": "PBX_DB",
+      "database_name": "cloud-pbx-db",
+      "database_id": "YOUR_D1_DATABASE_ID" // wrangler d1 create cloud-pbx-db
+    }
+  ],
+
+  // ── R2 Buckets ───────────────────────────────────────────────────────────────
+  "r2_buckets": [
+    {
+      "binding": "VOICEMAIL_BUCKET",
+      "bucket_name": "cloud-pbx-voicemails"
+    },
+    {
+      "binding": "RECORDINGS_BUCKET",
+      "bucket_name": "cloud-pbx-recordings"
+    }
+  ],
+
+  // ── KV Namespaces ────────────────────────────────────────────────────────────
+  "kv_namespaces": [
+    {
+      "binding": "SMS_CONVERSATIONS",
+      "id": "YOUR_KV_NAMESPACE_ID",       // wrangler kv namespace create SMS_CONVERSATIONS
+      "preview_id": "YOUR_KV_PREVIEW_ID"
+    }
+  ],
+
+  // ── Queues ───────────────────────────────────────────────────────────────────
+  "queues": {
+    "producers": [
+      {
+        "binding": "CAMPAIGN_QUEUE",
+        "queue": "campaign-sms-queue"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "campaign-sms-queue",
+        "dead_letter_queue": "campaign-sms-dlq",
+        "retry_delay": 60,
+        "max_retries": 3
+      }
+    ]
+  },
+
+  // ── Static Assets (Admin Dashboard) ─────────────────────────────────────────
+  "assets": {
+    "directory": "./public/",
+    "binding": "ASSETS"
+  },
+
+  // ── Vars ─────────────────────────────────────────────────────────────────────
+  "vars": {
+    "BASE_URL": "https://your-worker.your-account.workers.dev",
+    "COMPANY_NAME": "Your Company Name",
+    "COMPANY_GREETING": "We're here to help. Please listen to the following options.",
+
+    // Switch to the 70B model for better reasoning (uses more AI tokens):
+    // "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+    "AI_MODEL": "@cf/meta/llama-3.1-8b-instruct"
+  }
+
+  // ── Secrets (set via CLI — never commit these) ────────────────────────────────
+  // wrangler secret put TWILIO_ACCOUNT_SID
+  // wrangler secret put TWILIO_AUTH_TOKEN
+  // wrangler secret put TWILIO_TOLL_FREE_NUMBER
+  //
+  // ANTHROPIC_API_KEY is NO LONGER needed — AI runs via the Workers AI binding.
+}
