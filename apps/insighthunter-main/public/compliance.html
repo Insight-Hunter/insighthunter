@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Compliance · InsightHunter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body class="page">
+    <header class="topbar">
+      <div class="brand">InsightHunter</div>
+      <nav class="nav">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./compliance.html" class="active">Compliance</a>
+        <a href="./bookkeeping.html">Bookkeeping</a>
+        <a href="./admin-compliance.html">Admin</a>
+        <a href="./settings.html">Settings</a>
+      </nav>
+    </header>
+
+    <main class="main">
+      <h1>Compliance Hub</h1>
+
+      <section class="card">
+        <h2>Open Items</h2>
+        <table class="table" id="compliance-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
