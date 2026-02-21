@@ -1,7 +1,7 @@
 // src/components/upload/SpreadsheetUploader.tsx
 import { useState, useRef } from 'react';
 import { FiUpload, FiFile, FiCheck } from 'react-icons/fi';
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 import Papa from 'papaparse';
 import './SpreadsheetUploader.css';
 
@@ -19,20 +19,67 @@ export default function SpreadsheetUploader({
   const [preview, setPreview] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const parseExcelAndGetData = async (file: File): Promise<any[]> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const buffer = e.target?.result as ArrayBuffer;
+          if (!buffer) {
+            return resolve([]);
+          }
+          const workbook = new ExcelJS.Workbook();
+          await workbook.xlsx.load(buffer);
+          const worksheet = workbook.worksheets[0];
+          const jsonData: any[] = [];
+          const headers: string[] = [];
+          
+          const headerRow = worksheet.getRow(1);
+          headerRow.eachCell({ includeEmpty: true }, (cell) => {
+              headers.push(cell.value ? cell.value.toString() : `column_${cell.col}`);
+          });
+
+          worksheet.eachRow((row, rowNumber) => {
+            if (rowNumber > 1) {
+              const rowData: { [key: string]: any } = {};
+              row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                const header = headers[colNumber - 1];
+                rowData[header] = cell.value;
+              });
+              jsonData.push(rowData);
+            }
+          });
+          resolve(jsonData);
+        } catch (error) {
+          console.error("Error parsing Excel file:", error);
+          reject(error);
+        }
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
     setFile(selectedFile);
 
-    // Parse and preview
     if (selectedFile.name.endsWith('.csv')) {
       parseCSV(selectedFile);
     } else if (
       selectedFile.name.endsWith('.xlsx') ||
       selectedFile.name.endsWith('.xls')
     ) {
-      parseExcel(selectedFile);
+        try {
+            const jsonData = await parseExcelAndGetData(selectedFile);
+            setPreview(jsonData.slice(0, 5));
+        } catch (error) {
+            alert('Failed to parse Excel file.');
+        }
     }
   };
 
@@ -46,25 +93,12 @@ export default function SpreadsheetUploader({
     });
   };
 
-  const parseExcel = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const data = new Uint8Array(e.target?.result as ArrayBuffer);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-      setPreview(jsonData.slice(0, 5));
-    };
-    reader.readAsArrayBuffer(file);
-  };
-
   const handleUpload = async () => {
     if (!file) return;
 
     setUploading(true);
 
     try {
-      // Upload to R2
       const formData = new FormData();
       formData.append('file', file);
       formData.append('companyId', companyId);
@@ -78,9 +112,8 @@ export default function SpreadsheetUploader({
         throw new Error('Upload failed');
       }
 
-      const data = await response.json();
+      await response.json();
 
-      // Parse full file
       if (file.name.endsWith('.csv')) {
         Papa.parse(file, {
           header: true,
@@ -89,15 +122,8 @@ export default function SpreadsheetUploader({
           },
         });
       } else {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const data = new Uint8Array(e.target?.result as ArrayBuffer);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-          onUploadComplete(jsonData);
-        };
-        reader.readAsArrayBuffer(file);
+        const jsonData = await parseExcelAndGetData(file);
+        onUploadComplete(jsonData);
       }
     } catch (error) {
       console.error('Upload error:', error);
