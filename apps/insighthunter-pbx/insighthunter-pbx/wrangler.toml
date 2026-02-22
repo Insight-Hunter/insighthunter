@@ -1,0 +1,42 @@
+name = "insighthunter-pbx"
+main = "src/index.ts"
+account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
+compatibility_date = "2024-07-25"
+
+[ai]
+binding = "AI"
+
+[[d1_databases]]
+binding = "PBX_DB"
+database_name = "cloud-pbx-db"
+database_id = "c18c8520-c3eb-47e7-9bbe-cbb9e251ccb8"
+
+[[r2_buckets]]
+binding = "VOICEMAIL_BUCKET"
+bucket_name = "cloud-pbx-voicemails"
+
+[[r2_buckets]]
+binding = "RECORDINGS_BUCKET"
+bucket_name = "cloud-pbx-recordings"
+
+[[kv_namespaces]]
+binding = "SMS_CONVERSATIONS"
+id = "3e5244e82b41420abb911004beebbc8b"
+
+[[queues.producers]]
+binding = "CAMPAIGN_QUEUE"
+queue = "campaign-sms-queue"
+
+[[queues.consumers]]
+queue = "campaign-sms-queue"
+dead_letter_queue = "campaign-sms-dlq"
+
+[vars]
+COMPANY_NAME = "InsightHunter Virtual PBX"
+COMPANY_GREETING = "We're here to help. Please listen to the following options."
+BASE_URL = "https://api.insighthunter.app/api/pbx"
+AI_MODEL = "@cf/meta/llama-3.1-8b-instruct"
+
+[[routes]]
+pattern = "*api.insighthunter.app/api/pbx/*"
+zone_name = "insighthunter.app"
