@@ -1,6 +1,5 @@
 {
-<<<<<<< HEAD
-  "name": "cloud-pbx",
+  "name": "insighthunter-pbx",
   "version": "1.1.0",
   "description": "Enterprise Business Phone System on Cloudflare Workers + Twilio + Workers AI",
   "scripts": {
@@ -24,30 +23,4 @@
     "typescript": "^5.5.2",
     "wrangler": "^4.67.0"
   }
-=======
-    "name": "cloud-pbx",
-    "version": "1.1.0",
-    "description": "Enterprise Business Phone System on Cloudflare Workers + Twilio + Workers AI",
-    "scripts": {
-        "dev": "wrangler dev",
-        "deploy": "wrangler deploy",
-        "db:create": "wrangler d1 create cloud-pbx-db",
-        "db:migrate": "wrangler d1 execute cloud-pbx-db --file=schema.sql",
-        "db:migrate:remote": "wrangler d1 execute cloud-pbx-db --file=schema.sql --remote",
-        "kv:create": "wrangler kv namespace create SMS_CONVERSATIONS",
-        "r2:create:vm": "wrangler r2 bucket create cloud-pbx-voicemails",
-        "r2:create:rec": "wrangler r2 bucket create cloud-pbx-recordings",
-        "queue:create": "wrangler queues create campaign-sms-queue && wrangler queues create campaign-sms-dlq",
-        "setup": "npm run db:create && npm run kv:create && npm run r2:create:vm && npm run r2:create:rec && npm run queue:create"
-    },
-    "dependencies": {
-        "hono": "^4.6.0",
-        "twilio": "^5.3.0"
-    },
-    "devDependencies": {
-        "@cloudflare/workers-types": "^4.20241127.0",
-        "typescript": "^5.5.2",
-        "wrangler": "^4.67.0"
-    }
->>>>>>> 4bbee605e5d2f059d5ee036444bd2a8d8e507568
-}
+
