@@ -43,7 +43,7 @@ Caller → Twilio → Cloudflare Workers (PBX Engine)
 ### 1. Install dependencies
 
 ```bash
-npm installg
+npm install
 ```
 
 ### 2. Set Twilio secrets
