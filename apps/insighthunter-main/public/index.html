@@ -1,200 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to InsightHunter</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background-color: #0c0c1e;
-      color: white;
-    }
-    .welcome-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 32px;
-    }
-    .welcome-card {
-      background-color: #1a1a3a;
-      border-radius: 16px;
-      padding: 32px;
-      width: 100%;
-      max-width: 800px;
-      border: 1px solid #3a3a5a;
-    }
-    .welcome-header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-    .welcome-header h1 {
-      font-size: 2.5rem;
-      margin-bottom: 8px;
-    }
-    .welcome-header p {
-      font-size: 1.2rem;
-      color: #a0a0c0;
-    }
-    .welcome-actions {
-      display: flex;
-      justify-content: space-around;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-    .action-card {
-      background-color: #2a2a5a;
-      border-radius: 12px;
-      padding: 24px;
-      text-align: center;
-      flex: 1;
-      text-decoration: none;
-      color: white;
-      border: 1px solid #4a4a7a;
-    }
-    .action-icon {
-      font-size: 2rem;
-      margin-bottom: 8px;
-    }
-    .welcome-sections {
-      display: flex;
-      gap: 32px;
-      margin-bottom: 32px;
-    }
-    .company-snapshot, .recent-activity {
-      background-color: #2a2a5a;
-      border-radius: 12px;
-      padding: 24px;
-      flex: 1;
-      border: 1px solid #4a4a7a;
-    }
-    .company-snapshot h2, .recent-activity h2 {
-      font-size: 1.5rem;
-      margin-bottom: 16px;
-    }
-    .company-snapshot ul, .recent-activity ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .company-snapshot li, .recent-activity li {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    .recent-activity li {
-      justify-content: flex-start;
-    }
-    .check {
-      margin-right: 8px;
-    }
-    .integrations-panel {
-      background-color: #2a2a5a;
-      border-radius: 12px;
-      padding: 24px;
-      margin-top: 32px;
-      border: 1px solid #4a4a7a;
-    }
-    .integrations-panel h2 {
-      font-size: 1.5rem;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-    .integration-cards {
-      display: flex;
-      justify-content: space-around;
-      gap: 16px;
-    }
-    .integration-card {
-      background-color: #1a1a3a;
-      border-radius: 8px;
-      padding: 16px;
-      text-align: center;
-      flex: 1;
-      border: 1px solid #3a3a5a;
-    }
-    .integration-card h3 {
-        font-size: 1.2rem;
-        margin-bottom: 8px;
-    }
-    .welcome-footer {
-      text-align: center;
-      margin-top: 32px;
-    }
-    .welcome-footer a {
-      color: #a0a0c0;
-      text-decoration: none;
-      margin: 0 16px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InsightHunter - Your Financial Nervous System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-  <div class="welcome-container">
-    <div class="welcome-card">
-      <div class="welcome-header">
-        <h1>Welcome to InsightHunter</h1>
-        <p>Your enterprise financial nervous system.</p>
-      </div>
-      <div class="welcome-actions">
-        <a href="/bookkeeping" class="action-card">
-          <div class="action-icon">📝</div>
-          <div class="action-label">Start Wizard</div>
-        </a>
-        <a href="/bookkeeping/reports" class="action-card">
-          <div class="action-icon">📄</div>
-          <div class="action-label">View Reports</div>
-        </a>
-        <a href="#" class="action-card">
-          <div class="action-icon">📈</div>
-          <div class="action-label">Simulation Preview</div>
-        </a>
-      </div>
-      <div class="welcome-sections">
-        <div class="company-snapshot">
-          <h2>Company Snapshot</h2>
-          <ul>
-            <li><span>Role</span><span>Treasurer</span></li>
-            <li><span>Domain</span><span>Liquidity</span></li>
-            <li><span>Risk tolerance</span><span>Moderate</span></li>
-            <li><span>Last report</span><span>Dec 12 <a href="#">Download</a></span></li>
-          </ul>
+<body class="page">
+
+    <header class="header">
+        <div class="brand">InsightHunter</div>
+        <nav class="nav">
+            <a href="features.html">Features</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="about.html">About</a>
+            <a href="login.html">Login</a>
+            <a href="signup.html" class="btn-primary">Sign Up Free</a>
+        </nav>
+    </header>
+
+    <main class="main">
+        <section class="hero">
+            <h1>Your Financial Nervous System</h1>
+            <p>Clarity, control, and confidence in your financial operations. The ultimate toolkit for modern businesses.</p>
+            <a href="signup.html" class="btn-primary" style="font-size: 1.2em; padding: 15px 30px;">Get Started for Free</a>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <h2>Insight-Lite</h2>
+                <p>The essentials for getting started. Perfect for individuals and small teams. Automated bookkeeping, expense tracking, and basic reporting.</p>
+                <a href="pricing.html">Learn More</a>
+            </div>
+            <div class="feature-card">
+                <h2>Insight-Standard</h2>
+                <p>Advanced features for growing businesses. Unlock more power and insights with customizable invoices, and bill pay.</p>
+                <a href="pricing.html">Learn More</a>
+            </div>
+            <div class="feature-card">
+                <h2>Insight-Pro</h2>
+                <p>The ultimate toolkit for power users. AI-powered financial analysis, multi-user tenancy, and dedicated support.</p>
+                <a href="pricing.html">Learn More</a>
+            </div>
+        </section>
+
+        <section class="testimonials">
+            <h2 style="text-align: center; margin-bottom: 40px;">What our customers are saying</h2>
+            <div class="testimonial-card">
+                <p>"InsightHunter has transformed how we manage our finances. It's intuitive, powerful, and has saved us countless hours."</p>
+                <strong>- CEO of a growing startup</strong>
+            </div>
+            <div class="testimonial-card">
+                <p>"The AI-powered insights are a game-changer. We can now make financial decisions with more confidence than ever before."</p>
+                <strong>- Finance Director at a mid-sized company</strong>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 InsightHunter. All rights reserved.</p>
+        <div>
+            <a href="/legal/privacy.html">Privacy Policy</a> | 
+            <a href="/legal/terms.html">Terms of Service</a>
         </div>
-        <div class="recent-activity">
-          <h2>Recent Activity</h2>
-          <ul>
-            <li><span class="check">✅</span> Quiz submitted</li>
-            <li><span class="check">✅</span> Preview seeded</li>
-            <li><span class="check">✅</span> Report generated</li>
-          </ul>
-        </div>
-      </div>
-      <div class="integrations-panel">
-        <h2>Integrations</h2>
-        <div class="integration-cards">
-          <div class="integration-card">
-            <h3>Compliance</h3>
-            <p>Automated workflows, reminders, and document generation.</p>
-          </div>
-          <div class="integration-card">
-            <h3>Bookkeeping</h3>
-            <p>Ledgers, reconciliation, and financial reporting.</p>
-          </div>
-          <div class="integration-card">
-            <h3>BizForma</h3>
-            <p>LLC, EIN, and S-Corp formation with guided steps.</p>
-          </div>
-        </div>
-      </div>
-      <div class="welcome-footer">
-        <a href="/docs">Docs</a>
-        <a href="/support">Support</a>
-        <a href="/admin">Admin</a>
-        <a href="/legal/privacy.html">Privacy</a>
-        <a href="/legal/terms.html">Terms</a>
-      </div>
-    </div>
-  </div>
+    </footer>
+
 </body>
 </html>
