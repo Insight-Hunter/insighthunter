@@ -5,58 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InsightHunter - Your Financial Nervous System</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="page">
-    <div class="topbar">
-        <div class="brand">INSIGHTHUNTER</div>
+
+    <header class="header">
+        <div class="brand">InsightHunter</div>
         <nav class="nav">
-            <a href="index.html" class="active">Home</a>
             <a href="features.html">Features</a>
             <a href="pricing.html">Pricing</a>
             <a href="about.html">About</a>
-            <a href="my-account.html">My Account</a>
             <a href="login.html">Login</a>
-            <a href="signup.html" class="btn-primary">Sign Up</a>
+            <a href="signup.html" class="btn-primary">Sign Up Free</a>
         </nav>
-    </div>
+    </header>
 
     <main class="main">
         <section class="hero">
-            <h1>Welcome to InsightHunter</h1>
-            <p>Your enterprise financial nervous system. Gain clarity, control, and confidence in your financial operations.</p>
-            <a href="features.html" class="btn-primary">Explore Features</a>
-            <div class="robot-figure"></div>
+            <h1>Your Financial Nervous System</h1>
+            <p>Clarity, control, and confidence in your financial operations. The ultimate toolkit for modern businesses.</p>
+            <a href="signup.html" class="btn-primary" style="font-size: 1.2em; padding: 15px 30px;">Get Started for Free</a>
         </section>
 
-        <section class="grid">
-            <div class="card">
+        <section class="features">
+            <div class="feature-card">
                 <h2>Insight-Lite</h2>
-                <p>The essentials for getting started. Perfect for individuals and small teams.</p>
-                <a href="pricing.html" class="link-button">Learn More</a>
+                <p>The essentials for getting started. Perfect for individuals and small teams. Automated bookkeeping, expense tracking, and basic reporting.</p>
+                <a href="pricing.html">Learn More</a>
             </div>
-            <div class="card">
+            <div class="feature-card">
                 <h2>Insight-Standard</h2>
-                <p>Advanced features for growing businesses. Unlock more power and insights.</p>
-                <a href="pricing.html" class="link-button">Learn More</a>
+                <p>Advanced features for growing businesses. Unlock more power and insights with customizable invoices, and bill pay.</p>
+                <a href="pricing.html">Learn More</a>
             </div>
-            <div class="card">
+            <div class="feature-card">
                 <h2>Insight-Pro</h2>
-                <p>The ultimate toolkit for power users. AI assistance and multi-user tenancy.</p>
-                <a href="pricing.html" class="link-button">Learn More</a>
+                <p>The ultimate toolkit for power users. AI-powered financial analysis, multi-user tenancy, and dedicated support.</p>
+                <a href="pricing.html">Learn More</a>
             </div>
         </section>
 
-        <section class="card">
-            <h2>Why InsightHunter?</h2>
-            <p>We provide a comprehensive suite of tools to help you manage your finances, from bookkeeping and compliance to LLC formation. Our platform is designed to be intuitive, powerful, and scalable.</p>
+        <section class="testimonials">
+            <h2 style="text-align: center; margin-bottom: 40px;">What our customers are saying</h2>
+            <div class="testimonial-card">
+                <p>"InsightHunter has transformed how we manage our finances. It's intuitive, powerful, and has saved us countless hours."</p>
+                <strong>- CEO of a growing startup</strong>
+            </div>
+            <div class="testimonial-card">
+                <p>"The AI-powered insights are a game-changer. We can now make financial decisions with more confidence than ever before."</p>
+                <strong>- Finance Director at a mid-sized company</strong>
+            </div>
         </section>
+
     </main>
 
     <footer class="footer">
         <p>&copy; 2024 InsightHunter. All rights reserved.</p>
-        <a href="/legal/privacy.html">Privacy Policy</a>
-        <a href="/legal/terms.html">Terms of Service</a>
+        <div>
+            <a href="/legal/privacy.html">Privacy Policy</a> | 
+            <a href="/legal/terms.html">Terms of Service</a>
+        </div>
     </footer>
+
 </body>
 </html>
