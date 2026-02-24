@@ -4,28 +4,27 @@ import { parse } from 'papaparse';
 import type { R2Bucket } from '@cloudflare/workers-types';
 import { serveStatic } from 'hono/cloudflare-workers';
 import { getCookie, setCookie } from 'hono/cookie';
+import { jwt } from 'hono/jwt';
 
 // Define the environment bindings
 interface Env {
   CSV_BUCKET: R2Bucket;
-  // For production, you should have a JWT_SECRET to validate tokens
-  // JWT_SECRET: string;
+  JWT_SECRET: string;
 }
 
 const app = new Hono<{ Bindings: Env }>();
 const secure = new Hono<{ Bindings: Env }>();
 
 // --- Authentication Middleware ---
-// This middleware is applied to the 'secure' Hono instance.
-secure.use('*', async (c, next) => {
-  const token = getCookie(c, 'auth_token');
-  // In a real application, you would also validate the token here.
-  // e.g. const payload = await verify(token, c.env.JWT_SECRET);
-  if (!token) {
-    return c.redirect('/login');
-  }
-  await next();
-});
+const authMiddleware = (c, next) => {
+  const jwtMiddleware = jwt({
+    secret: c.env.JWT_SECRET,
+    cookie: 'auth_token',
+  });
+  return jwtMiddleware(c, next);
+};
+
+secure.use('*', authMiddleware);
 
 
 // --- PUBLIC ROUTES ---
@@ -35,10 +34,9 @@ app.get('/public/*', serveStatic({ root: './' }));
 app.get('/sw.js', serveStatic({ path: './public/sw.js' }));
 
 // The login route redirects the user to your main site to authenticate.
-// You should replace the URL with your actual production signup URL.
 app.get('/login', (c) => {
-  const signupUrl = 'https://insighthunter.io/signup.html'; // Placeholder URL
-  return c.redirect(signupUrl, 302);
+  const loginUrl = 'https://insighthunter.io/login.html'; // Corrected URL
+  return c.redirect(loginUrl, 302);
 });
 
 // After successful login, your main site should redirect back to this URL,
@@ -50,7 +48,7 @@ app.get('/auth/callback', (c) => {
       path: '/',
       secure: true, // Should be true in production
       httpOnly: true,
-      maxAge: 60 * 60 * 24 * 7, // 1 week
+      maxAge: 60 * 60 * 24, // 1 day, align with JWT expiry
     });
     return c.redirect('/');
   }
@@ -227,7 +225,10 @@ function calculateMetrics(data: string[][]) {
 
 // Main Dashboard
 secure.get('/', async (c) => {
-  const list = await c.env.CSV_BUCKET.list({ limit: 100 });
+  const payload = c.get('jwtPayload');
+  const userId = payload.sub;
+  
+  const list = await c.env.CSV_BUCKET.list({ prefix: `uploads/${userId}/`, limit: 100 });
   if (!list.objects.length) {
     return c.html(<Dashboard data={null} metrics={null} />);
   }
@@ -250,11 +251,14 @@ secure.get('/upload', (c) => c.html(<UploadPage />));
 
 // Handle File Upload
 secure.post('/upload', async (c) => {
+  const payload = c.get('jwtPayload');
+  const userId = payload.sub;
+
   const formData = await c.req.formData();
   const file = formData.get('csvFile');
 
   if (file instanceof File && file.name.endsWith('.csv')) {
-    const key = `uploads/${Date.now()}-${file.name}`;
+    const key = `uploads/${userId}/${Date.now()}-${file.name}`;
     await c.env.CSV_BUCKET.put(key, file.stream());
     return c.redirect('/');
   } else {

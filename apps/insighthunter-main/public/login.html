@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+kAY9u88TaeuI9wByQkismZ2oGjBWqf5mVBhDTYNE<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -24,12 +24,14 @@
     <main class="main">
         <section class="card form-container">
             <h1>Login to your account</h1>
-            <form class="form">
+            <form id="login-form" class="form">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required>
 
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
+                
+                <p id="error-message" style="color: red;"></p>
 
                 <button type="submit" class="btn-primary">Login</button>
             </form>
@@ -42,5 +44,43 @@
         <a href="/legal/privacy.html">Privacy Policy</a>
         <a href="/legal/terms.html">Terms of Service</a>
     </footer>
+
+    <script>
+      const loginForm = document.getElementById('login-form');
+      const errorMessage = document.getElementById('error-message');
+      
+      // You will need to replace this with the actual URL of your authentication service
+      const authApiUrl = 'https://auth.insighthunter.io'; 
+      // You will need to replace this with the actual URL of your PWA
+      const liteAppUrl = 'https://lite.insighthunter.io';
+
+      loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        errorMessage.textContent = '';
+
+        const email = event.target.email.value;
+        const password = event.target.password.value;
+
+        try {
+          const response = await fetch(`${authApiUrl}/api/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // On successful login, redirect to the PWA with the token
+            window.location.href = `${liteAppUrl}/auth/callback?token=${data.token}`;
+          } else {
+            errorMessage.textContent = data.error || 'An unknown error occurred.';
+          }
+        } catch (error) {
+          console.error('Login failed:', error);
+          errorMessage.textContent = 'Could not connect to the authentication service.';
+        }
+      });
+    </script>
 </body>
 </html>

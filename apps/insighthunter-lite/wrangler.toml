@@ -1,3 +1,4 @@
+account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
 name = "insighthunter-lite"
 main = "src/index.tsx"
 compatibility_date = "2024-05-02"

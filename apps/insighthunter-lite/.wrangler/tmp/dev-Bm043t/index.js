@@ -32,7 +32,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
-// .wrangler/tmp/bundle-AMwCcT/checked-fetch.js
+// .wrangler/tmp/bundle-4bEefO/checked-fetch.js
 function checkURL(request, init) {
   const url = request instanceof URL ? request : new URL(
     (typeof request === "string" ? new Request(request, init) : request).url
@@ -50,7 +50,7 @@ function checkURL(request, init) {
 }
 var urls;
 var init_checked_fetch = __esm({
-  ".wrangler/tmp/bundle-AMwCcT/checked-fetch.js"() {
+  ".wrangler/tmp/bundle-4bEefO/checked-fetch.js"() {
     "use strict";
     urls = /* @__PURE__ */ new Set();
     __name(checkURL, "checkURL");
@@ -527,11 +527,11 @@ var require_papaparse_min = __commonJS({
   }
 });
 
-// .wrangler/tmp/bundle-AMwCcT/middleware-loader.entry.ts
+// .wrangler/tmp/bundle-4bEefO/middleware-loader.entry.ts
 init_checked_fetch();
 init_modules_watch_stub();
 
-// .wrangler/tmp/bundle-AMwCcT/middleware-insertion-facade.js
+// .wrangler/tmp/bundle-4bEefO/middleware-insertion-facade.js
 init_checked_fetch();
 init_modules_watch_stub();
 
@@ -609,6 +609,40 @@ init_modules_watch_stub();
 // node_modules/hono/dist/http-exception.js
 init_checked_fetch();
 init_modules_watch_stub();
+var HTTPException = class extends Error {
+  static {
+    __name(this, "HTTPException");
+  }
+  res;
+  status;
+  /**
+   * Creates an instance of `HTTPException`.
+   * @param status - HTTP status code for the exception. Defaults to 500.
+   * @param options - Additional options for the exception.
+   */
+  constructor(status = 500, options) {
+    super(options?.message, { cause: options?.cause });
+    this.res = options?.res;
+    this.status = status;
+  }
+  /**
+   * Returns the response object associated with the exception.
+   * If a response object is not provided, a new response is created with the error message and status code.
+   * @returns The response object.
+   */
+  getResponse() {
+    if (this.res) {
+      const newResponse = new Response(this.res.body, {
+        status: this.status,
+        headers: this.res.headers
+      });
+      return newResponse;
+    }
+    return new Response(this.message, {
+      status: this.status
+    });
+  }
+};
 
 // node_modules/hono/dist/request/constants.js
 init_checked_fetch();
@@ -3129,6 +3163,23 @@ init_modules_watch_stub();
 // node_modules/hono/dist/utils/cookie.js
 init_checked_fetch();
 init_modules_watch_stub();
+var algorithm = { name: "HMAC", hash: "SHA-256" };
+var getCryptoKey = /* @__PURE__ */ __name(async (secret) => {
+  const secretBuf = typeof secret === "string" ? new TextEncoder().encode(secret) : secret;
+  return await crypto.subtle.importKey("raw", secretBuf, algorithm, false, ["sign", "verify"]);
+}, "getCryptoKey");
+var verifySignature = /* @__PURE__ */ __name(async (base64Signature, value, secret) => {
+  try {
+    const signatureBinStr = atob(base64Signature);
+    const signature = new Uint8Array(signatureBinStr.length);
+    for (let i = 0, len = signatureBinStr.length; i < len; i++) {
+      signature[i] = signatureBinStr.charCodeAt(i);
+    }
+    return await crypto.subtle.verify(algorithm, secret, signature, new TextEncoder().encode(value));
+  } catch {
+    return false;
+  }
+}, "verifySignature");
 var validCookieNameRegEx = /^[\w!#$%&'*.^`|~+-]+$/;
 var validCookieValueRegEx = /^[ !#-:<-[\]-~]*$/;
 var parse = /* @__PURE__ */ __name((cookie, name) => {
@@ -3160,6 +3211,24 @@ var parse = /* @__PURE__ */ __name((cookie, name) => {
   }
   return parsedCookie;
 }, "parse");
+var parseSigned = /* @__PURE__ */ __name(async (cookie, secret, name) => {
+  const parsedCookie = {};
+  const secretKey = await getCryptoKey(secret);
+  for (const [key, value] of Object.entries(parse(cookie, name))) {
+    const signatureStartPos = value.lastIndexOf(".");
+    if (signatureStartPos < 1) {
+      continue;
+    }
+    const signedValue = value.substring(0, signatureStartPos);
+    const signature = value.substring(signatureStartPos + 1);
+    if (signature.length !== 44 || !signature.endsWith("=")) {
+      continue;
+    }
+    const isVerified = await verifySignature(signature, signedValue, secretKey);
+    parsedCookie[key] = isVerified ? signedValue : false;
+  }
+  return parsedCookie;
+}, "parseSigned");
 var _serialize = /* @__PURE__ */ __name((name, value, opt = {}) => {
   let cookie = `${name}=${value}`;
   if (name.startsWith("__Secure-") && !opt.secure) {
@@ -3245,6 +3314,27 @@ var getCookie = /* @__PURE__ */ __name((c, key, prefix) => {
   const obj = parse(cookie);
   return obj;
 }, "getCookie");
+var getSignedCookie = /* @__PURE__ */ __name(async (c, secret, key, prefix) => {
+  const cookie = c.req.raw.headers.get("Cookie");
+  if (typeof key === "string") {
+    if (!cookie) {
+      return void 0;
+    }
+    let finalKey = key;
+    if (prefix === "secure") {
+      finalKey = "__Secure-" + key;
+    } else if (prefix === "host") {
+      finalKey = "__Host-" + key;
+    }
+    const obj2 = await parseSigned(cookie, secret, finalKey);
+    return obj2[finalKey];
+  }
+  if (!cookie) {
+    return {};
+  }
+  const obj = await parseSigned(cookie, secret);
+  return obj;
+}, "getSignedCookie");
 var generateCookie = /* @__PURE__ */ __name((name, value, opt) => {
   let cookie;
   if (opt?.prefix === "secure") {
@@ -3265,6 +3355,739 @@ var setCookie = /* @__PURE__ */ __name((c, name, value, opt) => {
   const cookie = generateCookie(name, value, opt);
   c.header("Set-Cookie", cookie, { append: true });
 }, "setCookie");
+
+// node_modules/hono/dist/middleware/jwt/index.js
+init_checked_fetch();
+init_modules_watch_stub();
+
+// node_modules/hono/dist/middleware/jwt/jwt.js
+init_checked_fetch();
+init_modules_watch_stub();
+
+// node_modules/hono/dist/utils/jwt/index.js
+init_checked_fetch();
+init_modules_watch_stub();
+
+// node_modules/hono/dist/utils/jwt/jwt.js
+init_checked_fetch();
+init_modules_watch_stub();
+
+// node_modules/hono/dist/utils/encode.js
+init_checked_fetch();
+init_modules_watch_stub();
+var decodeBase64Url = /* @__PURE__ */ __name((str) => {
+  return decodeBase64(str.replace(/_|-/g, (m) => ({ _: "/", "-": "+" })[m] ?? m));
+}, "decodeBase64Url");
+var encodeBase64Url = /* @__PURE__ */ __name((buf) => encodeBase64(buf).replace(/\/|\+/g, (m) => ({ "/": "_", "+": "-" })[m] ?? m), "encodeBase64Url");
+var encodeBase64 = /* @__PURE__ */ __name((buf) => {
+  let binary = "";
+  const bytes = new Uint8Array(buf);
+  for (let i = 0, len = bytes.length; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}, "encodeBase64");
+var decodeBase64 = /* @__PURE__ */ __name((str) => {
+  const binary = atob(str);
+  const bytes = new Uint8Array(new ArrayBuffer(binary.length));
+  const half = binary.length / 2;
+  for (let i = 0, j = binary.length - 1; i <= half; i++, j--) {
+    bytes[i] = binary.charCodeAt(i);
+    bytes[j] = binary.charCodeAt(j);
+  }
+  return bytes;
+}, "decodeBase64");
+
+// node_modules/hono/dist/utils/jwt/jwa.js
+init_checked_fetch();
+init_modules_watch_stub();
+var AlgorithmTypes = /* @__PURE__ */ ((AlgorithmTypes2) => {
+  AlgorithmTypes2["HS256"] = "HS256";
+  AlgorithmTypes2["HS384"] = "HS384";
+  AlgorithmTypes2["HS512"] = "HS512";
+  AlgorithmTypes2["RS256"] = "RS256";
+  AlgorithmTypes2["RS384"] = "RS384";
+  AlgorithmTypes2["RS512"] = "RS512";
+  AlgorithmTypes2["PS256"] = "PS256";
+  AlgorithmTypes2["PS384"] = "PS384";
+  AlgorithmTypes2["PS512"] = "PS512";
+  AlgorithmTypes2["ES256"] = "ES256";
+  AlgorithmTypes2["ES384"] = "ES384";
+  AlgorithmTypes2["ES512"] = "ES512";
+  AlgorithmTypes2["EdDSA"] = "EdDSA";
+  return AlgorithmTypes2;
+})(AlgorithmTypes || {});
+
+// node_modules/hono/dist/utils/jwt/jws.js
+init_checked_fetch();
+init_modules_watch_stub();
+
+// node_modules/hono/dist/helper/adapter/index.js
+init_checked_fetch();
+init_modules_watch_stub();
+var knownUserAgents = {
+  deno: "Deno",
+  bun: "Bun",
+  workerd: "Cloudflare-Workers",
+  node: "Node.js"
+};
+var getRuntimeKey = /* @__PURE__ */ __name(() => {
+  const global = globalThis;
+  const userAgentSupported = typeof navigator !== "undefined" && true;
+  if (userAgentSupported) {
+    for (const [runtimeKey, userAgent] of Object.entries(knownUserAgents)) {
+      if (checkUserAgentEquals(userAgent)) {
+        return runtimeKey;
+      }
+    }
+  }
+  if (typeof global?.EdgeRuntime === "string") {
+    return "edge-light";
+  }
+  if (global?.fastly !== void 0) {
+    return "fastly";
+  }
+  if (global?.process?.release?.name === "node") {
+    return "node";
+  }
+  return "other";
+}, "getRuntimeKey");
+var checkUserAgentEquals = /* @__PURE__ */ __name((platform) => {
+  const userAgent = "Cloudflare-Workers";
+  return userAgent.startsWith(platform);
+}, "checkUserAgentEquals");
+
+// node_modules/hono/dist/utils/jwt/types.js
+init_checked_fetch();
+init_modules_watch_stub();
+var JwtAlgorithmNotImplemented = class extends Error {
+  static {
+    __name(this, "JwtAlgorithmNotImplemented");
+  }
+  constructor(alg) {
+    super(`${alg} is not an implemented algorithm`);
+    this.name = "JwtAlgorithmNotImplemented";
+  }
+};
+var JwtAlgorithmRequired = class extends Error {
+  static {
+    __name(this, "JwtAlgorithmRequired");
+  }
+  constructor() {
+    super('JWT verification requires "alg" option to be specified');
+    this.name = "JwtAlgorithmRequired";
+  }
+};
+var JwtAlgorithmMismatch = class extends Error {
+  static {
+    __name(this, "JwtAlgorithmMismatch");
+  }
+  constructor(expected, actual) {
+    super(`JWT algorithm mismatch: expected "${expected}", got "${actual}"`);
+    this.name = "JwtAlgorithmMismatch";
+  }
+};
+var JwtTokenInvalid = class extends Error {
+  static {
+    __name(this, "JwtTokenInvalid");
+  }
+  constructor(token) {
+    super(`invalid JWT token: ${token}`);
+    this.name = "JwtTokenInvalid";
+  }
+};
+var JwtTokenNotBefore = class extends Error {
+  static {
+    __name(this, "JwtTokenNotBefore");
+  }
+  constructor(token) {
+    super(`token (${token}) is being used before it's valid`);
+    this.name = "JwtTokenNotBefore";
+  }
+};
+var JwtTokenExpired = class extends Error {
+  static {
+    __name(this, "JwtTokenExpired");
+  }
+  constructor(token) {
+    super(`token (${token}) expired`);
+    this.name = "JwtTokenExpired";
+  }
+};
+var JwtTokenIssuedAt = class extends Error {
+  static {
+    __name(this, "JwtTokenIssuedAt");
+  }
+  constructor(currentTimestamp, iat) {
+    super(
+      `Invalid "iat" claim, must be a valid number lower than "${currentTimestamp}" (iat: "${iat}")`
+    );
+    this.name = "JwtTokenIssuedAt";
+  }
+};
+var JwtTokenIssuer = class extends Error {
+  static {
+    __name(this, "JwtTokenIssuer");
+  }
+  constructor(expected, iss) {
+    super(`expected issuer "${expected}", got ${iss ? `"${iss}"` : "none"} `);
+    this.name = "JwtTokenIssuer";
+  }
+};
+var JwtHeaderInvalid = class extends Error {
+  static {
+    __name(this, "JwtHeaderInvalid");
+  }
+  constructor(header) {
+    super(`jwt header is invalid: ${JSON.stringify(header)}`);
+    this.name = "JwtHeaderInvalid";
+  }
+};
+var JwtHeaderRequiresKid = class extends Error {
+  static {
+    __name(this, "JwtHeaderRequiresKid");
+  }
+  constructor(header) {
+    super(`required "kid" in jwt header: ${JSON.stringify(header)}`);
+    this.name = "JwtHeaderRequiresKid";
+  }
+};
+var JwtSymmetricAlgorithmNotAllowed = class extends Error {
+  static {
+    __name(this, "JwtSymmetricAlgorithmNotAllowed");
+  }
+  constructor(alg) {
+    super(`symmetric algorithm "${alg}" is not allowed for JWK verification`);
+    this.name = "JwtSymmetricAlgorithmNotAllowed";
+  }
+};
+var JwtAlgorithmNotAllowed = class extends Error {
+  static {
+    __name(this, "JwtAlgorithmNotAllowed");
+  }
+  constructor(alg, allowedAlgorithms) {
+    super(`algorithm "${alg}" is not in the allowed list: [${allowedAlgorithms.join(", ")}]`);
+    this.name = "JwtAlgorithmNotAllowed";
+  }
+};
+var JwtTokenSignatureMismatched = class extends Error {
+  static {
+    __name(this, "JwtTokenSignatureMismatched");
+  }
+  constructor(token) {
+    super(`token(${token}) signature mismatched`);
+    this.name = "JwtTokenSignatureMismatched";
+  }
+};
+var JwtPayloadRequiresAud = class extends Error {
+  static {
+    __name(this, "JwtPayloadRequiresAud");
+  }
+  constructor(payload) {
+    super(`required "aud" in jwt payload: ${JSON.stringify(payload)}`);
+    this.name = "JwtPayloadRequiresAud";
+  }
+};
+var JwtTokenAudience = class extends Error {
+  static {
+    __name(this, "JwtTokenAudience");
+  }
+  constructor(expected, aud) {
+    super(
+      `expected audience "${Array.isArray(expected) ? expected.join(", ") : expected}", got "${aud}"`
+    );
+    this.name = "JwtTokenAudience";
+  }
+};
+var CryptoKeyUsage = /* @__PURE__ */ ((CryptoKeyUsage2) => {
+  CryptoKeyUsage2["Encrypt"] = "encrypt";
+  CryptoKeyUsage2["Decrypt"] = "decrypt";
+  CryptoKeyUsage2["Sign"] = "sign";
+  CryptoKeyUsage2["Verify"] = "verify";
+  CryptoKeyUsage2["DeriveKey"] = "deriveKey";
+  CryptoKeyUsage2["DeriveBits"] = "deriveBits";
+  CryptoKeyUsage2["WrapKey"] = "wrapKey";
+  CryptoKeyUsage2["UnwrapKey"] = "unwrapKey";
+  return CryptoKeyUsage2;
+})(CryptoKeyUsage || {});
+
+// node_modules/hono/dist/utils/jwt/utf8.js
+init_checked_fetch();
+init_modules_watch_stub();
+var utf8Encoder = new TextEncoder();
+var utf8Decoder = new TextDecoder();
+
+// node_modules/hono/dist/utils/jwt/jws.js
+async function signing(privateKey, alg, data) {
+  const algorithm2 = getKeyAlgorithm(alg);
+  const cryptoKey = await importPrivateKey(privateKey, algorithm2);
+  return await crypto.subtle.sign(algorithm2, cryptoKey, data);
+}
+__name(signing, "signing");
+async function verifying(publicKey, alg, signature, data) {
+  const algorithm2 = getKeyAlgorithm(alg);
+  const cryptoKey = await importPublicKey(publicKey, algorithm2);
+  return await crypto.subtle.verify(algorithm2, cryptoKey, signature, data);
+}
+__name(verifying, "verifying");
+function pemToBinary(pem) {
+  return decodeBase64(pem.replace(/-+(BEGIN|END).*/g, "").replace(/\s/g, ""));
+}
+__name(pemToBinary, "pemToBinary");
+async function importPrivateKey(key, alg) {
+  if (!crypto.subtle || !crypto.subtle.importKey) {
+    throw new Error("`crypto.subtle.importKey` is undefined. JWT auth middleware requires it.");
+  }
+  if (isCryptoKey(key)) {
+    if (key.type !== "private" && key.type !== "secret") {
+      throw new Error(
+        `unexpected key type: CryptoKey.type is ${key.type}, expected private or secret`
+      );
+    }
+    return key;
+  }
+  const usages = [CryptoKeyUsage.Sign];
+  if (typeof key === "object") {
+    return await crypto.subtle.importKey("jwk", key, alg, false, usages);
+  }
+  if (key.includes("PRIVATE")) {
+    return await crypto.subtle.importKey("pkcs8", pemToBinary(key), alg, false, usages);
+  }
+  return await crypto.subtle.importKey("raw", utf8Encoder.encode(key), alg, false, usages);
+}
+__name(importPrivateKey, "importPrivateKey");
+async function importPublicKey(key, alg) {
+  if (!crypto.subtle || !crypto.subtle.importKey) {
+    throw new Error("`crypto.subtle.importKey` is undefined. JWT auth middleware requires it.");
+  }
+  if (isCryptoKey(key)) {
+    if (key.type === "public" || key.type === "secret") {
+      return key;
+    }
+    key = await exportPublicJwkFrom(key);
+  }
+  if (typeof key === "string" && key.includes("PRIVATE")) {
+    const privateKey = await crypto.subtle.importKey("pkcs8", pemToBinary(key), alg, true, [
+      CryptoKeyUsage.Sign
+    ]);
+    key = await exportPublicJwkFrom(privateKey);
+  }
+  const usages = [CryptoKeyUsage.Verify];
+  if (typeof key === "object") {
+    return await crypto.subtle.importKey("jwk", key, alg, false, usages);
+  }
+  if (key.includes("PUBLIC")) {
+    return await crypto.subtle.importKey("spki", pemToBinary(key), alg, false, usages);
+  }
+  return await crypto.subtle.importKey("raw", utf8Encoder.encode(key), alg, false, usages);
+}
+__name(importPublicKey, "importPublicKey");
+async function exportPublicJwkFrom(privateKey) {
+  if (privateKey.type !== "private") {
+    throw new Error(`unexpected key type: ${privateKey.type}`);
+  }
+  if (!privateKey.extractable) {
+    throw new Error("unexpected private key is unextractable");
+  }
+  const jwk = await crypto.subtle.exportKey("jwk", privateKey);
+  const { kty } = jwk;
+  const { alg, e, n } = jwk;
+  const { crv, x, y } = jwk;
+  return { kty, alg, e, n, crv, x, y, key_ops: [CryptoKeyUsage.Verify] };
+}
+__name(exportPublicJwkFrom, "exportPublicJwkFrom");
+function getKeyAlgorithm(name) {
+  switch (name) {
+    case "HS256":
+      return {
+        name: "HMAC",
+        hash: {
+          name: "SHA-256"
+        }
+      };
+    case "HS384":
+      return {
+        name: "HMAC",
+        hash: {
+          name: "SHA-384"
+        }
+      };
+    case "HS512":
+      return {
+        name: "HMAC",
+        hash: {
+          name: "SHA-512"
+        }
+      };
+    case "RS256":
+      return {
+        name: "RSASSA-PKCS1-v1_5",
+        hash: {
+          name: "SHA-256"
+        }
+      };
+    case "RS384":
+      return {
+        name: "RSASSA-PKCS1-v1_5",
+        hash: {
+          name: "SHA-384"
+        }
+      };
+    case "RS512":
+      return {
+        name: "RSASSA-PKCS1-v1_5",
+        hash: {
+          name: "SHA-512"
+        }
+      };
+    case "PS256":
+      return {
+        name: "RSA-PSS",
+        hash: {
+          name: "SHA-256"
+        },
+        saltLength: 32
+        // 256 >> 3
+      };
+    case "PS384":
+      return {
+        name: "RSA-PSS",
+        hash: {
+          name: "SHA-384"
+        },
+        saltLength: 48
+        // 384 >> 3
+      };
+    case "PS512":
+      return {
+        name: "RSA-PSS",
+        hash: {
+          name: "SHA-512"
+        },
+        saltLength: 64
+        // 512 >> 3,
+      };
+    case "ES256":
+      return {
+        name: "ECDSA",
+        hash: {
+          name: "SHA-256"
+        },
+        namedCurve: "P-256"
+      };
+    case "ES384":
+      return {
+        name: "ECDSA",
+        hash: {
+          name: "SHA-384"
+        },
+        namedCurve: "P-384"
+      };
+    case "ES512":
+      return {
+        name: "ECDSA",
+        hash: {
+          name: "SHA-512"
+        },
+        namedCurve: "P-521"
+      };
+    case "EdDSA":
+      return {
+        name: "Ed25519",
+        namedCurve: "Ed25519"
+      };
+    default:
+      throw new JwtAlgorithmNotImplemented(name);
+  }
+}
+__name(getKeyAlgorithm, "getKeyAlgorithm");
+function isCryptoKey(key) {
+  const runtime = getRuntimeKey();
+  if (runtime === "node" && !!crypto.webcrypto) {
+    return key instanceof crypto.webcrypto.CryptoKey;
+  }
+  return key instanceof CryptoKey;
+}
+__name(isCryptoKey, "isCryptoKey");
+
+// node_modules/hono/dist/utils/jwt/jwt.js
+var encodeJwtPart = /* @__PURE__ */ __name((part) => encodeBase64Url(utf8Encoder.encode(JSON.stringify(part)).buffer).replace(/=/g, ""), "encodeJwtPart");
+var encodeSignaturePart = /* @__PURE__ */ __name((buf) => encodeBase64Url(buf).replace(/=/g, ""), "encodeSignaturePart");
+var decodeJwtPart = /* @__PURE__ */ __name((part) => JSON.parse(utf8Decoder.decode(decodeBase64Url(part))), "decodeJwtPart");
+function isTokenHeader(obj) {
+  if (typeof obj === "object" && obj !== null) {
+    const objWithAlg = obj;
+    return "alg" in objWithAlg && Object.values(AlgorithmTypes).includes(objWithAlg.alg) && (!("typ" in objWithAlg) || objWithAlg.typ === "JWT");
+  }
+  return false;
+}
+__name(isTokenHeader, "isTokenHeader");
+var sign = /* @__PURE__ */ __name(async (payload, privateKey, alg = "HS256") => {
+  const encodedPayload = encodeJwtPart(payload);
+  let encodedHeader;
+  if (typeof privateKey === "object" && "alg" in privateKey) {
+    alg = privateKey.alg;
+    encodedHeader = encodeJwtPart({ alg, typ: "JWT", kid: privateKey.kid });
+  } else {
+    encodedHeader = encodeJwtPart({ alg, typ: "JWT" });
+  }
+  const partialToken = `${encodedHeader}.${encodedPayload}`;
+  const signaturePart = await signing(privateKey, alg, utf8Encoder.encode(partialToken));
+  const signature = encodeSignaturePart(signaturePart);
+  return `${partialToken}.${signature}`;
+}, "sign");
+var verify = /* @__PURE__ */ __name(async (token, publicKey, algOrOptions) => {
+  if (!algOrOptions) {
+    throw new JwtAlgorithmRequired();
+  }
+  const {
+    alg,
+    iss,
+    nbf = true,
+    exp = true,
+    iat = true,
+    aud
+  } = typeof algOrOptions === "string" ? { alg: algOrOptions } : algOrOptions;
+  if (!alg) {
+    throw new JwtAlgorithmRequired();
+  }
+  const tokenParts = token.split(".");
+  if (tokenParts.length !== 3) {
+    throw new JwtTokenInvalid(token);
+  }
+  const { header, payload } = decode(token);
+  if (!isTokenHeader(header)) {
+    throw new JwtHeaderInvalid(header);
+  }
+  if (header.alg !== alg) {
+    throw new JwtAlgorithmMismatch(alg, header.alg);
+  }
+  const now = Date.now() / 1e3 | 0;
+  if (nbf && payload.nbf && payload.nbf > now) {
+    throw new JwtTokenNotBefore(token);
+  }
+  if (exp && payload.exp && payload.exp <= now) {
+    throw new JwtTokenExpired(token);
+  }
+  if (iat && payload.iat && now < payload.iat) {
+    throw new JwtTokenIssuedAt(now, payload.iat);
+  }
+  if (iss) {
+    if (!payload.iss) {
+      throw new JwtTokenIssuer(iss, null);
+    }
+    if (typeof iss === "string" && payload.iss !== iss) {
+      throw new JwtTokenIssuer(iss, payload.iss);
+    }
+    if (iss instanceof RegExp && !iss.test(payload.iss)) {
+      throw new JwtTokenIssuer(iss, payload.iss);
+    }
+  }
+  if (aud) {
+    if (!payload.aud) {
+      throw new JwtPayloadRequiresAud(payload);
+    }
+    const audiences = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+    const matched = audiences.some(
+      (payloadAud) => aud instanceof RegExp ? aud.test(payloadAud) : typeof aud === "string" ? payloadAud === aud : Array.isArray(aud) && aud.includes(payloadAud)
+    );
+    if (!matched) {
+      throw new JwtTokenAudience(aud, payload.aud);
+    }
+  }
+  const headerPayload = token.substring(0, token.lastIndexOf("."));
+  const verified = await verifying(
+    publicKey,
+    alg,
+    decodeBase64Url(tokenParts[2]),
+    utf8Encoder.encode(headerPayload)
+  );
+  if (!verified) {
+    throw new JwtTokenSignatureMismatched(token);
+  }
+  return payload;
+}, "verify");
+var symmetricAlgorithms = [
+  AlgorithmTypes.HS256,
+  AlgorithmTypes.HS384,
+  AlgorithmTypes.HS512
+];
+var verifyWithJwks = /* @__PURE__ */ __name(async (token, options, init) => {
+  const verifyOpts = options.verification || {};
+  const header = decodeHeader(token);
+  if (!isTokenHeader(header)) {
+    throw new JwtHeaderInvalid(header);
+  }
+  if (!header.kid) {
+    throw new JwtHeaderRequiresKid(header);
+  }
+  if (symmetricAlgorithms.includes(header.alg)) {
+    throw new JwtSymmetricAlgorithmNotAllowed(header.alg);
+  }
+  if (!options.allowedAlgorithms.includes(header.alg)) {
+    throw new JwtAlgorithmNotAllowed(header.alg, options.allowedAlgorithms);
+  }
+  if (options.jwks_uri) {
+    const response = await fetch(options.jwks_uri, init);
+    if (!response.ok) {
+      throw new Error(`failed to fetch JWKS from ${options.jwks_uri}`);
+    }
+    const data = await response.json();
+    if (!data.keys) {
+      throw new Error('invalid JWKS response. "keys" field is missing');
+    }
+    if (!Array.isArray(data.keys)) {
+      throw new Error('invalid JWKS response. "keys" field is not an array');
+    }
+    if (options.keys) {
+      options.keys.push(...data.keys);
+    } else {
+      options.keys = data.keys;
+    }
+  } else if (!options.keys) {
+    throw new Error('verifyWithJwks requires options for either "keys" or "jwks_uri" or both');
+  }
+  const matchingKey = options.keys.find((key) => key.kid === header.kid);
+  if (!matchingKey) {
+    throw new JwtTokenInvalid(token);
+  }
+  if (matchingKey.alg && matchingKey.alg !== header.alg) {
+    throw new JwtAlgorithmMismatch(matchingKey.alg, header.alg);
+  }
+  return await verify(token, matchingKey, {
+    alg: header.alg,
+    ...verifyOpts
+  });
+}, "verifyWithJwks");
+var decode = /* @__PURE__ */ __name((token) => {
+  try {
+    const [h, p] = token.split(".");
+    const header = decodeJwtPart(h);
+    const payload = decodeJwtPart(p);
+    return {
+      header,
+      payload
+    };
+  } catch {
+    throw new JwtTokenInvalid(token);
+  }
+}, "decode");
+var decodeHeader = /* @__PURE__ */ __name((token) => {
+  try {
+    const [h] = token.split(".");
+    return decodeJwtPart(h);
+  } catch {
+    throw new JwtTokenInvalid(token);
+  }
+}, "decodeHeader");
+
+// node_modules/hono/dist/utils/jwt/index.js
+var Jwt = { sign, verify, decode, verifyWithJwks };
+
+// node_modules/hono/dist/middleware/jwt/jwt.js
+var jwt = /* @__PURE__ */ __name((options) => {
+  const verifyOpts = options.verification || {};
+  if (!options || !options.secret) {
+    throw new Error('JWT auth middleware requires options for "secret"');
+  }
+  if (!options.alg) {
+    throw new Error('JWT auth middleware requires options for "alg"');
+  }
+  if (!crypto.subtle || !crypto.subtle.importKey) {
+    throw new Error("`crypto.subtle.importKey` is undefined. JWT auth middleware requires it.");
+  }
+  return /* @__PURE__ */ __name(async function jwt2(ctx, next) {
+    const headerName = options.headerName || "Authorization";
+    const credentials = ctx.req.raw.headers.get(headerName);
+    let token;
+    if (credentials) {
+      const parts = credentials.split(/\s+/);
+      if (parts.length !== 2) {
+        const errDescription = "invalid credentials structure";
+        throw new HTTPException(401, {
+          message: errDescription,
+          res: unauthorizedResponse({
+            ctx,
+            error: "invalid_request",
+            errDescription
+          })
+        });
+      } else {
+        token = parts[1];
+      }
+    } else if (options.cookie) {
+      if (typeof options.cookie == "string") {
+        token = getCookie(ctx, options.cookie);
+      } else if (options.cookie.secret) {
+        if (options.cookie.prefixOptions) {
+          token = await getSignedCookie(
+            ctx,
+            options.cookie.secret,
+            options.cookie.key,
+            options.cookie.prefixOptions
+          );
+        } else {
+          token = await getSignedCookie(ctx, options.cookie.secret, options.cookie.key);
+        }
+      } else {
+        if (options.cookie.prefixOptions) {
+          token = getCookie(ctx, options.cookie.key, options.cookie.prefixOptions);
+        } else {
+          token = getCookie(ctx, options.cookie.key);
+        }
+      }
+    }
+    if (!token) {
+      const errDescription = "no authorization included in request";
+      throw new HTTPException(401, {
+        message: errDescription,
+        res: unauthorizedResponse({
+          ctx,
+          error: "invalid_request",
+          errDescription
+        })
+      });
+    }
+    let payload;
+    let cause;
+    try {
+      payload = await Jwt.verify(token, options.secret, {
+        alg: options.alg,
+        ...verifyOpts
+      });
+    } catch (e) {
+      cause = e;
+    }
+    if (!payload) {
+      throw new HTTPException(401, {
+        message: "Unauthorized",
+        res: unauthorizedResponse({
+          ctx,
+          error: "invalid_token",
+          statusText: "Unauthorized",
+          errDescription: "token verification failure"
+        }),
+        cause
+      });
+    }
+    ctx.set("jwtPayload", payload);
+    await next();
+  }, "jwt2");
+}, "jwt");
+function unauthorizedResponse(opts) {
+  return new Response("Unauthorized", {
+    status: 401,
+    statusText: opts.statusText,
+    headers: {
+      "WWW-Authenticate": `Bearer realm="${opts.ctx.req.url}",error="${opts.error}",error_description="${opts.errDescription}"`
+    }
+  });
+}
+__name(unauthorizedResponse, "unauthorizedResponse");
+var verifyWithJwks2 = Jwt.verifyWithJwks;
+var verify2 = Jwt.verify;
+var decode2 = Jwt.decode;
+var sign2 = Jwt.sign;
 
 // node_modules/hono/dist/jsx/jsx-runtime.js
 init_checked_fetch();
@@ -3833,18 +4656,19 @@ __name(jsxDEV, "jsxDEV");
 // src/index.tsx
 var app = new Hono2();
 var secure = new Hono2();
-secure.use("*", async (c, next) => {
-  const token = getCookie(c, "auth_token");
-  if (!token) {
-    return c.redirect("/login");
-  }
-  await next();
-});
+var authMiddleware = /* @__PURE__ */ __name((c, next) => {
+  const jwtMiddleware = jwt({
+    secret: c.env.JWT_SECRET,
+    cookie: "auth_token"
+  });
+  return jwtMiddleware(c, next);
+}, "authMiddleware");
+secure.use("*", authMiddleware);
 app.get("/public/*", module({ root: "./" }));
 app.get("/sw.js", module({ path: "./public/sw.js" }));
 app.get("/login", (c) => {
-  const signupUrl = "https://insighthunter.io/signup.html";
-  return c.redirect(signupUrl, 302);
+  const loginUrl = "https://insighthunter.io/login.html";
+  return c.redirect(loginUrl, 302);
 });
 app.get("/auth/callback", (c) => {
   const token = c.req.query("token");
@@ -3854,8 +4678,8 @@ app.get("/auth/callback", (c) => {
       secure: true,
       // Should be true in production
       httpOnly: true,
-      maxAge: 60 * 60 * 24 * 7
-      // 1 week
+      maxAge: 60 * 60 * 24
+      // 1 day, align with JWT expiry
     });
     return c.redirect("/");
   }
@@ -3994,7 +4818,9 @@ function calculateMetrics(data) {
 }
 __name(calculateMetrics, "calculateMetrics");
 secure.get("/", async (c) => {
-  const list = await c.env.CSV_BUCKET.list({ limit: 100 });
+  const payload = c.get("jwtPayload");
+  const userId = payload.sub;
+  const list = await c.env.CSV_BUCKET.list({ prefix: `uploads/${userId}/`, limit: 100 });
   if (!list.objects.length) {
     return c.html(/* @__PURE__ */ jsxDEV(Dashboard, { data: null, metrics: null }));
   }
@@ -4010,10 +4836,12 @@ secure.get("/", async (c) => {
 });
 secure.get("/upload", (c) => c.html(/* @__PURE__ */ jsxDEV(UploadPage, {})));
 secure.post("/upload", async (c) => {
+  const payload = c.get("jwtPayload");
+  const userId = payload.sub;
   const formData = await c.req.formData();
   const file = formData.get("csvFile");
   if (file instanceof File && file.name.endsWith(".csv")) {
-    const key = `uploads/${Date.now()}-${file.name}`;
+    const key = `uploads/${userId}/${Date.now()}-${file.name}`;
     await c.env.CSV_BUCKET.put(key, file.stream());
     return c.redirect("/");
   } else {
@@ -4068,7 +4896,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// .wrangler/tmp/bundle-AMwCcT/middleware-insertion-facade.js
+// .wrangler/tmp/bundle-4bEefO/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -4102,7 +4930,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// .wrangler/tmp/bundle-AMwCcT/middleware-loader.entry.ts
+// .wrangler/tmp/bundle-4bEefO/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

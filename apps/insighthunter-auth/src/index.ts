@@ -1,16 +1,16 @@
-// apps/insighthunter-auth/src/index.ts
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { jwt, sign } from 'hono/jwt';
 
 // Define the environment bindings that will be available to the worker.
 export interface Env {
   DB: D1Database;
-  AUTH_TOKENS: KVNamespace;
+  LITE_APP_URL: string;
+  JWT_SECRET: string; // Secret for signing JWTs
 }
 
 const app = new Hono<{ Bindings: Env }>();
 
-// --- CORS Middleware ---
 // Allow cross-origin requests from any domain.
 app.use('*', cors({
   origin: (origin) => origin,
@@ -36,7 +36,6 @@ async function hashPassword(password: string): Promise<string> {
         256 // 256 bits
     );
 
-    // Combine salt and hash, then encode as a hex string for easy storage.
     const saltHex = Array.from(new Uint8Array(salt)).map(b => b.toString(16).padStart(2, '0')).join('');
     const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
     
@@ -63,24 +62,12 @@ async function verifyPassword(password: string, storedSaltAndHash: string): Prom
             256
         );
 
-        // Constant-time comparison to prevent timing attacks
         return crypto.subtle.timingSafeEqual(storedHash, new Uint8Array(derivedHashBuffer));
     } catch (e) {
         console.error("Error during password verification:", e);
         return false;
     }
 }
-
-
-/**
- * Generates a cryptographically secure, random token.
- * @returns A 64-character hex string to be used as an auth token.
- */
-function generateToken(): string {
-    const randomBytes = crypto.getRandomValues(new Uint8Array(32));
-    return Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
 
 // --- API Endpoints ---
 
@@ -95,7 +82,6 @@ app.post('/api/signup', async (c) => {
     }
     
     try {
-        // Check if user already exists
         const existingUser = await c.env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first();
         if (existingUser) {
             return c.json({ success: false, error: 'User with this email already exists.' }, 409);
@@ -103,7 +89,6 @@ app.post('/api/signup', async (c) => {
 
         const hashedPassword = await hashPassword(password);
         
-        // Insert the new user and retrieve their ID
         const result = await c.env.DB.prepare('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?) RETURNING id')
             .bind(name, email, hashedPassword)
             .first();
@@ -113,10 +98,12 @@ app.post('/api/signup', async (c) => {
         }
         
         const userId = result.id;
-        const token = generateToken();
         
-        // Store the token in KV with a 24-hour expiration
-        await c.env.AUTH_TOKENS.put(token, userId.toString(), { expirationTtl: 86400 }); 
+        const payload = {
+            sub: userId,
+            exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24), // 24-hour expiration
+        };
+        const token = await sign(payload, c.env.JWT_SECRET);
 
         return c.json({ success: true, token: token });
     } catch (error) {
@@ -148,8 +135,11 @@ app.post('/api/login', async (c) => {
             return c.json({ success: false, error: 'Invalid credentials.' }, 401);
         }
 
-        const token = generateToken();
-        await c.env.AUTH_TOKENS.put(token, user.id.toString(), { expirationTtl: 86400 }); // 24-hour expiration
+        const payload = {
+            sub: user.id,
+            exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24), // 24-hour expiration
+        };
+        const token = await sign(payload, c.env.JWT_SECRET);
 
         return c.json({ success: true, token: token });
     } catch (error) {
@@ -159,25 +149,17 @@ app.post('/api/login', async (c) => {
 });
 
 /**
- * Endpoint for validating an authentication token.
+ * Endpoint for validating a JWT.
  * This is called by other services to verify a user's session.
  */
-app.get('/api/validate-token', async (c) => {
-    const authHeader = c.req.header('Authorization');
-    const token = authHeader ? authHeader.split(' ')[1] : null;
-
-    if (!token) {
-        return c.json({ success: false, error: 'Unauthorized: Token not provided.' }, 401);
-    }
-
-    const userId = await c.env.AUTH_TOKENS.get(token);
-
-    if (!userId) {
-        return c.json({ success: false, error: 'Unauthorized: Invalid or expired token.' }, 401);
-    }
-
-    return c.json({ success: true, userId: userId });
-});
+app.get(
+  '/api/validate-token',
+  (c, next) => jwt({ secret: c.env.JWT_SECRET })(c, next),
+  async (c) => {
+    const payload = c.get('jwtPayload');
+    return c.json({ success: true, userId: payload.sub });
+  }
+);
 
 
 /**
