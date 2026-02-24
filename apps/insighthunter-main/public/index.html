@@ -3,95 +3,1083 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InsightHunter - Your Financial Nervous System</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>InsightHunter — Financial Operations Platform for Modern Businesses</title>
+    <meta name="description" content="InsightHunter gives business owners and fractional CFOs real-time cash flow clarity, automated forecasting, and client-ready financial reports — in one powerful platform.">
+    <meta property="og:title" content="InsightHunter — Your Financial Nervous System">
+    <meta property="og:description" content="Real-time cash flow clarity, automated forecasting, and client-ready reports. The financial operations platform built for modern businesses.">
+    <meta property="og:type" content="website">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body class="page">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <header class="header">
-        <div class="brand">InsightHunter</div>
+        :root {
+            --ink: #0D1117;
+            --ink-soft: #3D4451;
+            --ink-muted: #6B7280;
+            --paper: #FAFAF8;
+            --surface: #FFFFFF;
+            --surface-alt: #F4F3EF;
+            --gold: #C9A84C;
+            --gold-light: #F0E0A8;
+            --gold-dark: #9A7520;
+            --teal: #1A6B5E;
+            --teal-light: #E8F5F2;
+            --teal-mid: #2A8A78;
+            --accent: #1A6B5E;
+            --border: #E5E2D8;
+            --border-strong: #C8C4B4;
+            --radius: 4px;
+            --radius-lg: 8px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(250,250,248,0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: box-shadow 0.3s;
+        }
+        .header.scrolled { box-shadow: var(--shadow); }
+
+        .brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.01em;
+            text-decoration: none;
+        }
+        .brand span { color: var(--gold); }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav a {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--ink-soft);
+            text-decoration: none;
+            padding: 6px 14px;
+            border-radius: var(--radius);
+            transition: color 0.2s, background 0.2s;
+        }
+        .nav a:hover { color: var(--ink); background: var(--surface-alt); }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--ink);
+            color: #FFF;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            transition: background 0.2s, transform 0.15s;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.01em;
+        }
+        .btn-primary:hover { background: var(--teal); transform: translateY(-1px); }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            color: var(--ink);
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            border: 1.5px solid var(--border-strong);
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .btn-secondary:hover { border-color: var(--ink); color: var(--ink); }
+
+        /* ── HERO ── */
+        .hero {
+            padding: 140px 40px 100px;
+            max-width: 1160px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--teal);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 20px;
+        }
+        .hero-eyebrow::before {
+            content: '';
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--gold);
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.4rem, 4vw, 3.6rem);
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+            margin-bottom: 24px;
+        }
+        .hero h1 em {
+            font-style: normal;
+            color: var(--teal);
+            position: relative;
+        }
+        .hero h1 em::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 2px;
+        }
+
+        .hero-sub {
+            font-size: 1.1rem;
+            color: var(--ink-soft);
+            line-height: 1.7;
+            margin-bottom: 36px;
+            max-width: 480px;
+        }
+
+        .hero-cta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .hero-cta .btn-primary {
+            font-size: 1rem;
+            padding: 14px 28px;
+        }
+
+        .hero-trust {
+            margin-top: 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .hero-trust-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--ink-muted);
+            font-weight: 500;
+        }
+        .hero-trust-item svg { color: var(--teal); }
+
+        /* Dashboard mockup */
+        .hero-visual {
+            position: relative;
+        }
+        .dashboard-mock {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .mock-header {
+            background: var(--ink);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .mock-title {
+            margin-left: 8px;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+            font-weight: 500;
+        }
+        .mock-body { padding: 20px; }
+        .mock-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .mock-stat {
+            background: var(--surface-alt);
+            border-radius: 6px;
+            padding: 14px;
+            border: 1px solid var(--border);
+        }
+        .mock-stat-label { font-size: 0.65rem; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+        .mock-stat-value { font-size: 1.1rem; font-weight: 700; color: var(--ink); }
+        .mock-stat-delta { font-size: 0.65rem; margin-top: 2px; }
+        .delta-up { color: var(--teal); }
+        .delta-down { color: #DC2626; }
+        .mock-chart {
+            background: var(--surface-alt);
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            padding: 16px;
+            height: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        .mock-chart-label { font-size: 0.65rem; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 60px;
+        }
+        .bar {
+            flex: 1;
+            border-radius: 3px 3px 0 0;
+            background: var(--teal);
+            opacity: 0.7;
+            animation: grow 1s ease-out forwards;
+            transform-origin: bottom;
+        }
+        .bar:nth-child(even) { opacity: 0.4; }
+        .bar.highlight { opacity: 1; background: var(--gold); }
+        @keyframes grow {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+            background: var(--ink);
+            padding: 28px 40px;
+        }
+        .stats-bar-inner {
+            max-width: 1160px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+        .stat-item { text-align: center; }
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gold);
+            display: block;
+        }
+        .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.55); font-weight: 400; margin-top: 2px; }
+        .stat-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.12); }
+
+        /* ── SECTION SHARED ── */
+        .section { padding: 100px 40px; }
+        .section-inner { max-width: 1160px; margin: 0 auto; }
+        .section-eyebrow {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--teal);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 12px;
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 3vw, 2.6rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            color: var(--ink);
+            margin-bottom: 16px;
+        }
+        .section-sub {
+            font-size: 1rem;
+            color: var(--ink-soft);
+            max-width: 520px;
+            line-height: 1.7;
+            margin-bottom: 56px;
+        }
+
+        /* ── PROBLEM SECTION ── */
+        .problem { background: var(--surface-alt); }
+        .problem-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        .problem-list { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+        .problem-item {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .problem-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #FEE2E2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1rem;
+        }
+        .problem-text strong { display: block; font-size: 0.95rem; margin-bottom: 4px; color: var(--ink); }
+        .problem-text span { font-size: 0.875rem; color: var(--ink-muted); line-height: 1.5; }
+        .solution-callout {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            border-left: 4px solid var(--gold);
+        }
+        .solution-callout h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--ink);
+        }
+        .solution-callout p { color: var(--ink-soft); line-height: 1.7; font-size: 0.95rem; }
+
+        /* ── PLANS ── */
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+        .plan-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 36px 32px;
+            position: relative;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .plan-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
+        .plan-card.featured {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 4px var(--teal-light), var(--shadow);
+        }
+        .plan-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--teal);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 5px 16px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+        .plan-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 6px;
+        }
+        .plan-tagline { font-size: 0.85rem; color: var(--ink-muted); margin-bottom: 24px; line-height: 1.5; }
+        .plan-price {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+        .plan-price sup { font-size: 1.1rem; vertical-align: top; margin-top: 8px; font-family: 'DM Sans', sans-serif; }
+        .plan-period { font-size: 0.8rem; color: var(--ink-muted); margin-bottom: 28px; }
+        .plan-divider { height: 1px; background: var(--border); margin-bottom: 24px; }
+        .plan-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+        .plan-feature {
+            display: flex;
+            gap: 12px;
+            font-size: 0.875rem;
+            color: var(--ink-soft);
+            line-height: 1.4;
+        }
+        .plan-feature::before {
+            content: '✓';
+            color: var(--teal);
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+            margin-top: 1px;
+        }
+        .plan-cta {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .plan-cta-outline {
+            border: 1.5px solid var(--border-strong);
+            color: var(--ink);
+        }
+        .plan-cta-outline:hover { border-color: var(--ink); background: var(--surface-alt); }
+        .plan-cta-filled {
+            background: var(--teal);
+            color: white;
+        }
+        .plan-cta-filled:hover { background: var(--teal-mid); }
+
+        /* ── ADD-ONS ── */
+        .addons { background: var(--surface-alt); }
+        .addons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .addon-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px 24px;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .addon-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+        .addon-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: var(--teal-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+        }
+        .addon-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--ink);
+            margin-bottom: 8px;
+        }
+        .addon-desc { font-size: 0.825rem; color: var(--ink-muted); line-height: 1.5; }
+
+        /* ── TESTIMONIALS ── */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .testimonial-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            position: relative;
+        }
+        .testimonial-card::before {
+            content: '\201C';
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            color: var(--gold-light);
+            position: absolute;
+            top: 8px;
+            left: 24px;
+            line-height: 1;
+        }
+        .testimonial-text {
+            font-size: 0.95rem;
+            color: var(--ink-soft);
+            line-height: 1.7;
+            margin-bottom: 24px;
+            padding-top: 20px;
+        }
+        .testimonial-author { display: flex; align-items: center; gap: 14px; }
+        .author-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--teal-light), var(--gold-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--teal);
+        }
+        .author-name { font-weight: 600; font-size: 0.875rem; color: var(--ink); }
+        .author-role { font-size: 0.775rem; color: var(--ink-muted); margin-top: 2px; }
+
+        /* ── HOW IT WORKS ── */
+        .how-it-works { background: var(--ink); }
+        .how-it-works .section-title,
+        .how-it-works .section-eyebrow { color: white; }
+        .how-it-works .section-sub { color: rgba(255,255,255,0.55); }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            background: rgba(255,255,255,0.08);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        .step {
+            background: var(--ink);
+            padding: 40px 32px;
+            position: relative;
+        }
+        .step-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: rgba(255,255,255,0.06);
+            line-height: 1;
+            margin-bottom: 20px;
+        }
+        .step-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: white;
+            margin-bottom: 10px;
+        }
+        .step-desc { font-size: 0.875rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(201,168,76,0.15);
+            border: 1px solid rgba(201,168,76,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+        }
+
+        /* ── FINAL CTA ── */
+        .final-cta {
+            padding: 100px 40px;
+            text-align: center;
+            background: linear-gradient(160deg, var(--teal-light) 0%, var(--paper) 60%);
+        }
+        .final-cta .section-title { margin: 0 auto 16px; }
+        .final-cta .section-sub { margin: 0 auto 40px; }
+        .final-cta-actions { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+        .final-cta .btn-primary { font-size: 1rem; padding: 14px 32px; }
+        .no-card { font-size: 0.8rem; color: var(--ink-muted); margin-top: 16px; }
+
+        /* ── FOOTER ── */
+        .footer {
+            background: var(--ink);
+            padding: 60px 40px 40px;
+            color: rgba(255,255,255,0.5);
+        }
+        .footer-inner {
+            max-width: 1160px;
+            margin: 0 auto;
+        }
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            padding-bottom: 48px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 32px;
+        }
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+        }
+        .footer-brand span { color: var(--gold); }
+        .footer-tagline { font-size: 0.85rem; line-height: 1.6; }
+        .footer-col h4 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7); margin-bottom: 16px; }
+        .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .footer-links a { color: rgba(255,255,255,0.45); text-decoration: none; font-size: 0.875rem; transition: color 0.2s; }
+        .footer-links a:hover { color: white; }
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .footer-legal { display: flex; gap: 20px; }
+        .footer-legal a { color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s; }
+        .footer-legal a:hover { color: rgba(255,255,255,0.7); }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-up { opacity: 0; animation: fadeUp 0.6s ease forwards; }
+        .fade-up:nth-child(1) { animation-delay: 0.1s; }
+        .fade-up:nth-child(2) { animation-delay: 0.2s; }
+        .fade-up:nth-child(3) { animation-delay: 0.3s; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .header { padding: 0 20px; }
+            .nav a:not(.btn-primary) { display: none; }
+            .hero { grid-template-columns: 1fr; gap: 48px; padding: 120px 20px 60px; }
+            .hero-visual { order: -1; }
+            .problem-grid { grid-template-columns: 1fr; gap: 40px; }
+            .plans-grid { grid-template-columns: 1fr; }
+            .steps-grid { grid-template-columns: 1fr; }
+            .footer-top { grid-template-columns: 1fr 1fr; }
+            .section { padding: 64px 20px; }
+            .stat-divider { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header" id="header">
+        <a href="/" class="brand">Insight<span>Hunter</span></a>
         <nav class="nav">
             <a href="features.html">Features</a>
             <a href="pricing.html">Pricing</a>
             <a href="about.html">About</a>
-            <a href="login.html">Login</a>
-            <a href="signup.html" class="btn-primary">Sign Up Free</a>
+            <a href="login.html">Log In</a>
+            <a href="signup.html" class="btn-primary">Start Free →</a>
         </nav>
     </header>
 
-    <main class="main">
+    <main>
+
+        <!-- HERO -->
         <section class="hero">
-            <h1>Your Financial Nervous System</h1>
-            <p>Clarity, control, and confidence in your financial operations. The ultimate toolkit for modern businesses.</p>
-            <a href="signup.html" class="btn-primary" style="font-size: 1.2em; padding: 15px 30px;">Get Started for Free</a>
+            <div class="hero-content">
+                <div class="hero-eyebrow fade-up">Financial Operations Platform</div>
+                <h1 class="fade-up">
+                    Stop Flying Blind.<br>
+                    Run Your Finances with <em>Clarity</em>.
+                </h1>
+                <p class="hero-sub fade-up">
+                    InsightHunter gives business owners and fractional CFOs real-time cash flow visibility, automated forecasting, and client-ready financial reports — without the spreadsheet chaos.
+                </p>
+                <div class="hero-cta fade-up">
+                    <a href="signup.html" class="btn-primary">Get Started Free →</a>
+                    <a href="features.html" class="btn-secondary">See How It Works</a>
+                </div>
+                <div class="hero-trust fade-up">
+                    <div class="hero-trust-item">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        No credit card required
+                    </div>
+                    <div class="hero-trust-item">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        Setup in under 5 minutes
+                    </div>
+                    <div class="hero-trust-item">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        Cancel anytime
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Mockup -->
+            <div class="hero-visual fade-up">
+                <div class="dashboard-mock">
+                    <div class="mock-header">
+                        <div class="mock-dot" style="background:#FF5F57"></div>
+                        <div class="mock-dot" style="background:#FFBD2E"></div>
+                        <div class="mock-dot" style="background:#28CA41"></div>
+                        <span class="mock-title">InsightHunter Dashboard — Acme Corp</span>
+                    </div>
+                    <div class="mock-body">
+                        <div class="mock-stats">
+                            <div class="mock-stat">
+                                <div class="mock-stat-label">Cash Flow</div>
+                                <div class="mock-stat-value">$84.2K</div>
+                                <div class="mock-stat-delta delta-up">▲ 12% this month</div>
+                            </div>
+                            <div class="mock-stat">
+                                <div class="mock-stat-label">Runway</div>
+                                <div class="mock-stat-value">14 mo</div>
+                                <div class="mock-stat-delta delta-up">▲ Healthy</div>
+                            </div>
+                            <div class="mock-stat">
+                                <div class="mock-stat-label">Burn Rate</div>
+                                <div class="mock-stat-value">$6.1K</div>
+                                <div class="mock-stat-delta delta-down">▼ 3% vs target</div>
+                            </div>
+                        </div>
+                        <div class="mock-chart">
+                            <div class="mock-chart-label">Monthly Revenue — Last 6 Months</div>
+                            <div class="chart-bars">
+                                <div class="bar" style="height:45%"></div>
+                                <div class="bar" style="height:55%"></div>
+                                <div class="bar" style="height:50%"></div>
+                                <div class="bar" style="height:70%"></div>
+                                <div class="bar" style="height:65%"></div>
+                                <div class="bar highlight" style="height:88%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <section class="features">
-            <div class="feature-card">
-                <h2>Insight-Lite</h2>
-                <p>Basic clarity on cash flow and performance. Manual CSV uploads, simple dashboards, and basic reports.</p>
-                <a href="pricing.html">Learn More</a>
+        <!-- STATS BAR -->
+        <div class="stats-bar">
+            <div class="stats-bar-inner">
+                <div class="stat-item">
+                    <span class="stat-number">500+</span>
+                    <span class="stat-label">Businesses Served</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number">$2B+</span>
+                    <span class="stat-label">Cash Flow Monitored</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number">12 hrs</span>
+                    <span class="stat-label">Saved Per Month, Per User</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number">99.9%</span>
+                    <span class="stat-label">Platform Uptime</span>
+                </div>
             </div>
-            <div class="feature-card">
-                <h2>Insight-Standard</h2>
-                <p>Ongoing forecasting, alerts, and client-ready decks. Automatic CSV ingestion, rich dashboards, and branded reports.</p>
-                <a href="pricing.html">Learn More</a>
-            </div>
-            <div class="feature-card">
-                <h2>Insight-Pro</h2>
-                <p>Multi-entity, white-label, and advanced automation. For fractional CFOs and small firms managing multiple clients.</p>
-                <a href="pricing.html">Learn More</a>
-            </div>
-        </section>
-        
-        <section class="add-ons">
-            <h2 style="text-align: center; margin-bottom: 40px;">Professional Service Add-ons</h2>
-            <div class="add-on-card">
-                <h3>PBX</h3>
-                <p>A professional phone system for your business.</p>
-            </div>
-            <div class="add-on-card">
-                <h3>Website Services</h3>
-                <p>Design, hosting, domain registration, SEO, marketing, and reputation management.</p>
-            </div>
-            <div class="add-on-card">
-                <h3>BizForma</h3>
-                <p>Business registration and formation, compliance, tax setup, payroll setup, and legal documents.</p>
-            </div>
-            <div class="add-on-card">
-                <h3>Scout</h3>
-                <p>Your AI-powered research assistant.</p>
-            </div>
-            <div class="add-on-card">
-                <h3>Bookkeeping</h3>
-                <p>Professional bookkeeping services with its own pricing tiers.</p>
+        </div>
+
+        <!-- PROBLEM SECTION -->
+        <section class="section problem">
+            <div class="section-inner">
+                <div class="problem-grid">
+                    <div>
+                        <div class="section-eyebrow">The Problem</div>
+                        <h2 class="section-title">Most Business Owners Are<br>Flying Blind on Finances</h2>
+                        <p class="section-sub">Running a business without real-time financial clarity is like driving at night without headlights. You know something might be wrong — but only after it's too late.</p>
+                        <ul class="problem-list">
+                            <li class="problem-item">
+                                <div class="problem-icon">😤</div>
+                                <div class="problem-text">
+                                    <strong>Spreadsheets that break constantly</strong>
+                                    <span>Hours lost every month to manual data entry, formula errors, and out-of-date reports that nobody trusts.</span>
+                                </div>
+                            </li>
+                            <li class="problem-item">
+                                <div class="problem-icon">📉</div>
+                                <div class="problem-text">
+                                    <strong>No early warning system</strong>
+                                    <span>Cash flow problems don't announce themselves. By the time you notice, you're already behind — and scrambling.</span>
+                                </div>
+                            </li>
+                            <li class="problem-item">
+                                <div class="problem-icon">📊</div>
+                                <div class="problem-text">
+                                    <strong>Reports that take forever to produce</strong>
+                                    <span>Creating a board deck or investor update eats an entire day. Every. Single. Month.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="solution-callout">
+                        <h3>There's a better way.</h3>
+                        <p>InsightHunter connects to your financial data, monitors it continuously, and surfaces the insights that matter — so you always know where you stand and where you're headed. Think of it as having a CFO on call, 24/7, without the six-figure salary.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section class="testimonials">
-            <h2 style="text-align: center; margin-bottom: 40px;">What our customers are saying</h2>
-            <div class="testimonial-card">
-                <p>"InsightHunter has transformed how we manage our finances. It's intuitive, powerful, and has saved us countless hours."</p>
-                <strong>- CEO of a growing startup</strong>
+        <!-- HOW IT WORKS -->
+        <section class="section how-it-works">
+            <div class="section-inner">
+                <div class="section-eyebrow" style="color: rgba(201,168,76,0.8)">How It Works</div>
+                <h2 class="section-title" style="color: white;">Up and Running<br>in Three Steps</h2>
+                <p class="section-sub">No complicated setup. No data science degree required. Real insight in under 10 minutes.</p>
+                <div class="steps-grid">
+                    <div class="step">
+                        <div class="step-number">01</div>
+                        <div class="step-icon">📂</div>
+                        <div class="step-title">Connect Your Data</div>
+                        <div class="step-desc">Upload a CSV from QuickBooks, Xero, or your bank — or use our automatic ingestion for supported integrations. We handle the data prep so you don't have to.</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">02</div>
+                        <div class="step-icon">⚡</div>
+                        <div class="step-title">Get Instant Clarity</div>
+                        <div class="step-desc">Your dashboard populates automatically with cash flow trends, burn rate, runway, forecasts, and alerts — tailored to your business in real time.</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">03</div>
+                        <div class="step-icon">📤</div>
+                        <div class="step-title">Share & Act</div>
+                        <div class="step-desc">Generate branded, client-ready reports and investor decks in one click. Share a live dashboard link or export a polished PDF — your call.</div>
+                    </div>
+                </div>
             </div>
-            <div class="testimonial-card">
-                <p>"The AI-powered insights are a game-changer. We can now make financial decisions with more confidence than ever before."</p>
-                <strong>- Finance Director at a mid-sized company</strong>
+        </section>
+
+        <!-- PLANS -->
+        <section class="section">
+            <div class="section-inner">
+                <div class="section-eyebrow">Pricing</div>
+                <h2 class="section-title">Plans That Grow With You</h2>
+                <p class="section-sub">Start free and upgrade when you're ready. Every plan includes core financial visibility — no features hidden behind paywalls.</p>
+                <div class="plans-grid">
+
+                    <div class="plan-card">
+                        <div class="plan-name">Insight Lite</div>
+                        <div class="plan-tagline">For solo operators and early-stage businesses getting started with financial visibility.</div>
+                        <div class="plan-price"><sup>$</sup>0</div>
+                        <div class="plan-period">Free forever — no credit card needed</div>
+                        <div class="plan-divider"></div>
+                        <ul class="plan-features">
+                            <li class="plan-feature">Manual CSV uploads</li>
+                            <li class="plan-feature">Basic cash flow dashboard</li>
+                            <li class="plan-feature">3 standard financial reports/month</li>
+                            <li class="plan-feature">Single business entity</li>
+                            <li class="plan-feature">Email support</li>
+                        </ul>
+                        <a href="signup.html" class="plan-cta plan-cta-outline">Get Started Free</a>
+                    </div>
+
+                    <div class="plan-card featured">
+                        <div class="plan-badge">Most Popular</div>
+                        <div class="plan-name">Insight Standard</div>
+                        <div class="plan-tagline">For growing businesses that need ongoing forecasting, alerts, and client-ready reporting.</div>
+                        <div class="plan-price"><sup>$</sup>79<span style="font-size:1rem; font-family: 'DM Sans'; font-weight:400;">/mo</span></div>
+                        <div class="plan-period">Billed monthly · Save 20% annually</div>
+                        <div class="plan-divider"></div>
+                        <ul class="plan-features">
+                            <li class="plan-feature">Automatic CSV ingestion</li>
+                            <li class="plan-feature">Rich cash flow & KPI dashboards</li>
+                            <li class="plan-feature">Rolling 12-month forecasts</li>
+                            <li class="plan-feature">Smart alerts for cash flow issues</li>
+                            <li class="plan-feature">Branded, client-ready report decks</li>
+                            <li class="plan-feature">Priority support</li>
+                        </ul>
+                        <a href="signup.html" class="plan-cta plan-cta-filled">Start 14-Day Free Trial</a>
+                    </div>
+
+                    <div class="plan-card">
+                        <div class="plan-name">Insight Pro</div>
+                        <div class="plan-tagline">For fractional CFOs and advisory firms managing multiple clients at scale.</div>
+                        <div class="plan-price"><sup>$</sup>199<span style="font-size:1rem; font-family: 'DM Sans'; font-weight:400;">/mo</span></div>
+                        <div class="plan-period">Billed monthly · Save 20% annually</div>
+                        <div class="plan-divider"></div>
+                        <ul class="plan-features">
+                            <li class="plan-feature">Everything in Standard</li>
+                            <li class="plan-feature">Multi-entity management</li>
+                            <li class="plan-feature">White-label reporting (your brand)</li>
+                            <li class="plan-feature">Advanced automation workflows</li>
+                            <li class="plan-feature">Client portal access</li>
+                            <li class="plan-feature">Dedicated account manager</li>
+                        </ul>
+                        <a href="signup.html" class="plan-cta plan-cta-outline">Start 14-Day Free Trial</a>
+                    </div>
+
+                </div>
             </div>
+        </section>
+
+        <!-- ADD-ONS -->
+        <section class="section addons">
+            <div class="section-inner">
+                <div class="section-eyebrow">Professional Add-ons</div>
+                <h2 class="section-title">Everything Your Business Needs,<br>Under One Roof</h2>
+                <p class="section-sub">InsightHunter is more than financial software. Add the professional services your business needs as you grow — all from the same trusted platform.</p>
+                <div class="addons-grid">
+                    <div class="addon-card">
+                        <div class="addon-icon">📞</div>
+                        <div class="addon-name">PBX Phone System</div>
+                        <div class="addon-desc">A professional business phone system with extensions, call routing, and voicemail — no hardware required.</div>
+                    </div>
+                    <div class="addon-card">
+                        <div class="addon-icon">🌐</div>
+                        <div class="addon-name">Website Services</div>
+                        <div class="addon-desc">Professional design, fast hosting, domain registration, SEO optimization, and online reputation management.</div>
+                    </div>
+                    <div class="addon-card">
+                        <div class="addon-icon">🏛️</div>
+                        <div class="addon-name">BizForma</div>
+                        <div class="addon-desc">Business formation, compliance filing, tax setup, payroll configuration, and legal document preparation — done for you.</div>
+                    </div>
+                    <div class="addon-card">
+                        <div class="addon-icon">🤖</div>
+                        <div class="addon-name">Scout AI Research</div>
+                        <div class="addon-desc">Your AI-powered research assistant. Market analysis, competitor intelligence, and strategic insights on demand.</div>
+                    </div>
+                    <div class="addon-card">
+                        <div class="addon-icon">📒</div>
+                        <div class="addon-name">Bookkeeping</div>
+                        <div class="addon-desc">Dedicated professional bookkeepers who keep your books clean, current, and tax-ready every month.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TESTIMONIALS -->
+        <section class="section">
+            <div class="section-inner">
+                <div class="section-eyebrow">Customer Stories</div>
+                <h2 class="section-title">Businesses That Made the Switch</h2>
+                <p class="section-sub">Don't take our word for it — here's what real InsightHunter customers have to say.</p>
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">"Before InsightHunter, I was spending 2–3 days a month just trying to understand where our cash was going. Now I open my dashboard and know in 30 seconds. It's genuinely changed how I run the business."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">MR</div>
+                            <div>
+                                <div class="author-name">Marcus R.</div>
+                                <div class="author-role">CEO, Bright Path Logistics</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">"I manage 14 clients as a fractional CFO. InsightHunter Pro's multi-entity dashboard and white-label reports have made me look like a rockstar. My clients think I have a full team behind me."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">JS</div>
+                            <div>
+                                <div class="author-name">Jennifer S.</div>
+                                <div class="author-role">Fractional CFO, Summit Advisory Group</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">"The AI-powered alerts caught a cash flow crunch three weeks before it would have hit us. We had time to adjust. That alone paid for the subscription 10 times over."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">TK</div>
+                            <div>
+                                <div class="author-name">Tanya K.</div>
+                                <div class="author-role">Finance Director, NovaTech Solutions</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FINAL CTA -->
+        <section class="final-cta">
+            <div class="section-eyebrow" style="justify-content: center; display: flex;">Get Started Today</div>
+            <h2 class="section-title">Your Finances Deserve<br>Better Than a Spreadsheet.</h2>
+            <p class="section-sub">Join hundreds of businesses that have replaced guesswork with clarity. Start free — no credit card, no commitment, no setup fees.</p>
+            <div class="final-cta-actions">
+                <a href="signup.html" class="btn-primary" style="font-size: 1rem; padding: 14px 32px;">Start for Free →</a>
+                <a href="pricing.html" class="btn-secondary">View All Plans</a>
+            </div>
+            <p class="no-card">✓ No credit card required &nbsp;·&nbsp; ✓ Free plan available &nbsp;·&nbsp; ✓ Cancel anytime</p>
         </section>
 
     </main>
 
+    <!-- FOOTER -->
     <footer class="footer">
-        <p>&copy; 2024 InsightHunter. All rights reserved.</p>
-        <div>
-            <a href="/legal/privacy.html">Privacy Policy</a> | 
-            <a href="/legal/terms.html">Terms of Service</a>
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div>
+                    <div class="footer-brand">Insight<span>Hunter</span></div>
+                    <p class="footer-tagline">Your financial nervous system. Real-time clarity, automated forecasting, and client-ready reporting for modern businesses.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Product</h4>
+                    <ul class="footer-links">
+                        <li><a href="features.html">Features</a></li>
+                        <li><a href="pricing.html">Pricing</a></li>
+                        <li><a href="#">Integrations</a></li>
+                        <li><a href="#">Changelog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Status</a></li>
+                        <li><a href="/legal/privacy.html">Privacy Policy</a></li>
+                        <li><a href="/legal/terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2025 InsightHunter. All rights reserved.</span>
+                <div class="footer-legal">
+                    <a href="/legal/privacy.html">Privacy</a>
+                    <a href="/legal/terms.html">Terms</a>
+                    <a href="#">Security</a>
+                </div>
+            </div>
         </div>
     </footer>
+
+    <script>
+        // Sticky header shadow on scroll
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 10);
+        });
+    </script>
 
 </body>
 </html>
