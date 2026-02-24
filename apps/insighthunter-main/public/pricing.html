@@ -3,119 +3,559 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pricing - InsightHunter</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Pricing — InsightHunter</title>
+    <meta name="description" content="Start free and upgrade as you grow. InsightHunter plans for solo entrepreneurs, small businesses, and professional firms — from $0/month.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body class="page">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <header class="header">
-        <div class="brand">InsightHunter</div>
+        :root {
+            --ink: #0D1117;
+            --ink-soft: #3D4451;
+            --ink-muted: #6B7280;
+            --paper: #FAFAF8;
+            --surface: #FFFFFF;
+            --surface-alt: #F4F3EF;
+            --gold: #C9A84C;
+            --gold-light: #F0E0A8;
+            --teal: #1A6B5E;
+            --teal-light: #E8F5F2;
+            --teal-mid: #2A8A78;
+            --border: #E5E2D8;
+            --border-strong: #C8C4B4;
+            --radius: 4px;
+            --radius-lg: 10px;
+            --shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); line-height: 1.6; overflow-x: hidden; }
+
+        /* ── HEADER ── */
+        .header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(250,250,248,0.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 40px; height: 64px; display: flex; align-items: center; justify-content: space-between; transition: box-shadow 0.3s; }
+        .header.scrolled { box-shadow: var(--shadow); }
+        .brand { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--ink); text-decoration: none; }
+        .brand span { color: var(--gold); }
+        .nav { display: flex; align-items: center; gap: 6px; }
+        .nav a { font-size: 0.875rem; font-weight: 500; color: var(--ink-soft); text-decoration: none; padding: 6px 14px; border-radius: var(--radius); transition: color 0.2s, background 0.2s; }
+        .nav a:hover { color: var(--ink); background: var(--surface-alt); }
+        .nav a.active { color: var(--ink); font-weight: 600; }
+        .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--ink); color: #FFF; font-size: 0.875rem; font-weight: 600; padding: 8px 20px; border-radius: var(--radius); text-decoration: none; transition: background 0.2s, transform 0.15s; }
+        .btn-primary:hover { background: var(--teal); transform: translateY(-1px); }
+        .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--ink); font-size: 0.875rem; font-weight: 500; padding: 8px 20px; border-radius: var(--radius); text-decoration: none; border: 1.5px solid var(--border-strong); transition: border-color 0.2s; }
+        .btn-secondary:hover { border-color: var(--ink); }
+
+        /* ── PAGE HERO ── */
+        .page-hero {
+            padding: 120px 40px 72px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .page-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 0.72rem; font-weight: 700; color: var(--teal);
+            text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 16px;
+        }
+        .page-eyebrow::before { content: ''; display: block; width: 24px; height: 2px; background: var(--gold); }
+        .page-eyebrow::after { content: ''; display: block; width: 24px; height: 2px; background: var(--gold); }
+        .page-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 4vw, 3.2rem);
+            font-weight: 900; line-height: 1.12;
+            letter-spacing: -0.02em; color: var(--ink); margin-bottom: 16px;
+        }
+        .page-hero p { font-size: 1.05rem; color: var(--ink-soft); line-height: 1.75; margin-bottom: 32px; }
+
+        /* Toggle */
+        .billing-toggle {
+            display: inline-flex; align-items: center; gap: 12px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 40px; padding: 6px 20px;
+            font-size: 0.85rem; font-weight: 500; color: var(--ink-soft);
+        }
+        .toggle-switch {
+            position: relative; width: 44px; height: 24px; cursor: pointer;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-track {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--border-strong); border-radius: 24px;
+            transition: background 0.3s;
+        }
+        .toggle-switch input:checked + .toggle-track { background: var(--teal); }
+        .toggle-thumb {
+            position: absolute; top: 3px; left: 3px;
+            width: 18px; height: 18px; background: white;
+            border-radius: 50%; transition: transform 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(20px); }
+        .save-badge {
+            background: var(--teal-light); color: var(--teal);
+            font-size: 0.7rem; font-weight: 700; padding: 2px 8px;
+            border-radius: 20px; letter-spacing: 0.04em;
+        }
+
+        /* ── PLANS ── */
+        .plans-section { padding: 0 40px 80px; }
+        .plans-inner { max-width: 1100px; margin: 0 auto; }
+        .plans-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 24px; align-items: start;
+        }
+        .plan-card {
+            background: var(--surface); border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg); padding: 36px 30px;
+            position: relative; transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .plan-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
+        .plan-card.featured {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 4px var(--teal-light), var(--shadow);
+        }
+        .plan-badge {
+            position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+            background: var(--teal); color: white;
+            font-size: 0.67rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.1em; padding: 4px 16px; border-radius: 20px; white-space: nowrap;
+        }
+        .plan-name {
+            font-family: 'Playfair Display', serif; font-size: 1.35rem;
+            font-weight: 700; color: var(--ink); margin-bottom: 6px;
+        }
+        .plan-tagline { font-size: 0.85rem; color: var(--ink-muted); margin-bottom: 24px; line-height: 1.5; }
+        .plan-price-row { display: flex; align-items: flex-end; gap: 4px; margin-bottom: 4px; }
+        .plan-currency { font-size: 1.2rem; font-weight: 600; color: var(--ink); margin-bottom: 6px; font-family: 'DM Sans', sans-serif; }
+        .plan-amount { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 900; color: var(--ink); line-height: 1; }
+        .plan-period { font-size: 0.82rem; color: var(--ink-muted); margin-bottom: 6px; }
+        .plan-annual-note { font-size: 0.75rem; color: var(--teal); font-weight: 600; margin-bottom: 28px; min-height: 18px; }
+        .plan-divider { height: 1px; background: var(--border); margin-bottom: 24px; }
+        .plan-features { list-style: none; display: flex; flex-direction: column; gap: 0; margin-bottom: 32px; }
+        .plan-feature {
+            display: flex; gap: 12px; padding: 10px 0;
+            border-bottom: 1px solid var(--border); font-size: 0.875rem; color: var(--ink-soft); line-height: 1.45;
+        }
+        .plan-feature:last-child { border-bottom: none; }
+        .plan-feature-check { color: var(--teal); font-weight: 700; flex-shrink: 0; font-size: 0.8rem; margin-top: 2px; }
+        .plan-feature strong { color: var(--ink); font-weight: 600; }
+        .plan-cta {
+            display: block; text-align: center; padding: 13px;
+            border-radius: var(--radius); font-weight: 600; font-size: 0.9rem;
+            text-decoration: none; transition: all 0.2s; letter-spacing: 0.01em;
+        }
+        .plan-cta-outline { border: 1.5px solid var(--border-strong); color: var(--ink); }
+        .plan-cta-outline:hover { border-color: var(--ink); background: var(--surface-alt); }
+        .plan-cta-filled { background: var(--teal); color: white; }
+        .plan-cta-filled:hover { background: var(--teal-mid); }
+
+        /* ── COMPARISON TABLE ── */
+        .compare-section { padding: 80px 40px; background: var(--surface-alt); }
+        .compare-inner { max-width: 1100px; margin: 0 auto; }
+        .section-eyebrow { font-size: 0.72rem; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 12px; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 2.8vw, 2.4rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; color: var(--ink); margin-bottom: 40px; }
+        .compare-table { width: 100%; border-collapse: collapse; }
+        .compare-table th {
+            text-align: left; padding: 14px 20px;
+            font-size: 0.82rem; font-weight: 700; color: var(--ink-muted);
+            text-transform: uppercase; letter-spacing: 0.08em;
+            border-bottom: 2px solid var(--border);
+        }
+        .compare-table th.plan-col { text-align: center; }
+        .compare-table th.featured-col { color: var(--teal); }
+        .compare-table td { padding: 13px 20px; font-size: 0.875rem; color: var(--ink-soft); border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .compare-table td.plan-col { text-align: center; font-weight: 600; font-size: 0.9rem; }
+        .compare-table tr:last-child td { border-bottom: none; }
+        .compare-table tr:hover td { background: var(--surface); }
+        .compare-table .category-row td { background: var(--surface-alt); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-muted); padding: 10px 20px; }
+        .check { color: var(--teal); font-size: 1rem; }
+        .dash { color: var(--border-strong); font-size: 1.2rem; }
+        .featured-col { background: rgba(26,107,94,0.04); }
+
+        /* ── ADD-ONS ── */
+        .addons-section { padding: 80px 40px; }
+        .addons-inner { max-width: 1100px; margin: 0 auto; }
+        .addons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .addon-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 28px 24px;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .addon-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+        .addon-icon { width: 44px; height: 44px; border-radius: 10px; background: var(--teal-light); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 14px; }
+        .addon-name { font-weight: 700; font-size: 1rem; color: var(--ink); margin-bottom: 4px; }
+        .addon-price { font-size: 0.82rem; font-weight: 600; color: var(--teal); margin-bottom: 10px; }
+        .addon-desc { font-size: 0.82rem; color: var(--ink-muted); line-height: 1.55; margin-bottom: 18px; }
+        .addon-cta { display: inline-block; font-size: 0.82rem; font-weight: 600; color: var(--ink); text-decoration: none; border-bottom: 1.5px solid var(--border-strong); padding-bottom: 1px; transition: border-color 0.2s, color 0.2s; }
+        .addon-cta:hover { color: var(--teal); border-color: var(--teal); }
+
+        /* ── FAQ ── */
+        .faq-section { padding: 80px 40px; background: var(--surface-alt); }
+        .faq-inner { max-width: 720px; margin: 0 auto; }
+        .faq-list { display: flex; flex-direction: column; gap: 0; }
+        .faq-item { border-bottom: 1px solid var(--border); }
+        .faq-item:first-child { border-top: 1px solid var(--border); }
+        .faq-question {
+            width: 100%; background: none; border: none; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 0; text-align: left;
+            font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+            font-weight: 600; color: var(--ink); gap: 16px;
+        }
+        .faq-question:hover { color: var(--teal); }
+        .faq-icon { font-size: 1.2rem; color: var(--ink-muted); flex-shrink: 0; transition: transform 0.3s; }
+        .faq-item.open .faq-icon { transform: rotate(45deg); }
+        .faq-answer { font-size: 0.9rem; color: var(--ink-soft); line-height: 1.75; max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.3s ease; }
+        .faq-item.open .faq-answer { max-height: 300px; padding-bottom: 20px; }
+
+        /* ── FINAL CTA ── */
+        .final-cta { padding: 100px 40px; text-align: center; background: linear-gradient(160deg, var(--teal-light) 0%, var(--paper) 60%); }
+        .final-cta h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 700; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 14px; }
+        .final-cta p { font-size: 1rem; color: var(--ink-soft); margin-bottom: 36px; }
+        .final-cta-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+        .final-cta .btn-primary { font-size: 1rem; padding: 13px 30px; }
+        .no-card { font-size: 0.77rem; color: var(--ink-muted); margin-top: 14px; }
+
+        /* ── FOOTER ── */
+        .footer { background: var(--ink); padding: 60px 40px 36px; }
+        .footer-inner { max-width: 1100px; margin: 0 auto; }
+        .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; padding-bottom: 44px; border-bottom: 1px solid rgba(255,255,255,0.07); margin-bottom: 28px; }
+        .footer-brand { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: white; margin-bottom: 10px; }
+        .footer-brand span { color: var(--gold); }
+        .footer-tagline { font-size: 0.83rem; color: rgba(255,255,255,0.38); line-height: 1.65; }
+        .footer-col h4 { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.55); margin-bottom: 16px; }
+        .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .footer-links a { color: rgba(255,255,255,0.35); text-decoration: none; font-size: 0.84rem; transition: color 0.2s; }
+        .footer-links a:hover { color: rgba(255,255,255,0.72); }
+        .footer-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 0.77rem; flex-wrap: wrap; gap: 12px; color: rgba(255,255,255,0.28); }
+        .footer-legal { display: flex; gap: 18px; }
+        .footer-legal a { color: rgba(255,255,255,0.28); text-decoration: none; transition: color 0.2s; }
+        .footer-legal a:hover { color: rgba(255,255,255,0.65); }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-up { opacity: 0; animation: fadeUp 0.6s ease forwards; }
+        .d1 { animation-delay: 0.1s; } .d2 { animation-delay: 0.2s; } .d3 { animation-delay: 0.3s; }
+
+        @media (max-width: 960px) {
+            .header { padding: 0 20px; }
+            .nav a:not(.btn-primary) { display: none; }
+            .plans-grid { grid-template-columns: 1fr; }
+            .plans-section, .addons-section, .compare-section, .faq-section { padding: 60px 20px; }
+            .page-hero { padding: 110px 20px 56px; }
+            .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+            .compare-table { font-size: 0.8rem; }
+            .compare-table th, .compare-table td { padding: 10px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header" id="header">
+        <a href="index.html" class="brand">Insight<span>Hunter</span></a>
         <nav class="nav">
             <a href="features.html">Features</a>
-            <a href="pricing.html">Pricing</a>
+            <a href="pricing.html" class="active">Pricing</a>
             <a href="about.html">About</a>
-            <a href="login.html">Login</a>
-            <a href="signup.html" class="btn-primary">Sign Up Free</a>
+            <a href="login.html">Log In</a>
+            <a href="signup.html" class="btn-primary">Start Free →</a>
         </nav>
     </header>
 
-    <main class="main">
-        <section class="hero">
-            <h1>Pricing Plans</h1>
-            <p>Choose the right plan for your business. Whether you're a startup or an established enterprise, we have a plan that fits your needs.</p>
+    <main>
+
+        <!-- PAGE HERO -->
+        <div class="page-hero">
+            <div class="page-eyebrow fade-up d1">Pricing</div>
+            <h1 class="fade-up d2">Simple, Honest Pricing.<br>Start Free, Upgrade Anytime.</h1>
+            <p class="fade-up d3">No hidden fees, no surprise charges. Pick the plan that fits where you are today — you can always grow into the next one.</p>
+            <div class="billing-toggle fade-up d3">
+                <span>Monthly</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="billingToggle">
+                    <div class="toggle-track"></div>
+                    <div class="toggle-thumb"></div>
+                </label>
+                <span>Annual</span>
+                <span class="save-badge">Save 20%</span>
+            </div>
+        </div>
+
+        <!-- PLANS -->
+        <section class="plans-section">
+            <div class="plans-inner">
+                <div class="plans-grid">
+
+                    <!-- LITE -->
+                    <div class="plan-card fade-up d1">
+                        <div class="plan-name">Insight Lite</div>
+                        <div class="plan-tagline">For new businesses and freelancers getting their first clear picture of cash flow.</div>
+                        <div class="plan-price-row">
+                            <span class="plan-currency">$</span>
+                            <span class="plan-amount">0</span>
+                        </div>
+                        <div class="plan-period">Free forever</div>
+                        <div class="plan-annual-note">&nbsp;</div>
+                        <div class="plan-divider"></div>
+                        <ul class="plan-features">
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Manual CSV Upload</strong> — Upload bank exports and P&L files for one company profile</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>12-Month Dashboard</strong> — Revenue, expenses, net, and cash trends at a glance</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Category Breakdowns</strong> — Top customers, vendors, and expense buckets</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>One-Click PDF Report</strong> — Shareable Insight Report for stakeholders</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>3–6 Month Cash Flow Projection</strong> — Trend-based forecast to anticipate future needs</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Monthly Email Summary</strong> — Key insights delivered to your inbox every month</span></li>
+                        </ul>
+                        <a href="signup.html" class="plan-cta plan-cta-outline">Get Started Free — No Card Needed</a>
+                    </div>
+
+                    <!-- STANDARD -->
+                    <div class="plan-card featured fade-up d2">
+                        <div class="plan-badge">Most Popular</div>
+                        <div class="plan-name">Insight Standard</div>
+                        <div class="plan-tagline">For growing businesses that need ongoing forecasting, alerts, and client-ready reporting.</div>
+                        <div class="plan-price-row">
+                            <span class="plan-currency">$</span>
+                            <span class="plan-amount" id="standard-price">49</span>
+                        </div>
+                        <div class="plan-period">per month</div>
+                        <div class="plan-annual-note" id="standard-note">&nbsp;</div>
+                        <div class="plan-divider"></div>
+                        <ul class="plan-features">
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Automatic CSV Ingestion</strong> — Connect 2–3 companies and automate data entry</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Rich 24-Month Dashboard</strong> — Trends, customer profitability, and customizable KPIs</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>12–18 Month Projections</strong> — P&L and cash flow forecasts with basic scenario modeling</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Branded PDF Reports</strong> — Board Pack and Investor Snapshot with your own branding</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Weekly Alerts</strong> — Low runway, budget variances, and KPI threshold notifications</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>2–3 Team Seats</strong> — Collaborate with your bookkeeper or business partner</span></li>
+                        </ul>
+                        <a href="signup.html" class="plan-cta plan-cta-filled">Start 14-Day Free Trial →</a>
+                    </div>
+
+                    <!-- PRO -->
+                    <div class="plan-card fade-up d3">
+                        <div class="plan-name">Insight Pro</div>
+                        <div class="plan-tagline">For firms and agencies managing multiple clients with advanced automation and white-label reporting.</div>
+                        <div class="plan-price-row">
+                            <span class="plan-currency">$</span>
+                            <span class="plan-amount" id="pro-price">149</span>
+                        </div>
+                        <div class="plan-period">per month</div>
+                        <div class="plan-annual-note" id="pro-note">&nbsp;</div>
+                        <div class="plan-divider"></div>
+                        <ul class="plan-features">
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Everything in Standard</strong></span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Multi-Client Management</strong> — Manage multiple clients from one unified account</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>White-Label Reports & Emails</strong> — Your branding on every client-facing document</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Scheduled Client Reports</strong> — Auto-send monthly or quarterly reports per client</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Advanced Multi-Scenario Forecasting</strong> — "What-if" modeling with custom drivers</span></li>
+                            <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Priority API Access</strong> — First access to new integrations and the InsightHunter API</span></li>
+                        </ul>
+                        <a href="signup.html" class="plan-cta plan-cta-outline">Start 14-Day Free Trial →</a>
+                    </div>
+
+                </div>
+            </div>
         </section>
 
-        <section class="features">
-            <div class="feature-card">
-                <h2>Insight-Lite</h2>
-                <p class="price">$0/mo</p>
-                <p>Get basic clarity on your cash flow and performance. Perfect for new businesses and freelancers.</p>
-                <ul>
-                    <li><strong>Manual CSV Upload:</strong> Upload bank exports and basic P&L files for one company/profile.</li>
-                    <li><strong>Simple Dashboard:</strong> View 12-month revenue, expenses, net, and cash trends at a glance.</li>
-                    <li><strong>Basic Category Breakdowns:</strong> See your top customers, vendors, and expense buckets.</li>
-                    <li><strong>Insight Report:</strong> Generate a one-click lightweight PDF report to share with stakeholders.</li>
-                    <li><strong>Cash Flow Projection:</strong> Get a 3-6 month trend-based cash flow projection to anticipate future needs.</li>
-                    <li><strong>Monthly Email Summaries:</strong> Receive key insights in your inbox every month to stay on top of your finances.</li>
-                </ul>
-                <a href="signup.html" class="btn-secondary">Get Started</a>
-            </div>
-            <div class="feature-card">
-                <h2>Insight-Standard</h2>
-                <p class="price">$49/mo</p>
-                <p>For growing businesses that need ongoing forecasting, alerts, and client-ready decks.</p>
-                <ul>
-                    <li><strong>Automatic CSV Ingestion:</strong> Connect 2-3 companies and automate your data entry.</li>
-                    <li><strong>Rich Dashboard:</strong> View 12-24 month trends, customer profitability, and customizable KPIs.</li>
-                    <li><strong>12-18 Month Projections:</strong> Get P&L and cash flow projections with basic scenario modeling.</li>
-                    <li><strong>Branded PDF Reports:</strong> Create professional "Board Pack" and "Investor Snapshot" reports with your own branding.</li>
-                    <li><strong>Weekly Alerts:</strong> Get notified about low runway, budget variances, and KPI thresholds.</li>
-                    <li><strong>Team Seats:</strong> Collaborate with your team with 2-3 team seats.</li>
-                </ul>
-                <a href="checkout.html" class="btn-primary">Choose Plan</a>
-            </div>
-            <div class="feature-card">
-                <h2>Insight-Pro</h2>
-                <p class="price">$99/mo</p>
-                <p>For established businesses and agencies that require multi-entity, white-label, and advanced automation.</p>
-                <ul>
-                    <li><strong>Multi-Tenant Client Management:</strong> Manage multiple clients from a single, unified account.</li>
-                    <li><strong>White-Label PDFs/Emails:</strong> Customize your reports and emails with your own branding for a seamless client experience.</li>
-                    <li><strong>Scheduled Reports Per Client:</strong> Automatically send reports to your clients on a monthly or quarterly basis.</li>
-                    <li><strong>Advanced Multi-Scenario Forecasting:</strong> Create advanced forecasts with multiple "what-if" scenarios and drivers.</li>
-                    <li><strong>Priority Integrations/API:</strong> Get priority access to new integrations and the InsightHunter API.</li>
-                    <li><strong>Higher Team Seats with Roles:</strong> Add more team members with role-based access control to manage permissions.</li>
-                </ul>
-                <a href="checkout.html" class="btn-primary">Choose Plan</a>
+        <!-- COMPARISON TABLE -->
+        <section class="compare-section">
+            <div class="compare-inner">
+                <div class="section-eyebrow">Compare Plans</div>
+                <div class="section-title">Everything Side by Side</div>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40%">Feature</th>
+                            <th class="plan-col" style="width:20%">Lite</th>
+                            <th class="plan-col featured-col" style="width:20%">Standard</th>
+                            <th class="plan-col" style="width:20%">Pro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="category-row"><td colspan="4">Data & Connections</td></tr>
+                        <tr><td>Company profiles</td><td class="plan-col">1</td><td class="plan-col featured-col">2–3</td><td class="plan-col">Unlimited</td></tr>
+                        <tr><td>CSV upload</td><td class="plan-col"><span class="check">✓</span></td><td class="plan-col featured-col"><span class="check">✓</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+                        <tr><td>Automatic CSV ingestion</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="check">✓</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+                        <tr><td>API access</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="dash">—</span></td><td class="plan-col">Priority</td></tr>
+
+                        <tr class="category-row"><td colspan="4">Dashboards & Reporting</td></tr>
+                        <tr><td>Cash flow dashboard</td><td class="plan-col">12 months</td><td class="plan-col featured-col">24 months</td><td class="plan-col">24 months</td></tr>
+                        <tr><td>Custom KPIs</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="check">✓</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+                        <tr><td>One-click PDF reports</td><td class="plan-col">Basic</td><td class="plan-col featured-col">Branded</td><td class="plan-col">White-label</td></tr>
+                        <tr><td>Scheduled auto-reports</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="dash">—</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+                        <tr><td>Monthly email summary</td><td class="plan-col"><span class="check">✓</span></td><td class="plan-col featured-col"><span class="check">✓</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+
+                        <tr class="category-row"><td colspan="4">Forecasting</td></tr>
+                        <tr><td>Cash flow projection</td><td class="plan-col">3–6 months</td><td class="plan-col featured-col">12–18 months</td><td class="plan-col">12–18 months</td></tr>
+                        <tr><td>Scenario modeling</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col">Basic</td><td class="plan-col">Advanced</td></tr>
+                        <tr><td>Multi-scenario "what-if"</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="dash">—</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+
+                        <tr class="category-row"><td colspan="4">Alerts & Collaboration</td></tr>
+                        <tr><td>Alerts (runway, variances, KPIs)</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col">Weekly</td><td class="plan-col">Weekly</td></tr>
+                        <tr><td>Team seats</td><td class="plan-col">1</td><td class="plan-col featured-col">2–3</td><td class="plan-col">Unlimited</td></tr>
+                        <tr><td>Role-based access</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="dash">—</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+                        <tr><td>Multi-client management</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="dash">—</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+
+                        <tr class="category-row"><td colspan="4">Support</td></tr>
+                        <tr><td>Email support</td><td class="plan-col"><span class="check">✓</span></td><td class="plan-col featured-col"><span class="check">✓</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+                        <tr><td>Priority support</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="check">✓</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+                    </tbody>
+                </table>
             </div>
         </section>
 
-        <section class="add-ons">
-            <h2 style="text-align: center; margin-bottom: 40px;">Professional Service Add-ons</h2>
-            <div class="add-on-card">
-                <h3><a href="features/pbx.html">PBX</a></h3>
-                <p class="price">$20/mo</p>
-                <p>A professional phone system for your business, including a business phone number, call forwarding, and voicemail.</p>
-                <a href="checkout.html" class="btn-secondary">Purchase</a>
+        <!-- ADD-ONS -->
+        <section class="addons-section">
+            <div class="addons-inner">
+                <div class="section-eyebrow">Professional Add-ons</div>
+                <div class="section-title">Extend InsightHunter<br>As Your Business Grows</div>
+                <div class="addons-grid">
+                    <div class="addon-card">
+                        <div class="addon-icon">📞</div>
+                        <div class="addon-name">PBX Phone System</div>
+                        <div class="addon-price">$20 / month</div>
+                        <div class="addon-desc">A professional business phone number with call forwarding, extensions, and voicemail — no hardware needed.</div>
+                        <a href="features/pbx.html" class="addon-cta">Learn more →</a>
+                    </div>
+                    <div class="addon-card">
+                        <div class="addon-icon">🌐</div>
+                        <div class="addon-name">Website Services</div>
+                        <div class="addon-price">Starting at $500</div>
+                        <div class="addon-desc">Professional design, fast hosting, domain registration, SEO optimization, and reputation management.</div>
+                        <a href="features/website-services.html" class="addon-cta">Learn more →</a>
+                    </div>
+                    <div class="addon-card">
+                        <div class="addon-icon">🏛️</div>
+                        <div class="addon-name">BizForma</div>
+                        <div class="addon-price">Starting at $250</div>
+                        <div class="addon-desc">Business formation, compliance filing, tax setup, payroll configuration, and legal document preparation.</div>
+                        <a href="features/bizforma.html" class="addon-cta">Learn more →</a>
+                    </div>
+                    <div class="addon-card">
+                        <div class="addon-icon">🤖</div>
+                        <div class="addon-name">Scout AI Research</div>
+                        <div class="addon-price">$15 / month</div>
+                        <div class="addon-desc">Your AI-powered research assistant for market analysis, competitor intelligence, and on-demand insights.</div>
+                        <a href="features/scout.html" class="addon-cta">Learn more →</a>
+                    </div>
+                    <div class="addon-card">
+                        <div class="addon-icon">📒</div>
+                        <div class="addon-name">Bookkeeping</div>
+                        <div class="addon-price">Starting at $300 / month</div>
+                        <div class="addon-desc">Dedicated professional bookkeepers keeping your books clean, current, and tax-ready every month.</div>
+                        <a href="features/bookkeeping.html" class="addon-cta">Learn more →</a>
+                    </div>
+                </div>
             </div>
-            <div class="add-on-card">
-                <h3><a href="features/website-services.html">Website Services</a></h3>
-                <p class="price">Starting at $500</p>
-                <p>Design, hosting, domain registration, SEO, marketing, and reputation management.</p>
-                <a href="checkout.html" class="btn-secondary">Purchase</a>
+        </section>
+
+        <!-- FAQ -->
+        <section class="faq-section">
+            <div class="faq-inner">
+                <div class="section-eyebrow" style="text-align:center;">FAQ</div>
+                <div class="section-title" style="text-align:center; margin-bottom:48px;">Common Questions</div>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <button class="faq-question">Do I need a credit card to start?<span class="faq-icon">+</span></button>
+                        <div class="faq-answer">No. The Insight Lite plan is completely free and requires no credit card. You only need payment details when upgrading to Standard or Pro.</div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">Can I switch plans at any time?<span class="faq-icon">+</span></button>
+                        <div class="faq-answer">Yes — upgrade or downgrade at any time. If you upgrade mid-cycle, we prorate the difference. If you downgrade, the change takes effect at the start of your next billing period.</div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">What does "automatic CSV ingestion" mean?<span class="faq-icon">+</span></button>
+                        <div class="faq-answer">On the Lite plan, you manually upload CSV exports from your bank or accounting software. Standard and Pro plans support automated ingestion, meaning you connect your data source once and InsightHunter pulls it in on a schedule — no manual uploads needed.</div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">What's included in the 14-day free trial?<span class="faq-icon">+</span></button>
+                        <div class="faq-answer">You get full access to every feature in your chosen plan for 14 days — no limitations. If you decide it's not right for you, cancel before the trial ends and you won't be charged anything.</div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">How does annual billing work?<span class="faq-icon">+</span></button>
+                        <div class="faq-answer">When you choose annual billing, you pay for 12 months upfront at a 20% discount compared to monthly. That works out to roughly 2.4 months free per year.</div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">Can I use InsightHunter for multiple businesses?<span class="faq-icon">+</span></button>
+                        <div class="faq-answer">Yes. Standard supports 2–3 company profiles, and Pro supports unlimited clients — making it ideal for fractional CFOs and accounting firms managing multiple entities.</div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">Is my financial data secure?<span class="faq-icon">+</span></button>
+                        <div class="faq-answer">Absolutely. All data is encrypted at rest and in transit. We use role-based access controls to ensure only authorized users can view sensitive financial information. Your data is never sold or shared with third parties.</div>
+                    </div>
+                </div>
             </div>
-            <div class="add-on-card">
-                <h3><a href="features/bizforma.html">BizForma</a></h3>
-                <p class="price">Starting at $250</p>
-                <p>Business registration and formation, compliance, tax setup, payroll setup, and legal documents.</p>
-                <a href="checkout.html" class="btn-secondary">Purchase</a>
+        </section>
+
+        <!-- FINAL CTA -->
+        <section class="final-cta">
+            <h2>Ready to See Your Business Clearly?</h2>
+            <p>Start free today. No credit card, no commitment — just clarity.</p>
+            <div class="final-cta-actions">
+                <a href="signup.html" class="btn-primary" style="font-size:1rem; padding:13px 30px;">Get Started Free →</a>
+                <a href="index.html" class="btn-secondary">Back to Home</a>
             </div>
-            <div class="add-on-card">
-                <h3><a href="features/scout.html">Scout</a></h3>
-                <p class="price">$15/mo</p>
-                <p>Your AI-powered research assistant to get the information you need, when you need it.</p>
-                <a href="checkout.html" class="btn-secondary">Purchase</a>
-            </div>
-            <div class="add-on-card">
-                <h3><a href="features/bookkeeping.html">Bookkeeping</a></h3>
-                <p class="price">Starting at $300/mo</p>
-                <p>Professional bookkeeping services with its own pricing tiers to keep your financials in order.</p>
-                <a href="checkout.html" class="btn-secondary">Purchase</a>
-            </div>
+            <p class="no-card">✓ Free plan available &nbsp;·&nbsp; ✓ 14-day trial on paid plans &nbsp;·&nbsp; ✓ Cancel anytime</p>
         </section>
 
     </main>
 
     <footer class="footer">
-        <p>&copy; 2024 InsightHunter. All rights reserved.</p>
-        <div>
-            <a href="/legal/privacy.html">Privacy Policy</a> | 
-            <a href="/legal/terms.html">Terms of Service</a>
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div>
+                    <div class="footer-brand">Insight<span>Hunter</span></div>
+                    <p class="footer-tagline">Real-time financial clarity for solo entrepreneurs, small businesses, and the advisors who serve them.</p>
+                </div>
+                <div class="footer-col"><h4>Product</h4><ul class="footer-links"><li><a href="features.html">Features</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="#">Integrations</a></li><li><a href="#">Changelog</a></li></ul></div>
+                <div class="footer-col"><h4>Company</h4><ul class="footer-links"><li><a href="about.html">About Us</a></li><li><a href="#">Blog</a></li><li><a href="#">Careers</a></li><li><a href="#">Contact</a></li></ul></div>
+                <div class="footer-col"><h4>Support</h4><ul class="footer-links"><li><a href="#">Help Center</a></li><li><a href="#">System Status</a></li><li><a href="/legal/privacy.html">Privacy Policy</a></li><li><a href="/legal/terms.html">Terms of Service</a></li></ul></div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2025 InsightHunter. All rights reserved.</span>
+                <div class="footer-legal"><a href="/legal/privacy.html">Privacy</a><a href="/legal/terms.html">Terms</a><a href="#">Security</a></div>
+            </div>
         </div>
     </footer>
+
+    <script>
+        // Header scroll shadow
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => { header.classList.toggle('scrolled', window.scrollY > 10); });
+
+        // Billing toggle
+        const toggle = document.getElementById('billingToggle');
+        const standardPrice = document.getElementById('standard-price');
+        const proPrice = document.getElementById('pro-price');
+        const standardNote = document.getElementById('standard-note');
+        const proNote = document.getElementById('pro-note');
+
+        toggle.addEventListener('change', () => {
+            if (toggle.checked) {
+                standardPrice.textContent = '39';
+                proPrice.textContent = '119';
+                standardNote.textContent = 'Billed as $468/year — save $120';
+                proNote.textContent = 'Billed as $1428/year — save $360';
+            } else {
+                standardPrice.textContent = '49';
+                proPrice.textContent = '149';
+                standardNote.textContent = '\u00a0';
+                proNote.textContent = '\u00a0';
+            }
+        });
+
+        // FAQ accordion
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
+                const isOpen = item.classList.contains('open');
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+                if (!isOpen) item.classList.add('open');
+            });
+        });
+    </script>
 
 </body>
 </html>
