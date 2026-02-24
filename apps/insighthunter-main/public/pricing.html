@@ -5,65 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pricing - InsightHunter</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="page">
-    <div class="topbar">
-        <div class="brand">INSIGHTHUNTER</div>
+
+    <header class="header">
+        <div class="brand">InsightHunter</div>
         <nav class="nav">
-            <a href="index.html">Home</a>
             <a href="features.html">Features</a>
-            <a href="pricing.html" class="active">Pricing</a>
+            <a href="pricing.html">Pricing</a>
             <a href="about.html">About</a>
-            <a href="my-account.html">My Account</a>
             <a href="login.html">Login</a>
-            <a href="signup.html" class="btn-primary">Sign Up</a>
+            <a href="signup.html" class="btn-primary">Sign Up Free</a>
         </nav>
-    </div>
+    </header>
 
     <main class="main">
-        <h1>Pricing Tiers</h1>
+        <section class="hero">
+            <h1>Pricing Plans</h1>
+            <p>Choose the right plan for your business.</p>
+        </section>
 
-        <section class="grid">
-            <div class="card">
+        <section class="features">
+            <div class="feature-card">
                 <h2>Insight-Lite</h2>
-                <p class="price">Free</p>
+                <p class="price">$0/mo</p>
                 <ul>
-                    <li>Basic Bookkeeping</li>
-                    <li>Standard Reporting</li>
-                    <li>Single User</li>
+                    <li>Manual CSV upload (1 company/profile)</li>
+                    <li>Simple dashboard</li>
+                    <li>Basic category breakdowns</li>
+                    <li>One-click "Insight Report" PDF</li>
+                    <li>3–6 month cash flow projection</li>
+                    <li>Monthly email summaries</li>
                 </ul>
                 <a href="signup.html" class="btn-secondary">Get Started</a>
             </div>
-            <div class="card">
+            <div class="feature-card">
                 <h2>Insight-Standard</h2>
                 <p class="price">$49/mo</p>
                 <ul>
-                    <li>Advanced Bookkeeping</li>
-                    <li>Customizable Reports</li>
-                    <li>Up to 5 Users</li>
-                    <li>Compliance Tools</li>
+                    <li>Automatic CSV ingestion (2–3 companies)</li>
+                    <li>Rich dashboard with KPIs</li>
+                    <li>12–18 month projections</li>
+                    <li>Branded PDF reports</li>
+                    <li>Weekly alerts</li>
+                    <li>2–3 team seats</li>
                 </ul>
-                <a href="signup.html" class="btn-primary">Choose Standard</a>
+                <a href="signup.html" class="btn-primary">Choose Plan</a>
             </div>
-            <div class="card">
+            <div class="feature-card">
                 <h2>Insight-Pro</h2>
                 <p class="price">$99/mo</p>
                 <ul>
-                    <li>All Standard Features</li>
-                    <li>AI Assistant</li>
-                    <li>Multi-User Tenancy</li>
-                    <li>BizForma Integration</li>
+                    <li>Multi-tenant client management</li>
+                    <li>White-label PDFs/emails</li>
+                    <li>Scheduled reports per client</li>
+                    <li>Advanced multi-scenario forecasting</li>
+                    <li>Priority integrations/API</li>
+                    <li>Higher team seats with roles</li>
                 </ul>
-                <a href="signup.html" class="btn-primary">Choose Pro</a>
+                <a href="signup.html" class="btn-primary">Choose Plan</a>
             </div>
         </section>
+
+        <section class="add-ons">
+            <h2 style="text-align: center; margin-bottom: 40px;">Professional Service Add-ons</h2>
+            <div class="add-on-card">
+                <h3>PBX</h3>
+                <p>A professional phone system for your business.</p>
+            </div>
+            <div class="add-on-card">
+                <h3>Website Services</h3>
+                <p>Design, hosting, domain registration, SEO, marketing, and reputation management.</p>
+            </div>
+            <div class="add-on-card">
+                <h3>BizForma</h3>
+                <p>Business registration and formation, compliance, tax setup, payroll setup, and legal documents.</p>
+            </div>
+            <div class="add-on-card">
+                <h3>Scout</h3>
+                <p>Your AI-powered research assistant.</p>
+            </div>
+            <div class="add-on-card">
+                <h3>Bookkeeping</h3>
+                <p>Professional bookkeeping services with its own pricing tiers.</p>
+            </div>
+        </section>
+
     </main>
 
     <footer class="footer">
         <p>&copy; 2024 InsightHunter. All rights reserved.</p>
-        <a href="/legal/privacy.html">Privacy Policy</a>
-        <a href="/legal/terms.html">Terms of Service</a>
+        <div>
+            <a href="/legal/privacy.html">Privacy Policy</a> | 
+            <a href="/legal/terms.html">Terms of Service</a>
+        </div>
     </footer>
+
 </body>
 </html>

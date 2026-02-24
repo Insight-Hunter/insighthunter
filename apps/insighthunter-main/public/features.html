@@ -5,55 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Features - InsightHunter</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="page">
-    <div class="topbar">
-        <div class="brand">INSIGHTHUNTER</div>
+
+    <header class="header">
+        <div class="brand">InsightHunter</div>
         <nav class="nav">
             <a href="index.html">Home</a>
-            <a href="features.html" class="active">Features</a>
+            <a href="features.html">Features</a>
             <a href="pricing.html">Pricing</a>
             <a href="about.html">About</a>
-            <a href="my-account.html">My Account</a>
             <a href="login.html">Login</a>
-            <a href="signup.html" class="btn-primary">Sign Up</a>
+            <a href="signup.html" class="btn-primary">Sign Up Free</a>
         </nav>
-    </div>
+    </header>
 
     <main class="main">
-        <h1>Features</h1>
-
-        <section class="card">
-            <h2>AI-Powered Assistance</h2>
-            <p>Our Insight-Pro tier includes a powerful AI assistant that can help you with a variety of tasks, including financial analysis, forecasting, and reporting. Ask questions in natural language and get instant insights.</p>
+        <section class="hero">
+            <h1>Our Features</h1>
+            <p>Explore the powerful features that make InsightHunter the ultimate financial toolkit for modern businesses.</p>
         </section>
 
-        <section class="card">
-            <h2>Multi-User Tenancy</h2>
-            <p>Collaborate with your team seamlessly. Insight-Pro offers multi-user tenancy, allowing you to set up different roles and permissions for your team members.</p>
+        <section class="features">
+            <div class="feature-card">
+                <h2>Insight-Lite</h2>
+                <p>Basic clarity on cash flow and performance. Manual CSV uploads, simple dashboards, and basic reports.</p>
+                <a href="features/insight-lite.html">Learn More</a>
+            </div>
+            <div class="feature-card">
+                <h2>Insight-Standard</h2>
+                <p>Ongoing forecasting, alerts, and client-ready decks. Automatic CSV ingestion, rich dashboards, and branded reports.</p>
+                <a href="features/insight-standard.html">Learn More</a>
+            </div>
+            <div class="feature-card">
+                <h2>Insight-Pro</h2>
+                <p>Multi-entity, white-label, and advanced automation. For fractional CFOs and small firms managing multiple clients.</p>
+                <a href="features/insight-pro.html">Learn More</a>
+            </div>
         </section>
 
-        <section class="card">
-            <h2>Bookkeeping</h2>
-            <p>A complete bookkeeping solution with ledgers, reconciliation, and financial reporting. Keep your finances in order and make informed decisions.</p>
+        <section class="add-ons">
+            <h2 style="text-align: center; margin-bottom: 40px;">Professional Service Add-ons</h2>
+            <div class="add-on-card">
+                <h3>PBX</h3>
+                <p>A professional phone system for your business.</p>
+                 <a href="features/pbx.html">Learn More</a>
+            </div>
+            <div class="add-on-card">
+                <h3>Website Services</h3>
+                <p>Design, hosting, domain registration, SEO, marketing, and reputation management.</p>
+                 <a href="features/website-services.html">Learn More</a>
+            </div>
+            <div class="add-on-card">
+                <h3>BizForma</h3>
+                <p>Business registration and formation, compliance, tax setup, payroll setup, and legal documents.</p>
+                 <a href="features/bizforma.html">Learn More</a>
+            </div>
+            <div class="add-on-card">
+                <h3>Scout</h3>
+                <p>Your AI-powered research assistant.</p>
+                 <a href="features/scout.html">Learn More</a>
+            </div>
+            <div class="add-on-card">
+                <h3>Bookkeeping</h3>
+                <p>Professional bookkeeping services with its own pricing tiers.</p>
+                 <a href="features/bookkeeping.html">Learn More</a>
+            </div>
         </section>
 
-        <section class="card">
-            <h2>Compliance</h2>
-            <p>Automated workflows, reminders, and document generation to help you stay compliant with financial regulations.</p>
-        </section>
-
-        <section class="card">
-            <h2>BizForma</h2>
-            <p>Guided steps for LLC, EIN, and S-Corp formation. Get your business off the ground quickly and easily.</p>
-        </section>
     </main>
 
     <footer class="footer">
         <p>&copy; 2024 InsightHunter. All rights reserved.</p>
-        <a href="/legal/privacy.html">Privacy Policy</a>
-        <a href="/legal/terms.html">Terms of Service</a>
+        <div>
+            <a href="/legal/privacy.html">Privacy Policy</a> | 
+            <a href="/legal/terms.html">Terms of Service</a>
+        </div>
     </footer>
+
 </body>
 </html>

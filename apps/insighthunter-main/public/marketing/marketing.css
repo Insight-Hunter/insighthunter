@@ -36,7 +36,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius);
   padding: 24px;
-  background: rgba(2, 6, 23, 0.9);
+  background: var(--bg-elevated);
   box-shadow: var(--shadow);
 }
 
@@ -45,7 +45,7 @@
   padding: 60px 20px;
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
-  background: rgba(2, 6, 23, 0.9);
+  background: var(--bg-elevated);
   margin-top: 24px;
 }
 

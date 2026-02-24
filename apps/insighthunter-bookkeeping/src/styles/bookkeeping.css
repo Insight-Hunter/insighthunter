@@ -1,14 +1,14 @@
 /* src/styles/bookkeeping.css */
 :root {
-  --primary-color: #667eea;
-  --secondary-color: #764ba2;
-  --success-color: #10b981;
+  --primary-color: #4c6fff;
+  --secondary-color: #0a0f1f;
+  --success-color: #22c55e;
   --danger-color: #ef4444;
-  --warning-color: #f59e0b;
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --border-color: #e5e7eb;
-  --bg-light: #f9fafb;
+  --warning-color: #facc15;
+  --text-primary: #e5e7eb;
+  --text-secondary: #9ca3af;
+  --border-color: #1f2937;
+  --bg-light: #020617;
 }
 
 * {
@@ -37,11 +37,12 @@ body {
 .btn-primary {
   background: var(--primary-color);
   color: white;
+  box-shadow: 0 0 20px rgba(76, 111, 255, 0.15);
 }
 
 .btn-primary:hover {
-  background: var(--secondary-color);
   transform: translateY(-1px);
+  box-shadow: 0 0 40px rgba(76, 111, 255, 0.25);
 }
 
 .btn-primary:disabled {
@@ -50,10 +51,12 @@ body {
 }
 
 .btn-secondary {
-  background: #e5e7eb;
+  background: transparent;
   color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover {
-  background: #d1d5db;
+  background: var(--secondary-color);
+  border-color: var(--primary-color);
 }

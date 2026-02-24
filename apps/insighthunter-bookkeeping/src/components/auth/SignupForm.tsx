@@ -1,7 +1,7 @@
 // src/components/auth/SignupForm.tsx
 import { useState } from 'react';
 import { FiMail, FiLock, FiUser, FiBriefcase } from 'react-icons/fi';
-import './AuthForms.css';
+import '../../styles/bookkeeping.css';
 
 export default function SignupForm() {
   const [formData, setFormData] = useState({
