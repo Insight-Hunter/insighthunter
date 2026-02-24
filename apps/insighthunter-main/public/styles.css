@@ -2,283 +2,535 @@
    InsightHunter Global Theme - Dark Neon Style
    ============================================================ */
 
-:root {
-  --bg-light: #020617;
-  --bg-elevated: #0a0f1f;
-  --border-subtle: #111827;
-  --border-strong: #1f2937;
-  --text: #e5e7eb;
-  --muted: #9ca3af;
-  --accent: #4c6fff;
-
-  --radius: 8px;
-  --radius-sm: 4px;
-
-  --shadow: 0 0 20px rgba(76, 111, 255, 0.15);
-  --shadow-strong: 0 0 40px rgba(76, 111, 255, 0.25);
-
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  --font-serif: "Iowan Old Style", "Apple Garamond", "Times New Roman", serif;
-}
-
-/* ============================================================
-     Base
-     ============================================================ */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-body.page {
-  margin: 0;
-  font-family: var(--font-sans);
-  background-color: var(--bg-light);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* ============================================================
-     Header
-     ============================================================ */
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 24px;
-  background-color: var(--bg-elevated);
-  border-bottom: 1px solid var(--border-subtle);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.brand {
-  font-weight: 600;
-  font-size: 20px;
-  color: var(--text);
-}
-
-.nav a {
-  color: var(--muted);
-  margin-left: 20px;
-  text-decoration: none;
-  font-size: 16px;
-  transition: color 0.2s ease;
-}
-
-.nav a:hover {
-  color: var(--accent);
-}
-
-
-/* ============================================================
-     Layout
-     ============================================================ */
-
-.main {
-  max-width: 1100px;
-  margin: 40px auto;
-  padding: 0 24px;
-}
-
-h1 {
-  font-family: var(--font-serif);
-  font-size: 48px;
-  font-weight: 600;
-  margin-bottom: 16px;
-}
-
-h2 {
-  font-family: var(--font-serif);
-  font-size: 32px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-/* ============================================================
-     Hero Section
-     ============================================================ */
-
-.hero {
-  text-align: center;
-  padding: 60px 0;
-}
-
-.hero p {
-  font-size: 18px;
-  color: var(--muted);
-  max-width: 600px;
-  margin: 0 auto 30px;
-}
-
-/* ============================================================
-     Features Section
-     ============================================================ */
-
-.features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
-  margin: 60px 0;
-}
-
-.feature-card {
-  background-color: var(--bg-elevated);
-  border-radius: var(--radius);
-  padding: 30px;
-  box-shadow: var(--shadow);
-  transition: all 0.3s ease;
-  border: 1px solid var(--border-subtle);
-}
-
-.feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-strong);
-}
-
-.feature-card h2 {
-  font-size: 24px;
-  margin-bottom: 12px;
-}
-
-.feature-card p {
-  color: var(--muted);
-}
-
-.feature-card a {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 500;
-  display: inline-block;
-  margin-top: 20px;
-}
-
-/* ============================================================
-     Add-ons Section
-     ============================================================ */
-
-.add-ons {
-  margin: 60px 0;
-}
-
-.add-on-card {
-  background-color: var(--bg-elevated);
-  border-radius: var(--radius);
-  padding: 30px;
-  box-shadow: var(--shadow);
-  margin-bottom: 20px;
-  border: 1px solid var(--border-subtle);
-}
-
-.add-on-card h3 {
-  font-size: 20px;
-  margin-bottom: 12px;
-}
-
-.add-on-card p {
-  color: var(--muted);
-}
-
-/* ============================================================
-     Testimonials Section
-     ============================================================ */
-
-.testimonials {
-  margin: 60px 0;
-}
-
-.testimonial-card {
-  background-color: var(--bg-elevated);
-  border-radius: var(--radius);
-  padding: 30px;
-  box-shadow: var(--shadow);
-  margin-bottom: 20px;
-}
-
-.testimonial-card p {
-  font-style: italic;
-  color: var(--muted);
-  margin: 0 0 10px;
-}
-
-.testimonial-card strong {
-  font-weight: 500;
-  color: var(--text);
-}
-
-/* ============================================================
-     Buttons
-     ============================================================ */
-
-.btn-primary {
-  display: inline-block;
-  padding: 12px 24px;
-  border-radius: var(--radius-sm);
-  font-weight: 500;
-  font-size: 16px;
-  cursor: pointer;
-  text-decoration: none;
-  text-align: center;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
-  background-color: var(--accent);
-  color: #fff;
-  box-shadow: var(--shadow);
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-strong);
-}
-
-/* ============================================================
-     Footer
-     ============================================================ */
-
-.footer {
-  text-align: center;
-  padding: 30px;
-  color: var(--muted);
-  border-top: 1px solid var(--border-subtle);
-  margin-top: 60px;
-}
-
-.footer a {
-  color: var(--muted);
-  text-decoration: none;
-}
-
-.footer a:hover {
-  color: var(--accent);
-}
-
-/* ============================================================
-     Responsive
-     ============================================================ */
-
-@media (max-width: 768px) {
-  .header {
-    flex-direction: column;
-    padding: 16px;
+   :root {
+    --bg-light: #020617;
+    --bg-elevated: #0a0f1f;
+    --border-subtle: #111827;
+    --border-strong: #1f2937;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --accent: #4c6fff;
+  
+    --radius: 8px;
+    --radius-sm: 4px;
+  
+    --shadow: 0 0 20px rgba(76, 111, 255, 0.15);
+    --shadow-strong: 0 0 40px rgba(76, 111, 255, 0.25);
+  
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    --font-serif: "Iowan Old Style", "Apple Garamond", "Times New Roman", serif;
   }
-
-  .nav {
+  
+  /* ============================================================
+       Base
+       ============================================================ */
+  
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  
+  body.page {
+    margin: 0;
+    font-family: var(--font-sans);
+    background-color: var(--bg-light);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* ============================================================
+       Header
+       ============================================================ */
+  
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background-color: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-subtle);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  
+  .brand {
+    font-weight: 600;
+    font-size: 20px;
+    color: var(--text);
+  }
+  
+  .nav a {
+    color: var(--muted);
+    margin-left: 20px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.2s ease;
+  }
+  
+  .nav a:hover {
+    color: var(--accent);
+  }
+  
+  .nav a.active {
+    color: var(--accent);
+  }
+  
+  /* ============================================================
+       Layout
+       ============================================================ */
+  
+  .main {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 24px;
+  }
+  
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 48px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  
+  h2 {
+    font-family: var(--font-serif);
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  /* Shared section helpers */
+  
+  .hero-center {
+    text-align: center;
+  }
+  
+  .section-title {
+    text-align: center;
+    margin: 40px 0 10px;
+  }
+  
+  .section-intro {
+    text-align: center;
+    color: var(--muted);
+    max-width: 640px;
+    margin: 0 auto 30px;
+  }
+  
+  /* ============================================================
+       Hero Section
+       ============================================================ */
+  
+  .hero {
+    text-align: center;
+    padding: 60px 0;
+  }
+  
+  .hero p {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 600px;
+    margin: 0 auto 30px;
+  }
+  
+  .hero-friction {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  
+  /* Lightweight proof strip (Lite traffic driver) */
+  
+  .proof-strip {
+    text-align: center;
+    margin: 10px 0 30px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  
+  /* ============================================================
+       Features Section (cards)
+       ============================================================ */
+  
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin: 60px 0;
+  }
+  
+  .feature-card {
+    background-color: var(--bg-elevated);
+    border-radius: var(--radius);
+    padding: 30px;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-subtle);
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-strong);
+  }
+  
+  .feature-card h2 {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+  
+  .feature-card h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  
+  .feature-card p {
+    color: var(--muted);
+  }
+  
+  .feature-card a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-block;
+    margin-top: 20px;
+  }
+  
+  /* Feature grid for tiers */
+  
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+  }
+  
+  .feature-card ul {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  
+  .feature-card-highlight {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-strong);
+  }
+  
+  /* Link styling inside cards */
+  
+  .feature-card .link-more {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-block;
     margin-top: 16px;
   }
-
-  .nav a {
-    margin: 0 10px;
+  
+  .feature-card .link-more:hover {
+    text-decoration: underline;
   }
-
-  h1 {
-    font-size: 36px;
+  
+  /* ============================================================
+       Pillars (Compliance / Bookkeeping / Admin)
+       ============================================================ */
+  
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin: 40px 0 60px;
   }
-
-  h2 {
-    font-size: 28px;
+  
+  .pillar-card {
+    background-color: var(--bg-elevated);
+    border-radius: var(--radius);
+    padding: 24px 24px 20px;
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow);
   }
-}
+  
+  .pillar-card h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+  
+  .pillar-card p {
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  
+  .pillar-card ul {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  
+  /* ============================================================
+       Add-ons Section
+       ============================================================ */
+  
+  .add-ons {
+    margin: 60px 0;
+  }
+  
+  .add-on-card {
+    background-color: var(--bg-elevated);
+    border-radius: var(--radius);
+    padding: 30px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    border: 1px solid var(--border-subtle);
+  }
+  
+  .add-on-card h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+  
+  .add-on-card p {
+    color: var(--muted);
+  }
+  
+  /* Add-on grid */
+  
+  .add-on-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+  }
+  
+  .add-on-card .link-more {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-block;
+    margin-top: 16px;
+  }
+  
+  .add-on-card .link-more:hover {
+    text-decoration: underline;
+  }
+  
+  /* ============================================================
+       Testimonials Section
+       ============================================================ */
+  
+  .testimonials {
+    margin: 60px 0;
+  }
+  
+  .testimonial-card {
+    background-color: var(--bg-elevated);
+    border-radius: var(--radius);
+    padding: 30px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  
+  .testimonial-card p {
+    font-style: italic;
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+  
+  .testimonial-card strong {
+    font-weight: 500;
+    color: var(--text);
+  }
+  
+  /* ============================================================
+       Tier Summary & CTA band
+       ============================================================ */
+  
+  .tier-summary {
+    margin: 20px 0 40px;
+  }
+  
+  .tier-highlight {
+    background-color: var(--bg-elevated);
+    border-radius: var(--radius);
+    padding: 24px;
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow);
+  }
+  
+  .tier-highlight h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+  
+  .tier-highlight p {
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  
+  .tier-highlight ul {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  
+  .cta-band {
+    margin: 60px 0 20px;
+    padding: 24px;
+    border-radius: var(--radius);
+    background: radial-gradient(circle at top left, rgba(76, 111, 255, 0.16), transparent 55%);
+    border: 1px solid var(--border-subtle);
+  }
+  
+  .cta-content {
+    text-align: center;
+  }
+  
+  .cta-content h2 {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  
+  .cta-content p {
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  
+  /* ============================================================
+       Comparison blocks (Standard / Pro)
+       ============================================================ */
+  
+  .comparison {
+    margin: 40px 0 60px;
+  }
+  
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+  }
+  
+  .comparison-column {
+    background-color: var(--bg-elevated);
+    border-radius: var(--radius);
+    padding: 24px;
+    border: 1px solid var(--border-subtle);
+  }
+  
+  .comparison-column h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  
+  .comparison-column ul {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  
+  .comparison-column-highlight {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-strong);
+  }
+  
+  /* ============================================================
+       Buttons
+       ============================================================ */
+  
+  .btn-primary {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    background-color: var(--accent);
+    color: #fff;
+    box-shadow: var(--shadow);
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-strong);
+  }
+  
+  .btn-secondary {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-subtle);
+    background-color: transparent;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+  
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  
+  /* ============================================================
+       Footer
+       ============================================================ */
+  
+  .footer {
+    text-align: center;
+    padding: 30px;
+    color: var(--muted);
+    border-top: 1px solid var(--border-subtle);
+    margin-top: 60px;
+  }
+  
+  .footer a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  
+  .footer a:hover {
+    color: var(--accent);
+  }
+  
+  /* ============================================================
+       Responsive
+       ============================================================ */
+  
+  @media (max-width: 768px) {
+    .header {
+      flex-direction: column;
+      padding: 16px;
+    }
+  
+    .nav {
+      margin-top: 16px;
+    }
+  
+    .nav a {
+      margin: 0 10px;
+    }
+  
+    h1 {
+      font-size: 36px;
+    }
+  
+    h2 {
+      font-size: 28px;
+    }
+  }
+  

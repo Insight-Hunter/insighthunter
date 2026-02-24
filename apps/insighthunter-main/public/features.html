@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Features - InsightHunter</title>
+    <title>Features – InsightHunter</title>
+    <meta name="description" content="Explore InsightHunter features across Compliance Hub, Bookkeeping Workspace, and Admin & Automation. See Lite, Standard, Pro tiers plus PBX, websites, BizForma, Scout, and bookkeeping services.">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="page">
-
     <header class="header">
         <div class="brand">InsightHunter</div>
         <nav class="nav">
             <a href="index.html">Home</a>
-            <a href="features.html">Features</a>
+            <a href="features.html" class="active">Features</a>
             <a href="pricing.html">Pricing</a>
             <a href="about.html">About</a>
             <a href="login.html">Login</a>
@@ -24,67 +24,121 @@
     </header>
 
     <main class="main">
-        <section class="hero">
-            <h1>Our Features</h1>
-            <p>Explore the powerful features that make InsightHunter the ultimate financial toolkit for modern businesses.</p>
+        <!-- Hero -->
+        <section class="hero hero-center">
+            <h1>What You Get With InsightHunter</h1>
+            <p>One AI-powered CFO workspace that brings Compliance, Bookkeeping, and Admin tasks into a single, accountable system.</p>
         </section>
 
+        <!-- Pillars -->
+        <section class="pillars">
+            <div class="pillar-card">
+                <h2>Compliance Hub</h2>
+                <p>Track licenses, filings, deadlines, and open items in one place so nothing slips through the cracks.</p>
+                <ul>
+                    <li>Entity, tax, and license calendars</li>
+                    <li>Reminders for due dates and renewals</li>
+                    <li>Attach documents and notes to every item</li>
+                </ul>
+            </div>
+            <div class="pillar-card">
+                <h2>Bookkeeping Workspace</h2>
+                <p>Centralize ledgers, reconciliations, and reporting so owners and accountants always see the same numbers.</p>
+                <ul>
+                    <li>Upload or sync transactions and trial balances</li>
+                    <li>Standardized ledgers and reconciliation views</li>
+                    <li>Client-ready performance and cash reports</li>
+                </ul>
+            </div>
+            <div class="pillar-card">
+                <h2>Admin & Automation</h2>
+                <p>Automate recurring workflows, document generation, and communication so the finance back office runs itself.</p>
+                <ul>
+                    <li>Task workflows and reminders</li>
+                    <li>Template-based letters and forms</li>
+                    <li>Status dashboards for owners and teams</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Software tiers -->
         <section class="features">
-            <div class="feature-card">
-                <h2>Insight-Lite</h2>
-                <p>Basic clarity on cash flow and performance. Manual CSV uploads, simple dashboards, and basic reports.</p>
-                <a href="features/insight-lite.html">Learn More</a>
-            </div>
-            <div class="feature-card">
-                <h2>Insight-Standard</h2>
-                <p>Ongoing forecasting, alerts, and client-ready decks. Automatic CSV ingestion, rich dashboards, and branded reports.</p>
-                <a href="features/insight-standard.html">Learn More</a>
-            </div>
-            <div class="feature-card">
-                <h2>Insight-Pro</h2>
-                <p>Multi-entity, white-label, and advanced automation. For fractional CFOs and small firms managing multiple clients.</p>
-                <a href="features/insight-pro.html">Learn More</a>
+            <h2 class="section-title">InsightHunter Software Tiers</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Insight-Lite</h3>
+                    <p>Desktop-friendly clarity for a single business or client. Upload CSVs, see cash and runway, and export simple reports.</p>
+                    <ul>
+                        <li>Manual CSV uploads</li>
+                        <li>Simple dashboards for cash and burn</li>
+                        <li>Basic performance and runway reports</li>
+                    </ul>
+                    <a href="features/insight-lite.html" class="link-more">Learn more</a>
+                </div>
+                <div class="feature-card feature-card-highlight">
+                    <h3>Insight-Standard</h3>
+                    <p>Always-on forecasting and alerting for growing businesses and firms managing active clients.</p>
+                    <ul>
+                        <li>Automatic CSV ingestion and refresh</li>
+                        <li>Richer dashboards and trends</li>
+                        <li>Branded, client-ready report decks</li>
+                    </ul>
+                    <a href="features/insight-standard.html" class="link-more">Learn more</a>
+                </div>
+                <div class="feature-card">
+                    <h3>Insight-Pro</h3>
+                    <p>Multi-entity, white-label workspace for fractional CFOs and small firms running dozens of entities.</p>
+                    <ul>
+                        <li>Multi-client and multi-entity views</li>
+                        <li>Advanced automation and bulk workflows</li>
+                        <li>White-label portals and exports</li>
+                    </ul>
+                    <a href="features/insight-pro.html" class="link-more">Learn more</a>
+                </div>
             </div>
         </section>
 
+        <!-- Add-ons -->
         <section class="add-ons">
-            <h2 style="text-align: center; margin-bottom: 40px;">Professional Service Add-ons</h2>
-            <div class="add-on-card">
-                <h3>PBX</h3>
-                <p>A professional phone system for your business.</p>
-                 <a href="features/pbx.html">Learn More</a>
-            </div>
-            <div class="add-on-card">
-                <h3>Website Services</h3>
-                <p>Design, hosting, domain registration, SEO, marketing, and reputation management.</p>
-                 <a href="features/website-services.html">Learn More</a>
-            </div>
-            <div class="add-on-card">
-                <h3>BizForma</h3>
-                <p>Business registration and formation, compliance, tax setup, payroll setup, and legal documents.</p>
-                 <a href="features/bizforma.html">Learn More</a>
-            </div>
-            <div class="add-on-card">
-                <h3>Scout</h3>
-                <p>Your AI-powered research assistant.</p>
-                 <a href="features/scout.html">Learn More</a>
-            </div>
-            <div class="add-on-card">
-                <h3>Bookkeeping</h3>
-                <p>Professional bookkeeping services with its own pricing tiers.</p>
-                 <a href="features/bookkeeping.html">Learn More</a>
+            <h2 class="section-title">Professional Service Add-ons</h2>
+            <p class="section-intro">Layer in done-for-you services around the same workspace so owners never wonder who is doing what.</p>
+
+            <div class="add-on-grid">
+                <div class="add-on-card">
+                    <h3>PBX</h3>
+                    <p>Professional phone system aligned to your finance and client workflows, with clear call routing and logging.</p>
+                    <a href="features/pbx.html" class="link-more">Learn more</a>
+                </div>
+                <div class="add-on-card">
+                    <h3>Website Services</h3>
+                    <p>Done-for-you sites, hosting, domains, SEO, and reputation management tuned for accountants and local businesses.</p>
+                    <a href="features/website-services.html" class="link-more">Learn more</a>
+                </div>
+                <div class="add-on-card">
+                    <h3>BizForma</h3>
+                    <p>LLC, S‑Corp, EIN, registrations, and compliance setup handled inside the same system that tracks every future deadline.</p>
+                    <a href="features/bizforma.html" class="link-more">Learn more</a>
+                </div>
+                <div class="add-on-card">
+                    <h3>Scout</h3>
+                    <p>AI-powered research and drafting assistant for policies, checklists, playbooks, and client communication.</p>
+                    <a href="features/scout.html" class="link-more">Learn more</a>
+                </div>
+                <div class="add-on-card">
+                    <h3>Bookkeeping Services</h3>
+                    <p>Hands-on bookkeeping powered by the same ledgers and workflows your team sees every day.</p>
+                    <a href="features/bookkeeping.html" class="link-more">Learn more</a>
+                </div>
             </div>
         </section>
-
     </main>
 
     <footer class="footer">
-        <p>&copy; 2024 InsightHunter. All rights reserved.</p>
+        <p>&copy; 2026 InsightHunter. All rights reserved.</p>
         <div>
-            <a href="/legal/privacy.html">Privacy Policy</a> | 
+            <a href="/legal/privacy.html">Privacy Policy</a> |
             <a href="/legal/terms.html">Terms of Service</a>
         </div>
     </footer>
-
 </body>
 </html>
