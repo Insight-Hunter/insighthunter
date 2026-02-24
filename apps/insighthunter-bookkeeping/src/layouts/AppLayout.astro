@@ -1,19 +1,14 @@
 ---
 // src/layouts/AppLayout.astro
 
-import NavBar from '../components/NavBar';
-import AstroLayout from '../layouts/AstroLayout'; // if you actually use this
+import NavBar from '../components/shared/NavBar.tsx';
 import '../styles/bookkeeping.css';
 
 interface Props {
   title: string;
 }
 
-// Option 1: typed destructuring
-const { title } = Astro.props as Props;
-
-// Option 2 (Astro style):
-// const { title }: Props = Astro.props;
+const { title } = Astro.props;
 ---
 
 <!DOCTYPE html>

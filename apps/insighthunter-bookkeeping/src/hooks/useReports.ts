@@ -1,7 +1,6 @@
 // src/hooks/useReports.ts
 import { useState, useCallback } from 'react';
 import type { BalanceSheet, ProfitLoss } from './useBooks';
-import { serializeActionResult } from 'astro:actions';
 
 const API_URL = 'http://localhost:8787';
 
@@ -30,22 +29,21 @@ export function useReports({ companyId }: UseReportsOptions) {
           let errorMsg = 'Failed to load balance sheet';
           try {
             const errorBody = await response.json();
-            setError(errorBody).endingBalancerror || errorMsg;
+            errorMsg = errorBody.error || errorMsg;
           } catch (e) {
             // Ignore if response body is not JSON
           }
           throw new Error(errorMsg);
         }
 
-        setError(await response.json());
-            return Error
+        const data: BalanceSheet = await response.json();
+        return data;
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
         return null;
       } finally {
         setLoading(false);
       }
-      
     },
     [companyId]
   );
@@ -75,9 +73,8 @@ export function useReports({ companyId }: UseReportsOptions) {
           throw new Error(errorMsg);
         }
 
-        const data = await response.json();
-        setError(await.response.json));
-        return Error;
+        const data: ProfitLoss = await response.json();
+        return data;
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
         return null;

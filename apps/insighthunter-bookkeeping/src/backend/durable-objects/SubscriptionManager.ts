@@ -1,7 +1,7 @@
 // src/backend/durable-objects/SubscriptionManager.ts
 import { DurableObject } from 'cloudflare:workers';
 import Stripe from 'stripe';
-import { Subscription, PricingTier, UsageMetrics } from '@/types';
+import type { Subscription, PricingTier, UsageMetrics } from '@/types';
 import { getPlanById } from '../utils/pricing';
 import type { Env } from '../index';
 
@@ -11,7 +11,7 @@ export class SubscriptionManager extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     this.stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2023-10-16',
     });
   }
 
@@ -48,7 +48,7 @@ export class SubscriptionManager extends DurableObject<Env> {
 
   private async createSubscription(request: Request): Promise<Response> {
     try {
-      const { userId, companyId, planId, paymentMethodId } = await request.json();
+      const { userId, companyId, planId, paymentMethodId } = await request.json() as { userId: string, companyId: string, planId: string, paymentMethodId: string };
 
       const plan = getPlanById(planId);
       if (!plan) {
@@ -140,7 +140,7 @@ export class SubscriptionManager extends DurableObject<Env> {
 
   private async cancelSubscription(request: Request): Promise<Response> {
     try {
-      const { userId, immediate } = await request.json();
+      const { userId, immediate } = await request.json() as { userId: string, immediate: boolean };
 
       const subscription = await this.ctx.storage.get<Subscription>(`sub:${userId}`);
 
@@ -176,7 +176,7 @@ export class SubscriptionManager extends DurableObject<Env> {
 
   private async updateSubscription(request: Request): Promise<Response> {
     try {
-      const { userId, newPlanId } = await request.json();
+      const { userId, newPlanId } = await request.json() as { userId: string, newPlanId: string };
 
       const subscription = await this.ctx.storage.get<Subscription>(`sub:${userId}`);
 

@@ -1,3 +1,4 @@
+account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
 name = "insighthunter-auth"
 main = "src/index.ts"
 compatibility_date = "2024-03-18"
@@ -5,8 +6,8 @@ compatibility_date = "2024-03-18"
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-db"
-database_id = "<YOUR_DATABASE_ID>"
+database_id = "aa2b9aa2-f1dd-4fdc-b4b0-d9b4bdc2ea57"
 
 [[kv_namespaces]]
 binding = "AUTH_TOKENS"
-id = "<YOUR_AUTH_TOKENS_KV_ID>"
+id = "029a6b1c13a24c89b0dbd39e4b5f6021"

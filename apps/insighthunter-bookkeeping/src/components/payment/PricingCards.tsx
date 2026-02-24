@@ -30,7 +30,7 @@ export default function PricingCards() {
       </div>
 
       <div className="pricing-cards">
-        {(['starter', 'professional', 'enterprise'] as PricingTier[]).map((tier) => {
+        {(['insight-lite', 'standard', 'pro'] as PricingTier[]).map((tier) => {
           const plan = PRICING_PLANS[tier].find(
             (p) => p.billingPeriod === billingPeriod
           )!;
@@ -38,9 +38,9 @@ export default function PricingCards() {
           return (
             <div
               key={plan.id}
-              className={`pricing-card ${tier === 'professional' ? 'featured' : ''}`}
+              className={`pricing-card ${tier === 'standard' ? 'featured' : ''}`}
             >
-              {tier === 'professional' && (
+              {tier === 'standard' && (
                 <div className="featured-badge">Most Popular</div>
               )}
 
@@ -67,9 +67,9 @@ export default function PricingCards() {
 
               <button
                 onClick={() => handleSelectPlan(plan.id)}
-                className={`select-plan-btn ${tier === 'professional' ? 'primary' : 'secondary'}`}
+                className={`select-plan-btn ${tier === 'standard' ? 'primary' : 'secondary'}`}
               >
-                Start Free Trial
+                {plan.price === 0 ? 'Get Started' : 'Start Free Trial'}
               </button>
             </div>
           );
@@ -77,7 +77,7 @@ export default function PricingCards() {
       </div>
 
       <div className="pricing-note">
-        <p>All plans include a 14-day free trial. No credit card required.</p>
+        <p>All plans include a 14-day free trial, except for Insight-Lite which is always free.</p>
       </div>
     </div>
   );

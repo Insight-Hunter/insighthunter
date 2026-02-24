@@ -1,6 +1,6 @@
 ---
 // src/pages/pricing.astro
-import '../styles/globals.css';
+import '../styles/bookkeeping.css';
 import PricingCards from '@/components/payment/PricingCards';
 ---
 
@@ -129,6 +129,14 @@ import PricingCards from '@/components/payment/PricingCards';
   }
 
   .faq h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .faq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,.faq h2 {
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 3rem;

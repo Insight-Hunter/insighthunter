@@ -1,7 +1,7 @@
 // src/backend/durable-objects/BankConnectionManager.ts
 import { DurableObject } from 'cloudflare:workers';
 import { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode } from 'plaid';
-import { BankConnection, BankTransaction, PlaidLinkToken } from '@/types';
+import type { BankConnection, BankTransaction, PlaidLinkToken } from '@/types';
 import type { Env } from '../index';
 
 export class BankConnectionManager extends DurableObject<Env> {
@@ -52,7 +52,7 @@ export class BankConnectionManager extends DurableObject<Env> {
 
   private async createLinkToken(request: Request): Promise<Response> {
     try {
-      const { userId, companyId } = await request.json();
+      const { userId, companyId } = await request.json() as {userId: string, companyId: string};
 
       const response = await this.plaidClient.linkTokenCreate({
         user: {
@@ -81,7 +81,7 @@ export class BankConnectionManager extends DurableObject<Env> {
 
   private async exchangePublicToken(request: Request): Promise<Response> {
     try {
-      const { userId, companyId, publicToken, metadata } = await request.json();
+      const { userId, companyId, publicToken, metadata } = await request.json() as {userId: string, companyId: string, publicToken: string, metadata: any};
 
       // Exchange public token for access token
       const tokenResponse = await this.plaidClient.itemPublicTokenExchange({
@@ -158,7 +158,7 @@ export class BankConnectionManager extends DurableObject<Env> {
 
   private async syncTransactions(request: Request): Promise<Response> {
     try {
-      const { accountId } = await request.json();
+      const { accountId } = await request.json() as {accountId: string};
 
       const connection = await this.ctx.storage.get<BankConnection>(
         `bank:${accountId}`
@@ -216,7 +216,7 @@ export class BankConnectionManager extends DurableObject<Env> {
 
   private async disconnectAccount(request: Request): Promise<Response> {
     try {
-      const { accountId } = await request.json();
+      const { accountId } = await request.json() as {accountId: string};
 
       const connection = await this.ctx.storage.get<BankConnection>(
         `bank:${accountId}`
