@@ -1,0 +1,12 @@
+name = "insighthunter-auth"
+main = "src/index.ts"
+compatibility_date = "2024-03-18"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-db"
+database_id = "<YOUR_DATABASE_ID>"
+
+[[kv_namespaces]]
+binding = "AUTH_TOKENS"
+id = "<YOUR_AUTH_TOKENS_KV_ID>"

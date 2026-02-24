@@ -1,4 +1,4 @@
-// src/backend/index.ts
+// apps/insighthunter-bookkeeping/src/backend/index.ts
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { BookkeepingLedger } from './durable-objects/BookkeepingLedger';
@@ -9,13 +9,15 @@ import { BankConnectionManager } from './durable-objects/BankConnectionManager';
 export { BookkeepingLedger, InvoiceManager, SubscriptionManager, BankConnectionManager };
 
 export interface Env {
+  // Durable Objects
   BOOKKEEPING_LEDGER: DurableObjectNamespace;
   INVOICE_MANAGER: DurableObjectNamespace;
   SUBSCRIPTION_MANAGER: DurableObjectNamespace;
   BANK_CONNECTION_MANAGER: DurableObjectNamespace;
-  SPREADSHEET_UPLOADS: R2Bucket;
-  AUTH_TOKENS: KVNamespace;
   
+  // R2 Buckets
+  SPREADSHEET_UPLOADS: R2Bucket;
+
   // Secrets
   QUICKBOOKS_CLIENT_ID: string;
   QUICKBOOKS_CLIENT_SECRET: string;
@@ -43,23 +45,26 @@ app.get('/health', (c) => {
   return c.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
+// NOTE: The X-Authenticated-User-Id header is added by the insighthunter-main gateway.
+
 // Subscription routes
 app.post('/api/subscriptions/create', async (c) => {
-  const { userId, planId } = await c.req.json();
+  const userId = c.req.header('X-Authenticated-User-Id');
+  const { planId } = await c.req.json();
   const id = c.env.SUBSCRIPTION_MANAGER.idFromName(userId);
   const manager = c.env.SUBSCRIPTION_MANAGER.get(id);
   return manager.fetch(c.req.raw);
 });
 
 app.get('/api/subscriptions/:userId', async (c) => {
-  const userId = c.req.param('userId');
+  const userId = c.req.param('userId'); // or from header
   const id = c.env.SUBSCRIPTION_MANAGER.idFromName(userId);
   const manager = c.env.SUBSCRIPTION_MANAGER.get(id);
   return manager.fetch(c.req.raw);
 });
 
 app.post('/api/subscriptions/:userId/cancel', async (c) => {
-  const userId = c.req.param('userId');
+  const userId = c.req.param('userId'); // or from header
   const id = c.env.SUBSCRIPTION_MANAGER.idFromName(userId);
   const manager = c.env.SUBSCRIPTION_MANAGER.get(id);
   return manager.fetch(c.req.raw);
@@ -67,42 +72,36 @@ app.post('/api/subscriptions/:userId/cancel', async (c) => {
 
 // Stripe webhook
 app.post('/api/webhooks/stripe', async (c) => {
-  // Handle in SubscriptionManager
   const id = c.env.SUBSCRIPTION_MANAGER.idFromName('webhook-handler');
   const manager = c.env.SUBSCRIPTION_MANAGER.get(id);
   return manager.fetch(c.req.raw);
 });
 
 // Bank connection routes
-app.post('/api/bank/create-link-token', async (c) => {
-  const { userId } = await c.req.json();
+app.all('/api/bank/*', async (c) => {
+  const userId = c.req.header('X-Authenticated-User-Id');
   const id = c.env.BANK_CONNECTION_MANAGER.idFromName(userId);
   const manager = c.env.BANK_CONNECTION_MANAGER.get(id);
   return manager.fetch(c.req.raw);
 });
 
-app.post('/api/bank/exchange-token', async (c) => {
-  const { userId } = await c.req.json();
-  const id = c.env.BANK_CONNECTION_MANAGER.idFromName(userId);
-  const manager = c.env.BANK_CONNECTION_MANAGER.get(id);
+// Ledger routes
+app.all('/api/ledger/:companyId/*', async (c) => {
+  const companyId = c.req.param('companyId');
+  const id = c.env.BOOKKEEPING_LEDGER.idFromName(companyId);
+  const ledger = c.env.BOOKKEEPING_LEDGER.get(id);
+  return ledger.fetch(c.req.raw);
+});
+
+// Invoice routes
+app.all('/api/invoices/:companyId/*', async (c) => {
+  const companyId = c.req.param('companyId');
+  const id = c.env.INVOICE_MANAGER.idFromName(companyId);
+  const manager = c.env.INVOICE_MANAGER.get(id);
   return manager.fetch(c.req.raw);
 });
 
-app.get('/api/bank/:userId/accounts', async (c) => {
-  const userId = c.req.param('userId');
-  const id = c.env.BANK_CONNECTION_MANAGER.idFromName(userId);
-  const manager = c.env.BANK_CONNECTION_MANAGER.get(id);
-  return manager.fetch(c.req.raw);
-});
-
-app.post('/api/bank/:userId/sync', async (c) => {
-  const userId = c.req.param('userId');
-  const id = c.env.BANK_CONNECTION_MANAGER.idFromName(userId);
-  const manager = c.env.BANK_CONNECTION_MANAGER.get(id);
-  return manager.fetch(c.req.raw);
-});
-
-// Spreadsheet upload
+// Spreadsheet upload routes
 app.post('/api/upload/spreadsheet', async (c) => {
   const { companyId, file } = await c.req.parseBody();
   
@@ -135,57 +134,6 @@ app.get('/api/upload/spreadsheet/:key', async (c) => {
       'Content-Disposition': `attachment; filename="${key.split('/').pop()}"`,
     },
   });
-});
-
-// Ledger routes
-app.post('/api/ledger/:companyId/transaction', async (c) => {
-  const companyId = c.req.param('companyId');
-  const id = c.env.BOOKKEEPING_LEDGER.idFromName(companyId);
-  const ledger = c.env.BOOKKEEPING_LEDGER.get(id);
-  return ledger.fetch(c.req.raw);
-});
-
-app.get('/api/ledger/:companyId/transactions', async (c) => {
-  const companyId = c.req.param('companyId');
-  const id = c.env.BOOKKEEPING_LEDGER.idFromName(companyId);
-  const ledger = c.env.BOOKKEEPING_LEDGER.get(id);
-  return ledger.fetch(c.req.raw);
-});
-
-app.get('/api/ledger/:companyId/balance-sheet', async (c) => {
-  const companyId = c.req.param('companyId');
-  const id = c.env.BOOKKEEPING_LEDGER.idFromName(companyId);
-  const ledger = c.env.BOOKKEEPING_LEDGER.get(id);
-  return ledger.fetch(c.req.raw);
-});
-
-app.get('/api/ledger/:companyId/profit-loss', async (c) => {
-  const companyId = c.req.param('companyId');
-  const id = c.env.BOOKKEEPING_LEDGER.idFromName(companyId);
-  const ledger = c.env.BOOKKEEPING_LEDGER.get(id);
-  return ledger.fetch(c.req.raw);
-});
-
-// Invoice routes
-app.post('/api/invoices/:companyId', async (c) => {
-  const companyId = c.req.param('companyId');
-  const id = c.env.INVOICE_MANAGER.idFromName(companyId);
-  const manager = c.env.INVOICE_MANAGER.get(id);
-  return manager.fetch(c.req.raw);
-});
-
-app.get('/api/invoices/:companyId', async (c) => {
-  const companyId = c.req.param('companyId');
-  const id = c.env.INVOICE_MANAGER.idFromName(companyId);
-  const manager = c.env.INVOICE_MANAGER.get(id);
-  return manager.fetch(c.req.raw);
-});
-
-app.get('/api/invoices/:companyId/:invoiceId', async (c) => {
-  const companyId = c.req.param('companyId');
-  const id = c.env.INVOICE_MANAGER.idFromName(companyId);
-  const manager = c.env.INVOICE_MANAGER.get(id);
-  return manager.fetch(c.req.raw);
 });
 
 export default app;
