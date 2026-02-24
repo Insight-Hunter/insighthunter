@@ -1,0 +1,22 @@
+
+{
+  "name": "InsightHunter Lite",
+  "short_name": "InsightLite",
+  "description": "A lightweight financial dashboard to track your cash, burn, and runway.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme_color": "#007aff",
+  "icons": [
+    {
+      "src": "/public/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/public/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
