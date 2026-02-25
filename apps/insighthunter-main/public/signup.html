@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="signup.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <!-- The `defer` attribute is used, but `async` is removed to ensure the script is available for the explicit callback -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" defer></script>
+    <!-- <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" defer></script> -->
 </head>
 <body class="page">
     <div class="topbar">
@@ -48,7 +48,7 @@
                     </div>
                     
                     <!-- This div is now the target for explicit rendering -->
-                    <div id="turnstile-widget-container"></div>
+                    <!-- <div id="turnstile-widget-container"></div> -->
                     
                     <p id="error-message" style="color: red;"></p>
 
@@ -66,6 +66,7 @@
     </footer>
     
     <script src="signup.js"></script>
+    <!--
     <script>
       function onloadTurnstileCallback() {
         turnstile.render('#turnstile-widget-container', {
@@ -74,5 +75,6 @@
         });
       }
     </script>
+    -->
 </body>
 </html>
