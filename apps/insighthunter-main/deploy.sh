@@ -2,6 +2,7 @@
 
 git add . 
 git commit -m ":pre-deploy git"
+git --commit-dirty=true
 git push 
 
 export CLOUDFLARE_ACCOUNT_ID="18c8e61a3669253dcfd0c7eec6be36a3"
