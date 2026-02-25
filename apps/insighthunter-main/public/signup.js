@@ -9,7 +9,7 @@ const liteAppUrl = 'https://lite.insighthunter.app';
 signupForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   errorMessage.textContent = '';
-
+ 
   const name = event.target.name.value;
   const email = event.target.email.value;
   const password = event.target.password.value;

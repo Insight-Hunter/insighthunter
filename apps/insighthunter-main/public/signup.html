@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +7,8 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="signup.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <!-- The `defer` attribute is used, but `async` is removed to ensure the script is available for the explicit callback -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" defer></script>
 </head>
 <body class="page">
     <div class="topbar">
@@ -24,43 +24,55 @@
         </nav>
     </div>
 
-    <main class="main">
-        <section class="card form-container">
-            <h1>Create your account</h1>
-            <form id="signup-form" class="form">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <div class="form-group">
-                    <label for="confirm-password">Confirm Password</label>
-                    <input type="password" id="confirm-password" name="confirm-password" required>
-                </div>
-                
-                <div class="cf-turnstile" data-sitekey="0x4AAAAAACh0ortSylrGgGmZ"></div>
-                
-                <p id="error-message" style="color: red;"></p>
+    <main class="main-content">
+        <section class="signup-section">
+            <div class="container">
+                <h1>Create Your InsightHunter Account</h1>
+                <p>Start your journey into the future of data analysis.</p>
+                <form id="signup-form" class="signup-form">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm Password</label>
+                        <input type="password" id="confirm-password" name="confirm-password" required>
+                    </div>
+                    
+                    <!-- This div is now the target for explicit rendering -->
+                    <div id="turnstile-widget-container"></div>
+                    
+                    <p id="error-message" style="color: red;"></p>
 
-                <button type="submit" class="btn-primary">Create Account</button>
-            </form>
-            <p>Already have an account? <a href="login.html">Log in</a></p>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                </form>
+                <p>Already have an account? <a href="login.html">Log in</a></p>
+            </div>
         </section>
     </main>
 
     <footer class="footer">
-        <p>&copy; 2024 InsightHunter. All rights reserved.</p>
-        <a href="/legal/privacy.html">Privacy Policy</a>
-        <a href="/legal/terms.html">Terms of Service</a>
+        <div class="container">
+            <p>&copy; 2024 InsightHunter. All rights reserved.</p>
+        </div>
     </footer>
-
+    
     <script src="signup.js"></script>
+    <script>
+      function onloadTurnstileCallback() {
+        turnstile.render('#turnstile-widget-container', {
+          sitekey: '0x4AAAAAACh0ortSylrGgGmZ',
+          // You can add other options here, like theme: 'dark'
+        });
+      }
+    </script>
 </body>
 </html>
