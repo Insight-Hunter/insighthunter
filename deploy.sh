@@ -1,11 +1,17 @@
 #!/bin/bash
-git add .
-git commit -m "pre deployment"
+
+git add . 
+git commit -m ":pre-deploy git"
+git --commit-dirty=true
 git push 
 
-export CLOUDFLARE_API_TOKEN="kAY9u88TaeuI9wByQkismZ2oGjBWqf5mVBhDTYNE"
 export CLOUDFLARE_ACCOUNT_ID="18c8e61a3669253dcfd0c7eec6be36a3"
+export CLOUDFLARE_API_TOKEN="kAY9u88TaeuI9wByQkismZ2oGjBWqf5mVBhDTYNE"
 
-wrangler pages deploy apps/insighthunter-main
+wrangler pages deploy apps/insighthunter-msin/public
 
-echo "Deployment Command issued with Token and ID stored" 
+
+
+echo " "
+echo "Secrets set and deployment command ran"
+
