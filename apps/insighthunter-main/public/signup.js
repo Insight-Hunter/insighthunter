@@ -20,7 +20,8 @@ signupForm.addEventListener('submit', async (event) => {
     return;
   }
 
-  const turnstileResponse = document.querySelector('.cf-turnstile').dataset.turnstileId;
+  // Correctly get the Turnstile response token from the form
+  const turnstileResponse = signupForm.elements['cf-turnstile-response'].value;
   if (!turnstileResponse) {
     errorMessage.textContent = 'Please complete the CAPTCHA.';
     return;
