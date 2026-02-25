@@ -1,8 +1,28 @@
 name = "insighthunter-auth"
 main = "src/index.ts"
-compatibility_date = "2023-10-30"
+compatibility_date = "2026-02-25"
+compatibility_flags = ["nodejs_compat_v2"]
+usage_model = "bundled"
 
 [[d1_databases]]
 binding = "AUTH_DB"
 database_name = "insighthunter-auth"
-database_id = "<YOUR_DATABASE_ID>"
+database_id = "<YOUR_AUTH_DATABASE_ID>"
+
+[[d1_databases]]
+binding = "D1_DB"
+database_name = "insighthunter_db"
+database_id = "<YOUR_APP_DATABASE_ID>"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "<YOUR_KV_NAMESPACE_ID>"
+
+[env.production]
+name = "insighthunter-auth"
+routes = [
+  # This route pattern assumes your authentication API is served from a subdomain.
+  { pattern = "auth.insighthunter.app/*", custom_domain = true }
+]
+
+

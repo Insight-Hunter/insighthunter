@@ -1,89 +1,288 @@
-export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    const url = new URL(request.url);
+// index.ts
+import Stripe from 'stripe';
+import { createHmac } from 'node:crypto';
+import bcrypt from 'bcryptjs'; // npm i bcryptjs stripe
 
-    if (url.pathname === '/api/signup') {
-      return handleSignup(request, env);
-    } else {
-      return new Response('Not found', { status: 404 });
-    }
-  },
-};
-
-async function handleSignup(request: Request, env: Env): Promise<Response> {
-  if (request.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
-  }
-
-  try {
-    const { name, email, password, 'cf-turnstile-response': turnstileResponse } = await request.json();
-
-    const turnstileSecretKey = '0x4AAAAAACh0opVnevzeby3S65WWzoSwJOE';
-
-    const turnstileVerificationResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        secret: turnstileSecretKey,
-        response: turnstileResponse,
-      }),
-    });
-
-    const turnstileVerificationData = await turnstileVerificationResponse.json();
-
-    if (!turnstileVerificationData.success) {
-      return new Response(JSON.stringify({ success: false, error: 'CAPTCHA verification failed.' }), {
-        headers: { 'Content-Type': 'application/json' },
-        status: 400,
-      });
-    }
-
-    // Hash the password
-    const hashedPassword = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
-    const hashArray = Array.from(new Uint8Array(hashedPassword));
-    const hashedPasswordHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-    const id = crypto.randomUUID();
-
-    try {
-        await env.AUTH_DB.prepare(
-            `INSERT INTO users (id, name, email, password, created_at, updated_at) VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))`
-        )
-        .bind(
-            id,
-            name,
-            email,
-            hashedPasswordHex
-        )
-        .run();
-    } catch (dbError) {
-        console.error('Database error:', dbError);
-        if (dbError.message.includes('UNIQUE constraint failed: users.email')) {
-            return new Response(JSON.stringify({ success: false, error: 'Email already in use.' }), {
-                headers: { 'Content-Type': 'application/json' },
-                status: 409,
-            });
-        }
-        return new Response(JSON.stringify({ success: false, error: 'Failed to create user.' }), {
-            headers: { 'Content-Type': 'application/json' },
-            status: 500,
-        });
-    }
-
-
-    // For now, we'll just return a success response with a dummy token
-    return new Response(JSON.stringify({ success: true, token: 'dummy-token' }), {
-      headers: { 'Content-Type': 'application/json' },
-    });
-  } catch (error) {
-    console.error('Signup failed:', error);
-    return new Response(JSON.stringify({ success: false, error: 'An unknown error occurred.' }), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 500,
-    });
-  }
+interface User {
+  id: string;
+  email: string;
+  password_hash: string;
+  role: string;
+  stripe_customer_id?: string;
+  subscription_status?: 'active' | 'trialing' | 'past_due' | 'canceled';
+  created_at: string;
 }
 
 interface Env {
-  AUTH_DB: D1Database;
+  D1_DB: D1Database;
+  TURNSTILE_SECRET: string;
+  STRIPE_SECRET_KEY: string;
+  STRIPE_WEBHOOK_SECRET: string;
+  JWT_SECRET: string;
+  STRIPE_PUBLISHABLE_KEY: string; // For client-side
 }
+
+const stripe = (env: Env) => new Stripe(env.STRIPE_SECRET_KEY, {
+  apiVersion: '2024-10-22.beta',
+  httpAgent: undefined as any,
+});
+
+// Secure password hashing
+const hashPassword = async (password: string): Promise<string> => {
+  return bcrypt.hash(password, 12);
+};
+
+const verifyPassword = async (password: string, hash: string): Promise<boolean> => {
+  return bcrypt.compare(password, hash);
+};
+
+// JWT helpers (HS256)
+const generateJWT = (payload: { userId: string } & Record<string, any>, env: Env): string => {
+  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+  const encodedPayload = btoa(JSON.stringify(payload));
+  const signatureBytes = await crypto.subtle.sign(
+    'HMAC',
+    await crypto.subtle.importKey('raw', new TextEncoder().encode(env.JWT_SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
+    new TextEncoder().encode(`${header}.${encodedPayload}`)
+  );
+  const signature = btoa(String.fromCharCode(...new Uint8Array(signatureBytes)));
+  return `${header}.${encodedPayload}.${signature}`;
+};
+
+const verifyJWT = async (token: string, env: Env): Promise<{ userId: string } | null> => {
+  try {
+    const [header, payload, signature] = token.split('.');
+    const expectedSignatureBytes = await crypto.subtle.sign(
+      'HMAC',
+      await crypto.subtle.importKey('raw', new TextEncoder().encode(env.JWT_SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
+      new TextEncoder().encode(`${header}.${payload}`)
+    );
+    const expectedSignature = btoa(String.fromCharCode(...new Uint8Array(expectedSignatureBytes)));
+    if (signature !== expectedSignature) return null;
+    return JSON.parse(atob(payload));
+  } catch {
+    return null;
+  }
+};
+
+// Rate limiting (simple IP-based)
+const RATE_LIMIT_KV_KEY = 'rate:signup';
+const getRateLimit = async (ip: string, kv?: KVNamespace): Promise<boolean> => {
+  if (!kv) return true;
+  const key = `${RATE_LIMIT_KV_KEY}:${ip}`;
+  const count = (await kv.get(key, { type: 'json' }) as number[]) || [];
+  if (count.length >= 5) return false; // 5/min
+  count.push(Date.now());
+  await kv.put(key, JSON.stringify(count.filter(t => t > Date.now() - 60000)));
+  return true;
+};
+
+// Auth middleware
+const withAuth = async (request: Request, env: Env): Promise<User | null> => {
+  const cookie = request.headers.get('Cookie')?.match(/auth_jwt=([^;]+)/)?.[1];
+  if (!cookie) return null;
+  const payload = await verifyJWT(cookie, env);
+  if (!payload?.userId) return null;
+  
+  const { results } = await env.D1_DB.prepare('SELECT * FROM users WHERE id = ?')
+    .bind(payload.userId).all();
+  return results[0] as User;
+};
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const url = new URL(request.url);
+    const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
+
+    // Rate limiting on signup
+    if (request.method === 'POST' && url.pathname === '/api/signup') {
+      if (!(await getRateLimit(clientIP, env.RATE_LIMIT_KV))) {
+        return new Response('Too many requests', { status: 429, headers: { 'Retry-After': '60' } });
+      }
+    }
+
+    // POST /api/signup
+    if (request.method === 'POST' && url.pathname === '/api/signup') {
+      try {
+        const formData = await request.formData();
+        const email = (formData.get('email') as string)?.trim().toLowerCase();
+        const password = formData.get('password') as string;
+        const role = formData.get('role') as string;
+        const turnstileToken = formData.get('cf-turnstile-response') as string;
+
+        // Validation
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          return new Response('Invalid email', { status: 400 });
+        }
+        if (password?.length < 12) {
+          return new Response('Password too short', { status: 400 });
+        }
+        if (!['owner', 'accountant', 'fractional_cfo', 'other'].includes(role)) {
+          return new Response('Invalid role', { status: 400 });
+        }
+        if (!await verifyTurnstile(turnstileToken, env)) {
+          return new Response('Bot detected', { status: 400 });
+        }
+
+        // Check email exists
+        const existing = await env.D1_DB.prepare('SELECT id FROM users WHERE email = ?')
+          .bind(email).first();
+        if (existing) return new Response('Email already exists', { status: 409 });
+
+        const passwordHash = await hashPassword(password);
+        const { results } = await env.D1_DB.prepare(`
+          INSERT INTO users (email, password_hash, role, created_at) 
+          VALUES (?, ?, ?, ?) RETURNING id
+        `).bind(email, passwordHash, role, new Date().toISOString()).run();
+
+        const userId = (results?.[0] as any)?.id;
+        if (!userId) throw new Error('User creation failed');
+
+        const jwt = generateJWT({ userId }, env);
+        const headers = new Headers();
+        headers.set('Set-Cookie', `auth_jwt=${jwt}; HttpOnly; Secure; SameSite=Strict; Max-Age=2592000; Path=/`); // 30 days
+        headers.set('Location', `/shopping?userId=${userId}`);
+        return new Response(null, { status: 302, headers });
+      } catch (error) {
+        console.error('Signup error:', error);
+        return new Response('Internal error', { status: 500 });
+      }
+    }
+
+    // GET /shopping (protected)
+    if (url.pathname === '/shopping') {
+      const user = await withAuth(request, env);
+      if (!user) return new Response('Unauthorized', { status: 401 });
+      
+      return new Response(shoppingHTML(env.STRIPE_PUBLISHABLE_KEY), {
+        headers: { 'Content-Type': 'text/html' }
+      });
+    }
+
+    // POST /api/create-checkout (protected)
+    if (request.method === 'POST' && url.pathname === '/api/create-checkout') {
+      const user = await withAuth(request, env);
+      if (!user) return new Response('Unauthorized', { status: 401 });
+
+      try {
+        const formData = await request.formData();
+        const plan = formData.get('plan') as string;
+        const addons = formData.getAll('addons[]') as string[];
+
+        const basePrices = { free: 0, standard: 4900, pro: 14900 };
+        let amount = basePrices[plan as keyof typeof basePrices];
+        const addonPrices = { 'compliance-hub': 1900, 'forecasting': 2900 };
+        addons.forEach(addon => { amount += (addonPrices as any)[addon] || 0; });
+
+        let customerId = user.stripe_customer_id;
+        if (!customerId) {
+          const customer = await stripe(env).customers.create({
+            email: user.email,
+            metadata: { userId: user.id }
+          });
+          customerId = customer.id;
+          await env.D1_DB.prepare('UPDATE users SET stripe_customer_id = ? WHERE id = ?')
+            .bind(customerId, user.id).run();
+        }
+
+        const session = await stripe(env).checkout.sessions.create({
+          customer: customerId,
+          payment_method_types: ['card'],
+          line_items: [{
+            price_data: {
+              currency: 'usd',
+              product_data: { name: `InsightHunter ${plan.slice(0,1).toUpperCase() + plan.slice(1)}` },
+              unit_amount: Math.max(amount, 500), // Min $5
+              recurring: { interval: 'month' },
+            },
+            quantity: 1,
+          }],
+          mode: 'subscription',
+          success_url: `${new URL(request.url).origin}/my-account`,
+          cancel_url: `${new URL(request.url).origin}/shopping`,
+          metadata: { addons: addons.join(',') }
+        });
+
+        return Response.json({ url: session.url });
+      } catch (error) {
+        console.error('Checkout error:', error);
+        return new Response('Payment setup failed', { status: 500 });
+      }
+    }
+
+    // POST /api/webhook - Stripe webhook
+    if (request.method === 'POST' && url.pathname === '/api/webhook') {
+      const sig = request.headers.get('stripe-signature')!;
+      let event;
+
+      try {
+        event = stripe(env).webhooks.constructEvent(
+          await request.text(),
+          sig,
+          env.STRIPE_WEBHOOK_SECRET
+        );
+      } catch (err) {
+        return new Response(`Webhook signature failed`, { status: 400 });
+      }
+
+      if (event.type === 'checkout.session.completed') {
+        const session = event.data.object as any;
+        const userId = session.customer_details.metadata?.userId;
+        if (userId) {
+          await env.D1_DB.prepare(`
+            UPDATE users SET subscription_status = 'active' 
+            WHERE id = ?
+          `).bind(userId).run();
+        }
+      }
+
+      return new Response('OK', { status: 200 });
+    }
+
+    // GET /my-account (protected)
+    if (url.pathname === '/my-account') {
+      const user = await withAuth(request, env);
+      if (!user) return new Response('Unauthorized', { status: 401 });
+
+      const apps = user.subscription_status === 'active' 
+        ? ['dashboard', 'compliance', 'forecasting'] 
+        : ['dashboard'];
+
+      return new Response(myAccountHTML(apps), { headers: { 'Content-Type': 'text/html' } });
+    }
+
+    return new Response('Not found', { status: 404 });
+  },
+} satisfies ExportedHandler<Env>;
+
+// HTML templates (inline for simplicity)
+const shoppingHTML = (publishableKey: string) => `<!DOCTYPE html>
+<html><head><title>Select Plan</title><script src="https://js.stripe.com/v3/"></script></head><body>
+<h1>Select Your Plan & Add-ons</h1>
+<form id="purchase-form">
+  <div>
+    <label><input type="radio" name="plan" value="free" checked> Free</label>
+    <label><input type="radio" name="plan" value="standard"> Standard ($49/mo)</label>
+    <label><input type="radio" name="plan" value="pro"> Pro ($149/mo)</label>
+  </div>
+  <div>
+    <label><input type="checkbox" name="addons[]" value="compliance-hub"> Compliance Hub (+$19/mo)</label>
+    <label><input type="checkbox" name="addons[]" value="forecasting"> Forecasting (+$29/mo)</label>
+  </div>
+  <button type="submit">Checkout</button>
+</form>
+<script>
+  const stripe = Stripe('${publishableKey}');
+  document.getElementById('purchase-form').onsubmit = async(e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const res = await fetch('/api/create-checkout', {method:'POST', body:formData});
+    const {url} = await res.json();
+    window.location.href = url;
+  };
+</script></body></html>`;
+
+const myAccountHTML = (apps: string[]) => `<!DOCTYPE html>
+<html><body><h1>My Apps</h1><ul>${
+  apps.map(app => `<li><a href="/app/${app}">${app}</a></li>`).join('')
+}</ul></body></html>`;
