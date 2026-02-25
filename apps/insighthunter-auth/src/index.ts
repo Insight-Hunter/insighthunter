@@ -11,9 +11,9 @@ export interface Env {
 
 const app = new Hono<{ Bindings: Env }>();
 
-// Allow cross-origin requests from any domain.
+// Allow cross-origin requests from specific domains.
 app.use('*', cors({
-  origin: (origin) => origin,
+  origin: ['https://insighthunter.app', 'https://lite.insighthunter.app'],
   credentials: true,
 }));
 
@@ -89,15 +89,15 @@ app.post('/api/signup', async (c) => {
 
         const hashedPassword = await hashPassword(password);
         
-        const result = await c.env.DB.prepare('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?) RETURNING id')
+        const result = await c.env.DB.prepare('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)')
             .bind(name, email, hashedPassword)
-            .first();
+            .run();
 
-        if (!result || !result.id) {
+        if (!result.meta.last_row_id) {
             throw new Error("Failed to create user or retrieve user ID.");
         }
         
-        const userId = result.id;
+        const userId = result.meta.last_row_id;
         
         const payload = {
             sub: userId,
@@ -108,7 +108,8 @@ app.post('/api/signup', async (c) => {
         return c.json({ success: true, token: token });
     } catch (error) {
         console.error("Signup Error:", error);
-        return c.json({ success: false, error: 'An internal error occurred during signup.' }, 500);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return c.json({ success: false, error: 'An internal error occurred during signup.', details: errorMessage }, 500);
     }
 });
 
