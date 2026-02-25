@@ -12,7 +12,7 @@ wrangler d1 execute insighthunter-auth --file=apps/insighthunter-auth/schema.sql
 # Make sure your CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN are set
 wrangler d1 execute insight-hunter --file=apps/insighthunter-auth/schema.sql -c apps/insighthunter-auth/wrangler.toml --remote
 
-wrangler deploy /home/user/insighthunter/apps/insighthunter-auth
+## wrangler deploy /home/user/insighthunter/apps/insighthunter-auth
 ## wrangler deploy /home/user/insighthunter/apps/insighthunter-main
 
 echo " "
