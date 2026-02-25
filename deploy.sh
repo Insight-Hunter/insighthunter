@@ -8,8 +8,7 @@ git push
 export CLOUDFLARE_ACCOUNT_ID="18c8e61a3669253dcfd0c7eec6be36a3"
 export CLOUDFLARE_API_TOKEN="kAY9u88TaeuI9wByQkismZ2oGjBWqf5mVBhDTYNE"
 
-wrangler pages deploy apps/insighthunter-msin/public
-
+wrangler pages deploy /home/user/insighthunter/apps/insighthunter-main/public
 
 
 echo " "
