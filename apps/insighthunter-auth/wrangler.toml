@@ -1,11 +1,8 @@
 name = "insighthunter-auth"
 main = "src/index.ts"
-compatibility_date = "2024-03-20"
-
-[vars]
-LITE_APP_URL = "https://lite.insighthunter.app"
+compatibility_date = "2023-10-30"
 
 [[d1_databases]]
-binding = "DB"
-database_name = "insighthunter_db"
-database_id = "aa2b9aa2-f1dd-4fdc-b4b0-d9b4bdc2ea57"
+binding = "AUTH_DB"
+database_name = "insighthunter-auth"
+database_id = "<YOUR_DATABASE_ID>"

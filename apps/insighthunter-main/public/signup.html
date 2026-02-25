@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - InsightHunter</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="signup.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body class="page">
     <div class="topbar">
@@ -25,14 +28,24 @@
         <section class="card form-container">
             <h1>Create your account</h1>
             <form id="signup-form" class="form">
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" required>
-
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" name="confirm-password" required>
+                </div>
+                
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAACh0ortSylrGgGmZ"></div>
                 
                 <p id="error-message" style="color: red;"></p>
 
@@ -48,43 +61,6 @@
         <a href="/legal/terms.html">Terms of Service</a>
     </footer>
 
-    <script>
-      const signupForm = document.getElementById('signup-form');
-      const errorMessage = document.getElementById('error-message');
-
-      // You will need to replace this with the actual URL of your authentication service
-      const authApiUrl = 'https://auth.insighthunter.app'; 
-      // You will need to replace this with the actual URL of your PWA
-      const liteAppUrl = 'https://lite.insighthunter.app';
-
-      signupForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        errorMessage.textContent = '';
-
-        const name = event.target.name.value;
-        const email = event.target.email.value;
-        const password = event.target.password.value;
-
-        try {
-          const response = await fetch(`${authApiUrl}/api/signup`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password }),
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            // On successful signup, redirect to the PWA with the token
-            window.location.href = `${liteAppUrl}/auth/callback?token=${data.token}`;
-          } else {
-            errorMessage.textContent = data.error || 'An unknown error occurred.';
-          }
-        } catch (error) {
-          console.error('Signup failed:', error);
-          errorMessage.textContent = 'Could not connect to the authentication service.';
-        }
-      });
-    </script>
+    <script src="signup.js"></script>
 </body>
 </html>

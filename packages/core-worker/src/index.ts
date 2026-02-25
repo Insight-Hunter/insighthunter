@@ -18,7 +18,7 @@ async function handleSignup(request: Request, env: Env): Promise<Response> {
   try {
     const { name, email, password, 'cf-turnstile-response': turnstileResponse } = await request.json();
 
-    const turnstileSecretKey = '0x4AAAAAACh0opVnevzeby3S65WWzoSwJOE';
+    const turnstileSecretKey = 'YOUR_TURNSTILE_SECRET_KEY';
 
     const turnstileVerificationResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
       method: 'POST',
@@ -38,38 +38,7 @@ async function handleSignup(request: Request, env: Env): Promise<Response> {
       });
     }
 
-    // Hash the password
-    const hashedPassword = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
-    const hashArray = Array.from(new Uint8Array(hashedPassword));
-    const hashedPasswordHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-    const id = crypto.randomUUID();
-
-    try {
-        await env.AUTH_DB.prepare(
-            `INSERT INTO users (id, name, email, password, created_at, updated_at) VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))`
-        )
-        .bind(
-            id,
-            name,
-            email,
-            hashedPasswordHex
-        )
-        .run();
-    } catch (dbError) {
-        console.error('Database error:', dbError);
-        if (dbError.message.includes('UNIQUE constraint failed: users.email')) {
-            return new Response(JSON.stringify({ success: false, error: 'Email already in use.' }), {
-                headers: { 'Content-Type': 'application/json' },
-                status: 409,
-            });
-        }
-        return new Response(JSON.stringify({ success: false, error: 'Failed to create user.' }), {
-            headers: { 'Content-Type': 'application/json' },
-            status: 500,
-        });
-    }
-
+    // TODO: Add your user creation logic here (e.g., save the user to a database)
 
     // For now, we'll just return a success response with a dummy token
     return new Response(JSON.stringify({ success: true, token: 'dummy-token' }), {
@@ -85,5 +54,18 @@ async function handleSignup(request: Request, env: Env): Promise<Response> {
 }
 
 interface Env {
-  AUTH_DB: D1Database;
+  // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
+  // MY_KV_NAMESPACE: KVNamespace;
+  //
+  // Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
+  // MY_DURABLE_OBJECT: DurableObjectNamespace;
+  //
+  // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
+  // MY_BUCKET: R2Bucket;
+  //
+  // Example binding to a Service. Learn more at https://developers.cloudflare.com/workers/runtime-apis/service-bindings/
+  // MY_SERVICE: Fetcher;
+  //
+  // Example binding to a Queue. Learn more at https://developers.cloudflare.com/workers/runtime-apis/queues/
+  // MY_QUEUE: Queue;
 }

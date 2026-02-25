@@ -17,6 +17,6 @@ echo "📱 Mobile App..."
 
 # Web App (HTML)
 echo "🌐 Web App..."
-(cd apps/insighthunter-web/public && python3 -m http.server 3000) &
+(cd apps/insighthunter-main/public && python3 -m http.server 3000) &
 
 wait
