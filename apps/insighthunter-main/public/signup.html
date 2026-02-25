@@ -1,80 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - InsightHunter</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sign Up – InsightHunter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="signup.css" />
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="signup.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <!-- The `defer` attribute is used, but `async` is removed to ensure the script is available for the explicit callback -->
-    <!-- <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" defer></script> -->
-</head>
-<body class="page">
-    <div class="topbar">
-        <div class="brand">INSIGHTHUNTER</div>
-        <nav class="nav">
-            <a href="index.html">Home</a>
-            <a href="features.html">Features</a>
-            <a href="pricing.html">Pricing</a>
-            <a href="about.html">About</a>
-            <a href="my-account.html">My Account</a>
-            <a href="login.html">Login</a>
-            <a href="signup.html" class="btn-primary active">Sign Up</a>
+  </head>
+  <body class="ih-body">
+    <header class="ih-header">
+      <div class="ih-header-inner">
+        <a href="/" class="ih-logo">InsightHunter</a>
+        <nav class="ih-nav">
+          <a href="/bookkeeping/subscribe.html">Pricing</a>
+          <a href="/features">Features</a>
+          <a href="/login" class="ih-link-muted">Log in</a>
+          <a href="/signup" class="ih-btn ih-btn-outline">Get started</a>
         </nav>
-    </div>
+      </div>
+    </header>
 
-    <main class="main-content">
-        <section class="signup-section">
-            <div class="container">
-                <h1>Create Your InsightHunter Account</h1>
-                <p>Start your journey into the future of data analysis.</p>
-                <form id="signup-form" class="signup-form">
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirm-password">Confirm Password</label>
-                        <input type="password" id="confirm-password" name="confirm-password" required>
-                    </div>
-                    
-                    <!-- This div is now the target for explicit rendering -->
-                    <!-- <div id="turnstile-widget-container"></div> -->
-                    
-                    <p id="error-message" style="color: red;"></p>
+    <main>
+      <!-- HERO + SIGNUP -->
+      <section class="ih-hero">
+        <div class="ih-hero-left">
+          <h1>Stop flying blind. Run your finances with clarity.</h1>
+          <p>
+            InsightHunter gives solo entrepreneurs, freelancers, and small firms
+            CFO-level visibility, automated reporting, and the confidence to make
+            smart decisions — starting free.
+          </p>
+          <ul class="ih-hero-list">
+            <li>Real-time cash flow dashboards</li>
+            <li>Compliance hub and automated reminders</li>
+            <li>Client-ready reports in one click</li>
+          </ul>
+          <div class="ih-hero-meta">
+            <span>✓ No credit card required</span>
+            <span>✓ Free plan forever</span>
+          </div>
+        </div>
 
-                    <button type="submit" class="btn-primary">Create Account</button>
-                </form>
-                <p>Already have an account? <a href="login.html">Log in</a></p>
-            </div>
-        </section>
+        <div class="ih-hero-right">
+          <form class="ih-signup-card" id="signup-form" method="post">
+            <h2>Create your account</h2>
+            <p class="ih-signup-subtitle">
+              Start on the Free plan. Upgrade only when you’re ready.
+            </p>
+
+            <label class="ih-field">
+              <span>Work email</span>
+              <input
+                type="email"
+                name="email"
+                autocomplete="email"
+                required
+                placeholder="you@firmname.com"
+              />
+            </label>
+
+            <label class="ih-field">
+              <span>Password</span>
+              <input
+                type="password"
+                name="password"
+                autocomplete="new-password"
+                required
+                minlength="12"
+                placeholder="At least 12 characters"
+              />
+              <small class="ih-field-help">
+                Use at least 12 characters, including a number and symbol.
+              </small>
+            </label>
+
+            <label class="ih-field">
+              <span>Account type</span>
+              <select name="role" required>
+                <option value="">Select one</option>
+                <option value="owner">Business owner</option>
+                <option value="accountant">Accounting firm</option>
+                <option value="fractional_cfo">Fractional CFO</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+
+            <input type="hidden" name="plan" id="selected-plan" value="free" />
+
+            <div id="turnstile-widget-container"></div>
+            <p id="error-message" style="color: red;"></p>
+
+            <button type="submit" class="ih-btn ih-btn-primary ih-btn-full">
+              Create free account
+            </button>
+
+            <p class="ih-signup-footnote">
+              By continuing, you agree to our
+              <a href="/legal/terms">Terms</a> and
+              <a href="/legal/privacy">Privacy Policy</a>.
+            </p>
+
+            <p class="ih-signup-login">
+              Already using InsightHunter?
+              <a href="/login">Log in</a>
+            </p>
+          </form>
+        </div>
+      </section>
+
+      <!-- PRICING -->
+      <section class="ih-section" id="pricing">
+        <header class="ih-section-header">
+          <h2>Plans that grow with your business</h2>
+          <p>
+            Start free and upgrade as your client roster grows. Core features on every plan —
+            no essential tools locked behind a paywall.
+          </p>
+        </header>
+
+        <div class="ih-pricing-grid">
+          <!-- Free -->
+          <article class="ih-plan">
+            <h3>Free</h3>
+            <p class="ih-plan-price">$0</p>
+            <p class="ih-plan-tagline">For owners getting their first financial cockpit.</p>
+            <ul class="ih-plan-features">
+              <li>Manual CSV uploads</li>
+              <li>Basic compliance task tracking</li>
+              <li>Up to 3 client profiles</li>
+              <li>Standard report templates</li>
+              <li>Email support</li>
+            </ul>
+            <button
+              class="ih-btn ih-btn-outline ih-btn-full"
+              data-plan="free"
+            >
+              Start free
+            </button>
+          </article>
+
+          <!-- Standard -->
+          <article class="ih-plan ih-plan-featured">
+            <div class="ih-plan-badge">Most popular</div>
+            <h3>Standard</h3>
+            <p class="ih-plan-price">$49<span>/mo</span></p>
+            <p class="ih-plan-tagline">For firms ready to centralize compliance and reporting.</p>
+            <ul class="ih-plan-features">
+              <li>Automatic data ingestion</li>
+              <li>Full compliance hub with smart reminders</li>
+              <li>Up to 20 client profiles</li>
+              <li>Engagement letter generation & tracking</li>
+              <li>Branded client-ready report packs</li>
+              <li>Priority support</li>
+            </ul>
+            <button
+              class="ih-btn ih-btn-primary ih-btn-full"
+              data-plan="standard"
+            >
+              Try Standard
+            </button>
+          </article>
+
+          <!-- Pro -->
+          <article class="ih-plan">
+            <h3>Pro</h3>
+            <p class="ih-plan-price">$149<span>/mo</span></p>
+            <p class="ih-plan-tagline">For fractional CFOs and multi-entity firms.</p>
+            <ul class="ih-plan-features">
+              <li>Everything in Standard</li>
+              <li>Unlimited client profiles</li>
+              <li>Multi-entity management</li>
+              <li>White-label reporting</li>
+              <li>Advanced automation workflows</li>
+              <li>Dedicated account manager</li>
+            </ul>
+            <button
+              class="ih-btn ih-btn-outline ih-btn-full"
+              data-plan="pro"
+            >
+              Talk to sales
+            </button>
+          </article>
+        </div>
+      </section>
     </main>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 InsightHunter. All rights reserved.</p>
-        </div>
-    </footer>
-    
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" defer></script>
     <script src="signup.js"></script>
-    <!--
     <script>
       function onloadTurnstileCallback() {
         turnstile.render('#turnstile-widget-container', {
           sitekey: '0x4AAAAAACh0ortSylrGgGmZ',
-          // You can add other options here, like theme: 'dark'
         });
       }
+
+      // Simple plan selection wiring: clicking a pricing button sets the hidden plan in the signup form
+      const planButtons = document.querySelectorAll("[data-plan]");
+      const planInput = document.getElementById("selected-plan");
+      const signupForm = document.querySelector(".ih-signup-card");
+
+      planButtons.forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          const plan = btn.getAttribute("data-plan");
+          if (planInput) planInput.value = plan;
+          if (signupForm) signupForm.scrollIntoView({ behavior: "smooth" });
+        });
+      });
     </script>
-    -->
-</body>
+  </body>
 </html>

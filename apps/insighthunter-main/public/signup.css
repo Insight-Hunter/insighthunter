@@ -1,33 +1,304 @@
-.form-container {
-    max-width: 450px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+
+:root {
+  --ih-brand-primary: hsl(210, 80%, 50%);
+  --ih-brand-secondary: hsl(195, 90%, 45%);
+  --ih-text-primary: hsl(215, 20%, 15%);
+  --ih-text-muted: hsl(215, 15%, 45%);
+  --ih-bg-primary: hsl(0, 0%, 100%);
+  --ih-bg-accent: hsl(210, 40%, 98%);
+  --ih-border-primary: hsl(210, 20%, 85%);
+  --ih-border-accent: hsl(210, 80%, 50%);
+  --ih-error: hsl(0, 70%, 50%);
+  --ih-success: hsl(140, 70%, 40%);
+  --ih-font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  --ih-font-display: "Lexend", var(--ih-font-sans);
+  --ih-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --ih-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --ih-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --ih-radius: 0.5rem;
 }
 
-.form-group {
-    margin-bottom: 1.5rem;
+/* GENERAL STYLES */
+.ih-body {
+  font-family: var(--ih-font-sans);
+  color: var(--ih-text-primary);
+  background-color: var(--ih-bg-primary);
+  line-height: 1.6;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--ih-font-display);
+  font-weight: 600;
+  line-height: 1.2;
+}
+a {
+  color: var(--ih-brand-primary);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
+/* HEADER */
+.ih-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--ih-border-primary);
+}
+.ih-header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.ih-logo {
+  font-family: var(--ih-font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ih-text-primary);
+}
+.ih-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.ih-link-muted {
+  color: var(--ih-text-muted);
 }
 
-.form-group input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+/* BUTTONS */
+.ih-btn {
+  display: inline-block;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--ih-radius);
+  font-weight: 500;
+  text-align: center;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+.ih-btn-primary {
+  background-color: var(--ih-brand-primary);
+  color: white;
+  border-color: var(--ih-brand-primary);
+}
+.ih-btn-primary:hover {
+  background-color: hsl(210, 80%, 60%);
+  text-decoration: none;
+}
+.ih-btn-outline {
+  border-color: var(--ih-border-primary);
+  color: var(--ih-text-primary);
+}
+.ih-btn-outline:hover {
+  background-color: var(--ih-bg-accent);
+  border-color: var(--ih-border-accent);
+  text-decoration: none;
+}
+.ih-btn-full {
+  width: 100%;
 }
 
-.g-recaptcha {
-    margin-bottom: 1.5rem;
+/* HERO SECTION */
+.ih-hero {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 4rem;
+  max-width: 1200px;
+  margin: 4rem auto;
+  padding: 0 1.5rem;
+}
+.ih-hero-left h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+.ih-hero-left p {
+  font-size: 1.125rem;
+  color: var(--ih-text-muted);
+  max-width: 600px;
+}
+.ih-hero-list {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.ih-hero-list li {
+  padding-left: 1.75rem;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="hsl(140, 70%, 40%)"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>')
+    no-repeat left center;
+  background-size: 1.25rem;
+}
+.ih-hero-meta {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--ih-text-muted);
 }
 
-.cf-turnstile {
-    margin-bottom: 1.5rem;
+/* SIGNUP CARD */
+.ih-signup-card {
+  background-color: white;
+  padding: 2.5rem;
+  border-radius: var(--ih-radius);
+  box-shadow: var(--ih-shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.ih-signup-card h2 {
+  font-size: 1.75rem;
+  text-align: center;
+  margin: 0 0 0.5rem;
+}
+.ih-signup-subtitle {
+  text-align: center;
+  margin: -0.5rem 0 0.5rem;
+  color: var(--ih-text-muted);
+}
+.ih-signup-footnote,
+.ih-signup-login {
+  font-size: 0.8rem;
+  text-align: center;
+  color: var(--ih-text-muted);
+}
+
+/* FORM FIELDS */
+.ih-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.ih-field span {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.ih-field input,
+.ih-field select {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--ih-border-primary);
+  border-radius: var(--ih-radius);
+  background-color: var(--ih-bg-primary);
+  font-size: 1rem;
+}
+.ih-field input:focus {
+  outline: 2px solid var(--ih-brand-primary);
+  border-color: transparent;
+}
+.ih-field-help {
+  font-size: 0.8rem;
+  color: var(--ih-text-muted);
+}
+
+/* PRICING SECTION */
+.ih-section {
+  max-width: 1200px;
+  margin: 6rem auto;
+  padding: 0 1.5rem;
+}
+.ih-section-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 3rem;
+}
+.ih-section-header h2 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+.ih-section-header p {
+  font-size: 1.125rem;
+  color: var(--ih-text-muted);
+}
+
+.ih-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+.ih-plan {
+  border: 1px solid var(--ih-border-primary);
+  padding: 2rem;
+  border-radius: var(--ih-radius);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.ih-plan-featured {
+  border-color: var(--ih-brand-primary);
+  border-width: 2px;
+  padding-top: 1rem;
+  position: relative;
+}
+.ih-plan-badge {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--ih-brand-primary);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.ih-plan h3 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+.ih-plan-price {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+.ih-plan-price span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--ih-text-muted);
+}
+.ih-plan-tagline {
+  color: var(--ih-text-muted);
+  margin: 0 0 1rem;
+  min-height: 40px; /* Aligns buttons */
+}
+.ih-plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+.ih-plan-features li {
+  padding-left: 1.5rem;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="hsl(140, 70%, 40%)" viewBox="0 0 16 16"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>')
+    no-repeat left 5px;
+  background-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+  .ih-hero {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  .ih-hero-right {
+    order: -1; /* Signup form moves to top */
+  }
+}
+
+@media (max-width: 768px) {
+  .ih-pricing-grid {
+    grid-template-columns: 1fr;
+  }
+  .ih-plan {
+    max-width: 400px;
+    margin: 0 auto;
+  }
 }
