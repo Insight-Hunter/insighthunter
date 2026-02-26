@@ -16,7 +16,7 @@ export CLOUDFLARE_API_TOKEN="kAY9u88TaeuI9wByQkismZ2oGjBWqf5mVBhDTYNE"
 #wrangler secret put STRIPE_PUBLISHABLE_KEY
 
 cd apps/insighthunter-auth
-npx wrangler d1 execute insight-users --file=./migrations/0001_initial_schema/0001_initial_schema.sql
+npx wrangler d1 execute insight-users --remote --file=./migrations/0001_initial_schema/0001_initial_schema.sql
 
 
 npx wrangler deploy --name insighthunter-auth
