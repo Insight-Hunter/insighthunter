@@ -1,67 +1,145 @@
-// index.ts
-import Stripe from 'stripe';
-import { createHmac } from 'node:crypto';
-import bcrypt from 'bcryptjs'; // npm i bcryptjs stripe
 
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { getCookie, setCookie } from 'hono/cookie';
 import { jwt } from 'hono/jwt';
+import bcrypt from 'bcryptjs';
 
+// --- TYPE DEFINITIONS ---
 interface Env {
-  ASSETS: Fetcher;
   USERS: D1Database;
-  SESSIONS: KVNamespace;
+  // The SESSIONS KV is no longer needed with stateless JWT cookies
+  // SESSIONS: KVNamespace; 
   JWT_SECRET: string;
-  AUTH_API_URL: string;
+}
+
+interface User {
+  id: number;
+  email: string;
+  password: string;
+  role: string;
+  plan: string;
+}
+
+interface JwtPayload {
+  userId: number;
+  role: string;
+  exp: number; // Expiration time
 }
 
 const app = new Hono<{ Bindings: Env }>();
 
-// CORS for all
+// --- MIDDLEWARE ---
 app.use('*', cors({
-  origin: 'https://insighthunter.app', // Production domain
+  origin: (origin) => origin,
   credentials: true,
 }));
 
-// Serve static assets (signup.html, shop.html, etc.)
-app.get('/*', async (c) => {
-  const url = new URL(c.req.url);
-  const pathname = url.pathname;
-  
-  // Serve HTML/CSS/JS/images from public/
-  if (pathname.match(/\.(html|css|js|png|jpg|ico|svg)$/)) {
-    return c.env.ASSETS.fetch(c.req);
+// --- PUBLIC API ROUTES ---
+
+app.post('/api/signup', async (c) => {
+  try {
+    const body = await c.req.formData();
+    const email = body.get('email');
+    const password = body.get('password');
+    const role = body.get('role');
+    const plan = body.get('plan') || 'free';
+
+    if (typeof email !== 'string' || typeof password !== 'string' || typeof role !== 'string') {
+      return c.json({ success: false, error: 'Email, password, and role are required' }, 400);
+    }
+    if (password.length < 12) {
+      return c.json({ success: false, error: 'Password must be at least 12 characters' }, 400);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    await c.env.USERS.prepare(
+        'INSERT INTO users (email, password, role, plan, created_at) VALUES (?, ?, ?, ?, ?)'
+    ).bind(email, hashedPassword, role, plan, new Date().toISOString()).run();
+
+    // After signup, we log the user in directly
+    return c.redirect('https://insighthunter.app/login.html', 302);
+
+  } catch (e: any) {
+    if (e.message?.includes('UNIQUE constraint failed')) {
+      return c.json({ success: false, error: 'A user with this email already exists' }, 409);
+    }
+    console.error('Signup Error:', e);
+    return c.json({ success: false, error: 'An internal error occurred during signup' }, 500);
   }
-  
-  // Root redirects to shop
-  if (pathname === '/') {
-    return Response.redirect('/shop.html', 302);
-  }
-  
-  // SPA fallback - serve index.html (if you add one)
-  return c.env.ASSETS.fetch(new Request(new URL('/index.html', c.req.url)));
 });
 
-// Proxy auth API calls to auth worker
-app.all('/api/auth/*', async (c) => {
-  const authUrl = new URL(c.req.url.replace('/api/auth', c.env.AUTH_API_URL + '/api/auth'));
-  return fetch(authUrl, c.req);
+app.post('/api/login', async (c) => {
+    const { email, password } = await c.req.json();
+
+    if (!email || !password) {
+        return c.json({ success: false, error: 'Email and password are required' }, 400);
+    }
+
+    const user = await c.env.USERS.prepare('SELECT id, password, role FROM users WHERE email = ?').bind(email).first<User>();
+
+    if (!user) {
+        return c.json({ success: false, error: 'Invalid credentials' }, 401);
+    }
+
+    const passwordIsValid = await bcrypt.compare(password, user.password);
+    if (!passwordIsValid) {
+        return c.json({ success: false, error: 'Invalid credentials' }, 401);
+    }
+    
+    const sevenDays = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7);
+    const payload: JwtPayload = { userId: user.id, role: user.role, exp: sevenDays };
+    const token = await jwt.sign(payload, c.env.JWT_SECRET);
+    
+    // Set the JWT directly in a secure, HttpOnly cookie
+    setCookie(c, 'auth_token', token, {
+        path: '/',
+        secure: true, // Always true in production
+        httpOnly: true,
+        sameSite: 'Lax',
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    return c.redirect('https://insighthunter.app/dashboard.html', 302);
 });
 
-// Protected dashboard
-app.get('/api/dashboard', jwt({ secret: c.env.JWT_SECRET }), async (c) => {
-  const payload = c.get('jwtPayload');
-  const user = await c.env.USERS.prepare('SELECT email FROM users WHERE id = ?')
-    .bind(payload.userId).first();
-  return c.json({ user, plan: 'growth', features: ['forecasting', 'reports'] });
+// --- PROTECTED SESSION VALIDATION ROUTE ---
+
+/**
+ * Validates the auth_token cookie sent by a browser.
+ * This is called by the main API gateway to authenticate requests.
+ */
+app.get('/api/validate-session', async (c) => {
+    // 1. Get the auth_token from the cookie
+    const token = getCookie(c, 'auth_token');
+    if (!token) {
+        return c.json({ success: false, error: 'No auth token provided.' }, 401);
+    }
+
+    // 2. Verify the JWT
+    try {
+        const payload = await jwt.verify(token, c.env.JWT_SECRET) as JwtPayload;
+        
+        // 3. Respond with success and the user info
+        return c.json({ success: true, userId: payload.userId, role: payload.role });
+
+    } catch (e) {
+        // This catches expired tokens or invalid signatures
+        console.error('JWT Verification Error:', e);
+        return c.json({ success: false, error: 'Invalid or expired token.' }, 401);
+    }
 });
 
-// Checkout webhook (Stripe/Lemon Squeezy)
-app.post('/api/webhooks/checkout', async (c) => {
-  const body = await c.req.text();
-  // Verify Stripe webhook signature
-  // Update user subscription in D1
-  return c.json({ received: true });
+// --- GENERIC HANDLERS ---
+
+app.onError((err, c) => {
+  console.error(`Hono Error: ${err}`);
+  return c.json({ success: false, error: 'Internal Server Error' }, 500);
+});
+
+app.notFound((c) => {
+  return c.json({ success: false, error: 'Not Found' }, 404);
 });
 
 export default app;
