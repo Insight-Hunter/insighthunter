@@ -1,27 +1,31 @@
+interface Window {
+    turnstile: any;
+    turnstileCallback: (token: string) => void;
+}
 
 // --- Plan Selection Logic ---
-const planButtons = document.querySelectorAll("[data-plan]");
-const planInput = document.getElementById("selected-plan");
-const signupCard = document.querySelector(".ih-signup-card");
+const planButtons = document.querySelectorAll<HTMLElement>("[data-plan]");
+const planInput = document.getElementById("selected-plan") as HTMLInputElement | null;
+const signupCard = document.querySelector(".ih-signup-card") as HTMLElement | null;
 
 planButtons.forEach((btn) => {
-  btn.addEventListener("click", (e) => {
+  btn.addEventListener("click", (e: Event) => {
     e.preventDefault();
     const plan = btn.getAttribute("data-plan");
-    if (planInput) {
+    if (planInput && plan) {
       planInput.value = plan;
     }
-    signupCard.scrollIntoView({ behavior: "smooth" });
+    signupCard?.scrollIntoView({ behavior: "smooth" });
   });
 });
 
 // --- Turnstile and Form Submission Logic ---
-const submitButton = document.getElementById('submit-btn');
-const signupForm = document.getElementById('signup-form');
-const errorMessage = document.getElementById('error-message');
+const submitButton = document.getElementById('submit-btn') as HTMLButtonElement | null;
+const signupForm = document.getElementById('signup-form') as HTMLFormElement | null;
+const errorMessage = document.getElementById('error-message') as HTMLParagraphElement | null;
 
 // This function is called by the Turnstile widget when it is successful
-window.turnstileCallback = function (token) {
+window.turnstileCallback = function (token: string) {
   if (submitButton) {
     submitButton.disabled = false;
     const currentPlan = planInput ? planInput.value : 'free';
@@ -33,23 +37,27 @@ window.turnstileCallback = function (token) {
 // The authentication service runs on a separate subdomain
 const authApiUrl = 'https://auth.insighthunter.app';
 
-signupForm.addEventListener('submit', async (event) => {
+signupForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  errorMessage.textContent = '';
-  errorMessage.style.display = 'none';
+  if (errorMessage) {
+    errorMessage.textContent = '';
+    errorMessage.style.display = 'none';
+  }
 
   if (submitButton) {
       submitButton.disabled = true;
       submitButton.textContent = 'Creating account...';
   }
 
-  const formData = new FormData(event.target);
+  const formData = new FormData(event.target as HTMLFormElement);
   
   const turnstileResponse = formData.get('cf-turnstile-response');
   if (!turnstileResponse) {
-    errorMessage.textContent = 'Please complete the security check.';
-    errorMessage.style.display = 'block';
+    if (errorMessage) {
+        errorMessage.textContent = 'Please complete the security check.';
+        errorMessage.style.display = 'block';
+    }
     if (submitButton) {
         submitButton.disabled = false;
         const currentPlan = planInput ? planInput.value : 'free';
@@ -66,12 +74,14 @@ signupForm.addEventListener('submit', async (event) => {
       credentials: 'include',
     });
 
-    if (response.url.includes('shopping.html')) {
+    if (response.ok && response.redirected) {
       window.location.href = response.url;
     } else {
       const errorText = await response.text();
-      errorMessage.textContent = errorText || 'An unknown error occurred.';
-      errorMessage.style.display = 'block';
+      if(errorMessage) {
+        errorMessage.textContent = errorText || 'An unknown error occurred.';
+        errorMessage.style.display = 'block';
+      }
       if (submitButton) {
         submitButton.disabled = false;
         const currentPlan = planInput ? planInput.value : 'free';
@@ -84,8 +94,10 @@ signupForm.addEventListener('submit', async (event) => {
     }
   } catch (error) {
     console.error('Signup request failed:', error);
-    errorMessage.textContent = 'Could not connect to the signup service. Please try again later.';
-    errorMessage.style.display = 'block';
+    if(errorMessage) {
+        errorMessage.textContent = 'Could not connect to the signup service. Please try again later.';
+        errorMessage.style.display = 'block';
+    }
     if (submitButton) {
         submitButton.disabled = false;
         const currentPlan = planInput ? planInput.value : 'free';

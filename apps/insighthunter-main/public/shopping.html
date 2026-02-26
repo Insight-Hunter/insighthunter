@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Select Plan & Add-ons - InsightHunter</title>
+  <link rel="stylesheet" href="styles.css" />
   <script src="https://js.stripe.com/v3/"></script>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="shopping.ts" defer></script>
   <style>
     :root {
       --bg: #050816; --surface: #0b1020; --border: rgba(148,163,184,.3);
@@ -29,10 +30,10 @@
     .plan-card { 
       border: 1px solid var(--border); border-radius: var(--radius); 
       padding: 28px 24px; background: rgba(15,23,42,.95);
-      transition: all .2s ease; position: relative;
+      transition: all .2s ease; position: relative; cursor: pointer;
     }
-    .plan-card:hover { border-color: var(--accent); box-shadow: 0 20px 40px rgba(56,189,248,.2); }
-    .plan-featured { border-color: var(--accent); transform: translateY(-8px); }
+    .plan-card:hover { border-color: var(--accent); }
+    .plan-card.plan-featured { border-color: var(--accent); box-shadow: 0 0 20px rgba(56,189,248,.3); transform: translateY(-4px); }
     .plan-badge { 
       position: absolute; top: -12px; left: 24px; 
       background: var(--accent); color: #0b1120; padding: 4px 12px; 
@@ -42,7 +43,7 @@
     .plan-price { font-size: 2.2rem; font-weight: 700; margin: 0 0 8px; }
     .plan-period { color: var(--muted); font-size: .9rem; }
     .plan-features { list-style: none; padding: 0; margin: 24px 0 32px; }
-    .plan-features li { padding: 8px 0; border-bottom: 1px solid rgba(148,163,184,.1); }
+    .plan-features li { padding: 8px 0; border-bottom: 1px solid rgba(148,163,184,.1); display: flex; align-items: center; gap: 8px; }
     .plan-features li:last-child { border-bottom: none; }
     
     /* Addons */
@@ -50,8 +51,7 @@
     .addons-title { margin: 0 0 20px; font-size: 1.3rem; }
     .addons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
     .addon-item { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all .15s; }
-    .addon-item:hover { border-color: var(--accent); background: rgba(56,189,248,.1); }
-    .addon-item input:checked + .addon-info { color: var(--accent); }
+    .addon-item:hover, .addon-item:has(input:checked) { border-color: var(--accent); background: rgba(56,189,248,.1); }
     
     /* CTA */
     .cta-section { text-align: center; }
@@ -62,9 +62,10 @@
     }
     .btn-primary { background: linear-gradient(135deg, var(--accent), #0ea5e9); color: #0b1120; box-shadow: 0 12px 28px rgba(56,189,248,.3); }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(56,189,248,.4); }
-    .btn-secondary { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
-    
-    /* Responsive */
+    .btn-primary:disabled { background: var(--muted); cursor: not-allowed; transform: none; box-shadow: none; }
+
+    input[type="radio"], input[type="checkbox"] { accent-color: var(--accent); }
+
     @media (max-width: 768px) { 
       .container { padding: 24px 16px; }
       .pricing-grid { grid-template-columns: 1fr; }
@@ -77,118 +78,81 @@
     <h1>Choose your plan</h1>
     <p class="subtitle">Start free. Scale as your business grows. Cancel anytime.</p>
     
-    <!-- Plans -->
-    <div class="pricing-grid">
-      <div class="plan-card">
-        <h2 class="plan-name">Starter</h2>
-        <div class="plan-price">$0<span class="plan-period">/month</span></div>
-        <ul class="plan-features">
-          <li>CSV uploads</li>
-          <li>3 client profiles</li>
-          <li>Basic reports</li>
-          <li>Email support</li>
-        </ul>
-        <label class="btn btn-secondary" style="cursor:pointer;">
-          <input type="radio" name="plan" value="starter" checked style="display:none;">
-          Continue free
-        </label>
-      </div>
-      
-      <div class="plan-card plan-featured">
-        <div class="plan-badge">Most popular</div>
-        <h2 class="plan-name">Professional</h2>
-        <div class="plan-price">$49<span class="plan-period">/month</span></div>
-        <ul class="plan-features">
-          <li>Auto data sync</li>
-          <li>20 client profiles</li>
-          <li>Branded reports</li>
-          <li>Priority support</li>
-          <li>Compliance hub</li>
-        </ul>
-        <label class="btn btn-primary" style="cursor:pointer;">
-          <input type="radio" name="plan" value="professional" style="display:none;">
-          Get Professional
-        </label>
-      </div>
-      
-      <div class="plan-card">
-        <h2 class="plan-name">Enterprise</h2>
-        <div class="plan-price">$149<span class="plan-period">/month</span></div>
-        <ul class="plan-features">
-          <li>Everything in Pro</li>
-          <li>Unlimited clients</li>
-          <li>White-label reports</li>
-          <li>API access</li>
-          <li>Account manager</li>
-        </ul>
-        <label class="btn btn-secondary" style="cursor:pointer;">
-          <input type="radio" name="plan" value="enterprise" style="display:none;">
-          Contact sales
-        </label>
-      </div>
-    </div>
-    
-    <!-- Add-ons -->
-    <div class="addons-section">
-      <h3 class="addons-title">Add-ons (optional)</h3>
-      <div class="addons-grid">
-        <label class="addon-item">
-          <input type="checkbox" name="addons[]" value="compliance">
-          <div class="addon-info">
-            <strong>Compliance Hub</strong><br>
-            <small>$19/mo - IRS/State deadline tracking</small>
-          </div>
-        </label>
-        <label class="addon-item">
-          <input type="checkbox" name="addons[]" value="forecasting">
-          <div class="addon-info">
-            <strong>Forecasting AI</strong><br>
-            <small>$29/mo - Cash flow predictions</small>
-          </div>
-        </label>
-      </div>
-    </div>
-    
-    <!-- Turnstile + Submit -->
-    <div class="cta-section">
-      <div class="cf-turnstile" data-sitekey="YOUR_TURNSTILE_SITEKEY"></div>
-      <form id="checkoutForm" method="POST" action="/api/create-checkout" style="margin-top:20px;">
-        <button type="submit" class="btn btn-primary" disabled id="submitBtn">
-          Complete setup → Secure checkout
-        </button>
-      </form>
-      <p style="margin-top:12px;color:var(--muted);font-size:.85rem;">
-        No card needed for free plan • 14-day money-back guarantee
-      </p>
-    </div>
+    <form id="checkoutForm">
+        <div class="pricing-grid">
+            <label for="plan-starter" class="plan-card">
+                <input type="radio" name="plan" value="starter" id="plan-starter" style="display:none" checked>
+                <h2 class="plan-name">Starter</h2>
+                <div class="plan-price">$0<span class="plan-period">/month</span></div>
+                <ul class="plan-features">
+                    <li>✓ CSV uploads</li>
+                    <li>✓ 3 client profiles</li>
+                    <li>✓ Basic reports</li>
+                    <li>✓ Email support</li>
+                </ul>
+            </label>
+            
+            <label for="plan-professional" class="plan-card plan-featured">
+                <div class="plan-badge">Most popular</div>
+                <input type="radio" name="plan" value="professional" id="plan-professional" style="display:none">
+                <h2 class="plan-name">Professional</h2>
+                <div class="plan-price">$49<span class="plan-period">/month</span></div>
+                <ul class="plan-features">
+                    <li>✓ Auto data sync</li>
+                    <li>✓ 20 client profiles</li>
+                    <li>✓ Branded reports</li>
+                    <li>✓ Priority support</li>
+                </ul>
+            </label>
+            
+            <label for="plan-enterprise" class="plan-card">
+                <input type="radio" name="plan" value="enterprise" id="plan-enterprise" style="display:none">
+                <h2 class="plan-name">Enterprise</h2>
+                <div class="plan-price">$149<span class="plan-period">/month</span></div>
+                <ul class="plan-features">
+                    <li>✓ Everything in Pro</li>
+                    <li>✓ Unlimited clients</li>
+                    <li>✓ White-label reports</li>
+                    <li>✓ API access</li>
+                </ul>
+            </label>
+        </div>
+        
+        <div class="addons-section">
+            <h3 class="addons-title">Add-ons (optional)</h3>
+            <div class="addons-grid">
+                <label class="addon-item">
+                    <input type="checkbox" name="addons[]" value="compliance">
+                    <div class="addon-info">
+                        <strong>Compliance Hub</strong><br>
+                        <small>$19/mo - IRS/State deadline tracking</small>
+                    </div>
+                </label>
+                <label class="addon-item">
+                    <input type="checkbox" name="addons[]" value="forecasting">
+                    <div class="addon-info">
+                        <strong>Forecasting AI</strong><br>
+                        <small>$29/mo - Cash flow predictions</small>
+                    </div>
+                </label>
+            </div>
+        </div>
+        
+        <div class="cta-section">
+             <div 
+              class="cf-turnstile" 
+              data-sitekey="0x4AAAAAACh0opVnevzeby3S65WWzoSwJOE"
+              data-appearance="always"
+              data-theme="dark"
+            ></div>
+            <button type="submit" class="btn btn-primary" disabled id="submitBtn" style="margin-top:20px;">
+                Loading...
+            </button>
+            <p style="margin-top:12px;color:var(--muted);font-size:.85rem;">
+                No card needed for free plan • 14-day money-back guarantee
+            </p>
+        </div>
+    </form>
   </div>
-
-  <script>
-    const stripe = Stripe('pk_live_...'); // Your publishable key
-    const form = document.getElementById('checkoutForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const turnstile = document.querySelector('.cf-turnstile');
-    
-    // Enable submit on Turnstile success
-    window.onTurnstileSuccess = () => { submitBtn.disabled = false; };
-    
-    form.onsubmit = async (e) => {
-      e.preventDefault();
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Creating checkout...';
-      
-      const formData = new FormData(form);
-      const res = await fetch('/api/create-checkout', { method: 'POST', body: formData });
-      
-      if (res.ok) {
-        const { url } = await res.json();
-        window.location.href = url; // Stripe Checkout
-      } else {
-        alert('Something went wrong. Please try again.');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Complete setup → Secure checkout';
-      }
-    };
-  </script>
 </body>
 </html>

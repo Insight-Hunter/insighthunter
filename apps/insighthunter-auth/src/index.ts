@@ -103,31 +103,38 @@ const withAuth = async (request: Request, env: Env): Promise<User | null> => {
   return results[0] as User;
 };
 
+// CORS headers for responses
+const corsHeaders = {
+    'Access-Control-Allow-Origin': 'https://insighthunter.io',
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Credentials': 'true',
+};
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
 
-    // Add CORS headers for all OPTIONS requests
     if (request.method === 'OPTIONS') {
-      return new Response(null, {
-        headers: {
-          'Access-Control-Allow-Origin': 'https://insighthunter.io',
-          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type',
-        },
-      });
+      return new Response(null, { headers: corsHeaders });
+    }
+    
+    // GET /api/config - Provides public keys to the client
+    if (request.method === 'GET' && url.pathname === '/api/config') {
+        const data = {
+            stripePublishableKey: env.STRIPE_PUBLISHABLE_KEY,
+        };
+        return new Response(JSON.stringify(data), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
     }
 
-    // Rate limiting on signup
     if (request.method === 'POST' && url.pathname === '/api/signup') {
       if (!(await getRateLimit(clientIP, env.RATE_LIMIT_KV))) {
         return new Response('Too many requests', { status: 429, headers: { 'Retry-After': '60' } });
       }
-    }
 
-    // POST /api/signup
-    if (request.method === 'POST' && url.pathname === '/api/signup') {
       try {
         const formData = await request.formData();
         const email = (formData.get('email') as string)?.trim().toLowerCase();
@@ -135,24 +142,22 @@ export default {
         const role = formData.get('role') as string;
         const turnstileToken = formData.get('cf-turnstile-response') as string;
 
-        // Validation
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          return new Response('Invalid email', { status: 400 });
+          return new Response('Invalid email', { status: 400, headers: corsHeaders });
         }
         if (password?.length < 12) {
-          return new Response('Password too short', { status: 400 });
+          return new Response('Password too short', { status: 400, headers: corsHeaders });
         }
         if (!['owner', 'accountant', 'fractional_cfo', 'other'].includes(role)) {
-          return new Response('Invalid role', { status: 400 });
+          return new Response('Invalid role', { status: 400, headers: corsHeaders });
         }
         if (!await verifyTurnstile(turnstileToken, env)) {
-          return new Response('Bot detected', { status: 400 });
+          return new Response('Bot detected', { status: 400, headers: corsHeaders });
         }
 
-        // Check email exists
         const existing = await env.D1_DB.prepare('SELECT id FROM users WHERE email = ?')
           .bind(email).first();
-        if (existing) return new Response('Email already exists', { status: 409 });
+        if (existing) return new Response('Email already exists', { status: 409, headers: corsHeaders });
 
         const passwordHash = await hashPassword(password);
         const { results } = await env.D1_DB.prepare(`
@@ -164,43 +169,36 @@ export default {
         if (!userId) throw new Error('User creation failed');
 
         const jwt = await generateJWT({ userId }, env);
-        const headers = new Headers();
-        headers.set('Access-Control-Allow-Origin', 'https://insighthunter.io');
-        headers.set('Access-Control-Allow-Credentials', 'true');
-        headers.set('Set-Cookie', `auth_jwt=${jwt}; HttpOnly; Secure; SameSite=Strict; Max-Age=2592000; Path=/`); // 30 days
+        const headers = new Headers(corsHeaders);
+        headers.set('Set-Cookie', `auth_jwt=${jwt}; HttpOnly; Secure; SameSite=Strict; Max-Age=2592000; Path=/`);
         headers.set('Location', 'https://insighthunter.io/shopping.html');
         return new Response(null, { status: 302, headers });
 
       } catch (error) {
         console.error('Signup error:', error);
-        return new Response('Internal error', { status: 500 });
+        return new Response('Internal error', { status: 500, headers: corsHeaders });
       }
     }
 
-    // GET /shopping (protected)
-    if (url.pathname === '/shopping') {
-      const user = await withAuth(request, env);
-      if (!user) return new Response('Unauthorized', { status: 401 });
-      
-      return new Response(shoppingHTML(env.STRIPE_PUBLISHABLE_KEY), {
-        headers: { 'Content-Type': 'text/html' }
-      });
-    }
-
-    // POST /api/create-checkout (protected)
     if (request.method === 'POST' && url.pathname === '/api/create-checkout') {
       const user = await withAuth(request, env);
-      if (!user) return new Response('Unauthorized', { status: 401 });
+      if (!user) return new Response('Unauthorized', { status: 401, headers: corsHeaders });
 
       try {
         const formData = await request.formData();
         const plan = formData.get('plan') as string;
         const addons = formData.getAll('addons[]') as string[];
 
-        const basePrices = { free: 0, standard: 4900, pro: 14900 };
+        const basePrices = { starter: 0, professional: 4900, enterprise: 14900 };
         let amount = basePrices[plan as keyof typeof basePrices];
-        const addonPrices = { 'compliance-hub': 1900, 'forecasting': 2900 };
+        const addonPrices = { 'compliance': 1900, 'forecasting': 2900 };
         addons.forEach(addon => { amount += (addonPrices as any)[addon] || 0; });
+        
+        if (amount === 0) {
+            const headers = new Headers(corsHeaders);
+            headers.set('Location', 'https://insighthunter.io/my-account.html');
+            return new Response(null, { status: 303, headers });
+        }
 
         let customerId = user.stripe_customer_id;
         if (!customerId) {
@@ -220,25 +218,24 @@ export default {
             price_data: {
               currency: 'usd',
               product_data: { name: `InsightHunter ${plan.slice(0,1).toUpperCase() + plan.slice(1)}` },
-              unit_amount: Math.max(amount, 500), // Min $5
+              unit_amount: Math.max(amount, 50),
               recurring: { interval: 'month' },
             },
             quantity: 1,
           }],
           mode: 'subscription',
-          success_url: `${new URL(request.url).origin}/my-account`,
-          cancel_url: `${new URL(request.url).origin}/shopping`,
+          success_url: 'https://insighthunter.io/my-account.html',
+          cancel_url: 'https://insighthunter.io/shopping.html',
           metadata: { addons: addons.join(',') }
         });
 
-        return Response.json({ url: session.url });
+        return new Response(JSON.stringify({ url: session.url }), { headers: {...corsHeaders, 'Content-Type': 'application/json'}});
       } catch (error) {
         console.error('Checkout error:', error);
-        return new Response('Payment setup failed', { status: 500 });
+        return new Response('Payment setup failed', { status: 500, headers: corsHeaders });
       }
     }
 
-    // POST /api/webhook - Stripe webhook
     if (request.method === 'POST' && url.pathname === '/api/webhook') {
       const sig = request.headers.get('stripe-signature')!;
       let event;
@@ -267,50 +264,30 @@ export default {
       return new Response('OK', { status: 200 });
     }
 
-    // GET /my-account (protected)
-    if (url.pathname === '/my-account') {
-      const user = await withAuth(request, env);
-      if (!user) return new Response('Unauthorized', { status: 401 });
+    if (request.method === 'GET' && url.pathname === '/api/my-account') {
+        const user = await withAuth(request, env);
+        if (!user) return new Response('Unauthorized', { status: 401, headers: corsHeaders });
 
-      const apps = user.subscription_status === 'active' 
-        ? ['dashboard', 'compliance', 'forecasting'] 
-        : ['dashboard'];
+        const apps = user.subscription_status === 'active' 
+            ? ['dashboard', 'compliance', 'forecasting'] 
+            : ['dashboard'];
 
-      return new Response(myAccountHTML(apps), { headers: { 'Content-Type': 'text/html' } });
+        const accountData = {
+            email: user.email,
+            apps: apps,
+            status: user.subscription_status,
+        };
+
+        return new Response(JSON.stringify(accountData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
     }
 
-    return new Response('Not found', { status: 404 });
+    if (request.method === 'POST' && url.pathname === '/api/logout') {
+        const headers = new Headers(corsHeaders);
+        headers.set('Set-Cookie', 'auth_jwt=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/');
+        return new Response('Logged out', { headers });
+    }
+
+    // Fallback for other routes
+    return new Response('Not found', { status: 404, headers: corsHeaders });
   },
 } satisfies ExportedHandler<Env>;
-
-// HTML templates (inline for simplicity)
-const shoppingHTML = (publishableKey: string) => `<!DOCTYPE html>
-<html><head><title>Select Plan</title><script src="https://js.stripe.com/v3/"></script></head><body>
-<h1>Select Your Plan & Add-ons</h1>
-<form id="purchase-form">
-  <div>
-    <label><input type="radio" name="plan" value="free" checked> Free</label>
-    <label><input type="radio" name="plan" value="standard"> Standard ($49/mo)</label>
-    <label><input type="radio" name="plan" value="pro"> Pro ($149/mo)</label>
-  </div>
-  <div>
-    <label><input type="checkbox" name="addons[]" value="compliance-hub"> Compliance Hub (+$19/mo)</label>
-    <label><input type="checkbox" name="addons[]" value="forecasting"> Forecasting (+$29/mo)</label>
-  </div>
-  <button type="submit">Checkout</button>
-</form>
-<script>
-  const stripe = Stripe('${publishableKey}');
-  document.getElementById('purchase-form').onsubmit = async(e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const res = await fetch('/api/create-checkout', {method:'POST', body:formData});
-    const {url} = await res.json();
-    window.location.href = url;
-  };
-</script></body></html>`;
-
-const myAccountHTML = (apps: string[]) => `<!DOCTYPE html>
-<html><body><h1>My Apps</h1><ul>${
-  apps.map(app => `<li><a href="/app/${app}">${app}</a></li>`).join('')
-}</ul></body></html>`;

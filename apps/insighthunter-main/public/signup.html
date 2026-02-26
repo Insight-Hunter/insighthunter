@@ -1,135 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Sign Up – InsightHunter</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="signup.css" />
+<head>
+    <meta charset="UTF-8">
+    <title>InsightHunter - Sign Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Turnstile -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    <script src="signup.js" defer></script>
-
-  <body class="ih-body">
+</head>
+<body class="ih-body">
     <header class="ih-header">
-      <div class="ih-header-inner">
-        <a href="/" class="ih-logo">InsightHunter</a>
-        <nav class="ih-nav">
-          <a href="/pricing.html">Pricing</a>
-          <a href="/features">Features</a>
-          <a href="/login" class="ih-link-muted">Log in</a>
-          <a href="/signup" class="ih-btn ih-btn-outline">Get started</a>
-        </nav>
-      </div>
+        <div class="ih-header-inner">
+            <a href="/" class="ih-logo">InsightHunter</a>
+        </div>
     </header>
 
     <main>
-      <!-- HERO + SIGNUP -->
-      <section class="ih-hero">
-        <div class="ih-hero-left">
-          <h1>Stop flying blind. Run your finances with clarity.</h1>
-          <p>
-            InsightHunter gives solo entrepreneurs, freelancers, and small firms
-            CFO-level visibility, automated reporting, and the confidence to make
-            smart decisions — starting free.
-          </p>
-          <ul class="ih-hero-list">
-            <li>Real-time cash flow dashboards</li>
-            <li>Compliance hub and automated reminders</li>
-            <li>Client-ready reports in one click</li>
-          </ul>
-          <div class="ih-hero-meta">
-            <span>✓ No credit card required</span>
-            <span>✓ Free plan forever</span>
-          </div>
-        </div>
+        <section class="ih-hero">
+            <div class="ih-hero-content">
+                <h1 class="ih-hero-title">Actionable insights for financial wellness</h1>
+                <p class="ih-hero-subtitle">Connect your data, identify trends, and make smarter decisions with our AI-powered platform. Built for small businesses, trusted by accountants.</p>
+            </div>
+        </section>
 
-        <div class="ih-hero-right">
-          <form class="ih-signup-card" id="signup-form">
-            <h2>Create your account</h2>
-            <p class="ih-signup-subtitle">
-              Start on the Free plan. Upgrade only when you're ready.
-            </p>
+        <section style="text-align: center; padding: 0 1rem 4rem;">
+            <h2 style="font-size: 1.5rem; margin-bottom: 2rem;">Choose your starting point</h2>
+            <div class="ih-plan-chooser">
+                <a href="#" class="ih-plan-card" data-plan="free">
+                    <h3>Starter</h3>
+                    <p>For individuals and small teams getting started.</p>
+                    <span class="ih-btn ih-btn-secondary">Start for free</span>
+                </a>
+                <a href="#" class="ih-plan-card" data-plan="pro">
+                    <h3>Pro</h3>
+                    <p>For professionals who need more power and collaboration.</p>
+                    <span class="ih-btn ih-btn-primary">Choose Pro</span>
+                </a>
+            </div>
+        </section>
+        
+        <section class="ih-signup">
+            <form id="signup-form" class="ih-signup-card">
+                <h2 class="ih-signup-title">Create your account</h2>
+                <p class="ih-signup-subtitle">Get started in minutes. No credit card required for free plan.</p>
+                
+                <div class="ih-field">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="you@company.com">
+                </div>
 
-            <label class="ih-field">
-              <span>Work email</span>
-              <input
-                type="email"
-                name="email"
-                autocomplete="email"
-                required
-                placeholder="you@firmname.com"
-              />
-            </label>
+                <div class="ih-field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required minlength="12" placeholder="Min. 12 characters">
+                </div>
 
-            <label class="ih-field">
-              <span>Password</span>
-              <input
-                type="password"
-                name="password"
-                autocomplete="new-password"
-                required
-                minlength="12"
-                placeholder="At least 12 characters"
-              />
-              <small class="ih-field-help">
-                Use at least 12 characters, including a number and symbol.
-              </small>
-            </label>
+                <div class="ih-field">
+                    <label for="role">I am a...</label>
+                    <select id="role" name="role" required>
+                        <option value="" disabled selected>Select your role</option>
+                        <option value="owner">Business Owner</option>
+                        <option value="accountant">Accountant</option>
+                        <option value="fractional_cfo">Fractional CFO</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
 
-            <label class="ih-field">
-              <span>Account type</span>
-              <select name="role" required>
-                <option value="">Select one</option>
-                <option value="owner">Business owner</option>
-                <option value="accountant">Accounting firm</option>
-                <option value="fractional_cfo">Fractional CFO</option>
-                <option value="other">Other</option>
-              </select>
-            </label>
+                <input type="hidden" name="plan" id="selected-plan" value="free">
 
-            <!-- HIDDEN: Selected plan from pricing buttons -->
-            <input type="hidden" name="plan" id="selected-plan" value="free" />
-            <div id="turnstile-container"></div>
-            <!-- Turnstile - Invisible mode, auto-validates on submit attempt -->
-            <div 
-              class="cf-turnstile" 
-              data-sitekey="0x4AAAAAACh0opVnevzeby3S65WWzoSwJOE"
-              data-appearance="always"
-              data-theme="dark"
-              data-callback="turnstileCallback"
-            ></div>
+                <div 
+                  class="cf-turnstile" 
+                  data-sitekey="0x4AAAAAACh0opVnevzeby3S65WWzoSwJOE"
+                  data-callback="turnstileCallback"
+                  data-appearance="always"
+                  data-theme="dark"
+                ></div>
 
-            <!-- Error display -->
-            <p id="error-message" style="color: #f97316; font-size: 0.85rem; margin: 8px 0; display: none;"></p>
+                <p id="error-message" style="color: #f97316; font-size: 0.85rem; margin-top: 1rem; display: none;"></p>
 
-            <button 
-              type="submit" 
-              class="ih-btn ih-btn-primary ih-btn-full" 
-              id="submit-btn"
-              disabled
-            >
-              Create free account →
-            </button>
+                <button type="submit" id="submit-btn" class="ih-btn ih-btn-primary ih-btn-full" disabled>Create account</button>
 
-            <p class="ih-signup-footnote">
-              By continuing, you agree to our
-              <a href="/legal/terms">Terms</a> and
-              <a href="/legal/privacy">Privacy Policy</a>.
-            </p>
-
-            <p class="ih-signup-login">
-              Already using InsightHunter?
-              <a href="/login">Log in</a>
-            </p>
-          </form>
-        </div>
-      </section>
-
-      <!-- PRICING (unchanged - works with plan selection) -->
-      <section class="ih-section" id="pricing">
-      </section>
+                <p class="ih-form-footer">By signing up, you agree to our <a href="/terms">Terms of Service</a>.</p>
+            </form>
+        </section>
     </main>
-  </body>
-</html>u
+
+    <script src="signup.ts" defer></script>
+</body>
+</html>
