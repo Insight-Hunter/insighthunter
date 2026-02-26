@@ -1,5 +1,5 @@
 {
-  "name": "@insighthunter/auth",
+  "name": "insighthunter-auth",
   "version": "1.0.0",
   "description": "Authentication service for InsightHunter",
   "main": "src/index.ts",
