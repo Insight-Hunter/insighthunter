@@ -21,8 +21,8 @@ export CLOUDFLARE_API_TOKEN="kAY9u88TaeuI9wByQkismZ2oGjBWqf5mVBhDTYNE"
 ##wrandler d1 create insight-hunter 
 ## wrangler d1 execute insight-hunter --file=apps/insighthunter-auth/schema.sql -c apps/insighthunter-auth/wrangler.toml --remote
 
- wrangler deploy /home/user/insighthunter/apps/insighthunter-auth
- wrangler deploy /home/user/insighthunter/apps/insighthunter-main/public
+ wrangler deploy /home/user/insighthunter/apps/insighthunter-auth/src/index.ts
+ wrangler pages deploy /home/user/insighthunter/apps/insighthunter-main/public
 
 echo " "
 echo "Secrets set and deployment command ran"
