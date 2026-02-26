@@ -10,13 +10,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <!-- Turnstile -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  </head>
+    <script src="signup.js" defer></script>
+
   <body class="ih-body">
     <header class="ih-header">
       <div class="ih-header-inner">
         <a href="/" class="ih-logo">InsightHunter</a>
         <nav class="ih-nav">
-          <a href="/bookkeeping/subscribe.html">Pricing</a>
+          <a href="/pricing.html">Pricing</a>
           <a href="/features">Features</a>
           <a href="/login" class="ih-link-muted">Log in</a>
           <a href="/signup" class="ih-btn ih-btn-outline">Get started</a>
@@ -53,7 +54,7 @@
             </p>
 
             <label class="ih-field">
-              <span>Work email</span>
+              <span>Work email</span
               <input
                 type="email"
                 name="email"
@@ -91,7 +92,7 @@
 
             <!-- HIDDEN: Selected plan from pricing buttons -->
             <input type="hidden" name="plan" id="selected-plan" value="free" />
-
+            <div id="turnstile-container"></div>
             <!-- Turnstile - Invisible mode, auto-validates on submit attempt -->
             <div 
               class="cf-turnstile" 

@@ -20,12 +20,26 @@ interface Env {
   STRIPE_WEBHOOK_SECRET: string;
   JWT_SECRET: string;
   STRIPE_PUBLISHABLE_KEY: string; // For client-side
+  RATE_LIMIT_KV: KVNamespace;
 }
 
 const stripe = (env: Env) => new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-10-22.beta',
   httpAgent: undefined as any,
 });
+
+async function verifyTurnstile(token: string, env: Env): Promise<boolean> {
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+            secret: env.TURNSTILE_SECRET,
+            response: token,
+        }),
+    });
+    const data: { success: boolean } = await response.json();
+    return data.success;
+}
 
 // Secure password hashing
 const hashPassword = async (password: string): Promise<string> => {
@@ -37,7 +51,7 @@ const verifyPassword = async (password: string, hash: string): Promise<boolean> 
 };
 
 // JWT helpers (HS256)
-const generateJWT = (payload: { userId: string } & Record<string, any>, env: Env): string => {
+const generateJWT = async (payload: { userId: string } & Record<string, any>, env: Env): Promise<string> => {
   const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
   const encodedPayload = btoa(JSON.stringify(payload));
   const signatureBytes = await crypto.subtle.sign(
@@ -94,6 +108,17 @@ export default {
     const url = new URL(request.url);
     const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
 
+    // Add CORS headers for all OPTIONS requests
+    if (request.method === 'OPTIONS') {
+      return new Response(null, {
+        headers: {
+          'Access-Control-Allow-Origin': 'https://insighthunter.io',
+          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
+      });
+    }
+
     // Rate limiting on signup
     if (request.method === 'POST' && url.pathname === '/api/signup') {
       if (!(await getRateLimit(clientIP, env.RATE_LIMIT_KV))) {
@@ -138,11 +163,14 @@ export default {
         const userId = (results?.[0] as any)?.id;
         if (!userId) throw new Error('User creation failed');
 
-        const jwt = generateJWT({ userId }, env);
+        const jwt = await generateJWT({ userId }, env);
         const headers = new Headers();
+        headers.set('Access-Control-Allow-Origin', 'https://insighthunter.io');
+        headers.set('Access-Control-Allow-Credentials', 'true');
         headers.set('Set-Cookie', `auth_jwt=${jwt}; HttpOnly; Secure; SameSite=Strict; Max-Age=2592000; Path=/`); // 30 days
-        headers.set('Location', `/shopping?userId=${userId}`);
+        headers.set('Location', 'https://insighthunter.io/shopping.html');
         return new Response(null, { status: 302, headers });
+
       } catch (error) {
         console.error('Signup error:', error);
         return new Response('Internal error', { status: 500 });
