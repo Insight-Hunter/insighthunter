@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "stripe": "^14.0.0"
+    "stripe": "^14.25.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20231218.0"

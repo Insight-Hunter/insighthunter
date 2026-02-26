@@ -1,89 +1,183 @@
+<!-- public/signup.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>InsightHunter - Sign Up</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - Insight Hunter</title>
+  <link rel="icon" href="/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--primary:#667eea;--primary-dark:#5a67d8;--bg-gradient:linear-gradient(135deg,#667eea 0%,#764ba2 100%);--card-shadow:0 25px 50px -12px rgba(0,0,0,.25);--border:#e2e8f0;--text:#1a202c;--text-muted:#718096;--success:#38a169;--error:#e53e3e;--warning:#ed8936;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg-gradient);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;}
+    .container{max-width:480px;width:100%;background:white;border-radius:24px;box-shadow:var(--card-shadow);overflow:hidden;}
+    .header{padding:3rem 2.5rem 2rem;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;text-align:center;}
+    .header h1{font-size:2.25rem;font-weight:700;margin-bottom:0.5rem;}
+    .header p{font-size:1.1rem;opacity:0.95;}
+    .form-container{padding:2.5rem;}
+    .pricing-tier{margin-bottom:2rem;padding:1.5rem;background:#f7fafc;border-radius:16px;border:2px solid var(--border);}
+    .tier-title{font-size:1.25rem;font-weight:600;color:var(--text);margin-bottom:0.5rem;}
+    .tier-price{font-size:2.5rem;font-weight:700;color:var(--primary);}.tier-features{list-style:none;color:var(--text-muted);font-size:0.95rem;}
+    .tier-features li{margin-bottom:0.25rem;padding-left:1.5rem;position:relative;}.tier-features li::before{content:'✓';color:var(--success);font-weight:700;position:absolute;left:0;}
+    form{display:flex;flex-direction:column;gap:1.5rem;}
+    .input-group{position:relative;}
+    label{font-size:0.875rem;font-weight:500;color:var(--text);margin-bottom:0.5rem;display:block;}
+    input{padding:1.25rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:1rem;transition:all .2s;background:white;font-family:inherit;}
+    input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(102,126,234,.1);}
+    input.error{border-color:var(--error);}
+    .password-strength{display:flex;gap:0.5rem;margin-top:0.5rem;}
+    .strength-bar{height:4px;border-radius:2px;flex:1;background:var(--border);overflow:hidden;transition:all .3s;}
+    .strength-fill{width:0%;height:100%;border-radius:2px;transition:all .3s;}
+    .strength-weak{background:var(--warning);}.strength-good{background:var(--success);}.strength-strong{background:#2f855a;}
+    .submit-group{display:flex;gap:1rem;margin-top:2rem;}
+    button{padding:1.25rem 2rem;border:none;border-radius:12px;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all .2s;flex:1;}
+    .btn-primary{background:var(--primary);color:white;}.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);}
+    .btn-primary:disabled{background:#a0aec0;cursor:not-allowed;transform:none;}
+    .btn-secondary{background:transparent;color:var(--primary);border:2px solid var(--primary);}.btn-secondary:hover{background:var(--primary);color:white;}
+    .message{padding:1rem;border-radius:12px;margin:1rem 0;font-weight:500;}
+    .success{background:rgba(56,161,105,.1);color:var(--success);border:1px solid rgba(56,161,105,.2);}
+    .error{background:rgba(229,62,62,.1);color:var(--error);border:1px solid rgba(229,62,62,.2);}
+    .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:2rem 0;}
+    .feature{padding:1.5rem;border:2px solid var(--border);border-radius:16px;text-align:center;transition:all .2s;}
+    .feature:hover{border-color:var(--primary);transform:translateY(-2px);}
+    .feature-icon{font-size:2rem;margin-bottom:0.5rem;}
+    @media(max-width:640px){.header{padding:2rem 1.5rem 1.5rem;}.form-container{padding:2rem 1.5rem;}.submit-group{flex-direction:column;}}
+  </style>
 </head>
-<body class="ih-body">
-    <header class="ih-header">
-        <div class="ih-header-inner">
-            <a href="/" class="ih-logo">InsightHunter</a>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Join Insight Hunter</h1>
+      <p>Get enterprise-grade CFO insights starting today</p>
+    </div>
+    
+    <div class="form-container">
+      <!-- Pricing Tier Display -->
+      <div class="pricing-tier">
+        <div class="tier-title">Starter Plan</div>
+        <div class="tier-price">$29<span style="font-size:1rem;font-weight:400;">/mo</span></div>
+        <ul class="tier-features">
+          <li>Monthly forecasting reports</li>
+          <li>Real-time benchmarks</li>
+          <li>Unlimited data imports</li>
+          <li>Priority email support</li>
+        </ul>
+      </div>
+
+      <form id="signupForm">
+        <div class="input-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" name="fullName" placeholder="John Doe" required autocomplete="name">
         </div>
-    </header>
-
-    <main>
-        <section class="ih-hero">
-            <div class="ih-hero-content">
-                <h1 class="ih-hero-title">Actionable insights for financial wellness</h1>
-                <p class="ih-hero-subtitle">Connect your data, identify trends, and make smarter decisions with our AI-powered platform. Built for small businesses, trusted by accountants.</p>
-            </div>
-        </section>
-
-        <section style="text-align: center; padding: 0 1rem 4rem;">
-            <h2 style="font-size: 1.5rem; margin-bottom: 2rem;">Choose your starting point</h2>
-            <div class="ih-plan-chooser">
-                <a href="#" class="ih-plan-card" data-plan="free">
-                    <h3>Starter</h3>
-                    <p>For individuals and small teams getting started.</p>
-                    <span class="ih-btn ih-btn-secondary">Start for free</span>
-                </a>
-                <a href="#" class="ih-plan-card" data-plan="pro">
-                    <h3>Pro</h3>
-                    <p>For professionals who need more power and collaboration.</p>
-                    <span class="ih-btn ih-btn-primary">Choose Pro</span>
-                </a>
-            </div>
-        </section>
         
-        <section class="ih-signup">
-            <form id="signup-form" class="ih-signup-card">
-                <h2 class="ih-signup-title">Create your account</h2>
-                <p class="ih-signup-subtitle">Get started in minutes. No credit card required for free plan.</p>
-                
-                <div class="ih-field">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required placeholder="you@company.com">
-                </div>
+        <div class="input-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="john@business.com" required autocomplete="email">
+        </div>
+        
+        <div class="input-group">
+          <label for="company">Company</label>
+          <input type="text" id="company" name="company" placeholder="Acme Corp" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="At least 8 characters" minlength="8" required autocomplete="new-password">
+          <div class="password-strength">
+            <div class="strength-bar"><div class="strength-fill"></div></div>
+            <div class="strength-fill"></div>
+            <div class="strength-fill"></div>
+            <div class="strength-fill"></div>
+          </div>
+        </div>
 
-                <div class="ih-field">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required minlength="12" placeholder="Min. 12 characters">
-                </div>
+        <div class="submit-group">
+          <button type="submit" class="btn-primary" id="submitBtn">
+            Create Account & Start Trial
+          </button>
+          <a href="/" class="btn-secondary">Have Account? Login</a>
+        </div>
+      </form>
 
-                <div class="ih-field">
-                    <label for="role">I am a...</label>
-                    <select id="role" name="role" required>
-                        <option value="" disabled selected>Select your role</option>
-                        <option value="owner">Business Owner</option>
-                        <option value="accountant">Accountant</option>
-                        <option value="fractional_cfo">Fractional CFO</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
+      <div id="message"></div>
+    </div>
+  </div>
 
-                <input type="hidden" name="plan" id="selected-plan" value="free">
+  <script>
+    const form = document.getElementById('signupForm');
+    const passwordInput = document.getElementById('password');
+    const strengthBars = document.querySelectorAll('.strength-fill');
+    const submitBtn = document.getElementById('submitBtn');
+    const messageDiv = document.getElementById('message');
 
-                <div 
-                  class="cf-turnstile" 
-                  data-sitekey="0x4AAAAAACh0opVnevzeby3S65WWzoSwJOE"
-                  data-callback="turnstileCallback"
-                  data-appearance="always"
-                  data-theme="dark"
-                ></div>
+    // Password strength checker
+    passwordInput.addEventListener('input', (e) => {
+      const password = e.target.value;
+      let score = 0;
+      if (password.length >= 8) score++;
+      if (/[a-z]/.test(password)) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/\\d/.test(password)) score++;
+      if (/[^a-zA-Z0-9]/.test(password)) score++;
+      
+      strengthBars.forEach((bar, i) => {
+        bar.className = 'strength-fill';
+        if (i < score) {
+          bar.style.width = '100%';
+          if (score > 3) bar.classList.add('strength-strong');
+          else if (score > 2) bar.classList.add('strength-good');
+          else bar.classList.add('strength-weak');
+        } else {
+          bar.style.width = '0%';
+        }
+      });
+    });
 
-                <p id="error-message" style="color: #f97316; font-size: 0.85rem; margin-top: 1rem; display: none;"></p>
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+      
+      if (!data.password || strengthBars[3].style.width !== '100%') {
+        showMessage('Password must be strong (8+ chars, letters, numbers, symbols)', 'error');
+        return;
+      }
 
-                <button type="submit" id="submit-btn" class="ih-btn ih-btn-primary ih-btn-full" disabled>Create account</button>
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Creating Account...<span style="margin-left:0.5rem;">⏳</span>';
+      
+      try {
+        const res = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await res.json();
+        if (result.success) {
+          showMessage('Account created! Starting your 14-day trial...', 'success');
+          localStorage.setItem('token', result.token);
+          setTimeout(() => window.location.href = '/dashboard', 2000);
+        } else {
+          showMessage(result.error || 'Signup failed', 'error');
+        }
+      } catch (err) {
+        showMessage('Network error. Please try again.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Create Account & Start Trial';
+      }
+    });
 
-                <p class="ih-form-footer">By signing up, you agree to our <a href="/terms">Terms of Service</a>.</p>
-            </form>
-        </section>
-    </main>
-
-    <script src="signup.ts" defer></script>
+    function showMessage(text, type) {
+      messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+      if (type === 'success') {
+        messageDiv.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  </script>
 </body>
 </html>
