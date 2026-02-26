@@ -1,3 +1,57 @@
 name = "insighthunter-main"
-compatibility_date = "2024-03-20"
-pages_build_output_dir = "apps/insighthunter-main/public"
+main = "src/index.ts"
+compatibility_date = "2026-02-26"
+compatibility_flags = ["nodejs_compat"]
+
+# Shared D1 Database (same as auth worker)
+[[d1_databases]]
+binding = "USERS"
+database_name = "insight-users"
+database_id = "97eb1afb-543e-44d4-b465-a3859742aeba"
+
+# KV for caching sessions/dashboard data
+[[kv_namespaces]]
+binding = "CACHE"
+id = "af7391791e95423b82c1cd877c0992e3"
+preview_id = "af7391791e95423b82c1cd877c0992e3"
+
+# Static Assets - serves signup.html, shop.html, etc.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# Environment Variables
+[vars]
+AUTH_API_URL = "https://auth.insighthunter.app"
+JWT_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
+SITE_URL = "https://insighthunter.app"
+STRIPE_SECRET = "sk_test_your-stripe-secret-key"
+LEMON_SQUEEZY_WEBHOOK_SECRET = "ls_your-lemon-squeezy-secret"
+
+# Custom Domain (update after deploy)
+[[routes]]
+pattern = "api.insighthunter.app/*"
+
+# Full Observability
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+# Dev Environment (optional)
+[env.dev]
+vars = { 
+  AUTH_API_URL = "http://localhost:8787",
+  SITE_URL = "http://localhost:8787"
+}
+
+# Production Environment
+[env.production]
+vars = { 
+  AUTH_API_URL = "https://auth.insighthunter.app",
+  SITE_URL = "https://insighthunter.app"
+}
+
+# Miniflare limits for local dev
+[miniflare]
+kv_persist = true
+d1_persist = true

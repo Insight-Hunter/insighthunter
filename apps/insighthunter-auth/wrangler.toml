@@ -23,7 +23,8 @@ enabled = true
 head_sampling_rate = 1
 
 [[routes]]
-routes = [{"pattern": "auth.insighthunter.app/*", "zone_name": "insighthunter.app" }]
+pattern = "auth.insighthunter.app/*"
+zone_name = "insighthunter.app"
 
 # Production env
 [env.production]
