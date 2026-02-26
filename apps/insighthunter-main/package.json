@@ -4,5 +4,10 @@
   "scripts": {
     "start": "node app.js",
     "build": "echo \"No build specified\""
+  },
+  
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
   }
 }

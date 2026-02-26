@@ -1,9 +1,0 @@
-{
-  "name": "insighthunter-desktop",
-  "version": "1.0.0",
-  "scripts": {
-    "tauri": "tauri",
-    "build": "tauri build",
-    "serve": "tauri serve"
-  }
-}
