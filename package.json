@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@sentry/astro": "^9.20.0",
-    "@spotlightjs/astro": "^3.2.6"
+    "@spotlightjs/astro": "^3.2.6",
+    "openssl": "^2.0.0"
   }
 }

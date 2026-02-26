@@ -7,16 +7,16 @@ usage_model = "bundled"
 [[d1_databases]]
 binding = "AUTH_DB"
 database_name = "insighthunter-auth"
-database_id = "<YOUR_AUTH_DATABASE_ID>"
+database_id = "36b4a6b7-3509-4cd2-9cdc-7a35990affd5"
 
 [[d1_databases]]
 binding = "D1_DB"
-database_name = "insighthunter_db"
-database_id = "<YOUR_APP_DATABASE_ID>"
+database_name = "insight-hunter_db"
+database_id = "00161fe1-d6a6-44e8-b91a-b800ff04d880"
 
 [[kv_namespaces]]
 binding = "RATE_LIMIT_KV"
-id = "<YOUR_KV_NAMESPACE_ID>"
+id = "2819dd6ccecf4da78717f1a2d9c60da8"
 
 [env.production]
 name = "insighthunter-auth"

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -7,6 +8,8 @@
     <link rel="stylesheet" href="signup.css" />
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Turnstile -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   </head>
   <body class="ih-body">
     <header class="ih-header">
@@ -43,10 +46,10 @@
         </div>
 
         <div class="ih-hero-right">
-          <form class="ih-signup-card" id="signup-form" method="post">
+          <form class="ih-signup-card" id="signup-form" method="POST" action="/api/signup">
             <h2>Create your account</h2>
             <p class="ih-signup-subtitle">
-              Start on the Free plan. Upgrade only when you’re ready.
+              Start on the Free plan. Upgrade only when you're ready.
             </p>
 
             <label class="ih-field">
@@ -86,13 +89,27 @@
               </select>
             </label>
 
+            <!-- HIDDEN: Selected plan from pricing buttons -->
             <input type="hidden" name="plan" id="selected-plan" value="free" />
 
-            <div id="turnstile-widget-container"></div>
-            <p id="error-message" style="color: red;"></p>
+            <!-- Turnstile - Invisible mode, auto-validates on submit attempt -->
+            <div 
+              class="cf-turnstile" 
+              data-sitekey="0x4AAAAAACh0opVnevzeby3S65WWzoSwJOE"
+              data-appearance="always"
+              data-theme="dark"
+            ></div>
 
-            <button type="submit" class="ih-btn ih-btn-primary ih-btn-full">
-              Create free account
+            <!-- Error display -->
+            <p id="error-message" style="color: #f97316; font-size: 0.85rem; margin: 8px 0; display: none;"></p>
+
+            <button 
+              type="submit" 
+              class="ih-btn ih-btn-primary ih-btn-full" 
+              id="submit-btn"
+              disabled
+            >
+              Create free account →
             </button>
 
             <p class="ih-signup-footnote">
@@ -109,7 +126,7 @@
         </div>
       </section>
 
-      <!-- PRICING -->
+      <!-- PRICING (unchanged - works with plan selection) -->
       <section class="ih-section" id="pricing">
         <header class="ih-section-header">
           <h2>Plans that grow with your business</h2>
@@ -132,10 +149,7 @@
               <li>Standard report templates</li>
               <li>Email support</li>
             </ul>
-            <button
-              class="ih-btn ih-btn-outline ih-btn-full"
-              data-plan="free"
-            >
+            <button class="ih-btn ih-btn-outline ih-btn-full" data-plan="free">
               Start free
             </button>
           </article>
@@ -154,10 +168,7 @@
               <li>Branded client-ready report packs</li>
               <li>Priority support</li>
             </ul>
-            <button
-              class="ih-btn ih-btn-primary ih-btn-full"
-              data-plan="standard"
-            >
+            <button class="ih-btn ih-btn-primary ih-btn-full" data-plan="standard">
               Try Standard
             </button>
           </article>
@@ -175,10 +186,7 @@
               <li>Advanced automation workflows</li>
               <li>Dedicated account manager</li>
             </ul>
-            <button
-              class="ih-btn ih-btn-outline ih-btn-full"
-              data-plan="pro"
-            >
+            <button class="ih-btn ih-btn-outline ih-btn-full" data-plan="pro">
               Talk to sales
             </button>
           </article>
@@ -186,16 +194,8 @@
       </section>
     </main>
 
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" defer></script>
-    <script src="signup.js"></script>
     <script>
-      function onloadTurnstileCallback() {
-        turnstile.render('#turnstile-widget-container', {
-          sitekey: '0x4AAAAAACh0ortSylrGgGmZ',
-        });
-      }
-
-      // Simple plan selection wiring: clicking a pricing button sets the hidden plan in the signup form
+      // 1. Plan selection (your existing code - perfect!)
       const planButtons = document.querySelectorAll("[data-plan]");
       const planInput = document.getElementById("selected-plan");
       const signupForm = document.querySelector(".ih-signup-card");
@@ -205,8 +205,60 @@
           e.preventDefault();
           const plan = btn.getAttribute("data-plan");
           if (planInput) planInput.value = plan;
-          if (signupForm) signupForm.scrollIntoView({ behavior: "smooth" });
+          signupForm.scrollIntoView({ behavior: "smooth" });
         });
+      });
+
+      // 2. Turnstile integration - enable submit on success
+      window.turnstileCallback = function(token) {
+        document.getElementById('submit-btn').disabled = false;
+        document.getElementById('submit-btn').textContent = `Create ${planInput.value} account →`;
+      };
+
+      // 3. Form submission with loading + error handling
+      document.getElementById('signup-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('submit-btn');
+        const errorMsg = document.getElementById('error-message');
+        const formData = new FormData(this);
+        
+        // Get Turnstile token
+        const turnstileToken = turnstile.getResponse(document.querySelector('.cf-turnstile'));
+        if (!turnstileToken) {
+          errorMsg.textContent = 'Please complete the verification.';
+          errorMsg.style.display = 'block';
+          return;
+        }
+        formData.append('cf-turnstile-response', turnstileToken);
+
+        btn.disabled = true;
+        btn.textContent = 'Creating account...';
+        errorMsg.style.display = 'none';
+
+        try {
+          const response = await fetch('/api/signup', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (response.ok) {
+            // Redirect handled by Worker (302 to /shopping)
+            window.location.href = '/shopping.html';
+          } else {
+            const error = await response.text();
+            errorMsg.textContent = error || 'Signup failed. Try again.';
+            errorMsg.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = `Create ${planInput.value} account →`;
+            turnstile.reset(); // Reset Turnstile
+          }
+        } catch (err) {
+          errorMsg.textContent = 'Network error. Check connection.';
+          errorMsg.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = `Create ${planInput.value} account →`;
+        }
       });
     </script>
   </body>
