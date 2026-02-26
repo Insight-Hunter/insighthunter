@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -9,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <!-- Turnstile -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="signup.js" defer></script>
 
   <body class="ih-body">
     <header class="ih-header">
@@ -128,138 +130,7 @@
 
       <!-- PRICING (unchanged - works with plan selection) -->
       <section class="ih-section" id="pricing">
-        <header class="ih-section-header">
-          <h2>Plans that grow with your business</h2>
-          <p>
-            Start free and upgrade as your client roster grows. Core features on every plan —
-            no essential tools locked behind a paywall.
-          </p>
-        </header>
-
-        <div class="ih-pricing-grid">
-          <!-- Free -->
-          <article class="ih-plan">
-            <h3>Free</h3>
-            <p class="ih-plan-price">$0</p>
-            <p class="ih-plan-tagline">For owners getting their first financial cockpit.</p>
-            <ul class="ih-plan-features">
-              <li>Manual CSV uploads</li>
-              <li>Basic compliance task tracking</li>
-              <li>Up to 3 client profiles</li>
-              <li>Standard report templates</li>
-              <li>Email support</li>
-            </ul>
-            <button class="ih-btn ih-btn-outline ih-btn-full" data-plan="free">
-              Start free
-            </button>
-          </article>
-
-          <!-- Standard -->
-          <article class="ih-plan ih-plan-featured">
-            <div class="ih-plan-badge">Most popular</div>
-            <h3>Standard</h3>
-            <p class="ih-plan-price">$49<span>/mo</span></p>
-            <p class="ih-plan-tagline">For firms ready to centralize compliance and reporting.</p>
-            <ul class="ih-plan-features">
-              <li>Automatic data ingestion</li>
-              <li>Full compliance hub with smart reminders</li>
-              <li>Up to 20 client profiles</li>
-              <li>Engagement letter generation & tracking</li>
-              <li>Branded client-ready report packs</li>
-              <li>Priority support</li>
-            </ul>
-            <button class="ih-btn ih-btn-primary ih-btn-full" data-plan="standard">
-              Try Standard
-            </button>
-          </article>
-
-          <!-- Pro -->
-          <article class="ih-plan">
-            <h3>Pro</h3>
-            <p class="ih-plan-price">$149<span>/mo</span></p>
-            <p class="ih-plan-tagline">For fractional CFOs and multi-entity firms.</p>
-            <ul class="ih-plan-features">
-              <li>Everything in Standard</li>
-              <li>Unlimited client profiles</li>
-              <li>Multi-entity management</li>
-              <li>White-label reporting</li>
-              <li>Advanced automation workflows</li>
-              <li>Dedicated account manager</li>
-            </ul>
-            <button class="ih-btn ih-btn-outline ih-btn-full" data-plan="pro">
-              Talk to sales
-            </button>
-          </article>
-        </div>
       </section>
     </main>
-
-    <script>
-      // 1. Plan selection (your existing code - perfect!)
-      const planButtons = document.querySelectorAll("[data-plan]");
-      const planInput = document.getElementById("selected-plan");
-      const signupForm = document.querySelector(".ih-signup-card");
-
-      planButtons.forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          const plan = btn.getAttribute("data-plan");
-          if (planInput) planInput.value = plan;
-          signupForm.scrollIntoView({ behavior: "smooth" });
-        });
-      });
-
-      // 2. Turnstile integration - enable submit on success
-      window.turnstileCallback = function(token) {
-        document.getElementById('submit-btn').disabled = false;
-        document.getElementById('submit-btn').textContent = `Create ${planInput.value} account →`;
-      };
-
-      // 3. Form submission with loading + error handling
-      document.getElementById('signup-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const btn = document.getElementById('submit-btn');
-        const errorMsg = document.getElementById('error-message');
-        const formData = new FormData(this);
-        
-        // Get Turnstile token
-        const turnstileToken = turnstile.getResponse(document.querySelector('.cf-turnstile'));
-        if (!turnstileToken) {
-          errorMsg.textContent = 'Please complete the verification.';
-          errorMsg.style.display = 'block';
-          return;
-        }
-        formData.append('cf-turnstile-response', turnstileToken);
-
-        btn.disabled = true;
-        btn.textContent = 'Creating account...';
-        errorMsg.style.display = 'none';
-
-        try {
-          const response = await fetch('/api/signup', {
-            method: 'POST',
-            body: formData
-          });
-
-          if (response.ok) {
-            // Redirect handled by Worker (302 to /shopping)
-            window.location.href = '/shopping.html';
-          } else {
-            const error = await response.text();
-            errorMsg.textContent = error || 'Signup failed. Try again.';
-            errorMsg.style.display = 'block';
-            btn.disabled = false;
-            btn.textContent = `Create ${planInput.value} account →`;
-            turnstile.reset(); // Reset Turnstile
-          }
-        } catch (err) {
-          errorMsg.textContent = 'Network error. Check connection.';
-          errorMsg.style.display = 'block';
-          btn.disabled = false;
-          btn.textContent = `Create ${planInput.value} account →`;
-        }
-      });
-    </script>
   </body>
 </html>
