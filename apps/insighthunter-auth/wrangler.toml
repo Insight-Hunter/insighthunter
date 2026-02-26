@@ -11,7 +11,7 @@ database_id = "97eb1afb-543e-44d4-b465-a3859742aeba"
 [[kv_namespaces]]
 binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
-"preview_id = "60e34ba310ca40c79edec05470c7a271"
+preview_id = "60e34ba310ca40c79edec05470c7a271"
 
 [vars]
 JWT_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
@@ -23,7 +23,7 @@ enabled = true
 head_sampling_rate = 1
 
 [[routes]]
-pattern = "auth.insighthunter.app/*"
+routes = [{pattern = "auth.insighthunter.app/*", zone_name = "insighthunter.app" }]
 
 # Production env
 [env.production]
