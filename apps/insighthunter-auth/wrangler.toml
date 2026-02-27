@@ -21,7 +21,7 @@ preview_id = "60e34ba310ca40c79edec05470c7a271"
 binding = "RATE_LIMIT_KV"
 id = "2819dd6ccecf4da78717f1a2d9c60da8"
 
-[[vars]]
+[vars]
 JWT_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
 SALT_ROUNDS = "12"
 SESSION_TTL_DAYS = "7"

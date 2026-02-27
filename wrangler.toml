@@ -16,12 +16,12 @@ id = "af7391791e95423b82c1cd877c0992e3"
 preview_id = "af7391791e95423b82c1cd877c0992e3"
 
 # Static Assets - serves signup.html, shop.html, etc.
-[[assets]]
+[assets]
 directory = "./public"
 binding = "ASSETS"
 
 # Environment Variables
-[[vars]]
+[vars]
 AUTH_API_URL = "https://auth.insighthunter.app"
 JWT_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
 SITE_URL = "https://insighthunter.app"
