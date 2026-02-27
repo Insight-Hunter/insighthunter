@@ -2,9 +2,9 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { getCookie, setCookie } from 'hono/cookie';
-// CORRECTED: Import sign and verify directly
 import { sign, verify } from 'hono/jwt';
 import bcrypt from 'bcryptjs';
+import type { Context } from 'hono';
 
 // --- TYPE DEFINITIONS ---
 interface Env {
@@ -21,7 +21,9 @@ interface User {
   plan: string;
 }
 
+// CORRECTED: Add index signature to JwtPayload interface
 interface JwtPayload {
+  [key: string]: any;
   userId: number;
   role: string;
   exp: number; // Expiration time
@@ -36,11 +38,15 @@ app.use('*', cors({
 }));
 
 // --- UTILITY ---
-const createSession = async (c: any, user: { id: number; role: string }) => {
+const createSession = async (c: Context<{ Bindings: Env }>, user: { id: number; role: string }) => {
+    if (!c.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET environment variable not configured');
+    }
+    const secret = new TextEncoder().encode(c.env.JWT_SECRET);
+
     const sevenDays = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7);
     const payload: JwtPayload = { userId: user.id, role: user.role, exp: sevenDays };
-    // CORRECTED: Call sign() directly
-    const token = await sign(payload, c.env.JWT_SECRET);
+    const token = await sign(payload, secret);
 
     const sessionId = crypto.randomUUID();
     await c.env.SESSIONS.put(`session:${sessionId}`, JSON.stringify({ userId: user.id, token }), { expirationTtl: 60 * 60 * 24 * 7 });
@@ -123,6 +129,11 @@ app.post('/api/login', async (c) => {
 // --- SESSION VALIDATION ROUTE ---
 
 app.get('/api/validate-session', async (c) => {
+    if (!c.env.JWT_SECRET) {
+        console.error('JWT_SECRET not configured');
+        return c.json({ success: false, error: 'Internal server configuration error.' }, 500);
+    }
+
     const sessionId = getCookie(c, 'session_id');
     if (!sessionId) {
         return c.json({ success: false, error: 'No session cookie provided.' }, 401);
@@ -139,8 +150,8 @@ app.get('/api/validate-session', async (c) => {
     }
 
     try {
-        // CORRECTED: Call verify() directly
-        const payload = await verify(token, c.env.JWT_SECRET) as JwtPayload;
+        const secret = new TextEncoder().encode(c.env.JWT_SECRET);
+        const payload = await verify(token, secret) as JwtPayload;
         return c.json({ success: true, userId: payload.userId, role: payload.role });
 
     } catch (e) {
