@@ -3,9 +3,9 @@ name = "insighthunter-lite-api"
 main = "src/index.tsx"
 compatibility_date = "2024-05-02"
 
-routes = [
-    { pattern = "lite.insighthunter.app/api/*", zone_name = "insighthunter.app" }
-]
+[[routes]]
+pattern = "lite.insighthunter.app/api/*"
+zone_name = "insighthunter.app"
 
 # This binding allows the Worker to access the R2 bucket.
 # The bucket itself will need to be created in your Cloudflare dashboard.

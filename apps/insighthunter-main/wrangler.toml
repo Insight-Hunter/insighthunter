@@ -4,11 +4,12 @@ main = "functions/api/[[path]].js"
 compatibility_date = "2026-02-26"
 compatibility_flags = ["nodejs_compat"]
 
-routes = [
-    { "pattern": "api.insighthunter.app/*", "zone_name": "insighthunter.app" }
-]
+[[routes]]
+pattern": "api.insighthunter.app/*"
+"zone_name": "insighthunter.app"
 
-[[d1_databases]]
+[[d1_databa
+ses]]
 binding = "USERS"
 database_name = "insight-users"
 database_id = "97eb1afb-543e-44d4-b465-a3859742aeba"

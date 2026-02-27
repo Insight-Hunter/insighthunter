@@ -3,6 +3,10 @@ name = "insighthunter-bookkeeping"
 main = "src/backend/index.ts"
 compatibility_date = "2024-07-29"
 
+[[routes]]
+pattern = "bookkeeping.insighthunter.app/api/*"
+zone_name = "insighthunter.app"
+
 [[migrations]]
 tag = "v1"
 new_classes = ["SubscriptionManager", "BookkeepingLedger", "InvoiceManager", "BankConnectionManager"]
