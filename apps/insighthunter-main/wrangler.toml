@@ -8,8 +8,7 @@ compatibility_flags = ["nodejs_compat"]
 pattern = "api.insighthunter.app/*"
 zone_name = "insighthunter.app"
 
-[[d1_databa
-ses]]
+[[d1_databases]]
 binding = "USERS"
 database_name = "insight-users"
 database_id = "97eb1afb-543e-44d4-b465-a3859742aeba"
