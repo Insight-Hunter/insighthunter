@@ -16,8 +16,8 @@ id = "af7391791e95423b82c1cd877c0992e3"
 preview_id = "af7391791e95423b82c1cd877c0992e3"
 
 # Static Assets - serves signup.html, shop.html, etc.
-[site]
-path = "apps/insighthunter-main/public"
+# [site]
+# path = "apps/insighthunter-main/public"
 
 # Environment Variables
 [vars]
