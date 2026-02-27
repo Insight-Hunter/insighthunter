@@ -1,7 +1,11 @@
 name = "insighthunter-auth"
 main = "src/index.ts"
-compatibility_date = "2026-02-25"
+compatibility_date = "2024-07-29"
 compatibility_flags = ["nodejs_compat"]
+
+[[routes]]
+pattern = "*api.insighthunter.app/*"
+zone_name = "insighthunter.app"
 
 [[d1_databases]]
 binding = "USERS"
@@ -13,6 +17,10 @@ binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
 preview_id = "60e34ba310ca40c79edec05470c7a271"
 
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "2819dd6ccecf4da78717f1a2d9c60da8"
+
 [vars]
 JWT_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
 SALT_ROUNDS = "12"
@@ -21,17 +29,3 @@ SESSION_TTL_DAYS = "7"
 [observability]
 enabled = true
 head_sampling_rate = 1
-
-[[routes]]
-pattern = "auth.insighthunter.app/*"
-zone_name = "insighthunter.app"
-
-# Production env
-[env.production]
-# Deploy with: npx wrangler deploy --env production
-
-[[kv_namespaces]]
-binding = "RATE_LIMIT_KV"
-id = "2819dd6ccecf4da78717f1a2d9c60da8"
-
-
