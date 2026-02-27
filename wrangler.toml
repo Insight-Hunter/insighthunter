@@ -46,10 +46,10 @@ vars = {
 
 # Production Environment
 [env.production]
-vars = { 
-  AUTH_API_URL = "https://auth.insighthunter.app",
-  SITE_URL = "https://insighthunter.app"
-}
+
+[[vars]]
+AUTH_API_URL = "https://auth.insighthunter.app"
+SITE_URL = "https://insighthunter.app"
 
 # Miniflare limits for local dev
 [miniflare]
