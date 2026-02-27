@@ -16,21 +16,13 @@ zone_name = "insighthunter.app"
 tag = "v1"
 new_classes = ["SubscriptionManager", "BookkeepingLedger", "InvoiceManager", "BankConnectionManager"]
 
-[[durable_object.bindings]]
-name = "SUBSCRIPTION_MANAGER"
-class_name = "SubscriptionManager"
-
-[[durable_object.bindings]]
-name = "BOOKKEEPING_LEDGER"
-class_name = "BookkeepingLedger"
-
-[[durable_object.bindings]]
-name = "INVOICE_MANAGER"
-class_name = "InvoiceManager"
-
-[[durable_object.bindings]]
-name = "BANK_CONNECTION_MANAGER"
-class_name = "BankConnectionManager"
+[durable_objects]
+bindings = [
+  { name = "SUBSCRIPTION_MANAGER", class_name = "SubscriptionManager" },
+  { name = "BOOKKEEPING_LEDGER", class_name = "BookkeepingLedger" },
+  { name = "INVOICE_MANAGER", class_name = "InvoiceManager" },
+  { name = "BANK_CONNECTION_MANAGER", class_name = "BankConnectionManager" }
+]
 
 [[r2_buckets]]
 binding = "SPREADSHEET_UPLOADS"
@@ -38,5 +30,5 @@ bucket_name = "insighthunter-uploads"
 
 [vars]
 QUICKBOOKS_ENVIRONMENT = "sandbox"
-QUICKBOOKS_REDIRECT_URI = "https://insighthunter-bookkeeping.pages.dev/api/auth/quickbooks/callback"
-FRONTEND_URL = "https://insighthunter-bookkeeping.pages.dev"
+QUICKBOOKS_REDIRECT_URI = "https://bookkeeping.insighthunter.app/api/auth/quickbooks/callback"
+FRONTEND_URL = "https://bookkeeping.insighthunter.app"
