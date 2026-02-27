@@ -22,23 +22,24 @@ set -e
 
 # Deploy insighthunter-auth
 echo "Deploying insighthunter-auth..."
-npx wrangler deploy apps/insighthunter-auth/wrangler.toml
+npx wrangler deploy apps/insighthunter-auth/
+
 
 # Deploy insighthunter-bookkeeping
 echo "Deploying insighthunter-bookkeeping..."
-npx wrangler deploy apps/insighthunter-bookkeeping/wrangler.toml
+npx wrangler deploy apps/insighthunter-bookkeeping/
 
 # Deploy insighthunter-lite
 echo "Deploying insighthunter-lite..."
-npx wrangler deploy apps/insighthunter-lite/wrangler.toml
+npx wrangler deploy apps/insighthunter-lite/
 
 # Deploy insighthunter-main
 echo "Deploying insighthunter-main..."
-npx wrangler deploy apps/insighthunter-main/wrangler.toml
+npx wrangler deploy apps/insighthunter-main/
 
 # Deploy insighthunter-pbx
 echo "Deploying insighthunter-pbx..."
-npx wrangler deploy apps/insighthunter-pbx/wrangler.toml
+npx wrangler deploy apps/insighthunter-pbx/
 
 echo "All applications deployed successfully!"
 #npx wrangler d1 execute insight-users --remote --file=./migrations/0001_initial_schema/0001_initial_schema.sql
