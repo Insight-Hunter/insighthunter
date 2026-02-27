@@ -16,12 +16,19 @@ export CLOUDFLARE_API_TOKEN="kAY9u88TaeuI9wByQkismZ2oGjBWqf5mVBhDTYNE"
 #wrangler secret put STRIPE_PUBLISHABLE_KEY
 
 cd apps/insighthunter-auth
-npx wrangler d1 execute insight-users --remote --file=./migrations/0001_initial_schema/0001_initial_schema.sql
-
-
+#npx wrangler d1 execute insight-users --remote --file=./migrations/0001_initial_schema/0001_initial_schema.sql
 npx wrangler deploy --name insighthunter-auth
 cd .. /insighthunter-main
-npx wrangler deploy --name insighthunter-
+npx wrangler deploy --name insighthunter-main
+cd .. /insighthunter-bookkeeping
+npx wrangler deploy --name insighthunter-bookkeeping
+#cd .. /insighthunter-payments
+#npx wrangler deploy --name insighthunter-payments
+#cd .. /insighthunter-webhooks
+#npx wrangler deploy --name insighthunter-webhooks
+cd .. /insighthunter-pbx 
+npx wrangler deploy --name insighthunter-pbx
+
 ##wrangler d1 execute insighthunter-auth --file=apps/insighthunter-auth/schema.sql -c apps/insighthunter-auth/wrangler.toml --remote
 # Make sure your CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN are set
 ##wrangler d1 execute insighthunter --file=apps/insighthunter-auth/schema.sql -c apps/insighthunter-auth/wrangler.toml --remote
