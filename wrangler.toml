@@ -47,7 +47,3 @@ SITE_URL = "http://localhost:8787"
 AUTH_API_URL = "https://auth.insighthunter.app"
 SITE_URL = "https://insighthunter.app"
 
-# Miniflare limits for local dev
-[miniflare]
-kv_persist = true
-d1_persist = true
