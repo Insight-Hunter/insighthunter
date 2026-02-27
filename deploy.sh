@@ -18,15 +18,18 @@ export CLOUDFLARE_API_TOKEN="kAY9u88TaeuI9wByQkismZ2oGjBWqf5mVBhDTYNE"
 cd apps/insighthunter-auth
 #npx wrangler d1 execute insight-users --remote --file=./migrations/0001_initial_schema/0001_initial_schema.sql
 npx wrangler deploy --name insighthunter-auth
-cd .. /insighthunter-main
+cd .. 
+cd insighthunter-main
 npx wrangler deploy --name insighthunter-main
-cd .. /insighthunter-bookkeeping
+cd ..
+cd insighthunter-bookkeeping
 npx wrangler deploy --name insighthunter-bookkeeping
 #cd .. /insighthunter-payments
 #npx wrangler deploy --name insighthunter-payments
 #cd .. /insighthunter-webhooks
 #npx wrangler deploy --name insighthunter-webhooks
-cd .. /insighthunter-pbx 
+cd .. 
+cd insighthunter-pbx 
 npx wrangler deploy --name insighthunter-pbx
 
 ##wrangler d1 execute insighthunter-auth --file=apps/insighthunter-auth/schema.sql -c apps/insighthunter-auth/wrangler.toml --remote
