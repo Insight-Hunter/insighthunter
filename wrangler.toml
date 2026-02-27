@@ -28,7 +28,7 @@ STRIPE_SECRET = "sk_test_your-stripe-secret-key"
 LEMON_SQUEEZY_WEBHOOK_SECRET = "ls_your-lemon-squeezy-secret"
 
 # Custom Domain (update after deploy)
-[routes]
+[[routes]]
 pattern = "api.insighthunter.app/*"
 
 # Full Observability
