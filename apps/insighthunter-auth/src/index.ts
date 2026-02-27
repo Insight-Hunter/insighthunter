@@ -2,14 +2,14 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { getCookie, setCookie } from 'hono/cookie';
-import { jwt } from 'hono/jwt';
+// CORRECTED: Import sign and verify directly
+import { sign, verify } from 'hono/jwt';
 import bcrypt from 'bcryptjs';
 
 // --- TYPE DEFINITIONS ---
 interface Env {
   USERS: D1Database;
-  // The SESSIONS KV is no longer needed with stateless JWT cookies
-  // SESSIONS: KVNamespace; 
+  SESSIONS: KVNamespace;
   JWT_SECRET: string;
 }
 
@@ -35,17 +35,36 @@ app.use('*', cors({
   credentials: true,
 }));
 
+// --- UTILITY ---
+const createSession = async (c: any, user: { id: number; role: string }) => {
+    const sevenDays = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7);
+    const payload: JwtPayload = { userId: user.id, role: user.role, exp: sevenDays };
+    // CORRECTED: Call sign() directly
+    const token = await sign(payload, c.env.JWT_SECRET);
+
+    const sessionId = crypto.randomUUID();
+    await c.env.SESSIONS.put(`session:${sessionId}`, JSON.stringify({ userId: user.id, token }), { expirationTtl: 60 * 60 * 24 * 7 });
+
+    setCookie(c, 'session_id', sessionId, {
+        path: '/',
+        secure: true,
+        httpOnly: true,
+        sameSite: 'Lax',
+        maxAge: 60 * 60 * 24 * 7,
+    });
+}
+
 // --- PUBLIC API ROUTES ---
 
 app.post('/api/signup', async (c) => {
   try {
     const body = await c.req.formData();
-    const email = body.get('email');
-    const password = body.get('password');
-    const role = body.get('role');
-    const plan = body.get('plan') || 'free';
+    const email = body.get('email') as string;
+    const password = body.get('password') as string;
+    const role = body.get('role') as string;
+    const plan = (body.get('plan') as string) || 'free';
 
-    if (typeof email !== 'string' || typeof password !== 'string' || typeof role !== 'string') {
+    if (!email || !password || !role) {
       return c.json({ success: false, error: 'Email, password, and role are required' }, 400);
     }
     if (password.length < 12) {
@@ -58,8 +77,14 @@ app.post('/api/signup', async (c) => {
         'INSERT INTO users (email, password, role, plan, created_at) VALUES (?, ?, ?, ?, ?)'
     ).bind(email, hashedPassword, role, plan, new Date().toISOString()).run();
 
-    // After signup, we log the user in directly
-    return c.redirect('https://insighthunter.app/login.html', 302);
+    const newUser = await c.env.USERS.prepare('SELECT id, role FROM users WHERE email = ?').bind(email).first<User>();
+    if (!newUser) {
+        return c.json({ success: false, error: 'Failed to retrieve user after creation.' }, 500);
+    }
+
+    await createSession(c, newUser);
+
+    return c.redirect('https://insighthunter.app/dashboard.html', 302);
 
   } catch (e: any) {
     if (e.message?.includes('UNIQUE constraint failed')) {
@@ -71,7 +96,9 @@ app.post('/api/signup', async (c) => {
 });
 
 app.post('/api/login', async (c) => {
-    const { email, password } = await c.req.json();
+    const body = await c.req.formData();
+    const email = body.get('email') as string;
+    const password = body.get('password') as string;
 
     if (!email || !password) {
         return c.json({ success: false, error: 'Email and password are required' }, 400);
@@ -88,44 +115,35 @@ app.post('/api/login', async (c) => {
         return c.json({ success: false, error: 'Invalid credentials' }, 401);
     }
     
-    const sevenDays = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7);
-    const payload: JwtPayload = { userId: user.id, role: user.role, exp: sevenDays };
-    const token = await jwt.sign(payload, c.env.JWT_SECRET);
-    
-    // Set the JWT directly in a secure, HttpOnly cookie
-    setCookie(c, 'auth_token', token, {
-        path: '/',
-        secure: true, // Always true in production
-        httpOnly: true,
-        sameSite: 'Lax',
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-    });
+    await createSession(c, user);
 
     return c.redirect('https://insighthunter.app/dashboard.html', 302);
 });
 
-// --- PROTECTED SESSION VALIDATION ROUTE ---
+// --- SESSION VALIDATION ROUTE ---
 
-/**
- * Validates the auth_token cookie sent by a browser.
- * This is called by the main API gateway to authenticate requests.
- */
 app.get('/api/validate-session', async (c) => {
-    // 1. Get the auth_token from the cookie
-    const token = getCookie(c, 'auth_token');
-    if (!token) {
-        return c.json({ success: false, error: 'No auth token provided.' }, 401);
+    const sessionId = getCookie(c, 'session_id');
+    if (!sessionId) {
+        return c.json({ success: false, error: 'No session cookie provided.' }, 401);
     }
 
-    // 2. Verify the JWT
+    const sessionData = await c.env.SESSIONS.get(`session:${sessionId}`);
+    if (!sessionData) {
+        return c.json({ success: false, error: 'Invalid or expired session.' }, 401);
+    }
+
+    const { token } = JSON.parse(sessionData);
+    if (!token) {
+        return c.json({ success: false, error: 'No token found in session.' }, 401);
+    }
+
     try {
-        const payload = await jwt.verify(token, c.env.JWT_SECRET) as JwtPayload;
-        
-        // 3. Respond with success and the user info
+        // CORRECTED: Call verify() directly
+        const payload = await verify(token, c.env.JWT_SECRET) as JwtPayload;
         return c.json({ success: true, userId: payload.userId, role: payload.role });
 
     } catch (e) {
-        // This catches expired tokens or invalid signatures
         console.error('JWT Verification Error:', e);
         return c.json({ success: false, error: 'Invalid or expired token.' }, 401);
     }
