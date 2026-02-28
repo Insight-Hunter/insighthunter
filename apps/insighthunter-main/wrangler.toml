@@ -10,10 +10,7 @@ enabled            = true
 head_sampling_rate = 1
 
 # ── Static Assets ─────────────────────────────────────────────────
-[assets]
-directory = "public"
-binding   = "ASSETS-MAIN"
-not_found_handling = "single-page-application"
+
 
 # ── KV — session store ─────────────────────────────────────────────
 [[kv_namespaces]]
