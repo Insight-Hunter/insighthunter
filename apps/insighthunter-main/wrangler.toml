@@ -1,39 +1,38 @@
-account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
-name = "insighthunter-main"
-main = "functions/api/[[path]].js"
-compatibility_date = "2026-02-26"
-compatibility_flags = ["nodejs_compat"]
+# apps/insighthunter-main/wrangler.toml
+name                   = "insighthunter-main"
+compatibility_date     = "2025-03-07"
+compatibility_flags    = ["nodejs_compat"]
+pages_build_output_dir = "public"
+main                   = "src/index.ts"
 
-[[routes]]
-pattern = "api.insighthunter.app/*"
-zone_name = "insighthunter.app"
+[observability]
+enabled            = true
+head_sampling_rate = 1
 
-[[d1_databases]]
-binding = "USERS"
-database_name = "insight-users"
-database_id = "97eb1afb-543e-44d4-b465-a3859742aeba"
+# ── Static Assets ─────────────────────────────────────────────────
+[assets]
+directory = "public"
+binding   = "ASSETS"
+not_found_handling = "single-page-application"
 
+# ── KV — session store ─────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
+preview_id = "60e34ba310ca40c79edec05470c7a271"
 
-[vars]
-JWT_SECRET="5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
-AUTH_API_URL = "https://auth.insighthunter.app"
-STRIPE_WEBHOOK_SECRET = "whsec_your-stripe-secret"
+# ── D1 ─────────────────────────────────────────────────────────────
+[[d1_databases]]
+binding       = "DB"
+database_name = "insighthunter-db"
+database_id   = "aa2b9aa2-f1dd-4fdc-b4b0-d9b4bdc2ea57"
 
-[assets]
-directory = "./public"
-binding = "ASSETS"
-
-[observability]
-enabled = true
-head_sampling_rate = 1
-
+# ── R2 ─────────────────────────────────────────────────────────────
 [[r2_buckets]]
-binding = "BUCKET"
-bucket_name = "insighthunter-bucket"
+binding     = "ASSETS_BUCKET"
+bucket_name = "insighthunter-assets"
 
+# ── Service bindings ────────────────────────────────────────────────
 [[services]]
 binding = "AUTH_SERVICE"
 service = "insighthunter-auth"
@@ -41,3 +40,8 @@ service = "insighthunter-auth"
 [[services]]
 binding = "BOOKKEEPING_SERVICE"
 service = "insighthunter-bookkeeping"
+
+[vars]
+ENVIRONMENT = "production"
+
+# Secrets — run: wrangler secret put JWT_SECRET

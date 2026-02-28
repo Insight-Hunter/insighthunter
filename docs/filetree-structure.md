@@ -4,15 +4,6 @@ apps/
 ├── bizforma/
 │   └── package.json
 ├── insighthunter-auth/
-│   ├── .wrangler/
-│   │   ├── state/
-│   │   │   └── v3/
-│   │   │       └── d1/
-│   │   │           └── miniflare-D1DatabaseObject/
-│   │   │               ├── 4a7423698abc5c979ea6f7516b11bd2113ba6ef53cdd4134a6832e2cd4f3d9fb.sqlite
-│   │   │               ├── 4a7423698abc5c979ea6f7516b11bd2113ba6ef53cdd4134a6832e2cd4f3d9fb.sqlite-shm
-│   │   │               └── 4a7423698abc5c979ea6f7516b11bd2113ba6ef53cdd4134a6832e2cd4f3d9fb.sqlite-wal
-│   │   └── tmp/
 │   ├── migrations/
 │   │   ├── 0001_initial_schema/
 │   │   │   └── 0001_initial_schema.sql
@@ -29,8 +20,6 @@ apps/
 │   │   ├── content-modules.mjs
 │   │   ├── content.d.ts
 │   │   └── types.d.ts
-│   ├── .wrangler/
-│   │   └── tmp/
 │   ├── docs/
 │   │   ├── API.md
 │   │   ├── ARCHITECTURE.md
@@ -140,30 +129,6 @@ apps/
 │   ├── tsconfig.json
 │   └── wrangler.toml
 ├── insighthunter-lite/
-│   ├── .wrangler/
-│   │   ├── state/
-│   │   │   └── v3/
-│   │   │       ├── cache/
-│   │   │       │   └── miniflare-CacheObject/
-│   │   │       ├── r2/
-│   │   │       │   └── miniflare-R2BucketObject/
-│   │   │       │       └── 4b175388defe39b0141b1d3136783715249fa6ed56725a4cbaf5bc0a4e8cb06d.sqlite
-│   │   │       └── workflows/
-│   │   └── tmp/
-│   │       ├── bundle-96Tl5V/
-│   │       │   ├── checked-fetch.js
-│   │       │   ├── middleware-insertion-facade.js
-│   │       │   └── middleware-loader.entry.ts
-│   │       ├── bundle-VUGpiV/
-│   │       │   ├── checked-fetch.js
-│   │       │   ├── middleware-insertion-facade.js
-│   │       │   └── middleware-loader.entry.ts
-│   │       ├── dev-fsPRyI/
-│   │       │   ├── index.js
-│   │       │   └── index.js.map
-│   │       └── dev-NJnNT7/
-│   │           ├── index.js
-│   │           └── index.js.map
 │   ├── public/
 │   │   ├── manifest.json
 │   │   ├── sample-transactions.csv
@@ -178,9 +143,6 @@ apps/
 │   ├── upload.html
 │   └── wrangler.toml
 ├── insighthunter-main/
-│   ├── .wrangler/
-│   │   └── tmp/
-│   │       └── pages-sK6Avh/
 │   ├── functions/
 │   │   └── api/
 │   │       └── [[path]].js
@@ -248,8 +210,6 @@ apps/
 │   ├── package.json
 │   └── tsconfig.json
 ├── insighthunter-pbx/
-│   ├── .wrangler/
-│   │   └── tmp/
 │   ├── public/
 │   │   └── index.html
 │   ├── src/

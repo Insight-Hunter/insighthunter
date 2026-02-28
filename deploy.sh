@@ -54,3 +54,5 @@ echo "All applications deployed successfully!"
 echo " "
 echo "Main deployed!"
 
+
+                                

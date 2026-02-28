@@ -1,0 +1,11 @@
+account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
+name = "insighthunter-payroll"
+main = "src/index.ts"
+compatibility_date = "2024-07-25"
+
+[build]
+command = "npm install && npm run build"
+
+[[routes]]
+pattern = "payroll.insighthunter.app/api/*"
+zone_name = "insighthunter.app"
