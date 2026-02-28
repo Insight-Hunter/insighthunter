@@ -10,12 +10,11 @@
     "hono": "^4.12.3"
   },
   "devDependencies": {
-    "esbuild": "^0.20.0",
+    "esbuild": "^0.27.3",
     "typescript": "^5.3.3"
   },
   "assets": {
-    "directory":  "./public",
-    "binding":  "ASSETS"
+    "directory": "./public",
+    "binding": "ASSETS"
   }
-
 }
