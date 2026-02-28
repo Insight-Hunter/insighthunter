@@ -6,7 +6,7 @@
   "scripts": {
     "start": "wrangler dev",
     "deploy": "wrangler deploy",
-    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --platform=worker"
+    "build": "npm run build"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
