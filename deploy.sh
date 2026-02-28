@@ -25,8 +25,8 @@ npx wrangler deploy --config apps/insighthunter-auth/wrangler.toml
 
 
 # Deploy insighthunter-bookkeeping
-echo "Deploying insighthunter-bookkeeping..."
-npx wrangler deploy --config apps/insighthunter-bookkeeping/wrangler.toml
+##echo "Deploying insighthunter-bookkeeping..."
+##npx wrangler deploy --config apps/insighthunter-bookkeeping/wrangler.toml
 
 # Deploy insighthunter-lite
 echo "Deploying insighthunter-lite..."
