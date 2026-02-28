@@ -2,10 +2,17 @@
   "name": "insighthunter",
   "version": "1.0.0",
   "scripts": {
-    "start": "node app.js",
-    "build": "echo \"No build specified\""
+    "start": "wrangler dev",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --platform=worker",
+    "deploy": "wrangler deploy"
   },
-  
+  "dependencies": {
+    "hono": "^4.12.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0",
+    "typescript": "^5.3.3"
+  },
   "assets": {
     "directory": "./public",
     "binding": "ASSETS"

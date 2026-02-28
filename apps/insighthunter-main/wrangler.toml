@@ -12,7 +12,7 @@ head_sampling_rate = 1
 # ── Static Assets ─────────────────────────────────────────────────
 [assets]
 directory = "public"
-binding   = "ASSETS-MAIN"
+binding   = "ASSETS"
 not_found_handling = "single-page-application"
 
 # ── KV — session store ─────────────────────────────────────────────
