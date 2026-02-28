@@ -4,9 +4,13 @@
   "description": "Authentication service for InsightHunter",
   "main": "src/index.ts",
   "scripts": {
-    "start": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "build": "npm run build"
+    "dev":        "wrangler dev",
+    "deploy":     "wrangler deploy",
+    "build":      "tsc --noEmit",
+    "type-check": "tsc --noEmit",
+    "db:migrate": "wrangler d1 migrations apply insighthunter-auth --local",
+    "db:migrate:prod": "wrangler d1 migrations apply insighthunter-auth --remote",
+    "db:studio":  "wrangler d1 execute insighthunter-auth --local --command 'SELECT * FROM users LIMIT 10'"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
