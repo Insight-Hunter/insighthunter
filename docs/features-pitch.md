@@ -1,6 +1,6 @@
 # Insight Hunter - Auto-CFO for Freelancers & Small Firms
 
-AI-powered SaaS delivering CFO-level insights, forecasting, and reports. Upload CSVs for instant dashboards, P&L projections, cash flow forecasts, and KPI alerts. Built for non-technical owners needing clarity fast.
+AI-powered SaaS delivering CFO-level insights, forecasting, and reiports. Upload CSVs for instant dashboards, P&L projections, cash flow forecasts, and KPI alerts. Built for non-technical owners needing clarity fast.
 
 Live MVP at v1.3.1 with Dashboard, Forecast, Reports, and Settings.
 

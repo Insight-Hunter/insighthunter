@@ -6,7 +6,7 @@
     "build": "esbuild src/index.ts --bundle --outfile=dist/index.ts--format=esm --platform=neutral",
     "deploy": "wrangler deploy"
   },
-  "dependencies": {
+  "dependencies": { 
     "hono": "^4.12.3"
   },
   "devDependencies": {
