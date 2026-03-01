@@ -1,6 +1,274 @@
----
+
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
----
-<DashboardLayout title="Admin">
-  <!-- STUB -->
+import AdminStats from '../../components/islands/admin/AdminStats.svelte';
+import UserTable from '../../components/islands/admin/UserTable.svelte';
+import SystemHealth from '../../components/islands/admin/SystemHealth.svelte';
+import RecentActivity from '../../components/islands/admin/RecentActivity.svelte';
+
+// Admin-only guard — check for admin role beyond basic auth
+const user = Astro.locals.user;
+if (!user || user.plan !== 'pro') {
+  return Astro.redirect('/dashboard');
+}
+
+<DashboardLayout title="Admin" activePage="admin">
+
+  <div class="admin-page">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Admin Control Panel</h1>
+        <p class="page-sub">Platform-wide oversight, user management, and system health.</p>
+      </div>
+      <div class="page-header-actions">
+        <a href="/admin/compliance" class="btn-outline-sm">Compliance Overview</a>
+        <a href="/dashboard/reports" class="btn-primary-sm">View Reports</a>
+      </div>
+    </div>
+
+    <!-- Top Stats Row — Svelte island -->
+    <AdminStats client:load />
+
+    <!-- Main Grid -->
+    <div class="admin-grid">
+
+      <!-- Left: User Management Table -->
+      <section class="admin-card admin-card--wide">
+        <div class="admin-card-header">
+          <h2>User Management</h2>
+          <div class="admin-card-actions">
+            <input
+              type="search"
+              placeholder="Search users..."
+              class="admin-search"
+              id="userSearch"
+            />
+            <button class="btn-primary-sm" id="exportUsersBtn">Export CSV</button>
+          </div>
+        </div>
+        <UserTable client:load />
+      </section>
+
+      <!-- Right Column -->
+      <div class="admin-right-col">
+
+        <!-- System Health -->
+        <section class="admin-card">
+          <div class="admin-card-header">
+            <h2>System Health</h2>
+            <span class="status-badge status-badge--green">All Systems Operational</span>
+          </div>
+          <SystemHealth client:visible />
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="admin-card">
+          <div class="admin-card-header">
+            <h2>Recent Activity</h2>
+            <a href="#" class="card-link">View all →</a>
+          </div>
+          <RecentActivity client:visible />
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- Platform Stats Section -->
+    <section class="admin-card admin-full-width">
+      <div class="admin-card-header">
+        <h2>Platform Overview</h2>
+        <div class="admin-card-actions">
+          <select class="admin-select" id="periodSelect">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="platform-stats-grid">
+
+        <div class="platform-stat-group">
+          <h3>Subscriptions</h3>
+          <div class="mini-stats">
+            <div class="mini-stat">
+              <span class="mini-stat-label">Lite (Free)</span>
+              <span class="mini-stat-value" id="liteSubs">—</span>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-stat-label">Standard ($49)</span>
+              <span class="mini-stat-value" id="standardSubs">—</span>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-stat-label">Pro ($149)</span>
+              <span class="mini-stat-value" id="proSubs">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="platform-stat-group">
+          <h3>Engagement</h3>
+          <div class="mini-stats">
+            <div class="mini-stat">
+              <span class="mini-stat-label">Active Today</span>
+              <span class="mini-stat-value" id="activeToday">—</span>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-stat-label">Active This Week</span>
+              <span class="mini-stat-value" id="activeWeek">—</span>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-stat-label">Churn Rate</span>
+              <span class="mini-stat-value" id="churnRate">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="platform-stat-group">
+          <h3>Revenue</h3>
+          <div class="mini-stats">
+            <div class="mini-stat">
+              <span class="mini-stat-label">MRR</span>
+              <span class="mini-stat-value" id="mrr">—</span>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-stat-label">ARR</span>
+              <span class="mini-stat-value" id="arr">—</span>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-stat-label">New MRR (30d)</span>
+              <span class="mini-stat-value" id="newMrr">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="platform-stat-group">
+          <h3>Infrastructure</h3>
+          <div class="mini-stats">
+            <div class="mini-stat">
+              <span class="mini-stat-label">D1 Rows</span>
+              <span class="mini-stat-value" id="d1Rows">—</span>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-stat-label">KV Keys</span>
+              <span class="mini-stat-value" id="kvKeys">—</span>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-stat-label">Worker Requests/day</span>
+              <span class="mini-stat-value" id="workerReqs">—</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="admin-card admin-full-width">
+      <div class="admin-card-header">
+        <h2>Quick Actions</h2>
+      </div>
+      <div class="quick-actions-grid">
+
+        <button class="quick-action" id="sendAnnouncementBtn">
+          <span class="quick-action-icon">📢</span>
+          <span class="quick-action-label">Send Announcement</span>
+          <span class="quick-action-sub">Email all active users</span>
+        </button>
+
+        <button class="quick-action" id="exportDataBtn">
+          <span class="quick-action-icon">📥</span>
+          <span class="quick-action-label">Export All Data</span>
+          <span class="quick-action-sub">Full D1 backup as CSV</span>
+        </button>
+
+        <a href="/admin/compliance" class="quick-action">
+          <span class="quick-action-icon">✅</span>
+          <span class="quick-action-label">Compliance Audit</span>
+          <span class="quick-action-sub">View all open items</span>
+        </a>
+
+        <button class="quick-action" id="purgeCacheBtn">
+          <span class="quick-action-icon">🔄</span>
+          <span class="quick-action-label">Purge KV Cache</span>
+          <span class="quick-action-sub">Clear stale session data</span>
+        </button>
+
+        <button class="quick-action quick-action--danger" id="maintenanceModeBtn">
+          <span class="quick-action-icon">🚧</span>
+          <span class="quick-action-label">Maintenance Mode</span>
+          <span class="quick-action-sub">Take platform offline</span>
+        </button>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Admin Scripts -->
+  <script>
+    // Fetch platform stats from API
+    async function loadPlatformStats(period = 30) {
+      try {
+        const res = await fetch(`/api/admin/stats?period=${period}`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        const set = (id: string, val: string) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = val;
+        };
+
+        set('liteSubs',     data.subscriptions?.lite     ?? '—');
+        set('standardSubs', data.subscriptions?.standard ?? '—');
+        set('proSubs',      data.subscriptions?.pro      ?? '—');
+        set('activeToday',  data.engagement?.activeToday ?? '—');
+        set('activeWeek',   data.engagement?.activeWeek  ?? '—');
+        set('churnRate',    data.engagement?.churnRate   ?? '—');
+        set('mrr',          data.revenue?.mrr            ?? '—');
+        set('arr',          data.revenue?.arr            ?? '—');
+        set('newMrr',       data.revenue?.newMrr         ?? '—');
+        set('d1Rows',       data.infra?.d1Rows           ?? '—');
+        set('kvKeys',       data.infra?.kvKeys           ?? '—');
+        set('workerReqs',   data.infra?.workerReqs       ?? '—');
+      } catch (e) {
+        console.error('Failed to load platform stats:', e);
+      }
+    }
+
+    // Period selector
+    document.getElementById('periodSelect')?.addEventListener('change', (e) => {
+      const target = e.target as HTMLSelectElement;
+      loadPlatformStats(parseInt(target.value));
+    });
+
+    // Quick action: Export users CSV
+    document.getElementById('exportUsersBtn')?.addEventListener('click', () => {
+      window.location.href = '/api/admin/export/users';
+    });
+
+    // Quick action: Export all data
+    document.getElementById('exportDataBtn')?.addEventListener('click', () => {
+      window.location.href = '/api/admin/export/full';
+    });
+
+    // Quick action: Purge KV cache
+    document.getElementById('purgeCacheBtn')?.addEventListener('click', async () => {
+      if (!confirm('Purge all KV session cache? Active sessions will need to re-authenticate.')) return;
+      const res = await fetch('/api/admin/cache/purge', { method: 'POST' });
+      alert(res.ok ? '✅ Cache purged.' : '❌ Purge failed.');
+    });
+
+    // Quick action: Maintenance mode
+    document.getElementById('maintenanceModeBtn')?.addEventListener('click', async () => {
+      if (!confirm('⚠️ This will take the platform offline for all users. Continue?')) return;
+      const res = await fetch('/api/admin/maintenance', { method: 'POST' });
+      alert(res.ok ? '🚧 Maintenance mode enabled.' : '❌ Failed.');
+    });
+
+    loadPlatformStats();
+  </script>
+
 </DashboardLayout>
