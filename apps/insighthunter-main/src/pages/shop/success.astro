@@ -2,5 +2,92 @@
 import Layout from '../../layouts/Layout.astro';
 ---
 <Layout title="Shop">
-  <!-- STUB -->
+  <body>
+    <div class="success-container">
+      <div class="success-header">
+        <div class="checkmark"></div>
+        <h1>Payment Successful!</h1>
+        <p>Your subscription is now active. Welcome to Insight Hunter 🚀</p>
+      </div>
+      
+      <div class="content">
+        <div class="plan-details" id="planDetails">
+          <div class="plan-row">
+            <span class="plan-name">Growth Plan</span>
+            <span>Monthly</span>
+          </div>
+          <div class="plan-row">
+            <span>Amount</span>
+            <strong>$79.00</strong>
+          </div>
+          <div class="plan-row">
+            <span>Next payment</span>
+            <strong>Mar 26, 2026</strong>
+          </div>
+        </div>
+  
+        <ul class="features">
+          <li>✅ Instant access to all Growth features</li>
+          <li>✅ Real-time dashboard & weekly forecasts</li>
+          <li>✅ Priority Slack support activated</li>
+          <li>✅ Data import tools ready</li>
+        </ul>
+  
+        <div class="next-steps">
+          <h3>Next Steps</h3>
+          <ol>
+            <li><strong>Connect your data</strong> - Link accounting, CRM, and payroll in 5 minutes</li>
+            <li><strong>Review your first forecast</strong> - AI analysis ready in under 2 minutes</li>
+            <li><strong>Set up alerts</strong> - Get notified on cash flow risks automatically</li>
+          </ol>
+        </div>
+  
+        <a href="/dashboard" class="dashboard-btn">Go to Dashboard</a>
+  
+        <div class="support-info">
+          <h4>Need help getting started?</h4>
+          <p>Reply to your welcome email or message us on <strong>Slack</strong> - your dedicated onboarding specialist is waiting!</p>
+        </div>
+      </div>
+    </div>
+  
+    <script>
+      // Parse URL params for dynamic plan info
+      const urlParams = new URLSearchParams(window.location.search);
+      const plan = urlParams.get('plan') || 'Growth';
+      const amount = urlParams.get('amount') || '79';
+      const nextPayment = new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString();
+  
+      document.getElementById('planDetails').innerHTML = `
+        <div class="plan-row">
+          <span class="plan-name">${plan} Plan</span>
+          <span>Monthly</span>
+        </div>
+        <div class="plan-row">
+          <span>Amount</span>
+          <strong>$${parseInt(amount)/100}.00</strong>
+        </div>
+        <div class="plan-row">
+          <span>Next payment</span>
+          <strong>${nextPayment}</strong>
+        </div>
+      `;
+  
+      // Auto-redirect after 10s or track success event
+      setTimeout(() => {
+        if (confirm('Redirect to dashboard now?')) {
+          window.location.href = '/dashboard';
+        }
+      }, 10000);
+  
+      // Analytics
+      if (window.gtag) {
+        gtag('event', 'purchase', {
+          value: amount / 100,
+          currency: 'USD',
+          transaction_id: 'tx_' + Date.now()
+        });
+      }
+    </script>
+  </body>
 </Layout>

@@ -1,7 +1,414 @@
----
-import Layout from '../layouts/Layout.astro';
-// TODO: migrate content from public/features.html
----
+import Layout from "../layouts/Layout.astro";
+
 <Layout title="Features">
-  <!-- STUB: migrate from public/features.html -->
+  <body>
+
+    <!-- ── Navbar ──────────────────────────────────────────────────── -->
+    <nav class="nav">
+      <a href="/" class="nav-logo">Insight Hunter</a>
+      <div class="nav-links">
+        <a href="/index.html">Home</a>
+        <a href="/features.html" class="active">Features</a>
+        <a href="/shop.html">Pricing</a>
+        <a href="/docs.html">Docs</a>
+        <a href="/support.html">Support</a>
+      </div>
+      <div class="nav-right">
+        <div class="nav-user" id="navUser">
+          <div class="nav-user-dot"></div>
+          <span id="navUserEmail"></span>
+        </div>
+        <button class="nav-btn-outline" id="navSignInBtn" onclick="openAuth('login')">Sign In</button>
+        <button class="nav-btn"         id="navSignUpBtn" onclick="openAuth('signup')">Get Started</button>
+        <button class="nav-btn-outline" id="navSignOutBtn" style="display:none" onclick="signOut()">Sign Out</button>
+      </div>
+    </nav>
+  
+    <!-- ── Hero ────────────────────────────────────────────────────── -->
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-badge fade-up">🚀 3 Core Plans · 5 Powerful Add-ons</div>
+        <h1 class="fade-up d1">Your complete business<br>intelligence platform</h1>
+        <p class="fade-up d2">
+          Enterprise-grade financial tools built for small businesses.
+          Pick your plan, bolt on what you need — pay only for what you use.
+        </p>
+        <div class="hero-ctas fade-up d3">
+          <button class="btn-primary" onclick="openAuth('signup')">Start Free Trial</button>
+          <button class="btn-ghost"   onclick="scrollTo('plans')">Explore Plans ↓</button>
+        </div>
+      </div>
+    </section>
+  
+    <!-- ── Stats ───────────────────────────────────────────────────── -->
+    <div class="stats-bar">
+      <div class="stat-item"><div class="stat-num">3</div><div class="stat-label">Core Plans</div></div>
+      <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">Add-on Apps</div></div>
+      <div class="stat-item"><div class="stat-num">95%</div><div class="stat-label">Forecast Accuracy</div></div>
+      <div class="stat-item"><div class="stat-num">&lt;2min</div><div class="stat-label">Setup Time</div></div>
+      <div class="stat-item"><div class="stat-num">$0</div><div class="stat-label">Per Extra User (Pro)</div></div>
+    </div>
+  
+    <!-- ── Core Plans ──────────────────────────────────────────────── -->
+    <section class="section" id="plans">
+      <div class="section-header">
+        <div class="section-eyebrow">Core Plans</div>
+        <h2 class="section-title">Choose your tier</h2>
+        <p class="section-sub">All plans include the Insight Hunter dashboard. Upgrade anytime — no data migration, no downtime.</p>
+      </div>
+      <div id="corePlansGrid" class="cards-grid">
+        <!-- skeleton -->
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </section>
+  
+    <!-- ── Add-ons divider ─────────────────────────────────────────── -->
+    <div class="addons-divider">
+      <span class="addons-divider-label">⚡ Add-on Applications</span>
+    </div>
+  
+    <!-- ── Add-on Apps ─────────────────────────────────────────────── -->
+    <section class="section" id="addons" style="padding-top:3rem;">
+      <div class="section-header">
+        <div class="section-eyebrow">Add-ons</div>
+        <h2 class="section-title">Bolt on what you need</h2>
+        <p class="section-sub">Add-ons work on any plan. Each lives at its own subdomain and connects directly to your Insight data.</p>
+      </div>
+      <div id="addonsGrid" class="cards-grid">
+        <!-- skeleton -->
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </section>
+  
+    <!-- ── Auth Modal ──────────────────────────────────────────────── -->
+    <div class="overlay" id="authOverlay" onclick="overlayClick(event)">
+      <div class="modal" id="authModal" role="dialog" aria-modal="true" aria-label="Sign in or create account">
+        <button class="modal-close" onclick="closeAuth()" aria-label="Close">✕</button>
+        <div class="modal-glow"></div>
+        <div class="modal-header">
+          <div class="modal-logo">IH</div>
+          <h3 id="authModalTitle">Welcome back</h3>
+          <p  id="authModalSubtitle">Sign in to access your apps</p>
+        </div>
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tabLogin"  onclick="switchTab('login')">Sign In</button>
+          <button class="auth-tab"        id="tabSignup" onclick="switchTab('signup')">Create Account</button>
+        </div>
+        <div class="auth-body">
+          <form class="auth-form" id="authForm" novalidate>
+            <input type="text"     id="authName"     placeholder="Full name"     autocomplete="name"             style="display:none">
+            <input type="email"    id="authEmail"    placeholder="Email address" autocomplete="email"    required>
+            <input type="password" id="authPassword" placeholder="Password (min 8 chars)"
+                   autocomplete="current-password" required minlength="8">
+            <div id="authMsg" class="auth-msg" role="alert"></div>
+            <button type="submit" class="auth-submit" id="authSubmit">Sign In</button>
+          </form>
+          <div class="auth-divider" style="margin-top:1rem;">
+            New to Insight Hunter?
+            <a href="#" onclick="switchTab('signup');return false;" style="color:var(--accent)">Create a free account →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- ── Footer ──────────────────────────────────────────────────── -->
+    <footer>
+      <div class="footer-logo">Insight Hunter</div>
+      <p>
+        © 2026 Insight Hunter LLC ·
+        <a href="/marketing/legal/privacy.html">Privacy</a> ·
+        <a href="/marketing/legal/terms.html">Terms</a> ·
+        <a href="/support.html">Support</a>
+      </p>
+    </footer>
+  
+    <script>
+    /* ────────────────────────────────────────────────────────────────
+       State
+    ──────────────────────────────────────────────────────────────── */
+    let _authMode = "login",
+        _pendingApp  = "Welcome Back!";
+  
+    const TIER_MAP = {
+      lite:     { label:'Lite',              cls:'tier-lite'     },
+      standard: { label:'Standard',          cls:'tier-standard' },
+      pro:      { label:'Pro / Enterprise',  cls:'tier-pro'      },
+    };
+  
+    const STATUS_MAP = {
+      live:           { label:'Live',        cls:'s-live' },
+      beta:           { label:'Beta',        cls:'s-beta' },
+      'coming-soon':  { label:'Coming Soon', cls:'s-soon' },
+    };
+  
+    /* ────────────────────────────────────────────────────────────────
+       Render
+    ──────────────────────────────────────────────────────────────── */
+    function renderCard(app, delay) {
+      const status = STATUS_MAP.status || STATUS_MAP.live;
+      const tier = TIER_MAP.slug;
+      const tierBadge = tier
+        ? `<div class="fcard-tier-badge ${tier.cls}">${tier.label}</div>`
+        : '';
+  
+      return `
+        <a class="fcard fade-up" style="animation-delay:${delay}s"
+           href="${app.pageUrl}"
+           onclick="return handleCardClick(event,'${app.slug}')">
+          ${tierBadge}
+          <div class="fcard-top">
+            <div class="fcard-icon">${app.icon}</div>
+            <div class="fcard-status ${status.cls}">${status.label}</div>
+          </div>
+          <div class="fcard-name">${app.name}</div>
+          <div class="fcard-desc">${app.desc}</div>
+          <div class="fcard-tags">
+            ${app.tags.map(t => `<span class="fcard-tag">${t}</span>`).join('')}
+          </div>
+          <div class="fcard-footer">
+            <div class="fcard-price">
+              <strong>${app.price}</strong>
+              <span> · ${app.tenancy}</span>
+            </div>
+            <div class="fcard-arrow">→</div>
+          </div>
+        </a>`;
+    }
+  
+    function renderGrid(apps, gridId) {
+      const grid = document.getElementById(gridId);
+      if (!apps || apps.length === 0) {
+        grid.innerHTML = `<div class="load-error">
+          <div class="err-icon">📭</div>
+          <h3>No apps found</h3>
+        </div>`;
+        return;
+      }
+      grid.innerHTML = apps.map((app, i) => renderCard(app, i * 0.07)).join('');
+    }
+  
+    function renderError(gridId, onRetry) {
+      const grid = document.getElementById(gridId);
+      grid.innerHTML = `<div class="load-error" style="grid-column:1/-1">
+        <div class="err-icon">⚠️</div>
+        <h3>Couldn't load apps</h3>
+        <p>Check your connection and try again.</p>
+        <button onclick="${onRetry}">Retry</button>
+      </div>`;
+    }
+  
+    /* ────────────────────────────────────────────────────────────────
+       Data fetch
+    ──────────────────────────────────────────────────────────────── */
+    async function loadApps() {
+      try {
+        const res  = await fetch('/api/apps');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        renderGrid(data.core,   'corePlansGrid');
+        renderGrid(data.addons, 'addonsGrid');
+      } catch (err) {
+        console.error('[features] loadApps:', err);
+        renderError('corePlansGrid',  'loadApps()');
+        renderError('addonsGrid',     'loadApps()');
+      }
+    }
+  
+    /* ────────────────────────────────────────────────────────────────
+       Card click — navigate to feature detail page
+       If user clicks "launch" button inside card, auth-gate it
+    ──────────────────────────────────────────────────────────────── */
+    function handleCardClick(event, slug) {
+      // Let the <a href> navigate naturally to /features/[slug].html
+      // Auth gating happens on the detail page itself
+      return true; // allow default navigation
+    }
+  
+    /* ────────────────────────────────────────────────────────────────
+       Auth helpers
+    ──────────────────────────────────────────────────────────────── */
+    function getToken()  { return localStorage.getItem('ih_token'); }
+    function getTier()   { return localStorage.getItem('ih_tier'); }
+    function getEmail()  { return localStorage.getItem('ih_email'); }
+  
+    function isAuthenticated() { return !!getToken(); }
+  
+    function hasActivePlan() {
+      const tier = getTier();
+      return tier && tier !== 'free';
+    }
+  
+    function updateNav() {
+      const authed = isAuthenticated();
+      const email  = getEmail();
+  
+      document.getElementById('navUser').classList.toggle('show', authed);
+      document.getElementById('navUserEmail').textContent = email || '';
+      document.getElementById('navSignInBtn').style.display  = authed ? 'none' : '';
+      document.getElementById('navSignUpBtn').style.display  = authed ? 'none' : '';
+      document.getElementById('navSignOutBtn').style.display = authed ? '' : 'none';
+    }
+  
+    function signOut() {
+      localStorage.removeItem('ih_token');
+      localStorage.removeItem('ih_email');
+      localStorage.removeItem('ih_tier');
+      fetch('/api/logout', { method:'POST', credentials:'include' }).catch(() => {});
+      updateNav();
+    }
+  
+    /* ────────────────────────────────────────────────────────────────
+       Auth modal
+    ──────────────────────────────────────────────────────────────── */
+    function openAuth(mode, pendingSlug) {
+      _pendingApp = pendingSlug || null;
+      switchTab(mode || 'login');
+      document.getElementById('authOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      requestAnimationFrame(() => document.getElementById('authEmail').focus());
+    }
+  
+    function closeAuth() {
+      document.getElementById('authOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+      clearAuthMsg();
+    }
+  
+    function overlayClick(e) {
+      if (e.target === document.getElementById('authOverlay')) closeAuth();
+    }
+  
+    function switchTab(mode) {
+      _authMode = mode;
+      const isLogin = mode === 'login';
+  
+      document.getElementById('tabLogin').classList.toggle('active', isLogin);
+      document.getElementById('tabSignup').classList.toggle('active', !isLogin);
+      document.getElementById('authName').style.display = isLogin ? 'none' : '';
+      document.getElementById('authModalTitle').textContent    = isLogin ? 'Welcome back' : 'Create your account';
+      document.getElementById('authModalSubtitle').textContent = isLogin ? 'Sign in to access your apps' : 'Start your 14-day free trial';
+      document.getElementById('authSubmit').textContent        = isLogin ? 'Sign In' : 'Create Account';
+      document.getElementById('authPassword').autocomplete     = isLogin ? 'current-password' : 'new-password';
+  
+      document.querySelector('.auth-divider').innerHTML = isLogin
+        ? `New to Insight Hunter? <a href="#" onclick="switchTab('signup');return false;" style="color:var(--accent)">Create a free account →</a>`
+        : `Already have an account? <a href="#" onclick="switchTab('login');return false;" style="color:var(--accent)">Sign in →</a>`;
+  
+      clearAuthMsg();
+    }
+  
+    function showAuthMsg(text, type) {
+      const el = document.getElementById('authMsg');
+      el.textContent = text;
+      el.className   = `auth-msg ${type}`;
+    }
+  
+    function clearAuthMsg() {
+      const el = document.getElementById('authMsg');
+      el.textContent = '';
+      el.className   = 'auth-msg';
+    }
+  
+    /* ────────────────────────────────────────────────────────────────
+       Auth form submit
+    ──────────────────────────────────────────────────────────────── */
+    document.getElementById('authForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const isLogin  = _authMode === 'login';
+      const email    = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      const name     = document.getElementById('authName').value.trim();
+      const submit   = document.getElementById('authSubmit');
+  
+      if (!email || !password) { showAuthMsg('Please fill in all fields.', 'error'); return; }
+      if (password.length < 8) { showAuthMsg('Password must be at least 8 characters.', 'error'); return; }
+      if (!isLogin && !name)   { showAuthMsg('Please enter your full name.', 'error'); return; }
+  
+      submit.disabled    = true;
+      submit.textContent = isLogin ? 'Signing in…' : 'Creating account…';
+      clearAuthMsg();
+  
+      try {
+        const endpoint = isLogin ? '/api/login' : '/api/signup';
+        const body     = isLogin
+          ? { email, password }
+          : { email, password, fullName: name };
+  
+        const res  = await fetch(endpoint, {
+          method:      'POST',
+          credentials: 'include',
+          headers:     { 'Content-Type': 'application/json' },
+          body:        JSON.stringify(body),
+        });
+        const data = await res.json();
+  
+        if (data.success || data.token) {
+          localStorage.setItem('ih_token', data.token);
+          localStorage.setItem('ih_email', email);
+          localStorage.setItem('ih_tier',  data.tier || 'free');
+          updateNav();
+  
+          showAuthMsg(isLogin ? '✓ Signed in — redirecting…' : '✓ Account created — redirecting…', 'success');
+  
+          setTimeout(() => {
+            closeAuth();
+            if (_pendingApp) {
+              // Had a pending app launch — go to its feature page
+              window.location.href = `/features/${_pendingApp}.html?launch=1`;
+            } else if (!hasActivePlan()) {
+              window.location.href = '/shop.html';
+            } else {
+              window.location.href = '/dashboard.html';
+            }
+          }, 1400);
+        } else {
+          showAuthMsg(data.error || 'Something went wrong. Please try again.', 'error');
+        }
+      } catch {
+        showAuthMsg('Network error. Please check your connection.', 'error');
+      } finally {
+        submit.disabled    = false;
+        submit.textContent = isLogin ? 'Sign In' : 'Create Account';
+      }
+    });
+  
+    /* ────────────────────────────────────────────────────────────────
+       Utility
+    ──────────────────────────────────────────────────────────────── */
+    function scrollTo(id) {
+      document.getElementById(id)?.scrollIntoView({ behavior:'smooth' });
+    }
+  
+    /* ────────────────────────────────────────────────────────────────
+       Keyboard
+    ──────────────────────────────────────────────────────────────── */
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeAuth();
+    });
+  
+    /* ────────────────────────────────────────────────────────────────
+       URL param handling
+       ?login=1   → open login modal
+       ?signup=1  → open signup modal
+    ──────────────────────────────────────────────────────────────── */
+    function handleUrlParams() {
+      const p = new URLSearchParams(location.search);
+      if (p.get('signup') === '1') openAuth('signup');
+      if (p.get('login')  === '1') openAuth('login');
+    }
+  
+    /* ────────────────────────────────────────────────────────────────
+       Init
+    ──────────────────────────────────────────────────────────────── */
+    (async function init() {
+      updateNav();
+      handleUrlParams();
+      await loadApps();
+    })();
+    </script>
+    </body>
 </Layout>

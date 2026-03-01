@@ -2,5 +2,46 @@
 import Layout from '../../layouts/Layout.astro';
 ---
 <Layout title="Shop">
-  <!-- STUB -->
+  <body class="page">
+
+    <header class="header">
+        <div class="brand">InsightHunter</div>
+        <nav class="nav">
+            <a href="features.html">Features</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="about.html">About</a>
+            <a href="login.html">Login</a>
+            <a href="signup.html" class="btn-primary">Sign Up Free</a>
+        </nav>
+    </header>
+
+    <main class="main">
+        <section class="hero">
+            <h1>Checkout</h1>
+            <p>Complete your purchase.</p>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <h2>Billing Information</h2>
+                <form>
+                    <input type="text" placeholder="Name on Card">
+                    <input type="text" placeholder="Card Number">
+                    <input type="text" placeholder="MM/YY">
+                    <input type="text" placeholder="CVC">
+                    <button type="submit" class="btn-primary">Complete Purchase</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 InsightHunter. All rights reserved.</p>
+        <div>
+            <a href="/legal/privacy.html">Privacy Policy</a> | 
+            <a href="/legal/terms.html">Terms of Service</a>
+        </div>
+    </footer>
+
+</body>
 </Layout>

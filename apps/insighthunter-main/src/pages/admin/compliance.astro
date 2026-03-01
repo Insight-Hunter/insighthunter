@@ -1,6 +1,39 @@
----
+
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
----
+
 <DashboardLayout title="Admin">
-  <!-- STUB -->
+  <body class="page">
+    <header class="topbar">
+      <div class="brand">InsightHunter</div>
+      <nav class="nav">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./compliance.html">Compliance</a>
+        <a href="./bookkeeping.html">Bookkeeping</a>
+        <a href="./admin-compliance.html" class="active">Admin</a>
+        <a href="./settings.html">Settings</a>
+      </nav>
+    </header>
+
+    <main class="main">
+      <h1>Admin · Compliance</h1>
+
+      <section class="card">
+        <h2>Engagement Letters</h2>
+        <p>Generate and send engagement letters for current clients.</p>
+        <button class="btn-primary" id="btn-generate-engagement">
+          Generate Engagement Letter PDF
+        </button>
+      </section>
+
+      <section class="card">
+        <h2>Storage Usage</h2>
+        <p id="storage-usage">—</p>
+        <button class="btn-secondary" id="btn-cleanup-uploads">
+          Cleanup old uploads
+        </button>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
 </DashboardLayout>
