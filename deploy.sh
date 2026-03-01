@@ -23,7 +23,6 @@ set -e
 echo "Deploying insighthunter-auth..."
 npx wrangler deploy --config apps/insighthunter-auth/wrangler.toml
 
-
 # Deploy insighthunter-bookkeeping
 echo "Deploying insighthunter-bookkeeping..."
 npx wrangler deploy --config apps/insighthunter-bookkeeping/wrangler.toml
