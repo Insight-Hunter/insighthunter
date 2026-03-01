@@ -11,6 +11,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/uuid": "^10.0.0",
     "bcryptjs": "^3.0.3",
+    "esbuild": "^0.27.3",
     "hono": "^4.12.3",
     "openssl": "^2.0.0",
     "tree": "^0.1.3",

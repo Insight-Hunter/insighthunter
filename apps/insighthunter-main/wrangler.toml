@@ -1,8 +1,7 @@
-# apps/insighthunter-main/wrangler.toml
+
 name = "insighthunter-main"
 compatibility_date     = "2025-03-07"
 compatibility_flags    = ["nodejs_compat"]
-pages_build_output_dir = "public"
 main                   = "src/index.ts"
 
 [observability]
@@ -12,7 +11,7 @@ head_sampling_rate = 1
 # ── Static Assets ─────────────────────────────────────────────────
 [assets]
 directory = "public"
-binding   = "ASSETS-MAIN"
+binding   = "ASSETS"
 not_found_handling = "single-page-application"
 
 # ── KV — session store ─────────────────────────────────────────────
