@@ -1,0 +1,8 @@
+---
+import Layout from './Layout.astro';
+import '../styles/marketing.css';
+const { title } = Astro.props;
+---
+<Layout title={title}>
+  <slot />
+</Layout>
