@@ -1,1 +1,36 @@
 /* Global styles — migrated from public/styles.css */
+/* ================================================
+   InsightHunter Global Styles
+   Migrated from public/styles.css
+   Imported once via Layout.astro — applies to all pages
+   ================================================ */
+
+   :root {
+    --color-bg: #0a0a0f;
+    --color-surface: #13131a;
+    --color-primary: #00d4ff;
+    --color-accent: #7c3aed;
+    --color-text: #e2e8f0;
+    --color-muted: #64748b;
+    --font-main: 'Inter', sans-serif;
+    --font-display: 'Orbitron', sans-serif;
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-main);
+    line-height: 1.6;
+  }
+  
+  a { color: var(--color-primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  

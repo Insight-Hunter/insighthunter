@@ -1,7 +1,9 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-// TODO: migrate from public/login.html
+import LoginForm from '../../components/islands/auth/LoginForm.svelte';
 ---
 <Layout title="Login">
-  <!-- STUB: migrate from public/login.html -->
+  <section class="auth-page container">
+    <LoginForm client:load />
+  </section>
 </Layout>

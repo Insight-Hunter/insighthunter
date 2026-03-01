@@ -4,6 +4,15 @@ import svelte from '@astrojs/svelte';
 
 export default defineConfig({
   output: 'server',
-  adapter: cloudflare({ platformProxy: { enabled: true } }),
-  integrations: [svelte()]
+  adapter: cloudflare({
+    platformProxy: { enabled: true }
+  }),
+  integrations: [svelte()],
+  vite: {
+    resolve: {
+      alias: {
+        '@': '/src'
+      }
+    }
+  }
 });

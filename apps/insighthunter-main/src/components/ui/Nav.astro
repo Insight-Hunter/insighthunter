@@ -1,4 +1,22 @@
 ---
-// Nav static component
+// Nav is static — zero JS except the scroll handler below
 ---
-<!-- STUB: Nav -->
+<header class="header" id="header">
+  <a href="/" class="brand">Insight<span>Hunter</span></a>
+  <nav class="nav">
+    <a href="/features">Features</a>
+    <a href="/pricing">Pricing</a>
+    <a href="/marketing/about">About</a>
+    <a href="/auth/login">Log In</a>
+    <a href="#demo" class="btn-secondary">Book a Demo</a>
+    <a href="/auth/signup" class="btn-primary">Start Free →</a>
+  </nav>
+</header>
+
+<script>
+  const header = document.getElementById('header');
+  window.addEventListener('scroll', () => {
+    header?.classList.toggle('scrolled', window.scrollY > 10);
+  });
+</script>
+

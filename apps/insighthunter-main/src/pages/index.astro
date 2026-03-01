@@ -1,7 +1,453 @@
 ---
 import Layout from '../layouts/Layout.astro';
-// TODO: migrate content from public/index.html
 ---
-<Layout title="Index">
-  <!-- STUB: migrate from public/index.html -->
+<Layout
+  title="Finance Intelligence"
+  description="CFO-level clarity built for solo entrepreneurs, freelancers, and small businesses. Start free."
+>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <div class="hero-eyebrow fade-up d1">Your Financial Nervous System</div>
+      <h1 class="fade-up d2">Stop Flying Blind.<br>Run Your Finances with <em>Clarity</em>.</h1>
+      <p class="hero-sub fade-up d3">
+        CFO-level clarity, built for the way you actually work. InsightHunter gives solo entrepreneurs,
+        freelancers, and small business owners real-time cash flow visibility, automated reporting,
+        and the financial confidence to make smart decisions — starting free.
+      </p>
+      <div class="hero-cta fade-up d3">
+        <a href="/auth/signup" class="btn-primary">Get Started Free →</a>
+        <a href="#demo" class="btn-secondary">Book a 15-Min Demo</a>
+      </div>
+      <ul class="hero-bullets fade-up d4">
+        <li class="hero-bullet">Compliance hub with automated reminders and engagement letters</li>
+        <li class="hero-bullet">Client bookkeeping and ledgers in one auditable workspace</li>
+        <li class="hero-bullet">Instant reports your clients actually understand</li>
+        <li class="hero-bullet">Built for solo entrepreneurs, freelancers, and small businesses ready to take control</li>
+      </ul>
+      <div class="hero-trust fade-up d4">
+        <span class="hero-trust-item">✓ &nbsp;No credit card required</span>
+        <span class="hero-trust-item">✓ &nbsp;Setup in under 5 minutes</span>
+        <span class="hero-trust-item">✓ &nbsp;Cancel anytime</span>
+      </div>
+    </div>
+
+    <div class="hero-visual fade-up d2">
+      <div class="dashboard-mock">
+        <div class="mock-header">
+          <div class="mock-dot" style="background:#FF5F57"></div>
+          <div class="mock-dot" style="background:#FFBD2E"></div>
+          <div class="mock-dot" style="background:#28CA41"></div>
+          <span class="mock-title">InsightHunter — Firm Dashboard</span>
+        </div>
+        <div class="mock-body">
+          <div class="mock-row">
+            <div class="mock-stat">
+              <div class="mock-stat-label">Open Compliance</div>
+              <div class="mock-stat-value">14</div>
+              <div class="mock-stat-sub warn">3 due this week</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-label">Clients At Risk</div>
+              <div class="mock-stat-value">2</div>
+              <div class="mock-stat-sub alrt">Overdue items</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-label">Unread Responses</div>
+              <div class="mock-stat-value">7</div>
+              <div class="mock-stat-sub up">From clients</div>
+            </div>
+          </div>
+          <div class="mock-pills">
+            <span class="pill pill-green">✓ Filed · Acme Corp</span>
+            <span class="pill pill-amber">⏳ Pending · BlueSky LLC</span>
+            <span class="pill pill-red">! Overdue · TerraGroup</span>
+          </div>
+          <div class="mock-list">
+            <div class="mock-item">
+              <span class="mock-item-left">📋 &nbsp;Q3 Engagement Letter — BlueSky LLC</span>
+              <span class="mock-item-right">Due in 3 days</span>
+            </div>
+            <div class="mock-item">
+              <span class="mock-item-left">📊 &nbsp;Monthly Financial Report — Acme Corp</span>
+              <span class="mock-item-right">Ready to send</span>
+            </div>
+            <div class="mock-item">
+              <span class="mock-item-left">⚠️ &nbsp;State Filing — TerraGroup Inc.</span>
+              <span class="mock-item-right" style="color:var(--red);">2 days overdue</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stats-bar-inner">
+      <div class="stat-item">
+        <span class="stat-number">Free</span>
+        <span class="stat-label">To Get Started — No Card Needed</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">&lt; 5 min</span>
+        <span class="stat-label">Average Setup Time</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">Early</span>
+        <span class="stat-label">Access — Join Now & Shape the Product</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">99.9%</span>
+        <span class="stat-label">Platform Uptime</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHO IT'S FOR -->
+  <section class="section who">
+    <div class="section-inner">
+      <div class="section-eyebrow centered">Who It's For</div>
+      <h2 class="section-title centered">Serious Financial Clarity.<br>For Every Kind of Business.</h2>
+      <p class="section-sub centered">
+        InsightHunter was built for people who need real financial insight without the complexity
+        or overhead of enterprise software.
+      </p>
+      <div class="who-grid">
+        <div class="who-card">
+          <div class="who-icon">🧑‍💻</div>
+          <div class="who-title">Solo Entrepreneurs & Freelancers</div>
+          <div class="who-desc">
+            You're running the whole show — you don't have time to be your own CFO.
+            InsightHunter gives you instant clarity on cash flow, expenses, and financial health.
+          </div>
+        </div>
+        <div class="who-card">
+          <div class="who-icon">🚀</div>
+          <div class="who-title">Small Business Owners</div>
+          <div class="who-desc">
+            Know exactly where your money is, where it's going, and what's coming — without
+            hiring a finance team.
+          </div>
+        </div>
+        <div class="who-card">
+          <div class="who-icon">📈</div>
+          <div class="who-title">Fractional CFOs & Accountants</div>
+          <div class="who-desc">
+            Managing multiple clients? InsightHunter's multi-entity workspace, white-label reports,
+            and compliance hub let you deliver CFO-grade service at scale.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCT PILLARS -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-eyebrow">The Platform</div>
+      <h2 class="section-title">Four Pillars.<br>One Unified Workspace.</h2>
+      <p class="section-sub">InsightHunter isn't a collection of isolated tools — it's a cohesive suite designed to work together from day one.</p>
+      <div class="pillars-grid">
+        <div class="pillar-card p-compliance">
+          <div class="pillar-icon">✅</div>
+          <div class="pillar-name">Compliance Hub</div>
+          <div class="pillar-desc">Never miss a filing deadline again. Track every open item, request, and regulatory task per client.</div>
+          <ul class="pillar-features">
+            <li class="pillar-feature">Client-level compliance dashboard with due date visibility</li>
+            <li class="pillar-feature">Engagement letter generation, tracking, and e-sign</li>
+            <li class="pillar-feature">Audit-ready document history for every client</li>
+          </ul>
+          <a href="/features" class="pillar-tag">Explore Compliance →</a>
+        </div>
+        <div class="pillar-card p-books">
+          <div class="pillar-icon">📒</div>
+          <div class="pillar-name">Bookkeeping Workspace</div>
+          <div class="pillar-desc">Client books, ledgers, and reconciliations in one place — with AI-assisted transaction coding.</div>
+          <ul class="pillar-features">
+            <li class="pillar-feature">Ledgers and reconciliations with a clear audit trail</li>
+            <li class="pillar-feature">Standardized chart-of-accounts templates by industry</li>
+            <li class="pillar-feature">Ready-to-send financials for owners and stakeholders</li>
+          </ul>
+          <a href="https://bookkeeping.insighthunter.app/" class="pillar-tag">Go to App →</a>
+        </div>
+        <div class="pillar-card p-admin">
+          <div class="pillar-icon">⚙️</div>
+          <div class="pillar-name">Admin & Automation</div>
+          <div class="pillar-desc">Engagement letters, recurring tasks, and firm-wide settings from a single admin cockpit.</div>
+          <ul class="pillar-features">
+            <li class="pillar-feature">Template-driven engagement letters and client emails</li>
+            <li class="pillar-feature">Automated reminders and recurring workflow rules</li>
+            <li class="pillar-feature">Storage usage management and cleanup tools</li>
+          </ul>
+          <a href="/features" class="pillar-tag">Explore Admin →</a>
+        </div>
+        <div class="pillar-card p-insights">
+          <div class="pillar-icon">📊</div>
+          <div class="pillar-name">Insights & Reporting</div>
+          <div class="pillar-desc">CFO-level financial clarity for every client — without the CFO-level price tag.</div>
+          <ul class="pillar-features">
+            <li class="pillar-feature">Cash flow trends and KPI dashboards</li>
+            <li class="pillar-feature">Client-ready PDF Insight Packs in one click</li>
+            <li class="pillar-feature">Forecast alerts and variance notifications</li>
+          </ul>
+          <span class="pillar-tag" style="cursor:default;">Coming Soon</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM / SOLUTION -->
+  <section class="section problem">
+    <div class="section-inner">
+      <div class="problem-grid">
+        <div>
+          <div class="section-eyebrow">The Problem</div>
+          <h2 class="section-title">Most Business Owners Are Flying Blind on Finances</h2>
+          <p class="section-sub">Spreadsheets break. Accountants are reactive. And by the time you notice a cash flow problem, you're already behind.</p>
+          <ul class="problem-list">
+            <li class="problem-item">
+              <div class="problem-icon">😤</div>
+              <div class="problem-text">
+                <strong>No real-time picture of your finances</strong>
+                <span>You're checking your bank balance and hoping for the best — not running on data.</span>
+              </div>
+            </li>
+            <li class="problem-item">
+              <div class="problem-icon">📉</div>
+              <div class="problem-text">
+                <strong>Cash flow surprises that blindside you</strong>
+                <span>Without forecasting, you only find out when it's already a crisis.</span>
+              </div>
+            </li>
+            <li class="problem-item">
+              <div class="problem-icon">📊</div>
+              <div class="problem-text">
+                <strong>Financial reports that take forever — or never happen</strong>
+                <span>Between running the business, tracking KPIs and runway never gets done.</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="solution-callout">
+          <h3>InsightHunter gives you the clarity to run smarter.</h3>
+          <p>We built InsightHunter for the business owner doing it all themselves — and deserves the same financial visibility larger companies take for granted.</p>
+          <p>Real-time dashboards, automated forecasts, and reports you can actually understand — all in one place, starting free.</p>
+          <a href="/auth/signup" class="btn-teal">See It in Action →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section how-it-works">
+    <div class="section-inner">
+      <div class="section-eyebrow">How It Works</div>
+      <h2 class="section-title" style="color:white;">Up and Running in Three Steps</h2>
+      <p class="section-sub">No complicated setup. No weeks of onboarding. Real value in your first session.</p>
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-number">01</div>
+          <div class="step-icon">👥</div>
+          <div class="step-title">Connect Your Clients</div>
+          <div class="step-desc">Add clients and select compliance, bookkeeping, and admin templates for each engagement. Takes minutes, not days.</div>
+        </div>
+        <div class="step">
+          <div class="step-number">02</div>
+          <div class="step-icon">📋</div>
+          <div class="step-title">Track Tasks & Documents</div>
+          <div class="step-desc">InsightHunter organizes open items, due dates, and document requests per client — automatically surfacing what needs attention first.</div>
+        </div>
+        <div class="step">
+          <div class="step-number">03</div>
+          <div class="step-icon">📤</div>
+          <div class="step-title">Deliver Confidently</div>
+          <div class="step-desc">Send branded engagement letters, financial reports, and client updates in a few clicks. Automated reminders handle the follow-up.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-eyebrow centered">Pricing</div>
+      <h2 class="section-title centered">Plans That Grow With Your Business</h2>
+      <p class="section-sub centered">Start free and upgrade as your client roster grows. Core features on every plan — no essential tools locked behind a paywall.</p>
+      <div class="plans-grid">
+
+        <div class="plan-card">
+          <div class="plan-name">Insight Lite</div>
+          <div class="plan-tagline">For solo practitioners getting started with compliance visibility and basic reporting.</div>
+          <div class="plan-price"><sup>$</sup>0</div>
+          <div class="plan-period">Free forever · No credit card needed</div>
+          <div class="plan-divider"></div>
+          <ul class="plan-features">
+            <li class="plan-feature">Manual CSV uploads</li>
+            <li class="plan-feature">Basic compliance task tracking</li>
+            <li class="plan-feature">3 client profiles</li>
+            <li class="plan-feature">Standard report templates</li>
+            <li class="plan-feature">Email support</li>
+          </ul>
+          <a href="https://lite.insighthunter.app/" class="plan-cta plan-cta-outline">Go to App</a>
+        </div>
+
+        <div class="plan-card featured">
+          <div class="plan-badge">Most Popular</div>
+          <div class="plan-name">Insight Standard</div>
+          <div class="plan-tagline">For growing firms that need ongoing compliance tracking and client-ready reporting.</div>
+          <div class="plan-price"><sup>$</sup>49<span style="font-size:0.9rem;font-weight:400;">/mo</span></div>
+          <div class="plan-period">Billed monthly · Save 20% annually</div>
+          <div class="plan-divider"></div>
+          <ul class="plan-features">
+            <li class="plan-feature">Automatic data ingestion</li>
+            <li class="plan-feature">Full compliance hub with smart reminders</li>
+            <li class="plan-feature">Up to 20 client profiles</li>
+            <li class="plan-feature">Engagement letter generation & tracking</li>
+            <li class="plan-feature">Branded client-ready report packs</li>
+            <li class="plan-feature">Priority support</li>
+          </ul>
+          <a href="https://bookkeeping.insighthunter.app/" class="plan-cta plan-cta-filled">Go to App</a>
+        </div>
+
+        <div class="plan-card">
+          <div class="plan-name">Insight Pro</div>
+          <div class="plan-tagline">For fractional CFOs and advisory firms managing multiple clients at scale.</div>
+          <div class="plan-price"><sup>$</sup>149<span style="font-size:0.9rem;font-weight:400;">/mo</span></div>
+          <div class="plan-period">Billed monthly · Save 20% annually</div>
+          <div class="plan-divider"></div>
+          <ul class="plan-features">
+            <li class="plan-feature">Everything in Standard</li>
+            <li class="plan-feature">Unlimited client profiles</li>
+            <li class="plan-feature">Multi-entity management</li>
+            <li class="plan-feature">White-label reporting (your brand)</li>
+            <li class="plan-feature">Advanced automation workflows</li>
+            <li class="plan-feature">Dedicated account manager</li>
+          </ul>
+          <a href="/auth/signup" class="plan-cta plan-cta-outline">Start 14-Day Free Trial</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ADD-ONS -->
+  <section class="section addons">
+    <div class="section-inner">
+      <div class="section-eyebrow">Professional Add-ons</div>
+      <h2 class="section-title">Everything Your Business Needs,<br>Under One Roof</h2>
+      <p class="section-sub">Add professional services as your business grows — all from the same trusted platform.</p>
+      <div class="addons-grid">
+        <div class="addon-card">
+          <div class="addon-icon">📞</div>
+          <div class="addon-name">Virtual Phone and SMS</div>
+          <div class="addon-desc">Professional business phone with call routing, extensions, and voicemail — no hardware required.</div>
+        </div>
+        <div class="addon-card">
+          <div class="addon-icon">🌐</div>
+          <div class="addon-name">Website Services</div>
+          <div class="addon-desc">Design, hosting, domain registration, SEO, and online reputation management — done for you.</div>
+        </div>
+        <div class="addon-card">
+          <div class="addon-icon">🏛️</div>
+          <div class="addon-name">BizForma</div>
+          <div class="addon-desc">Business formation, compliance filing, tax setup, payroll configuration, and legal documents.</div>
+        </div>
+        <div class="addon-card">
+          <div class="addon-icon">🤖</div>
+          <div class="addon-name">Scout AI Research</div>
+          <div class="addon-desc">Market analysis, competitor intelligence, and strategic research powered by AI — on demand.</div>
+        </div>
+        <div class="addon-card">
+          <div class="addon-icon">📒</div>
+          <div class="addon-name">Bookkeeping</div>
+          <div class="addon-desc">Dedicated professional bookkeepers keeping your books clean, current, and tax-ready every month.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <section class="section trust">
+    <div class="section-inner">
+      <div class="section-eyebrow centered">Why Firms Choose InsightHunter</div>
+      <h2 class="section-title centered" style="color:white;">Built by Finance Pros.<br>For Finance Pros.</h2>
+      <p class="section-sub centered">Your clients trust you with their most sensitive financial data. You can trust InsightHunter to protect it.</p>
+      <div class="trust-grid">
+        <div class="trust-card">
+          <div class="trust-icon">🔒</div>
+          <div class="trust-title">Secure by Design</div>
+          <div class="trust-desc">Data encrypted at rest and in transit. Role-based access controls ensure only the right people see the right information.</div>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon">☁️</div>
+          <div class="trust-title">Cloud-Native Infrastructure</div>
+          <div class="trust-desc">Enterprise-grade cloud with 99.9% uptime, automatic backups, and zero maintenance on your end.</div>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon">🔄</div>
+          <div class="trust-title">Fits Your Existing Workflow</div>
+          <div class="trust-desc">Designed to complement tools you already use — not replace them wholesale. Import, export, integrate seamlessly.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-eyebrow centered">Customer Stories</div>
+      <h2 class="section-title centered">Firms That Made the Switch</h2>
+      <p class="section-sub centered">Real stories from accounting professionals and business owners who replaced spreadsheet chaos with InsightHunter.</p>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <p class="testimonial-text">"Before InsightHunter, compliance tasks were scattered across three different tools and a shared spreadsheet. Now everything is in one place and I actually trust that nothing is slipping through."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">MR</div>
+            <div>
+              <div class="author-name">Marcus R.</div>
+              <div class="author-role">Managing Partner, Bright Path CPA</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <p class="testimonial-text">"I manage 14 clients as a fractional CFO. The multi-entity dashboard and white-label reports have made me look like I have a full team. My clients love the professionalism."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">JS</div>
+            <div>
+              <div class="author-name">Jennifer S.</div>
+              <div class="author-role">Fractional CFO, Summit Advisory Group</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <p class="testimonial-text">"Automated reminders caught a filing deadline that would have slipped through a busy season. That one alert alone paid for the entire year's subscription."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">TK</div>
+            <div>
+              <div class="author-name">Tanya K.</div>
+              <div class="author-role">Tax Director, NovaTech Solutions</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta" id="demo">
+    <div class="section-eyebrow" style="display:flex;justify-content:center;">Ready to Get Started?</div>
+    <h2 class="section-title">Your Clients Deserve Better<br>Than a Spreadsheet.</h2>
+    <p class="section-sub">Join hundreds of firms and business owners who've replaced compliance chaos with clarity. Start free — no credit card, no commitment.</p>
+    <div class="final-cta-actions">
+      <a href="/auth/signup" class="btn-primary" style="font-size:1rem;padding:13px 30px;">Get Started Free →</a>
+      <a href="/pricing" class="btn-secondary">View All Plans</a>
+    </div>
+    <p class="no-card">✓ No credit card required &nbsp;·&nbsp; ✓ Free plan available &nbsp;·&nbsp; ✓ Cancel anytime</p>
+  </section>
+
 </Layout>

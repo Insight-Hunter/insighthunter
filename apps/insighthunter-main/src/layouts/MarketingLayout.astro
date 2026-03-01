@@ -1,8 +1,13 @@
 ---
 import Layout from './Layout.astro';
 import '../styles/marketing.css';
-const { title } = Astro.props;
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
 ---
-<Layout title={title}>
+<Layout title={title} description={description}>
   <slot />
 </Layout>

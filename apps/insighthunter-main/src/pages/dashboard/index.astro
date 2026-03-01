@@ -1,7 +1,18 @@
 ---
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
-// TODO: migrate from public/index.html
+import RevenueChart from '../../components/islands/dashboard/RevenueChart.svelte';
+import CashFlowChart from '../../components/islands/dashboard/CashFlowChart.svelte';
+import TransactionTable from '../../components/islands/dashboard/TransactionTable.svelte';
 ---
-<DashboardLayout title="Index">
-  <!-- STUB: migrate from public/index.html -->
+<DashboardLayout title="Dashboard">
+
+  <h1>Your Dashboard</h1>
+
+  <div class="metrics-grid">
+    <RevenueChart client:visible />
+    <CashFlowChart client:visible />
+  </div>
+
+  <TransactionTable client:load />
+
 </DashboardLayout>

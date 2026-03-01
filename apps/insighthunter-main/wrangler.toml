@@ -1,8 +1,10 @@
-
 name = "insighthunter-main"
-compatibility_date     = "2025-03-07"
-compatibility_flags    = ["nodejs_compat"]
-main                   = "src/index.ts"
+compatibility_date = "2026-03-01"
+compatibility_flags = ["nodejs_als"]
+main = "./dist/server/index.ts"
+
+[vars]
+ENVIRONMENT = "production"
 
 [observability]
 enabled            = true
@@ -10,9 +12,8 @@ head_sampling_rate = 1
 
 # ── Static Assets ─────────────────────────────────────────────────
 [assets]
-directory = "public"
+directory = "./dist/clients"
 binding   = "ASSETS"
-not_found_handling = "single-page-application"
 
 # ── KV — session store ─────────────────────────────────────────────
 [[kv_namespaces]]
@@ -33,14 +34,10 @@ bucket_name = "insighthunter-assets"
 
 # ── Service bindings ────────────────────────────────────────────────
 [[services]]
-binding = "AUTH_SERVICE"
+binding = "AUTH"
 service = "insighthunter-auth"
 
 [[services]]
 binding = "BOOKKEEPING_SERVICE"
 service = "insighthunter-bookkeeping"
-
-[vars]
-ENVIRONMENT = "production"
-
 # Secrets — run: wrangler secret put JWT_SECRET
