@@ -12,7 +12,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@astrojs/react": "^3.0.0",
+    "@astrojs/react": "^4.4.2",
     "@badgateway/oauth2-client": "^2.3.0",
     "astro": "^5.17.3",
     "chart.js": "^4.4.0",
