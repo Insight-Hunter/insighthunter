@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "wrangler dev",
-    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --platform=neutral",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/index.ts--format=esm --platform=neutral",
     "deploy": "wrangler deploy"
   },
   "dependencies": {
