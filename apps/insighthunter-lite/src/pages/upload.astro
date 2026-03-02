@@ -4,31 +4,25 @@ import DashboardLayout from '../layouts/DashboardLayout.astro';
 import CSVUploader from '../components/islands/CSVUploader.svelte';
 ---
 
-<DashboardLayout title="Upload Transactions — Insight Lite">
-  <div class="upload-page">
-    <header class="page-header">
-      <h1>Upload Transactions</h1>
-      <p>Upload a CSV export from your bank or accounting tool. We'll generate your P&L, cash flow, and AI insights instantly.</p>
+<DashboardLayout title="Upload CSV — InsightHunter Lite">
+  <div class="upload-wrapper">
+    <header>
+      <h1>Upload Transaction Data</h1>
+      <p>
+        Upload a CSV file with your bank transactions. The file should contain at least a
+        <code>Date</code> and <code>Amount</code> column.
+        <a href="/public/sample-transactions.csv" download>Download a sample CSV</a> to see the required format.
+      </p>
     </header>
-
-    <section class="sample-hint">
-      <a href="/sample-transactions.csv" download class="btn-secondary">
-        ↓ Download sample CSV
-      </a>
-      <span class="hint-text">Columns needed: date, description, amount</span>
-    </section>
-
-    <!-- Svelte island: interactive upload + results -->
     <CSVUploader client:load />
   </div>
 </DashboardLayout>
 
 <style>
-  .upload-page   { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; }
-  .page-header   { margin-bottom: 1.5rem; }
-  .page-header h1 { font-size: 1.75rem; font-weight: 700; }
-  .page-header p  { color: var(--color-muted); margin-top: 0.5rem; }
-  .sample-hint   { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
-  .btn-secondary { padding: 0.5rem 1rem; border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.875rem; text-decoration: none; }
-  .hint-text     { font-size: 0.8rem; color: var(--color-muted); }
+  .upload-wrapper { max-width: 720px; margin: 0 auto; padding: 2rem 1rem; }
+  header          { margin-bottom: 2rem; }
+  h1              { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+  p               { color: #6b7280; line-height: 1.6; }
+  code            { background: #f3f4f6; padding: 0.1em 0.4em; border-radius: 4px; font-size: 0.875em; }
+  a               { color: #007aff; }
 </style>
