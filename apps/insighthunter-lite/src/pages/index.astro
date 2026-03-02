@@ -1,6 +1,47 @@
 ---
-// TODO: migrate from index.html + src/index.tsx
+// apps/insighthunter-lite/src/pages/index.astro
+// SSR: fetch latest report at edge — no client round-trip needed
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import DashboardMetrics from '../components/islands/DashboardMetrics.svelte';
+
+const userId = Astro.locals.userId;
+let latestReport = null;
+
+if (userId) {
+  const { results } = await Astro.locals.runtime.env.DB.prepare(`
+    SELECT r.*, u.filename, u.row_count
+    FROM   reports r
+    JOIN   uploads u ON u.id = r.upload_id
+    WHERE  r.user_id = ?
+    ORDER  BY r.created_at DESC
+    LIMIT  1
+  `).bind(userId).first() ?? { results: null };
+
+  if (results) {
+    latestReport = { ...results, data: JSON.parse(results.data_json as string) };
+  }
+}
 ---
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8" /></head>
-<body><!-- STUB --></body></html>
+
+<DashboardLayout title="Dashboard — InsightHunter Lite">
+  {!latestReport ? (
+    <div class="welcome-card">
+      <div class="welcome-icon">📊</div>
+      <h1>Welcome to InsightHunter Lite</h1>
+      <p>Upload a CSV of your bank transactions to instantly see your cash position, burn rate, and runway.</p>
+      <a href="/upload" class="btn-primary">Upload Your First CSV</a>
+      <a href="/public/sample-transactions.csv" download class="btn-secondary">Download Sample CSV</a>
+    </div>
+  ) : (
+    <DashboardMetrics report={latestReport} client:load />
+  )}
+</DashboardLayout>
+
+<style>
+  .welcome-card  { max-width: 480px; margin: 4rem auto; text-align: center; background: #fff; border-radius: 12px; padding: 2.5rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .welcome-icon  { font-size: 3rem; margin-bottom: 1rem; }
+  .welcome-card h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.75rem; }
+  .welcome-card p  { color: #6b7280; margin-bottom: 1.5rem; }
+  .btn-primary   { display: inline-block; background: #007aff; color: #fff; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 500; text-decoration: none; margin-right: 0.75rem; }
+  .btn-secondary { display: inline-block; border: 1px solid #d1d5db; color: #374151; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 500; text-decoration: none; }
+</style>
