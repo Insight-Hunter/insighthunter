@@ -5,47 +5,46 @@ import CashFlowChart from '../../components/islands/dashboard/CashFlowChart.svel
 import TransactionTable from '../../components/islands/dashboard/TransactionTable.svelte';
 ---
 <DashboardLayout title="Dashboard">
-  <body class="page">
-    <header class="topbar">
-      <div class="brand">InsightHunter</div>
-      <nav class="nav">
-        <a href="./dashboard.html" class="active">Dashboard</a>
-        <a href="./compliance.html">Compliance</a>
-        <a href="./bookkeeping.html">Bookkeeping</a>
-        <a href="./admin-compliance.html">Admin</a>
-        <a href="./settings.html">Settings</a>
-      </nav>
-    </header>
+  <header class="topbar">
+    <div class="brand">InsightHunter</div>
+    <nav class="nav">
+      <a href="./dashboard.html" class="active">Dashboard</a>
+      <a href="./compliance.html">Compliance</a>
+      <a href="./bookkeeping.html">Bookkeeping</a>
+      <a href="./admin-compliance.html">Admin</a>
+      <a href="./settings.html">Settings</a>
+    </nav>
+  </header>
 
-    <main class="main">
-      <h1>Dashboard</h1>
+  <main class="main">
+    <h1>Dashboard</h1>
 
-      <div class="grid">
-        <div class="card">
-          <h2>Monthly Revenue</h2>
-          <p id="metric-monthly-revenue" class="metric">—</p>
-        </div>
-        <div class="card">
-          <h2>Cash on Hand</h2>
-          <p id="metric-cash-on-hand" class="metric">—</p>
-        </div>
-        <div class="card">
-          <h2>Open Compliance Items</h2>
-          <p id="metric-open-compliance" class="metric">—</p>
-        </div>
-        <div class="card">
-          <h2>Unreconciled Transactions</h2>
-          <p id="metric-unreconciled" class="metric">—</p>
-        </div>
+    <div class="grid">
+      <div class="card">
+        <h2>Monthly Revenue</h2>
+        <p id="metric-monthly-revenue" class="metric">—</p>
       </div>
+      <div class="card">
+        <h2>Cash on Hand</h2>
+        <p id="metric-cash-on-hand" class="metric">—</p>
+      </div>
+      <div class="card">
+        <h2>Open Compliance Items</h2>
+        <p id="metric-open-compliance" class="metric">—</p>
+      </div>
+      <div class="card">
+        <h2>Unreconciled Transactions</h2>
+        <p id="metric-unreconciled" class="metric">—</p>
+      </div>
+    </div>
 
-      <section class="card">
-        <h2>Recent Activity</h2>
-        <ul id="recent-activity" class="list"></ul>
-      </section>
-    </main>
+    <section class="card">
+      <h2>Recent Activity</h2>
+      <ul id="recent-activity" class="list"></ul>
+    </section>
+  </main>
 
-    <script src="./app.js"></script>
+  <script src="./app.js"></script>
 
   <div class="metrics-grid">
     <RevenueChart client:visible />
@@ -53,5 +52,4 @@ import TransactionTable from '../../components/islands/dashboard/TransactionTabl
   </div>
 
   <TransactionTable client:load />
-</body>
 </DashboardLayout>

@@ -1,4 +1,4 @@
-
+---
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
 import AdminStats from '../../components/islands/admin/AdminStats.svelte';
 import UserTable from '../../components/islands/admin/UserTable.svelte';
@@ -10,7 +10,7 @@ const user = Astro.locals.user;
 if (!user || user.plan !== 'pro') {
   return Astro.redirect('/dashboard');
 }
-
+---
 <DashboardLayout title="Admin" activePage="admin">
 
   <div class="admin-page">
@@ -147,7 +147,7 @@ if (!user || user.plan !== 'pro') {
         <div class="platform-stat-group">
           <h3>Infrastructure</h3>
           <div class="mini-stats">
-            <div class="mini-stat">
+            <div class.mini-stat">
               <span class="mini-stat-label">D1 Rows</span>
               <span class="mini-stat-value" id="d1Rows">—</span>
             </div>

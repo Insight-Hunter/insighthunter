@@ -4,35 +4,42 @@
   let plan = 'lite';
   let loading = false;
   let error = '';
-  let turnstileToken = '';
 
   async function handleSubmit(e: Event) {
     e.preventDefault();
-    if (!turnstileToken) { error = 'Please complete the verification.'; return; }
     loading = true;
     error = '';
 
     try {
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('password', password);
+      formData.append('plan', plan);
+      // The auth service requires a role, we'll default to 'customer' for signups
+      formData.append('role', 'customer');
+
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, plan, turnstileToken })
+        body: formData
       });
 
+      // The signup service redirects on success, so we check for redirect
+      if (res.redirected) {
+        window.location.href = res.url;
+        return;
+      }
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Signup failed');
-      window.location.href = '/shop';
+      if (!res.ok) {
+        throw new Error(data.error || 'Signup failed');
+      }
+
     } catch (err: any) {
       error = err.message;
     } finally {
       loading = false;
     }
   }
-
-  // Turnstile callback (called by Cloudflare script)
-  (window as any).onTurnstileSuccess = (token: string) => {
-    turnstileToken = token;
-  };
 </script>
 
 <div class="signup-wrapper">
@@ -64,26 +71,15 @@
 
     <label>
       Password
-      <input type="password" bind:value={password} required minlength="8" />
+      <input type="password" bind:value={password} required minlength="12" />
     </label>
 
-    <!-- Cloudflare Turnstile -->
-    <div
-      class="cf-turnstile"
-      data-sitekey="<your-turnstile-sitekey>"
-      data-callback="onTurnstileSuccess"
-    ></div>
-
-    <button type="submit" disabled={loading || !turnstileToken} class="btn-primary">
+    <button type="submit" disabled={loading} class="btn-primary">
       {loading ? 'Creating account...' : 'Create Account'}
     </button>
 
   </form>
 </div>
-
-<svelte:head>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-</svelte:head>
 
 <style>
   .signup-wrapper { max-width: 480px; margin: 4rem auto; padding: 2rem; }

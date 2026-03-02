@@ -15,7 +15,7 @@ const lite = app({
   price:         '$0/mo',
   priceMonthly:  0,
   tenancy:       'Single Tenant',
-  requiredPlans: ['lite', 'standard', 'pro'],
+  requiredPlans: ['lite', 'standard', 'pro-one', 'pro-enterprise'],
   desc:          'Essential financial visibility for freelancers and micro-businesses. Get your numbers under control without the complexity.',
   tags:          ['Cash Flow', 'P&L', 'Reports', 'Alerts'],
   features: [
@@ -54,7 +54,7 @@ const standard = app({
   price:         '$49/mo',
   priceMonthly:  4900,
   tenancy:       'Single Tenant',
-  requiredPlans: ['standard', 'pro'],
+  requiredPlans: ['standard', 'pro-one', 'pro-enterprise'],
   desc:          'Full-featured CFO suite for growing SMBs. AI forecasting, benchmarks, and team collaboration — everything you need to scale confidently.',
   tags:          ['Forecasting', 'Benchmarks', 'Teams', 'Integrations'],
   features: [
@@ -84,19 +84,58 @@ const standard = app({
   pageUrl:  '/features/standard',
 });
 
-const pro = app({
-  slug:          'pro',
-  name:          'Insight Pro',
+const pro_one = app({
+  slug:          'pro-one',
+  name:          'Insight Pro One',
   icon:          '🏢',
   status:        'live',
   category:      'core',
   tier:          'Core Plan · Enterprise',
   price:         '$149/mo+',
   priceMonthly:  14900,
-  tenancy:       'Single or Multi-Tenant',
-  requiredPlans: ['pro'],
+  tenancy:       'Single Tenant',
+  requiredPlans: ['pro-one'],
+  desc:          'Enterprise-grade financial intelligence for a single, large-scale business.',
+  tags:          ['White Label', 'API', 'Enterprise', 'SSO'],
+  features: [
+    'Everything in Insight Standard',
+    'White-label reports with custom branding & domain',
+    'Full REST & GraphQL API access',
+    'Custom workflow automation',
+    'SSO / SAML integration',
+    'Unlimited user seats',
+    'Dedicated account manager',
+    '24/7 phone & Slack support',
+    'SLA guarantee (99.9% uptime)',
+    'Custom data retention policies',
+  ],
+  faqs: [
+    { q: 'Can I white-label the dashboard?',
+      a: 'Yes. Upload your logo, set brand colours, add a custom domain. Your brand, not Insight Hunter.' },
+    { q: 'Is enterprise pricing available?',
+      a: 'Yes. Contact sales@insighthunter.app for a custom quote.' },
+    { q: 'What does the SLA cover?',
+      a: '99.9% monthly uptime with automatic credits if breached. Excludes scheduled maintenance windows.' },
+  ],
+  support:  'Dedicated Slack channel + 24/7 phone. New to Pro? Email sales@insighthunter.app.',
+  docsUrl:  'https://docs.insighthunter.app/pro-one',
+  appUrl:   'https://pro-one.insighthunter.app/',
+  pageUrl:  '/features/pro-one',
+});
+
+const pro_enterprise = app({
+  slug:          'pro-enterprise',
+  name:          'Insight Pro Enterprise',
+  icon:          '🏨',
+  status:        'live',
+  category:      'core',
+  tier:          'Core Plan · Enterprise',
+  price:         'From $299/mo',
+  priceMonthly:  29900,
+  tenancy:       'Enterprise',
+  requiredPlans: ['pro-enterprise'],
   desc:          'Enterprise-grade financial intelligence for multi-location businesses, franchises, and fractional CFOs managing multiple clients.',
-  tags:          ['Multi-Tenant', 'White Label', 'API', 'Enterprise', 'SSO'],
+  tags:          ['White Label', 'API', 'Enterprise', 'SSO'],
   features: [
     'Everything in Insight Standard',
     'Multi-tenant dashboard (unlimited entities)',
@@ -112,20 +151,17 @@ const pro = app({
     'Custom data retention policies',
   ],
   faqs: [
-    { q: 'What does multi-tenant mean?',
-      a: 'Manage multiple separate business entities from one login — ideal for franchises, holding companies, or fractional CFOs.' },
     { q: 'Can I white-label the dashboard for clients?',
       a: 'Yes. Upload your logo, set brand colours, add a custom domain. Clients see your brand, not Insight Hunter.' },
     { q: 'Is enterprise pricing available?',
       a: 'Yes. Volume discounts from 5+ entities. Contact sales@insighthunter.app for a custom quote.' },
-    { q: 'What does the SLA cover?',
-      a: '99.9% monthly uptime with automatic credits if breached. Excludes scheduled maintenance windows.' },
   ],
   support:  'Dedicated Slack channel + 24/7 phone. New to Pro? Email sales@insighthunter.app.',
-  docsUrl:  'https://docs.insighthunter.app/pro',
-  appUrl:   'https://pro.insighthunter.app/',
-  pageUrl:  '/features/pro',
+  docsUrl:  'https://docs.insighthunter.app/pro-enterprise',
+  appUrl:   'https://pro-enterprise.insighthunter.app/',
+  pageUrl:  '/features/pro-enterprise',
 });
+
 
 // ─── Add-on Apps ───────────────────────────────────────────────────────────
 const pbx = app({
@@ -138,7 +174,7 @@ const pbx = app({
   price:         'From $19/mo',
   priceMonthly:  1900,
   tenancy:       'Any Plan',
-  requiredPlans: ['lite', 'standard', 'pro'],
+  requiredPlans: ['lite', 'standard', 'pro-one', 'pro-enterprise'],
   desc:          'Cloud PBX with virtual numbers, IVR, team extensions, SMS campaigns, and call analytics — integrated with your CRM and Insight data.',
   tags:          ['PBX', 'VoIP', 'SMS', 'IVR', 'Call Tracking'],
   features: [
@@ -179,7 +215,7 @@ const bookkeeping = app({
   price:         'From $49/mo',
   priceMonthly:  4900,
   tenancy:       'Any Plan',
-  requiredPlans: ['lite', 'standard', 'pro'],
+  requiredPlans: ['lite', 'standard', 'pro-one', 'pro-enterprise'],
   desc:          'Automated transaction categorisation, reconciliation, and month-end close — AI-powered with optional certified human review.',
   tags:          ['Bookkeeping', 'Reconciliation', 'Expenses', 'GAAP', 'Month-End'],
   features: [
@@ -220,7 +256,7 @@ const payroll = app({
   price:         'From $39/mo + $6/employee',
   priceMonthly:  3900,
   tenancy:       'Any Plan',
-  requiredPlans: ['lite', 'standard', 'pro'],
+  requiredPlans: ['lite', 'standard', 'pro-one', 'pro-enterprise'],
   desc:          'Full-service payroll with automatic tax filings, direct deposit, contractor payments, and HR document management — all 50 US states.',
   tags:          ['Payroll', 'Tax Filing', 'Direct Deposit', 'HR', 'W-2', '1099'],
   features: [
@@ -261,7 +297,7 @@ const scout = app({
   price:         'From $29/mo',
   priceMonthly:  2900,
   tenancy:       'Standard & Pro',
-  requiredPlans: ['standard', 'pro'],
+  requiredPlans: ['standard', 'pro-one', 'pro-enterprise'],
   desc:          'AI-powered business intelligence and lead prospecting. Scout monitors your market, surfaces new customers, and tracks competitors automatically.',
   tags:          ['Lead Gen', 'Market Intel', 'Competitors', 'AI Prospecting', 'CRM'],
   features: [
@@ -302,7 +338,7 @@ const bizforma = app({
   price:         'From $19/mo',
   priceMonthly:  1900,
   tenancy:       'Any Plan',
-  requiredPlans: ['lite', 'standard', 'pro'],
+  requiredPlans: ['lite', 'standard', 'pro-one', 'pro-enterprise'],
   desc:          'Smart business document creation — contracts, proposals, NDAs, and HR forms generated by AI, e-signed, and stored in your encrypted vault.',
   tags:          ['Contracts', 'e-Sign', 'Proposals', 'NDA', 'SOW', 'Templates'],
   features: [
@@ -334,7 +370,7 @@ const bizforma = app({
 });
 
 // ─── Exports ───────────────────────────────────────────────────────────────
-export const CORE_APPS:  InsightApp[] = [lite, standard, pro];
+export const CORE_APPS:  InsightApp[] = [lite, standard, pro_one, pro_enterprise];
 export const ADDON_APPS: InsightApp[] = [pbx, bookkeeping, payroll, scout, bizforma];
 export const ALL_APPS:   InsightApp[] = [...CORE_APPS, ...ADDON_APPS];
 

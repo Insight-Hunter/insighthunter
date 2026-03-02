@@ -1,7 +1,18 @@
 import type { APIRoute } from 'astro';
-// TODO: proxy to insighthunter-auth Worker
-export const POST: APIRoute = async ({ request }) => {
-  return new Response(JSON.stringify({ stub: true }), {
-    headers: { 'Content-Type': 'application/json' }
-  });
+
+export const POST: APIRoute = async ({ request, locals }) => {
+  const authService = locals.runtime.env.AUTH;
+
+  const url = new URL(request.url);
+  // The auth worker has the route at /api/signup
+  url.pathname = '/api/signup';
+
+  // A new request is created to be forwarded to the auth service.
+  // The original request's body, headers, and method are preserved.
+  const newRequest = new Request(url.toString(), request);
+
+  // Fetch from the auth service.
+  const response = await authService.fetch(newRequest);
+
+  return response;
 };

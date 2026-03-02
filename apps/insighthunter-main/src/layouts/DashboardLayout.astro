@@ -1,34 +1,44 @@
+---
 import Layout from './Layout.astro';
 import '../styles/dashboard.css';
 
 interface Props {
   title: string;
 }
+
 const { title } = Astro.props;
+const { pathname } = Astro.url;
+
+const navLinks = [
+  { href: '/dashboard',              label: 'Dashboard' },
+  { href: '/dashboard/bookkeeping',  label: 'Bookkeeping' },
+  { href: '/dashboard/reconciliation', label: 'Reconciliation' },
+  { href: '/dashboard/reports',      label: 'Reports' },
+  { href: '/dashboard/clients',      label: 'Clients' },
+  { href: '/dashboard/compliance',   label: 'Compliance' },
+  { href: '/dashboard/settings',     label: 'Settings' },
+];
+---
 
 <Layout title={title} requiresAuth={true}>
-
   <div class="dashboard-shell">
 
     <aside class="sidebar">
-      <nav>
-        <a href="/dashboard">Dashboard</a>
-        <a href="/dashboard/bookkeeping">Bookkeeping</a>
-        <a href="/dashboard/reconciliation">Reconciliation</a>
-        <a href="/dashboard/reports">Reports</a>
-        <a href="/dashboard/clients">Clients</a>
-        <a href="/dashboard/compliance">Compliance</a>
-        <a href="/dashboard/settings">Settings</a>
+      <nav aria-label="Dashboard navigation">
+        {navLinks.map(({ href, label }) => (
+          <a href={href} aria-current={pathname === href ? 'page' : undefined}>
+            {label}
+          </a>
+        ))}
         <hr />
         <a href="/account">My Account</a>
         <a href="/auth/logout">Logout</a>
       </nav>
     </aside>
 
-    <div class="dashboard-content">
+    <main class="dashboard-content">
       <slot />
-    </div>
+    </main>
 
   </div>
-
 </Layout>

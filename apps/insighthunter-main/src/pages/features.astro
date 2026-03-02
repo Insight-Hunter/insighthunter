@@ -1,3 +1,4 @@
+
 ---
 import Layout from "../layouts/Layout.astro";
 import { CORE_APPS, ADDON_APPS } from "../data/apps.ts";
@@ -16,240 +17,272 @@ const TIER_MAP = {
 ---
 
 <Layout title="Features">
-  <body>
-    <!-- ── Navbar ──────────────────────────────────────────────────── -->
-    <nav class="nav">
-      <a href="/" class="nav-logo">Insight Hunter</a>
-      <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="/features" class="active">Features</a>
-        <a href="/shop">Pricing</a>
-        <a href="/docs">Docs</a>
-        <a href="/support">Support</a>
-      </div>
-      <div class="nav-right">
-        <div class="nav-user" id="navUser">
-          <div class="nav-user-dot"></div>
-          <span id="navUserEmail"></span>
-        </div>
-        <button
-          class="nav-btn-outline"
-          id="navSignInBtn"
-          onclick="openAuth('login')">Sign In</button
-        >
-        <button class="nav-btn" id="navSignUpBtn" onclick="openAuth('signup')"
-          >Get Started</button
-        >
-        <button
-          class="nav-btn-outline"
-          id="navSignOutBtn"
-          style="display:none"
-          onclick="signOut()">Sign Out</button
-        >
-      </div>
-    </nav>
-
-    <!-- ── Hero ────────────────────────────────────────────────────── -->
-    <section class="hero">
-      <div class="hero-inner">
-        <div class="hero-badge fade-up">🚀 3 Core Plans · 5 Powerful Add-ons</div>
-        <h1 class="fade-up d1">Your complete business<br />intelligence platform</h1>
-        <p class="fade-up d2">
-          Enterprise-grade financial tools built for small businesses. Pick your
-          plan, bolt on what you need — pay only for what you use.
-        </p>
-        <div class="hero-ctas fade-up d3">
-          <button class="btn-primary" onclick="openAuth('signup')"
-            >Start Free Trial</button
-          >
-          <button class="btn-ghost" onclick="scrollTo('plans')"
-            >Explore Plans ↓</button
-          >
-        </div>
-      </div>
-    </section>
-
-    <!-- ── Stats ───────────────────────────────────────────────────── -->
-    <div class="stats-bar">
-      <div class="stat-item">
-        <div class="stat-num">3</div>
-        <div class="stat-label">Core Plans</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">5</div>
-        <div class="stat-label">Add-on Apps</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">95%</div>
-        <div class="stat-label">Forecast Accuracy</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">&lt;2min</div>
-        <div class="stat-label">Setup Time</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">$0</div>
-        <div class="stat-label">Per Extra User (Pro)</div>
-      </div>
-    </div>
-
-    <!-- ── Core Plans ──────────────────────────────────────────────── -->
-    <section class="section" id="plans">
-      <div class="section-header">
-        <div class="section-eyebrow">Core Plans</div>
-        <h2 class="section-title">Choose your tier</h2>
-        <p class="section-sub">
-          All plans include the Insight Hunter dashboard. Upgrade anytime — no data
-          migration, no downtime.
-        </p>
-      </div>
-      <div id="corePlansGrid" class="cards-grid">
-        {CORE_APPS.map((app, i) => {
-            const status = STATUS_MAP[app.status] || STATUS_MAP.live;
-            const tier = TIER_MAP[app.slug];
-            return (
-              <a class={`fcard fade-up`} style={`animation-delay:${i * 0.07}s`} href={app.pageUrl}>
-                {tier && <div class={`fcard-tier-badge ${tier.cls}`}>{tier.label}</div>}
-                <div class="fcard-top">
-                  <div class="fcard-icon">{app.icon}</div>
-                  <div class={`fcard-status ${status.cls}`}>{status.label}</div>
-                </div>
-                <div class="fcard-name">{app.name}</div>
-                <div class="fcard-desc">{app.desc}</div>
-                <div class="fcard-tags">
-                  {app.tags.map(t => <span class="fcard-tag">{t}</span>)}
-                </div>
-                <div class="fcard-footer">
-                  <div class="fcard-price">
-                    <strong>{app.price}</strong>
-                    <span> · {app.tenancy}</span>
-                  </div>
-                  <div class="fcard-arrow">→</div>
-                </div>
-              </a>
-            );
-          })}
-      </div>
-    </section>
-
-    <!-- ── Add-ons divider ─────────────────────────────────────────── -->
-    <div class="addons-divider">
-      <span class="addons-divider-label">⚡ Add-on Applications</span>
-    </div>
-
-    <!-- ── Add-on Apps ─────────────────────────────────────────────── -->
-    <section class="section" id="addons" style="padding-top:3rem;">
-      <div class="section-header">
-        <div class="section-eyebrow">Add-ons</div>
-        <h2 class="section-title">Bolt on what you need</h2>
-        <p class="section-sub">
-          Add-ons work on any plan. Each lives at its own subdomain and connects
-          directly to your Insight data.
-        </p>
-      </div>
-      <div id="addonsGrid" class="cards-grid">
-        {ADDON_APPS.map((app, i) => {
-            const status = STATUS_MAP[app.status] || STATUS_MAP.live;
-            return (
-              <a class={`fcard fade-up`} style={`animation-delay:${i * 0.07}s`} href={app.pageUrl}>
-                <div class="fcard-top">
-                  <div class="fcard-icon">{app.icon}</div>
-                  <div class={`fcard-status ${status.cls}`}>{status.label}</div>
-                </div>
-                <div class="fcard-name">{app.name}</div>
-                <div class="fcard-desc">{app.desc}</div>
-                <div class="fcard-tags">
-                  {app.tags.map(t => <span class="fcard-tag">{t}</span>)}
-                </div>
-                <div class="fcard-footer">
-                  <div class="fcard-price">
-                    <strong>{app.price}</strong>
-                    <span> · {app.tenancy}</span>
-                  </div>
-                  <div class="fcard-arrow">→</div>
-                </div>
-              </a>
-            );
-          })}
-      </div>
-    </section>
-
-    <!-- ── Auth Modal ──────────────────────────────────────────────── -->
-    <div class="overlay" id="authOverlay" onclick="overlayClick(event)">
-      <div
-        class="modal"
-        id="authModal"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Sign in or create account"
-      >
-        <button class="modal-close" onclick="closeAuth()" aria-label="Close"
-          >✕</button
-        >
-        <div class="modal-glow"></div>
-        <div class="modal-header">
-          <div class="modal-logo">IH</div>
-          <h3 id="authModalTitle">Welcome back</h3>
-          <p id="authModalSubtitle">Sign in to access your apps</p>
-        </div>
-        <div class="auth-tabs">
-          <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')"
-            >Sign In</button
-          >
-          <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')"
-            >Create Account</button
-          >
-        </div>
-        <div class="auth-body">
-          <form class="auth-form" id="authForm" novalidate>
-            <input
-              type="text"
-              id="authName"
-              placeholder="Full name"
-              autocomplete="name"
-              style="display:none"
-            />
-            <input
-              type="email"
-              id="authEmail"
-              placeholder="Email address"
-              autocomplete="email"
-              required
-            />
-            <input
-              type="password"
-              id="authPassword"
-              placeholder="Password (min 8 chars)"
-              autocomplete="current-password"
-              required
-              minlength="8"
-            />
-            <div id="authMsg" class="auth-msg" role="alert"></div>
-            <button type="submit" class="auth-submit" id="authSubmit"
-              >Sign In</button
-            >
-          </form>
-          <div class="auth-divider" style="margin-top:1rem;">
-            New to Insight Hunter?
-            <a
-              href="#"
-              onclick="switchTab('signup');return false;"
-              style="color:var(--accent)">Create a free account →</a
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Footer ──────────────────────────────────────────────────── -->
-    <footer>
-      <div class="footer-logo">Insight Hunter</div>
-      <p>
-        © 2026 Insight Hunter LLC ·
-        <a href="/marketing/legal/privacy">Privacy</a> ·
-        <a href="/marketing/legal/terms">Terms</a> ·
-        <a href="/support">Support</a>
+  <!-- ── Hero ────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge fade-up">🚀 3 Core Plans · 5 Powerful Add-ons</div>
+      <h1 class="fade-up d1">Your complete business<br />intelligence platform</h1>
+      <p class="fade-up d2">
+        Enterprise-grade financial tools built for small businesses. Pick your
+        plan, bolt on what you need — pay only for what you use.
       </p>
-    </footer>
-  </body>
+      <div class="hero-ctas fade-up d3">
+        <button class="btn-primary" onclick="openAuth('signup')">Start Free Trial</button>
+        <button class="btn-ghost" onclick="scrollTo('plans')">Explore Plans ↓</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Stats ───────────────────────────────────────────────────── -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Core Plans</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Add-on Apps</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">95%</div>
+      <div class="stat-label">Forecast Accuracy</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">&lt;2min</div>
+      <div class="stat-label">Setup Time</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">$0</div>
+      <div class="stat-label">Per Extra User (Pro)</div>
+    </div>
+  </div>
+
+  <!-- ── Core Plans ──────────────────────────────────────────────── -->
+  <section class="section" id="plans">
+    <div class="section-header">
+      <div class="section-eyebrow">Core Plans</div>
+      <h2 class="section-title">Choose your tier</h2>
+      <p class="section-sub">
+        All plans include the Insight Hunter dashboard. Upgrade anytime — no data
+        migration, no downtime.
+      </p>
+    </div>
+    <div id="corePlansGrid" class="cards-grid">
+      {CORE_APPS.map((app, i) => {
+          const status = STATUS_MAP[app.status] || STATUS_MAP.live;
+          const tier = TIER_MAP[app.slug];
+          return (
+            <a class={`fcard fade-up`} style={`animation-delay:${i * 0.07}s`} href={app.pageUrl}>
+              {tier && <div class={`fcard-tier-badge ${tier.cls}`}>{tier.label}</div>}
+              <div class="fcard-top">
+                <div class="fcard-icon">{app.icon}</div>
+                <div class={`fcard-status ${status.cls}`}>{status.label}</div>
+              </div>
+              <div class="fcard-name">{app.name}</div>
+              <div class="fcard-desc">{app.desc}</div>
+              <div class="fcard-tags">
+                {app.tags.map(t => <span class="fcard-tag">{t}</span>)}
+              </div>
+              <div class="fcard-footer">
+                <div class="fcard-price">
+                  <strong>{app.price}</strong>
+                  <span> · {app.tenancy}</span>
+                </div>
+                <div class="fcard-arrow">→</div>
+              </div>
+            </a>
+          );
+        })}
+    </div>
+  </section>
+
+  <!-- ── Add-ons divider ─────────────────────────────────────────── -->
+  <div class="addons-divider">
+    <span class="addons-divider-label">⚡ Add-on Applications</span>
+  </div>
+
+  <!-- ── Add-on Apps ─────────────────────────────────────────────── -->
+  <section class="section" id="addons" style="padding-top:3rem;">
+    <div class="section-header">
+      <div class="section-eyebrow">Add-ons</div>
+      <h2 class="section-title">Bolt on what you need</h2>
+      <p class="section-sub">
+        Add-ons work on any plan. Each lives at its own subdomain and connects
+        directly to your Insight data.
+      </p>
+    </div>
+    <div id="addonsGrid" class="cards-grid">
+      {ADDON_APPS.map((app, i) => {
+          const status = STATUS_MAP[app.status] || STATUS_MAP.live;
+          return (
+            <a class={`fcard fade-up`} style={`animation-delay:${i * 0.07}s`} href={app.pageUrl}>
+              <div class="fcard-top">
+                <div class="fcard-icon">{app.icon}</div>
+                <div class={`fcard-status ${status.cls}`}>{status.label}</div>
+              </div>
+              <div class="fcard-name">{app.name}</div>
+              <div class="fcard-desc">{app.desc}</div>
+              <div class="fcard-tags">
+                {app.tags.map(t => <span class="fcard-tag">{t}</span>)}
+              </div>
+              <div class="fcard-footer">
+                <div class="fcard-price">
+                  <strong>{app.price}</strong>
+                  <span> · {app.tenancy}</span>
+                </div>
+                <div class="fcard-arrow">→</div>
+              </div>
+            </a>
+          );
+        })}
+    </div>
+  </section>
+
+  <!-- ── Auth Modal ──────────────────────────────────────────────── -->
+  <div class="overlay" id="authOverlay" onclick="overlayClick(event)">
+    <div
+      class="modal"
+      id="authModal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Sign in or create account"
+    >
+      <button class="modal-close" onclick="closeAuth()" aria-label="Close">✕</button>
+      <div class="modal-glow"></div>
+      <div class="modal-header">
+        <div class="modal-logo">IH</div>
+        <h3 id="authModalTitle">Welcome back</h3>
+        <p id="authModalSubtitle">Sign in to access your apps</p>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
+      </div>
+      <div class="auth-body">
+        <form class="auth-form" id="authForm" novalidate>
+          <input
+            type="text"
+            id="authName"
+            placeholder="Full name"
+            autocomplete="name"
+            style="display:none"
+          />
+          <input
+            type="email"
+            id="authEmail"
+            placeholder="Email address"
+            autocomplete="email"
+            required
+          />
+          <input
+            type="password"
+            id="authPassword"
+            placeholder="Password (min 8 chars)"
+            autocomplete="current-password"
+            required
+            minlength="8"
+          />
+          <div id="authMsg" class="auth-msg" role="alert"></div>
+          <button type="submit" class="auth-submit" id="authSubmit">Sign In</button>
+        </form>
+        <div class="auth-divider" style="margin-top:1rem;">
+          New to Insight Hunter?
+          <a
+            href="#"
+            onclick="switchTab('signup');return false;"
+            style="color:var(--accent)">Create a free account →</a>
+        </div>
+      </div>
+    </div>
+  </div>
 </Layout>
+
+<script>
+  // Auth Modal
+  const authOverlay = document.getElementById('authOverlay');
+  const authModal = document.getElementById('authModal');
+  const authForm = document.getElementById('authForm');
+  const authName = document.getElementById('authName');
+  const authEmail = document.getElementById('authEmail');
+  const authPassword = document.getElementById('authPassword');
+  const authSubmit = document.getElementById('authSubmit');
+  const authMsg = document.getElementById('authMsg');
+  const authModalTitle = document.getElementById('authModalTitle');
+  const authModalSubtitle = document.getElementById('authModalSubtitle');
+  const tabLogin = document.getElementById('tabLogin');
+  const tabSignup = document.getElementById('tabSignup');
+
+  function openAuth(mode = 'login') {
+    authOverlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    switchTab(mode);
+  }
+
+  function closeAuth() {
+    authOverlay.style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+
+  function overlayClick(event) {
+    if (event.target === authOverlay) {
+      closeAuth();
+    }
+  }
+
+  function switchTab(mode) {
+    if (mode === 'login') {
+      tabLogin.classList.add('active');
+      tabSignup.classList.remove('active');
+      authModalTitle.textContent = 'Welcome back';
+      authModalSubtitle.textContent = 'Sign in to access your apps';
+      authName.style.display = 'none';
+      authName.required = false;
+      authSubmit.textContent = 'Sign In';
+      // Update the divider link
+      const divider = authForm.nextElementSibling;
+      divider.innerHTML = `
+        New to Insight Hunter?
+        <a href="#" onclick="switchTab('signup');return false;" style="color:var(--accent)">Create a free account →</a>
+      `;
+    } else { // signup
+      tabSignup.classList.add('active');
+      tabLogin.classList.remove('active');
+      authModalTitle.textContent = 'Create your account';
+      authModalSubtitle.textContent = 'Start your 14-day Pro trial';
+      authName.style.display = 'block';
+      authName.required = true;
+      authSubmit.textContent = 'Create Account';
+       // Update the divider link
+      const divider = authForm.nextElementSibling;
+      divider.innerHTML = `
+        Already have an account?
+        <a href="#" onclick="switchTab('login');return false;" style="color:var(--accent)">Sign in →</a>
+      `;
+    }
+  }
+
+  authForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    authMsg.textContent = '';
+    // TODO: Add actual authentication logic (e.g., call API)
+    console.log('Form submitted');
+    // Example validation
+    if (!authEmail.value || !authPassword.value || (authName.style.display === 'block' && !authName.value)) {
+      authMsg.textContent = 'Please fill out all required fields.';
+      authMsg.style.color = 'var(--red)';
+      return;
+    }
+    authMsg.textContent = 'Success! (This is a demo)';
+    authMsg.style.color = 'var(--green)';
+    // In a real app, you'd redirect or update the UI here.
+  });
+
+  // Smooth scroll for "Explore Plans"
+  function scrollTo(id) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+</script>
