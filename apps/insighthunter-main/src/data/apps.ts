@@ -1,5 +1,15 @@
 // src/data/apps.ts
 import type { InsightApp, SubscriptionTier } from '../types.js';
+---
+import AdminStats from "../../components/islands/admin/AdminStats.svelte";
+---
+
+<AdminStats
+  totalUsers={stats.users}
+  totalRevenue={stats.revenue}
+  activeSubscriptions={stats.subs}
+  client:load
+/>
 
 // ─── Helper ────────────────────────────────────────────────────────────────
 function app(a: InsightApp): InsightApp { return a; }
