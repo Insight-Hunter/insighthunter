@@ -1,6 +1,6 @@
 
 import type { APIRoute } from 'astro';
-import { Surreal } from 'surrealdb.js';
+import { Surreal } from 'surrealdb'
 
 export const GET: APIRoute = async ({ locals }) => {
   const db = locals.runtime.env.DB;

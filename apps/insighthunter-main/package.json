@@ -9,9 +9,10 @@
     "deploy": "astro build && wrangler deploy"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^12.6.5",
+    "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/svelte": "^7.2.5",
     "astro": "^5.18.0",
+    "miniflare": "^4.20260305.0",
     "svelte": "^5.0.0"
   },
   "devDependencies": {
