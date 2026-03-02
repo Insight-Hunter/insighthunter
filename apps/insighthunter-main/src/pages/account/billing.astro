@@ -1,6 +1,23 @@
 ---
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
 ---
-<DashboardLayout title="Account">
-  <!-- STUB: migrate from public/my-account.html -->
+<DashboardLayout title="Billing">
+<div class="container">
+  <h1>Billing</h1>
+  <p>Manage your billing and subscription details.</p>
+  <div class="billing-info">
+    <h2>Current Plan</h2>
+    <p>You are currently on the <strong>Free Plan</strong>.</p>
+    <a href="/pricing" class="btn btn-primary">Upgrade Plan</a>
+  </div>
+  <div class="payment-methods">
+    <h2>Payment Methods</h2>
+    <p>You have no saved payment methods.</p>
+    <a href="#" class="btn btn-secondary">Add Payment Method</a>
+  </div>
+  <div class="billing-history">
+    <h2>Billing History</h2>
+    <p>You have no billing history.</p>
+  </div>
+</div>
 </DashboardLayout>

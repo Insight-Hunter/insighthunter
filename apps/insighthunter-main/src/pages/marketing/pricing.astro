@@ -1,6 +1,340 @@
 ---
-import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import Layout from '../layouts/Layout.astro';
 ---
-<MarketingLayout title="Pricing">
-  <!-- STUB: migrate from public/marketing/pricing.html -->
-</MarketingLayout>
+<Layout title="Pricing — InsightHunter">
+
+  <header class="header" id="header">
+    <a href="/" class="brand">Insight<span>Hunter</span></a>
+    <nav class="nav">
+      <a href="/features">Features</a>
+      <a href="/pricing" class="active">Pricing</a>
+      <a href="/about">About</a>
+      <a href="/login">Log In</a>
+      <a href="/signup" class="btn-primary">Start Free →</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- PAGE HERO -->
+    <div class="page-hero">
+      <div class="page-eyebrow fade-up d1">Pricing</div>
+      <h1 class="fade-up d2">Simple, Honest Pricing.<br />Start Free, Upgrade Anytime.</h1>
+      <p class="fade-up d3">No hidden fees, no surprise charges. Pick the plan that fits where you are today — you can always grow into the next one.</p>
+      <div class="billing-toggle fade-up d3">
+        <span>Monthly</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="billingToggle" />
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+        <span>Annual</span>
+        <span class="save-badge">Save 20%</span>
+      </div>
+    </div>
+
+    <!-- PLANS -->
+    <section class="plans-section">
+      <div class="plans-inner">
+        <div class="plans-grid">
+
+          <!-- LITE -->
+          <div class="plan-card fade-up d1">
+            <div class="plan-name">Insight Lite</div>
+            <div class="plan-tagline">For new businesses and freelancers getting their first clear picture of cash flow.</div>
+            <div class="plan-price-row">
+              <span class="plan-currency">$</span>
+              <span class="plan-amount">0</span>
+            </div>
+            <div class="plan-period">Free forever</div>
+            <div class="plan-annual-note">&nbsp;</div>
+            <div class="plan-divider"></div>
+            <ul class="plan-features">
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Manual CSV Upload</strong> — Upload bank exports and P&L files for one company profile</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>12-Month Dashboard</strong> — Revenue, expenses, net, and cash trends at a glance</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Category Breakdowns</strong> — Top customers, vendors, and expense buckets</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>One-Click PDF Report</strong> — Shareable Insight Report for stakeholders</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>3–6 Month Cash Flow Projection</strong> — Trend-based forecast to anticipate future needs</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Monthly Email Summary</strong> — Key insights delivered to your inbox every month</span></li>
+            </ul>
+            <a href="/signup" class="plan-cta plan-cta-outline">Get Started Free — No Card Needed</a>
+          </div>
+
+          <!-- STANDARD -->
+          <div class="plan-card featured fade-up d2">
+            <div class="plan-badge">Most Popular</div>
+            <div class="plan-name">Insight Standard</div>
+            <div class="plan-tagline">For growing businesses that need ongoing forecasting, alerts, and client-ready reporting.</div>
+            <div class="plan-price-row">
+              <span class="plan-currency">$</span>
+              <span class="plan-amount" id="standard-price">49</span>
+            </div>
+            <div class="plan-period">per month</div>
+            <div class="plan-annual-note" id="standard-note">&nbsp;</div>
+            <div class="plan-divider"></div>
+            <ul class="plan-features">
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Automatic CSV Ingestion</strong> — Connect 2–3 companies and automate data entry</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Rich 24-Month Dashboard</strong> — Trends, customer profitability, and customizable KPIs</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>12–18 Month Projections</strong> — P&L and cash flow forecasts with basic scenario modeling</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Branded PDF Reports</strong> — Board Pack and Investor Snapshot with your own branding</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Weekly Alerts</strong> — Low runway, budget variances, and KPI threshold notifications</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>2–3 Team Seats</strong> — Collaborate with your bookkeeper or business partner</span></li>
+            </ul>
+            <a href="/signup" class="plan-cta plan-cta-filled">Start 14-Day Free Trial →</a>
+          </div>
+
+          <!-- PRO -->
+          <div class="plan-card fade-up d3">
+            <div class="plan-name">Insight Pro</div>
+            <div class="plan-tagline">For firms and agencies managing multiple clients with advanced automation and white-label reporting.</div>
+            <div class="plan-price-row">
+              <span class="plan-currency">$</span>
+              <span class="plan-amount" id="pro-price">149</span>
+            </div>
+            <div class="plan-period">per month</div>
+            <div class="plan-annual-note" id="pro-note">&nbsp;</div>
+            <div class="plan-divider"></div>
+            <ul class="plan-features">
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Everything in Standard</strong></span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Multi-Client Management</strong> — Manage multiple clients from one unified account</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>White-Label Reports & Emails</strong> — Your branding on every client-facing document</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Scheduled Client Reports</strong> — Auto-send monthly or quarterly reports per client</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Advanced Multi-Scenario Forecasting</strong> — "What-if" modeling with custom drivers</span></li>
+              <li class="plan-feature"><span class="plan-feature-check">✓</span><span><strong>Priority API Access</strong> — First access to new integrations and the InsightHunter API</span></li>
+            </ul>
+            <a href="/signup" class="plan-cta plan-cta-outline">Start 14-Day Free Trial →</a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPARISON TABLE -->
+    <section class="compare-section">
+      <div class="compare-inner">
+        <div class="section-eyebrow">Compare Plans</div>
+        <div class="section-title">Everything Side by Side</div>
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th style="width:40%">Feature</th>
+              <th class="plan-col" style="width:20%">Lite</th>
+              <th class="plan-col featured-col" style="width:20%">Standard</th>
+              <th class="plan-col" style="width:20%">Pro</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="category-row"><td colspan="4">Data &amp; Connections</td></tr>
+            <tr><td>Company profiles</td><td class="plan-col">1</td><td class="plan-col featured-col">2–3</td><td class="plan-col">Unlimited</td></tr>
+            <tr><td>CSV upload</td><td class="plan-col"><span class="check">✓</span></td><td class="plan-col featured-col"><span class="check">✓</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+            <tr><td>Automatic CSV ingestion</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="check">✓</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+            <tr><td>API access</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="dash">—</span></td><td class="plan-col">Priority</td></tr>
+
+            <tr class="category-row"><td colspan="4">Dashboards &amp; Reporting</td></tr>
+            <tr><td>Cash flow dashboard</td><td class="plan-col">12 months</td><td class="plan-col featured-col">24 months</td><td class="plan-col">24 months</td></tr>
+            <tr><td>Custom KPIs</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="check">✓</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+            <tr><td>One-click PDF reports</td><td class="plan-col">Basic</td><td class="plan-col featured-col">Branded</td><td class="plan-col">White-label</td></tr>
+            <tr><td>Scheduled auto-reports</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="dash">—</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+            <tr><td>Monthly email summary</td><td class="plan-col"><span class="check">✓</span></td><td class="plan-col featured-col"><span class="check">✓</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+
+            <tr class="category-row"><td colspan="4">Forecasting</td></tr>
+            <tr><td>Cash flow projection</td><td class="plan-col">3–6 months</td><td class="plan-col featured-col">12–18 months</td><td class="plan-col">12–18 months</td></tr>
+            <tr><td>Scenario modeling</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col">Basic</td><td class="plan-col">Advanced</td></tr>
+            <tr><td>Multi-scenario "what-if"</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="dash">—</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+
+            <tr class="category-row"><td colspan="4">Alerts &amp; Collaboration</td></tr>
+            <tr><td>Alerts (runway, variances, KPIs)</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col">Weekly</td><td class="plan-col">Weekly</td></tr>
+            <tr><td>Team seats</td><td class="plan-col">1</td><td class="plan-col featured-col">2–3</td><td class="plan-col">Unlimited</td></tr>
+            <tr><td>Role-based access</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="dash">—</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+            <tr><td>Multi-client management</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="dash">—</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+
+            <tr class="category-row"><td colspan="4">Support</td></tr>
+            <tr><td>Email support</td><td class="plan-col"><span class="check">✓</span></td><td class="plan-col featured-col"><span class="check">✓</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+            <tr><td>Priority support</td><td class="plan-col"><span class="dash">—</span></td><td class="plan-col featured-col"><span class="check">✓</span></td><td class="plan-col"><span class="check">✓</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ADD-ONS -->
+    <section class="addons-section">
+      <div class="addons-inner">
+        <div class="section-eyebrow">Professional Add-ons</div>
+        <div class="section-title">Extend InsightHunter<br />As Your Business Grows</div>
+        <div class="addons-grid">
+          <div class="addon-card">
+            <div class="addon-icon">📞</div>
+            <div class="addon-name">Virtual Phone and SMS</div>
+            <div class="addon-price">$20 / month</div>
+            <div class="addon-desc">A professional business phone number with call forwarding, extensions, and voicemail — no hardware needed.</div>
+            <a href="/features/pbx" class="addon-cta">Learn more →</a>
+          </div>
+          <div class="addon-card">
+            <div class="addon-icon">🌐</div>
+            <div class="addon-name">Website Services</div>
+            <div class="addon-price">Starting at $500</div>
+            <div class="addon-desc">Professional design, fast hosting, domain registration, SEO optimization, and reputation management.</div>
+            <a href="/features/website-services" class="addon-cta">Learn more →</a>
+          </div>
+          <div class="addon-card">
+            <div class="addon-icon">🏛️</div>
+            <div class="addon-name">BizForma</div>
+            <div class="addon-price">Starting at $250</div>
+            <div class="addon-desc">Business formation, compliance filing, tax setup, payroll configuration, and legal document preparation.</div>
+            <a href="/features/bizforma" class="addon-cta">Learn more →</a>
+          </div>
+          <div class="addon-card">
+            <div class="addon-icon">🤖</div>
+            <div class="addon-name">Scout AI Research</div>
+            <div class="addon-price">$15 / month</div>
+            <div class="addon-desc">Your AI-powered research assistant for market analysis, competitor intelligence, and on-demand insights.</div>
+            <a href="/features/scout" class="addon-cta">Learn more →</a>
+          </div>
+          <div class="addon-card">
+            <div class="addon-icon">📒</div>
+            <div class="addon-name">Bookkeeping</div>
+            <div class="addon-price">Starting at $300 / month</div>
+            <div class="addon-desc">Dedicated professional bookkeepers keeping your books clean, current, and tax-ready every month.</div>
+            <a href="/features/bookkeeping" class="addon-cta">Learn more →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section">
+      <div class="faq-inner">
+        <div class="section-eyebrow" style="text-align:center;">FAQ</div>
+        <div class="section-title" style="text-align:center; margin-bottom:48px;">Common Questions</div>
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-question">Do I need a credit card to start?<span class="faq-icon">+</span></button>
+            <div class="faq-answer">No. The Insight Lite plan is completely free and requires no credit card. You only need payment details when upgrading to Standard or Pro.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question">Can I switch plans at any time?<span class="faq-icon">+</span></button>
+            <div class="faq-answer">Yes — upgrade or downgrade at any time. If you upgrade mid-cycle, we prorate the difference. If you downgrade, the change takes effect at the start of your next billing period.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question">What does "automatic CSV ingestion" mean?<span class="faq-icon">+</span></button>
+            <div class="faq-answer">On the Lite plan, you manually upload CSV exports from your bank or accounting software. Standard and Pro plans support automated ingestion, meaning you connect your data source once and InsightHunter pulls it in on a schedule — no manual uploads needed.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question">What's included in the 14-day free trial?<span class="faq-icon">+</span></button>
+            <div class="faq-answer">You get full access to every feature in your chosen plan for 14 days — no limitations. If you decide it's not right for you, cancel before the trial ends and you won't be charged anything.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question">How does annual billing work?<span class="faq-icon">+</span></button>
+            <div class="faq-answer">When you choose annual billing, you pay for 12 months upfront at a 20% discount compared to monthly. That works out to roughly 2.4 months free per year.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question">Can I use InsightHunter for multiple businesses?<span class="faq-icon">+</span></button>
+            <div class="faq-answer">Yes. Standard supports 2–3 company profiles, and Pro supports unlimited clients — making it ideal for fractional CFOs and accounting firms managing multiple entities.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question">Is my financial data secure?<span class="faq-icon">+</span></button>
+            <div class="faq-answer">Absolutely. All data is encrypted at rest and in transit. We use role-based access controls to ensure only authorized users can view sensitive financial information. Your data is never sold or shared with third parties.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="final-cta">
+      <h2>Ready to See Your Business Clearly?</h2>
+      <p>Start free today. No credit card, no commitment — just clarity.</p>
+      <div class="final-cta-actions">
+        <a href="/signup" class="btn-primary" style="font-size:1rem; padding:13px 30px;">Get Started Free →</a>
+        <a href="/" class="btn-secondary">Back to Home</a>
+      </div>
+      <p class="no-card">✓ Free plan available &nbsp;·&nbsp; ✓ 14-day trial on paid plans &nbsp;·&nbsp; ✓ Cancel anytime</p>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div>
+          <div class="footer-brand">Insight<span>Hunter</span></div>
+          <p class="footer-tagline">Real-time financial clarity for solo entrepreneurs, small businesses, and the advisors who serve them.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul class="footer-links">
+            <li><a href="/features">Features</a></li>
+            <li><a href="/pricing">Pricing</a></li>
+            <li><a href="#">Integrations</a></li>
+            <li><a href="#">Changelog</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="/about">About Us</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul class="footer-links">
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">System Status</a></li>
+            <li><a href="/legal/privacy">Privacy Policy</a></li>
+            <li><a href="/legal/terms">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 InsightHunter. All rights reserved.</span>
+        <div class="footer-legal">
+          <a href="/legal/privacy">Privacy</a>
+          <a href="/legal/terms">Terms</a>
+          <a href="#">Security</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</Layout>
+
+<script>
+  // Header scroll shadow
+  const header = document.getElementById('header') as HTMLElement;
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 10);
+  });
+
+  // Billing toggle
+  const toggle = document.getElementById('billingToggle') as HTMLInputElement;
+  const standardPrice = document.getElementById('standard-price') as HTMLElement;
+  const proPrice = document.getElementById('pro-price') as HTMLElement;
+  const standardNote = document.getElementById('standard-note') as HTMLElement;
+  const proNote = document.getElementById('pro-note') as HTMLElement;
+
+  toggle.addEventListener('change', () => {
+    if (toggle.checked) {
+      standardPrice.textContent = '39';
+      proPrice.textContent = '119';
+      standardNote.textContent = 'Billed as $468/year — save $120';
+      proNote.textContent = 'Billed as $1428/year — save $360';
+    } else {
+      standardPrice.textContent = '49';
+      proPrice.textContent = '149';
+      standardNote.textContent = '\u00a0';
+      proNote.textContent = '\u00a0';
+    }
+  });
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-question').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement!;
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach((i) => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+</script>
