@@ -19,7 +19,7 @@
     {
       "binding": "DB",
       "database_name": "insighthunter-lite",
-      "database_id": "YOUR_D1_DATABASE_ID"
+      "database_id": "0870098b-bfeb-466c-bcd5-98cc3a1b3e30"
     }
   ],
 
@@ -36,8 +36,8 @@
   "kv_namespaces": [
     {
       "binding": "SESSIONS",
-      "id": "YOUR_KV_NAMESPACE_ID",
-      "preview_id": "YOUR_KV_PREVIEW_ID"
+      "id": "60e34ba310ca40c79edec05470c7a271",
+      "preview_id": "60e34ba310ca40c79edec05470c7a271"
     }
   ],
 
