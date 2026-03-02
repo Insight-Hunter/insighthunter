@@ -41,7 +41,7 @@ const lite = app({
   support:  'Email: support@insighthunter.app · Subject: "Insight Lite" · Response within 24 hours.',
   docsUrl:  'https://docs.insighthunter.app/lite',
   appUrl:   'https://lite.insighthunter.app/',
-  pageUrl:  '/features/lite.html',
+  pageUrl:  '/features/lite',
 });
 
 const standard = app({
@@ -81,7 +81,7 @@ const standard = app({
   support:  'Email: support@insighthunter.app · In-app live chat · Response within 4 hours on business days.',
   docsUrl:  'https://docs.insighthunter.app/standard',
   appUrl:   'https://standard.insighthunter.app/',
-  pageUrl:  '/features/standard.html',
+  pageUrl:  '/features/standard',
 });
 
 const pro = app({
@@ -124,7 +124,7 @@ const pro = app({
   support:  'Dedicated Slack channel + 24/7 phone. New to Pro? Email sales@insighthunter.app.',
   docsUrl:  'https://docs.insighthunter.app/pro',
   appUrl:   'https://pro.insighthunter.app/',
-  pageUrl:  '/features/pro.html',
+  pageUrl:  '/features/pro',
 });
 
 // ─── Add-on Apps ───────────────────────────────────────────────────────────
@@ -166,7 +166,7 @@ const pbx = app({
   support:  'Email: pbx-support@insighthunter.app · 24/7 for Pro customers · Include your account number.',
   docsUrl:  'https://docs.insighthunter.app/pbx',
   appUrl:   'https://pbx.insighthunter.app/',
-  pageUrl:  '/features/pbx.html',
+  pageUrl:  '/features/pbx',
 });
 
 const bookkeeping = app({
@@ -207,7 +207,7 @@ const bookkeeping = app({
   support:  'Email: bookkeeping@insighthunter.app · For reconciliation errors include your date range and account name.',
   docsUrl:  'https://docs.insighthunter.app/bookkeeping',
   appUrl:   'https://bookkeeping.insighthunter.app/',
-  pageUrl:  '/features/bookkeeping.html',
+  pageUrl:  '/features/bookkeeping',
 });
 
 const payroll = app({
@@ -248,7 +248,7 @@ const payroll = app({
   support:  'Email: payroll@insighthunter.app · Urgent same-day issues: use the phone line shown in your app.',
   docsUrl:  'https://docs.insighthunter.app/payroll',
   appUrl:   'https://payroll.insighthunter.app/',
-  pageUrl:  '/features/payroll.html',
+  pageUrl:  '/features/payroll',
 });
 
 const scout = app({
@@ -289,7 +289,7 @@ const scout = app({
   support:  'Email: scout@insighthunter.app · For data accuracy issues include the company name and the error.',
   docsUrl:  'https://docs.insighthunter.app/scout',
   appUrl:   'https://scout.insighthunter.app/',
-  pageUrl:  '/features/scout.html',
+  pageUrl:  '/features/scout',
 });
 
 const bizforma = app({
@@ -330,7 +330,7 @@ const bizforma = app({
   support:  'Email: bizforma@insighthunter.app · For signing issues include the document ID from your dashboard.',
   docsUrl:  'https://docs.insighthunter.app/bizforma',
   appUrl:   'https://bizforma.insighthunter.app/',
-  pageUrl:  '/features/bizforma.html',
+  pageUrl:  '/features/bizforma',
 });
 
 // ─── Exports ───────────────────────────────────────────────────────────────

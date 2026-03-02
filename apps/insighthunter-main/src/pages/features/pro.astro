@@ -2,9 +2,9 @@
 import MarketingLayout from '../../layouts/MarketingLayout.astro';
 import { getApp } from '../../data/apps.ts';
 
-const app = getApp('bizforma');
+const app = getApp('pro');
 ---
-<MarketingLayout title={app.name} description={app.desc}>
+<MarketingLayout title="Insight Pro">
     <section class="hero">
         <h1>{app.name}</h1>
         <p>{app.desc}</p>
@@ -19,7 +19,7 @@ const app = getApp('bizforma');
         </section>
 
         <section class="cta">
-            <a href="/shop/checkout" class="btn-primary">Purchase</a>
+            <a href="/shop/checkout.html" class="btn-primary">Purchase</a>
         </section>
     </div>
 </MarketingLayout>

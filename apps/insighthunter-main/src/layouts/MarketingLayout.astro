@@ -1,13 +1,85 @@
 ---
-import Layout from './Layout.astro';
-import '../styles/marketing.css';
+import '../styles/styles.css';
+import Nav from '../components/ui/Nav.astro';
+import Footer from '../components/ui/Footer.astro';
 
 interface Props {
   title: string;
   description?: string;
+  ogImage?: string;
 }
-const { title, description } = Astro.props;
+
+const {
+  title,
+  description = 'AI-powered CFO workspace for accounting firms and small businesses. Automate compliance, bookkeeping, and forecasting.',
+  ogImage = '/og-default.png',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, 'https://insighthunter.app');
 ---
-<Layout title={title} description={description}>
-  <slot />
-</Layout>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Core Meta -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalURL} />
+
+  <!-- Title -->
+  <title>{title} – InsightHunter</title>
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content={`${title} – InsightHunter`} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image"       content={ogImage} />
+  <meta property="og:url"         content={canonicalURL} />
+  <meta property="og:type"        content="website" />
+  <meta property="og:site_name"   content="InsightHunter" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content={`${title} – InsightHunter`} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image"       content={ogImage} />
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+
+</head>
+<body>
+
+  <Nav />
+
+  <main id="main-content">
+    <slot />
+  </main>
+
+  <Footer />
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
+
+</body>
+</html>
