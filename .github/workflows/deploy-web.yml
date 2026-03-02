@@ -1,10 +1,10 @@
-name: Deploy InsightHunter Web
+name: Deploy InsightHunter
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/insighthunter-web/**'
+      - 'apps/insighthunter-main/**'
 
 jobs:
   deploy:
@@ -16,7 +16,10 @@ jobs:
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          projectName: insighthunter-web
-          directory: apps/insighthunter-web/public
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: insighthunter
+          directory: apps/insighthunter-main/public
+
+      - name: Claude Code Action Official
+        uses: anthropics/claude-code-action@v1
