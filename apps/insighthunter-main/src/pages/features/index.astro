@@ -1,7 +1,7 @@
 
 ---
-import Layout from "../layouts/Layout.astro";
-import { CORE_APPS, ADDON_APPS } from "../data/apps.ts";
+import Layout from "../../layouts/Layout.astro";
+import { CORE_APPS, ADDON_APPS } from "../../data/apps.ts";
 
 const STATUS_MAP = {
   live: { label: "Live", cls: "s-live" },
@@ -267,7 +267,7 @@ const TIER_MAP = {
     // TODO: Add actual authentication logic (e.g., call API)
     console.log('Form submitted');
     // Example validation
-    if (!authEmail.value || !authPassword.value || (authName.style.display === 'block' && !authName.value)) {
+    if (!authEmail..value || !authPassword.value || (authName.style.display === 'block' && !authName.value)) {
       authMsg.textContent = 'Please fill out all required fields.';
       authMsg.style.color = 'var(--red)';
       return;
