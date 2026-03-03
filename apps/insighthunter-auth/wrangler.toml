@@ -1,6 +1,6 @@
 name = "insighthunter-auth"
 account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
-main = "dist/_worker.js"
+main = "dist/index.js"
 compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
 

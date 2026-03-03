@@ -2,11 +2,11 @@
   "name": "insighthunter-auth",
   "version": "1.0.0",
   "description": "Authentication service for InsightHunter",
-  "main": "src/index.ts",
+  "main": "dist/_worker.ts",
   "scripts": {
     "start": "wrangler dev",
     "deploy": "wrangler deploy",
-    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --platform=worker",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --platform=neutral",
     "type-check": "tsc --noEmit",
     "db:migrate": "wrangler d1 migrations apply insighthunter-auth --local",
     "db:migrate:prod": "wrangler d1 migrations apply insighthunter-auth --remote",
