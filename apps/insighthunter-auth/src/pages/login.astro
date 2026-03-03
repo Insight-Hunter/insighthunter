@@ -1,0 +1,20 @@
+---
+// apps/insighthunter-auth/src/pages/auth/login.astro
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import LoginForm from '../../components/islands/auth/LoginForm.svelte';
+
+// Redirect if already logged in
+if (Astro.locals.userId) {
+  return Astro.redirect('https://lite.insighthunter.app');
+}
+
+const redirectTo = Astro.url.searchParams.get('redirect') ?? 'https://lite.insighthunter.app';
+const siteKey    = Astro.locals.runtime.env.TURNSTILE_SITE_KEY ?? '';
+---
+<MarketingLayout title="Sign In -- InsightHunter" noContainer>
+  <LoginForm
+    client:load
+    redirectTo={redirectTo}
+    turnstileSiteKey={siteKey}
+  />
+</MarketingLayout>
