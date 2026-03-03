@@ -33,5 +33,4 @@ npm install -D @types/bcryptjs
 #wrangler secret put MAGIC_LINK_JWT_SECRET    # different 32+ char secret
 #wrangler secret put RESEND_API_KEY           # from resend.com
 #wrangler secret put TURNSTILE_SECRET_KEY     # from Cloudflare dashboard > Turnstile
-
-npm run dev
+pnpm install
