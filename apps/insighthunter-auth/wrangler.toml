@@ -1,31 +1,58 @@
 name = "insighthunter-auth"
-main = "src/index.ts"
-compatibility_date = "2024-07-29"
+account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
+main = "dist/_worker.js"
+compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
-
-[[routes]]
-pattern = "auth.insighthunter.app/api/*"
-zone_name = "insighthunter.app"
-
-[[d1_databases]]
-binding = "USERS"
-database_name = "insight-users"
-database_id = "97eb1afb-543e-44d4-b465-a3859742aeba"
-
-[[kv_namespaces]]
-binding = "SESSIONS"
-id = "60e34ba310ca40c79edec05470c7a271"
-preview_id = "60e34ba310ca40c79edec05470c7a271"
-
-[[kv_namespaces]]
-binding = "RATE_LIMIT_KV"
-id = "2819dd6ccecf4da78717f1a2d9c60da8"
-
-[vars]
-JWT_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
-SALT_ROUNDS = "12"
-SESSION_TTL_DAYS = "7"
 
 [observability]
 enabled = true
 head_sampling_rate = 1
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[[routes]]
+pattern = "insighthunter.app/auth/*"
+zone_name = "insighthunter.app"
+
+[[routes]]
+pattern = "insighthunter.app/login"
+zone_name = "insighthunter.app"
+
+[[routes]]
+pattern = "insighthunter.app/signup"
+zone_name = "insighthunter.app"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-auth"
+database_id = "YOUR_AUTH_D1_ID"
+
+[[kv_namespaces]]
+binding = "LOGIN_SESSION_CACHE"
+id = "YOUR_SESSION_KV_ID"
+preview_id = "YOUR_SESSION_KV_PREVIEW_ID"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "YOUR_RATELIMIT_KV_ID"
+preview_id = "YOUR_RATELIMIT_KV_PREVIEW_ID"
+
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "insighthunter_auth_events"
+
+[vars]
+ENVIRONMENT = "development"
+APP_DOMAIN = "insighthunter.app"
+APP_NAME = "InsightHunter"
+TURNSTILE_SITE_KEY = "YOUR_TURNSTILE_SITE_KEY"
+
+# Secrets — set via CLI, never in this file:
+# wrangler secret put JWT_SECRET
+# wrangler secret put VERIFY_EMAIL_JWT_SECRET
+# wrangler secret put MAGIC_LINK_JWT_SECRET
+# wrangler secret put RESEND_API_KEY
+# wrangler secret put TURNSTILE_SECRET_KEY
