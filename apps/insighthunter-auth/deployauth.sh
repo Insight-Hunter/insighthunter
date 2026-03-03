@@ -18,14 +18,14 @@ npm install bcryptjs jose
 npm install -D @types/bcryptjs
 
 # Create D1
-wrangler d1 create insighthunter-auth
+#wrangler d1 create insighthunter-auth
 
 # Apply schema
-wrangler d1 migrations apply insighthunter-auth --local
+#wrangler d1 migrations apply insighthunter-auth --local
 
 # Create KV namespaces
-wrangler kv namespace create LOGIN_SESSION_CACHE
-wrangler kv namespace create RATE_LIMIT
+#wrangler kv namespace create LOGIN_SESSION_CACHE
+#wrangler kv namespace create RATE_LIMIT
 
 # Set secrets
 #wrangler secret put JWT_SECRET               # min 32 chars, same as insighthunter-lite
