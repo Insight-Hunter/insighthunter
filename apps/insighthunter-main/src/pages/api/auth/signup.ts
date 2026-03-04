@@ -1,18 +1,28 @@
 import type { APIRoute } from 'astro';
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  const authService = locals.runtime.env.AUTH;
+  // Cast the binding to Fetcher so we can use the service binding API
+  const authService = locals.runtime.env.AUTH_WORKER as Fetcher;
 
   const url = new URL(request.url);
-  // The auth worker has the route at /api/signup
+  // The auth worker handles signup at /api/signup
+  url.hostname = 'auth';
   url.pathname = '/api/signup';
 
-  // A new request is created to be forwarded to the auth service.
-  // The original request's body, headers, and method are preserved.
-  const newRequest = new Request(url.toString(), request);
+  // Forward the original request to the auth service worker,
+  // preserving method, headers, and body
+  const newRequest = new Request(url.toString(), {
+    method: request.method,
+    headers: request.headers,
+    body: request.body,
+  });
 
-  // Fetch from the auth service.
-  const response = await authService.fetch(newRequest);
+  const res = await authService.fetch(newRequest);
 
-  return response;
+  return new Response(await res.text(), {
+    status: res.status,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };

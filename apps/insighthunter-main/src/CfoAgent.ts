@@ -1,9 +1,9 @@
-import { Agent } from "agents";
+import { Agent, routeAgentRequest } from "agents";
 import type { Connection } from "agents";
 
 // ─── Env ──────────────────────────────────────────────────────
 export interface Env {
-  CFO_AGENT:    DurableObjectNamespace;
+  CFO_AGENT:    AgentNamespace<CfoAgent>;
   AI:           Ai;
   DB:           D1Database;
   REPORT_QUEUE: Queue;
@@ -18,16 +18,17 @@ export interface Env {
 
 // ─── State (synced to frontend via this.setState) ─────────────
 interface CfoState {
-  userId:          string;
-  email:           string;
-  plan:            "free" | "pro" | "white-label";
-  lastForecastAt:  string | null;
-  lastReportAt:    string | null;
-  alerts:          Alert[];
-  kpis:            KpiSnapshot | null;
-  onboarded:       boolean;
-  reportsUsed:     number;
-  reportsLimit:    number;
+  userId:         string;
+  email:          string;
+  plan:           "free" | "pro" | "white-label";
+  lastForecastAt: string | null;
+  lastReportAt:   string | null;
+  alerts:         Alert[];
+  kpis:           KpiSnapshot | null;
+  onboarded:      boolean;
+  reportsUsed:    number;
+  reportsLimit:   number;
+  schedulesInit:  boolean;
 }
 
 interface Alert {
@@ -62,16 +63,17 @@ export class CfoAgent extends Agent<Env, CfoState> {
 
   // ── Default State ─────────────────────────────────────────
   initialState: CfoState = {
-    userId:         "",
-    email:          "",
-    plan:           "free",
+    userId:        "",
+    email:         "",
+    plan:          "free",
     lastForecastAt: null,
-    lastReportAt:   null,
-    alerts:         [],
-    kpis:           null,
-    onboarded:      false,
-    reportsUsed:    0,
-    reportsLimit:   3, // free tier default
+    lastReportAt:  null,
+    alerts:        [],
+    kpis:          null,
+    onboarded:     false,
+    reportsUsed:   0,
+    reportsLimit:  3,
+    schedulesInit: false,
   };
 
   // ═══════════════════════════════════════════════════════════
@@ -81,47 +83,34 @@ export class CfoAgent extends Agent<Env, CfoState> {
     const { pathname } = new URL(request.url);
     const method = request.method;
 
+    // Bootstrap scheduled tasks once per agent instance lifetime
+    if (!this.state.schedulesInit && this.state.userId) {
+      await this.initSchedules();
+    }
+
     try {
-      // ── User & Onboarding ──────────────────────────────
-      if (method === "POST"   && pathname === "/init")             return this.initUser(request);
-      if (method === "GET"    && pathname === "/state")            return Response.json(this.state);
-      if (method === "PATCH"  && pathname === "/state")            return this.patchState(request);
-
-      // ── KPIs & Transactions ────────────────────────────
-      if (method === "GET"    && pathname === "/kpis")             return this.getKpis();
-      if (method === "GET"    && pathname === "/transactions")     return this.getTransactions(request);
-      if (method === "POST"   && pathname === "/transactions")     return this.addTransaction(request);
-      if (method === "DELETE" && pathname.startsWith("/transactions/")) return this.deleteTransaction(pathname);
-
-      // ── CSV Upload & Ingestion ─────────────────────────
-      if (method === "POST"   && pathname === "/upload")           return this.handleUpload(request);
-
-      // ── AI Forecast ────────────────────────────────────
-      if (method === "POST"   && pathname === "/forecast")         return this.runForecast();
-      if (method === "GET"    && pathname === "/forecast/history") return this.getForecastHistory();
-
-      // ── Reports ────────────────────────────────────────
-      if (method === "POST"   && pathname === "/report")           return this.queueReport(request);
-      if (method === "GET"    && pathname === "/reports")          return this.listReports();
-
-      // ── Alerts ─────────────────────────────────────────
-      if (method === "GET"    && pathname === "/alerts")           return this.getAlerts();
-      if (method === "PATCH"  && pathname.startsWith("/alerts/"))  return this.markAlertRead(pathname);
-      if (method === "DELETE" && pathname.startsWith("/alerts/"))  return this.deleteAlert(pathname);
-
-      // ── Semantic Search ────────────────────────────────
-      if (method === "POST"   && pathname === "/search")           return this.handleSearch(request);
-
-      // ── Plan & Billing ─────────────────────────────────
-      if (method === "GET"    && pathname === "/plan")             return this.getPlan();
-      if (method === "POST"   && pathname === "/plan/upgrade")     return this.upgradePlan(request);
-
-      // ── Cash Flow Analysis ─────────────────────────────
-      if (method === "GET"    && pathname === "/cashflow")         return this.getCashFlow(request);
-      if (method === "GET"    && pathname === "/pnl")              return this.getPnL(request);
+      if (method === "POST"   && pathname === "/init")                    return this.initUser(request);
+      if (method === "GET"    && pathname === "/state")                   return Response.json(this.state);
+      if (method === "PATCH"  && pathname === "/state")                   return this.patchState(request);
+      if (method === "GET"    && pathname === "/kpis")                    return this.getKpis();
+      if (method === "GET"    && pathname === "/transactions")            return this.getTransactions(request);
+      if (method === "POST"   && pathname === "/transactions")            return this.addTransaction(request);
+      if (method === "DELETE" && pathname.startsWith("/transactions/"))   return this.deleteTransaction(pathname);
+      if (method === "POST"   && pathname === "/upload")                  return this.handleUpload(request);
+      if (method === "POST"   && pathname === "/forecast")                return this.runForecast();
+      if (method === "GET"    && pathname === "/forecast/history")        return this.getForecastHistory();
+      if (method === "POST"   && pathname === "/report")                  return this.queueReport(request);
+      if (method === "GET"    && pathname === "/reports")                 return this.listReports();
+      if (method === "GET"    && pathname === "/alerts")                  return this.getAlerts();
+      if (method === "PATCH"  && pathname.startsWith("/alerts/"))         return this.markAlertRead(pathname);
+      if (method === "DELETE" && pathname.startsWith("/alerts/"))         return this.deleteAlert(pathname);
+      if (method === "POST"   && pathname === "/search")                  return this.handleSearch(request);
+      if (method === "GET"    && pathname === "/plan")                    return this.getPlan();
+      if (method === "POST"   && pathname === "/plan/upgrade")            return this.upgradePlan(request);
+      if (method === "GET"    && pathname === "/cashflow")                return this.getCashFlow(request);
+      if (method === "GET"    && pathname === "/pnl")                     return this.getPnL(request);
 
       return Response.json({ error: "Not found" }, { status: 404 });
-
     } catch (err) {
       console.error(`[CfoAgent] Error on ${method} ${pathname}:`, err);
       return Response.json(
@@ -136,64 +125,65 @@ export class CfoAgent extends Agent<Env, CfoState> {
   // ═══════════════════════════════════════════════════════════
   async onConnect(connection: Connection) {
     connection.accept();
-    // Send current state immediately on connect
-    connection.send(JSON.stringify({
-      type:  "init",
-      state: this.state,
-    }));
+    connection.send(JSON.stringify({ type: "init", state: this.state }));
   }
 
   async onMessage(connection: Connection, raw: string) {
-    const { type, payload } = JSON.parse(raw);
+    try {
+      const { type } = JSON.parse(raw) as { type: string; payload?: unknown };
 
-    switch (type) {
-      case "ping":
-        connection.send(JSON.stringify({ type: "pong" }));
-        break;
+      switch (type) {
+        case "ping":
+          connection.send(JSON.stringify({ type: "pong" }));
+          break;
 
-      case "get_kpis": {
-        const res  = await this.getKpis();
-        const data = await res.json();
-        connection.send(JSON.stringify({ type: "kpis", ...data }));
-        break;
+        case "get_kpis": {
+          const res  = await this.getKpis();
+          const data = await res.json() as Record<string, unknown>;
+          connection.send(JSON.stringify({ type: "kpis", ...data }));
+          break;
+        }
+
+        case "get_alerts":
+          connection.send(JSON.stringify({ type: "alerts", alerts: this.state.alerts }));
+          break;
+
+        case "run_forecast": {
+          connection.send(JSON.stringify({ type: "forecast_started" }));
+          const res  = await this.runForecast();
+          const data = await res.json() as Record<string, unknown>;
+          connection.send(JSON.stringify({ type: "forecast_done", ...data }));
+          break;
+        }
+
+        default:
+          connection.send(JSON.stringify({ type: "error", message: "Unknown message type" }));
       }
-
-      case "get_alerts": {
-        connection.send(JSON.stringify({
-          type:   "alerts",
-          alerts: this.state.alerts,
-        }));
-        break;
-      }
-
-      case "run_forecast": {
-        connection.send(JSON.stringify({ type: "forecast_started" }));
-        const res  = await this.runForecast();
-        const data = await res.json();
-        connection.send(JSON.stringify({ type: "forecast_done", ...data }));
-        break;
-      }
-
-      default:
-        connection.send(JSON.stringify({ type: "error", message: "Unknown message type" }));
+    } catch (err) {
+      console.error("[CfoAgent] WebSocket message error:", err);
+      connection.send(JSON.stringify({ type: "error", message: "Failed to process message" }));
     }
   }
 
-  async onClose(connection: Connection) {
+  async onDisconnect(connection: Connection) {
     console.log(`[CfoAgent] WebSocket closed for user: ${this.state.userId}`);
   }
 
   // ═══════════════════════════════════════════════════════════
   // SCHEDULED TASKS
   // ═══════════════════════════════════════════════════════════
-  async onStart() {
-    // Schedule daily digest on first agent start
-    await this.schedule("0 8 * * *", "dailyDigest", {});
-    // Schedule weekly alert check
+
+  /**
+   * Called once to register cron schedules on the agent.
+   * Guarded by `schedulesInit` in state so it only runs once per agent.
+   */
+  private async initSchedules() {
+    await this.schedule("0 8 * * *", "dailyDigest",    {});
     await this.schedule("0 9 * * 1", "weeklyAlertScan", {});
+    this.setState({ ...this.state, schedulesInit: true });
   }
 
-  async dailyDigest(_ unknown) {
+  async dailyDigest(_: unknown) {
     if (!this.state.userId) return;
     await this.refreshKpis();
     await this.runForecast();
@@ -201,7 +191,7 @@ export class CfoAgent extends Agent<Env, CfoState> {
     this.trackEvent("daily_digest_run", 1);
   }
 
-  async weeklyAlertScan(_ unknown) {
+  async weeklyAlertScan(_: unknown) {
     if (!this.state.userId) return;
     await this.checkAlerts();
     this.trackEvent("weekly_alert_scan", 1);
@@ -217,8 +207,8 @@ export class CfoAgent extends Agent<Env, CfoState> {
       plan:   CfoState["plan"];
     }>();
 
-    // Initialize SQLite schema on first run
-    await this.sql`
+    // Initialize SQLite schema
+    this.sql`
       CREATE TABLE IF NOT EXISTS transactions (
         id          TEXT PRIMARY KEY,
         date        TEXT NOT NULL,
@@ -231,7 +221,7 @@ export class CfoAgent extends Agent<Env, CfoState> {
       )
     `;
 
-    await this.sql`
+    this.sql`
       CREATE TABLE IF NOT EXISTS forecasts (
         id         TEXT PRIMARY KEY,
         content    TEXT NOT NULL,
@@ -239,7 +229,7 @@ export class CfoAgent extends Agent<Env, CfoState> {
       )
     `;
 
-    await this.sql`
+    this.sql`
       CREATE TABLE IF NOT EXISTS reports (
         id         TEXT PRIMARY KEY,
         type       TEXT NOT NULL,
@@ -260,14 +250,17 @@ export class CfoAgent extends Agent<Env, CfoState> {
       reportsLimit,
     });
 
+    // Bootstrap schedules on first init
+    await this.initSchedules();
+
     this.trackEvent("user_init", 1);
     return Response.json({ ok: true, state: this.state });
   }
 
   private async patchState(request: Request): Promise<Response> {
     const patch = await request.json<Partial<CfoState>>();
-    // Prevent overwriting protected fields
-    const { userId, email, ...safe } = patch;
+    // Prevent overwriting protected identity fields
+    const { userId: _u, email: _e, ...safe } = patch;
     this.setState({ ...this.state, ...safe });
     return Response.json({ ok: true });
   }
@@ -276,16 +269,17 @@ export class CfoAgent extends Agent<Env, CfoState> {
   // KPIs
   // ═══════════════════════════════════════════════════════════
   private async getKpis(): Promise<Response> {
-    const rows = await this.sql`
+    type KpiRow = { revenue: number; expenses: number; transactions: number };
+    const rows = [...this.sql<KpiRow>`
       SELECT
         COALESCE(SUM(CASE WHEN type = 'revenue' THEN amount ELSE 0 END), 0) AS revenue,
         COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS expenses,
         COUNT(*) AS transactions
       FROM transactions
       WHERE date >= date('now', '-30 days')
-    `;
+    `];
 
-    const row = [...rows][0] as any ?? { revenue: 0, expenses: 0, transactions: 0 };
+    const row = rows[0] ?? { revenue: 0, expenses: 0, transactions: 0 };
     const kpis: KpiSnapshot = {
       revenue:      row.revenue,
       expenses:     row.expenses,
@@ -315,40 +309,46 @@ export class CfoAgent extends Agent<Env, CfoState> {
     const from     = url.searchParams.get("from");
     const to       = url.searchParams.get("to");
 
-    // Build dynamic query with optional filters
-    const rows = type
-      ? await this.sql`
-          SELECT * FROM transactions
-          WHERE type = ${type}
-          ORDER BY date DESC LIMIT ${limit} OFFSET ${offset}`
-      : category
-      ? await this.sql`
-          SELECT * FROM transactions
-          WHERE category = ${category}
-          ORDER BY date DESC LIMIT ${limit} OFFSET ${offset}`
-      : from && to
-      ? await this.sql`
-          SELECT * FROM transactions
-          WHERE date BETWEEN ${from} AND ${to}
-          ORDER BY date DESC LIMIT ${limit} OFFSET ${offset}`
-      : await this.sql`
-          SELECT * FROM transactions
-          ORDER BY date DESC LIMIT ${limit} OFFSET ${offset}`;
+    let rows: Transaction[];
 
-    return Response.json({ transactions: [...rows] });
+    if (type) {
+      rows = [...this.sql<Transaction>`
+        SELECT * FROM transactions
+        WHERE type = ${type}
+        ORDER BY date DESC LIMIT ${limit} OFFSET ${offset}`];
+    } else if (category) {
+      rows = [...this.sql<Transaction>`
+        SELECT * FROM transactions
+        WHERE category = ${category}
+        ORDER BY date DESC LIMIT ${limit} OFFSET ${offset}`];
+    } else if (from && to) {
+      rows = [...this.sql<Transaction>`
+        SELECT * FROM transactions
+        WHERE date BETWEEN ${from} AND ${to}
+        ORDER BY date DESC LIMIT ${limit} OFFSET ${offset}`];
+    } else {
+      rows = [...this.sql<Transaction>`
+        SELECT * FROM transactions
+        ORDER BY date DESC LIMIT ${limit} OFFSET ${offset}`];
+    }
+
+    return Response.json({ transactions: rows });
   }
 
   private async addTransaction(request: Request): Promise<Response> {
     const txn = await request.json<Omit<Transaction, "id"> & { id?: string }>();
     const id  = txn.id ?? crypto.randomUUID();
+    const cat = txn.category ?? "uncategorized";
 
-    await this.sql`
+    this.sql`
       INSERT INTO transactions (id, date, description, amount, category, type)
-      VALUES (${id}, ${txn.date}, ${txn.description}, ${txn.amount}, ${txn.category ?? "uncategorized"}, ${txn.type})
+      VALUES (${id}, ${txn.date}, ${txn.description}, ${txn.amount}, ${cat}, ${txn.type})
     `;
 
-    // Auto-embed for semantic search
-    await this.embedTransaction({ ...txn, id });
+    // Fire-and-forget embedding (non-blocking)
+    this.embedTransaction({ ...txn, id, category: cat }).catch(err =>
+      console.error("[CfoAgent] Embedding error:", err)
+    );
 
     this.trackEvent("transaction_added", txn.amount);
     return Response.json({ ok: true, id });
@@ -356,7 +356,7 @@ export class CfoAgent extends Agent<Env, CfoState> {
 
   private async deleteTransaction(pathname: string): Promise<Response> {
     const id = pathname.split("/").pop()!;
-    await this.sql`DELETE FROM transactions WHERE id = ${id}`;
+    this.sql`DELETE FROM transactions WHERE id = ${id}`;
     await this.env.VECTORS.deleteByIds([id]);
     return Response.json({ ok: true });
   }
@@ -365,17 +365,19 @@ export class CfoAgent extends Agent<Env, CfoState> {
   // CSV UPLOAD & INGESTION
   // ═══════════════════════════════════════════════════════════
   private async handleUpload(request: Request): Promise<Response> {
-    const formData   = await request.formData();
-    const file       = formData.get("file") as File;
-    if (!file) return Response.json({ error: "No file provided" }, { status: 400 });
+    const formData = await request.formData();
+    const file     = formData.get("file") as File | null;
 
-    // Store raw CSV in R2
+    if (!file) return Response.json({ error: "No file provided" }, { status: 400 });
+    if (!file.name.endsWith(".csv")) {
+      return Response.json({ error: "Only CSV files are supported" }, { status: 400 });
+    }
+
     const r2Key = `uploads/${this.state.userId}/${Date.now()}_${file.name}`;
     await this.env.UPLOADS.put(r2Key, file.stream(), {
       httpMetadata: { contentType: "text/csv" },
     });
 
-    // Queue for async processing
     await this.env.AI_JOB_QUEUE.send({
       type:   "parse_csv",
       userId: this.state.userId,
@@ -390,13 +392,13 @@ export class CfoAgent extends Agent<Env, CfoState> {
   // AI FORECAST
   // ═══════════════════════════════════════════════════════════
   private async runForecast(): Promise<Response> {
-    const history = await this.sql`
+    type TxnRow = Pick<Transaction, "date" | "description" | "amount" | "category" | "type">;
+    const rows = [...this.sql<TxnRow>`
       SELECT date, description, amount, category, type
       FROM transactions
       ORDER BY date DESC
       LIMIT 90
-    `;
-    const rows = [...history] as Transaction[];
+    `];
 
     if (rows.length === 0) {
       return Response.json({
@@ -404,7 +406,6 @@ export class CfoAgent extends Agent<Env, CfoState> {
       });
     }
 
-    // Summarize for prompt efficiency
     const totalRevenue  = rows.filter(r => r.type === "revenue").reduce((s, r) => s + r.amount, 0);
     const totalExpenses = rows.filter(r => r.type === "expense").reduce((s, r) => s + r.amount, 0);
     const categories    = [...new Set(rows.map(r => r.category))];
@@ -428,35 +429,27 @@ Keep it concise and actionable.`;
     ) as { response: string };
 
     const forecastId = crypto.randomUUID();
-    await this.sql`
-      INSERT INTO forecasts (id, content)
-      VALUES (${forecastId}, ${result.response})
-    `;
+    this.sql`INSERT INTO forecasts (id, content) VALUES (${forecastId}, ${result.response})`;
 
-    this.setState({
-      ...this.state,
-      lastForecastAt: new Date().toISOString(),
-    });
-
+    this.setState({ ...this.state, lastForecastAt: new Date().toISOString() });
     this.trackEvent("forecast_generated", rows.length);
+
     return Response.json({ forecast: result.response, forecastId });
   }
 
   private async getForecastHistory(): Promise<Response> {
-    const rows = await this.sql`
-      SELECT id, content, created_at
-      FROM forecasts
-      ORDER BY created_at DESC
-      LIMIT 10
-    `;
-    return Response.json({ forecasts: [...rows] });
+    type ForecastRow = { id: string; content: string; created_at: string };
+    const rows = [...this.sql<ForecastRow>`
+      SELECT id, content, created_at FROM forecasts
+      ORDER BY created_at DESC LIMIT 10
+    `];
+    return Response.json({ forecasts: rows });
   }
 
   // ═══════════════════════════════════════════════════════════
   // REPORTS
   // ═══════════════════════════════════════════════════════════
   private async queueReport(request: Request): Promise<Response> {
-    // Enforce plan limits
     if (this.state.reportsUsed >= this.state.reportsLimit) {
       return Response.json(
         { error: "Report limit reached. Please upgrade your plan." },
@@ -466,17 +459,19 @@ Keep it concise and actionable.`;
 
     const { type } = await request.json<{ type: "pnl" | "cashflow" | "forecast" | "full" }>();
     const reportId = crypto.randomUUID();
+    const r2Key    = `reports/${this.state.userId}/${reportId}.pdf`;
 
-    await this.sql`
+    this.sql`
       INSERT INTO reports (id, type, r2_key, status)
-      VALUES (${reportId}, ${type}, ${"pending"}, ${"pending"})
+      VALUES (${reportId}, ${type}, ${r2Key}, 'pending')
     `;
 
     await this.env.REPORT_QUEUE.send({
       reportId,
-      userId:  this.state.userId,
+      userId: this.state.userId,
       type,
-      plan:    this.state.plan,
+      plan:   this.state.plan,
+      r2Key,
     });
 
     this.setState({
@@ -490,13 +485,12 @@ Keep it concise and actionable.`;
   }
 
   private async listReports(): Promise<Response> {
-    const rows = await this.sql`
+    type ReportRow = { id: string; type: string; r2_key: string; status: string; created_at: string };
+    const rows = [...this.sql<ReportRow>`
       SELECT id, type, r2_key, status, created_at
-      FROM reports
-      ORDER BY created_at DESC
-      LIMIT 20
-    `;
-    return Response.json({ reports: [...rows] });
+      FROM reports ORDER BY created_at DESC LIMIT 20
+    `];
+    return Response.json({ reports: rows });
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -507,7 +501,6 @@ Keep it concise and actionable.`;
     const { kpis } = await kpisRes.json() as { kpis: KpiSnapshot };
     const newAlerts: Alert[] = [];
 
-    // Negative net income alert
     if (kpis.netIncome < 0) {
       newAlerts.push({
         id:        crypto.randomUUID(),
@@ -519,7 +512,6 @@ Keep it concise and actionable.`;
       });
     }
 
-    // Expense spike alert (expenses > 80% of revenue)
     if (kpis.revenue > 0 && kpis.expenses / kpis.revenue > 0.8) {
       newAlerts.push({
         id:        crypto.randomUUID(),
@@ -533,10 +525,7 @@ Keep it concise and actionable.`;
 
     if (newAlerts.length > 0) {
       const existing = this.state.alerts.filter(a => !a.read).slice(0, 20);
-      this.setState({
-        ...this.state,
-        alerts: [...newAlerts, ...existing],
-      });
+      this.setState({ ...this.state, alerts: [...newAlerts, ...existing] });
     }
   }
 
@@ -579,7 +568,7 @@ Keep it concise and actionable.`;
     const matches = await this.env.VECTORS.query(embedding, {
       topK,
       filter,
-      returnMetadata: true,
+      returnMetadata: "all",
     });
 
     const results = matches.matches
@@ -599,7 +588,7 @@ Keep it concise and actionable.`;
       metadata: {
         userId:   this.state.userId,
         type:     txn.type,
-        amount:   txn.amount,
+        amount:   String(txn.amount),
         date:     txn.date,
         category: txn.category,
         text:     text.slice(0, 512),
@@ -621,18 +610,21 @@ Keep it concise and actionable.`;
   private async getCashFlow(request: Request): Promise<Response> {
     const url  = new URL(request.url);
     const days = parseInt(url.searchParams.get("days") ?? "30");
+    const since = `-${days} days`;
 
-    const rows = await this.sql`
+    type CashFlowRow = { date: string; revenue: number; expenses: number };
+    const rows = [...this.sql<CashFlowRow>`
       SELECT
         date,
         SUM(CASE WHEN type = 'revenue' THEN amount ELSE 0 END) AS revenue,
         SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) AS expenses
       FROM transactions
-      WHERE date >= date('now', ${`-${days} days`})
+      WHERE date >= date('now', ${since})
       GROUP BY date
       ORDER BY date ASC
-    `;
-    return Response.json({ cashflow: [...rows], days });
+    `];
+
+    return Response.json({ cashflow: rows, days });
   }
 
   private async getPnL(request: Request): Promise<Response> {
@@ -640,7 +632,8 @@ Keep it concise and actionable.`;
     const from = url.searchParams.get("from") ?? new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
     const to   = url.searchParams.get("to")   ?? new Date().toISOString().slice(0, 10);
 
-    const rows = await this.sql`
+    type PnLRow = { category: string; type: string; total: number; count: number };
+    const rows = [...this.sql<PnLRow>`
       SELECT
         category,
         type,
@@ -650,8 +643,9 @@ Keep it concise and actionable.`;
       WHERE date BETWEEN ${from} AND ${to}
       GROUP BY category, type
       ORDER BY total DESC
-    `;
-    return Response.json({ pnl: [...rows], from, to });
+    `];
+
+    return Response.json({ pnl: rows, from, to });
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -684,3 +678,13 @@ Keep it concise and actionable.`;
     });
   }
 }
+
+// ─── Default Worker Export ────────────────────────────────────
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    return (
+      (await routeAgentRequest(request, env)) ??
+      Response.json({ error: "Not found" }, { status: 404 })
+    );
+  },
+} satisfies ExportedHandler<Env>;

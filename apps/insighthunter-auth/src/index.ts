@@ -1,174 +1,250 @@
-
+// apps/insighthunter-auth/src/index.ts
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { getCookie, setCookie } from 'hono/cookie';
-import { sign, verify } from 'hono/jwt';
-import bcrypt from 'bcryptjs';
-import type { Context } from 'hono';
+import Stripe from 'stripe';
+import type { Plan } from '@insighthunter/types';
+import { PLAN_LIMITS, PLAN_RANK } from '@insighthunter/types';
 
-// --- TYPE DEFINITIONS ---
+// ─── Env ──────────────────────────────────────────────────────────────────────
+
 interface Env {
-  USERS: D1Database;
+  DB: D1Database;
   SESSIONS: KVNamespace;
-  JWT_SECRET: string;
+  EVENTS: AnalyticsEngineDataset;
+  STRIPE_SECRET_KEY: string;
+  STRIPE_WEBHOOK_SECRET: string;
+  STRIPE_PRICE_STANDARD: string;
+  STRIPE_PRICE_PRO: string;
+  APP_URL: string;
 }
 
-interface User {
-  id: number;
-  email: string;
-  password: string;
-  role: string;
-  plan: string;
-}
+// ─── App ──────────────────────────────────────────────────────────────────────
 
-// CORRECTED: Add index signature to JwtPayload interface
-interface JwtPayload {
-  [key: string]: any;
-  userId: number;
-  role: string;
-  exp: number; // Expiration time
-}
+type Vars = { userId: string; plan: Plan };
+const app = new Hono<{ Bindings: Env; Variables: Vars }>();
 
-const app = new Hono<{ Bindings: Env }>();
-
-// --- MIDDLEWARE ---
 app.use('*', cors({
-  origin: (origin) => origin,
+  origin: ['https://insighthunter.app', 'https://bookkeeping.insighthunter.app', 'http://localhost:4321'],
+  allowHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
 
-// --- UTILITY ---
-const createSession = async (c: Context<{ Bindings: Env }>, user: { id: number; role: string }) => {
-    if (!c.env.JWT_SECRET) {
-        throw new Error('JWT_SECRET environment variable not configured');
-    }
-    const secret = new TextEncoder().encode(c.env.JWT_SECRET);
+// ─── Auth Helpers ─────────────────────────────────────────────────────────────
 
-    const sevenDays = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7);
-    const payload: JwtPayload = { userId: user.id, role: user.role, exp: sevenDays };
-    const token = await sign(payload, secret);
-
-    const sessionId = crypto.randomUUID();
-    await c.env.SESSIONS.put(`session:${sessionId}`, JSON.stringify({ userId: user.id, token }), { expirationTtl: 60 * 60 * 24 * 7 });
-
-    setCookie(c, 'session_id', sessionId, {
-        path: '/',
-        secure: true,
-        httpOnly: true,
-        sameSite: 'Lax',
-        maxAge: 60 * 60 * 24 * 7,
-    });
+async function hashPassword(password: string, saltHex?: string) {
+  const enc = new TextEncoder();
+  const salt = saltHex
+    ? Uint8Array.from(saltHex.match(/.{2}/g)!.map((b) => parseInt(b, 16)))
+    : crypto.getRandomValues(new Uint8Array(16));
+  const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+  const buf = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 100_000, hash: 'SHA-256' }, key, 256);
+  const hex = (b: ArrayBuffer | Uint8Array) =>
+    Array.from(b instanceof Uint8Array ? b : new Uint8Array(b)).map((x) => x.toString(16).padStart(2, '0')).join('');
+  return { hash: hex(buf), salt: hex(salt) };
 }
 
-// --- PUBLIC API ROUTES ---
+async function requireAuth(c: any, next: any) {
+  const token = c.req.header('Authorization')?.slice(7);
+  if (!token) return c.json({ error: 'Unauthorized' }, 401);
+  const session = await c.env.SESSIONS.get(`session:${token}`);
+  if (!session) return c.json({ error: 'Session expired' }, 401);
+  const { userId, plan } = JSON.parse(session);
+  c.set('userId', userId);
+  c.set('plan', plan as Plan);
+  await next();
+}
 
-app.post('/api/signup', async (c) => {
-  try {
-    const body = await c.req.formData();
-    const email = body.get('email') as string;
-    const password = body.get('password') as string;
-    const role = body.get('role') as string;
-    const plan = (body.get('plan') as string) || 'free';
-
-    if (!email || !password || !role) {
-      return c.json({ success: false, error: 'Email, password, and role are required' }, 400);
+function requirePlan(min: Plan) {
+  return async (c: any, next: any) => {
+    const plan = c.get('plan') as Plan;
+    if (PLAN_RANK[plan] < PLAN_RANK[min]) {
+      return c.json({
+        error: 'Upgrade required',
+        requires: min,
+        current: plan,
+        upgrade_url: `${c.env.APP_URL}/pricing`,
+      }, 402);
     }
-    if (password.length < 12) {
-      return c.json({ success: false, error: 'Password must be at least 12 characters' }, 400);
-    }
+    await next();
+  };
+}
 
-    const hashedPassword = await bcrypt.hash(password, 12);
+// ─── Auth Routes ──────────────────────────────────────────────────────────────
 
-    await c.env.USERS.prepare(
-        'INSERT INTO users (email, password, role, plan, created_at) VALUES (?, ?, ?, ?, ?)'
-    ).bind(email, hashedPassword, role, plan, new Date().toISOString()).run();
+app.post('/auth/signup', async (c) => {
+  const { email, password, name } = await c.req.json<{ email: string; password: string; name: string }>();
+  if (!email || !password || !name) return c.json({ error: 'All fields required' }, 400);
+  if (password.length < 8) return c.json({ error: 'Password min 8 characters' }, 400);
 
-    const newUser = await c.env.USERS.prepare('SELECT id, role FROM users WHERE email = ?').bind(email).first<User>();
-    if (!newUser) {
-        return c.json({ success: false, error: 'Failed to retrieve user after creation.' }, 500);
-    }
+  const existing = await c.env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email.toLowerCase()).first();
+  if (existing) return c.json({ error: 'Email already registered' }, 409);
 
-    await createSession(c, newUser);
+  const { hash, salt } = await hashPassword(password);
+  const id = crypto.randomUUID();
+  await c.env.DB.prepare(
+    `INSERT INTO users (id, email, name, password_hash, salt, plan, subscription_status)
+     VALUES (?, ?, ?, ?, ?, 'lite', 'active')`
+  ).bind(id, email.toLowerCase(), name, hash, salt).run();
 
-    return c.redirect('https://insighthunter.app/dashboard.html', 302);
+  const token = crypto.randomUUID();
+  await c.env.SESSIONS.put(`session:${token}`, JSON.stringify({ userId: id, plan: 'lite' }), { expirationTtl: 2_592_000 });
 
-  } catch (e: any) {
-    if (e.message?.includes('UNIQUE constraint failed')) {
-      return c.json({ success: false, error: 'A user with this email already exists' }, 409);
-    }
-    console.error('Signup Error:', e);
-    return c.json({ success: false, error: 'An internal error occurred during signup' }, 500);
+  c.env.EVENTS.writeDataPoint({ blobs: ['signup', 'lite'], doubles: [1], indexes: [id] });
+  return c.json({ token, user: { id, email: email.toLowerCase(), name, plan: 'lite' } }, 201);
+});
+
+app.post('/auth/login', async (c) => {
+  const { email, password } = await c.req.json<{ email: string; password: string }>();
+  const user = await c.env.DB.prepare('SELECT * FROM users WHERE email = ?').bind(email.toLowerCase()).first<any>();
+  if (!user) return c.json({ error: 'Invalid credentials' }, 401);
+  const { hash } = await hashPassword(password, user.salt);
+  if (hash !== user.password_hash) return c.json({ error: 'Invalid credentials' }, 401);
+
+  const token = crypto.randomUUID();
+  await c.env.SESSIONS.put(`session:${token}`, JSON.stringify({ userId: user.id, plan: user.plan }), { expirationTtl: 2_592_000 });
+  c.env.EVENTS.writeDataPoint({ blobs: ['login', user.plan], doubles: [1], indexes: [user.id] });
+
+  return c.json({ token, user: { id: user.id, email: user.email, name: user.name, plan: user.plan } });
+});
+
+app.post('/auth/logout', requireAuth, async (c) => {
+  const token = c.req.header('Authorization')!.slice(7);
+  await c.env.SESSIONS.delete(`session:${token}`);
+  return c.json({ success: true });
+});
+
+app.get('/auth/me', requireAuth, async (c) => {
+  const user = await c.env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(c.get('userId')).first<any>();
+  if (!user) return c.json({ error: 'Not found' }, 404);
+  const limits = PLAN_LIMITS[user.plan as Plan];
+  const { count } = await c.env.DB
+    .prepare('SELECT COUNT(*) as count FROM clients WHERE user_id = ?')
+    .bind(user.id).first<{ count: number }>() ?? { count: 0 };
+
+  return c.json({
+    id: user.id, email: user.email, name: user.name,
+    plan: user.plan, subscriptionStatus: user.subscription_status,
+    limits, clientsUsed: count,
+    clientsRemaining: limits.clients === Infinity ? null : limits.clients - count,
+    onboardingComplete: !!user.onboarding_complete,
+  });
+});
+
+// ─── Billing Routes ───────────────────────────────────────────────────────────
+
+app.post('/billing/checkout', requireAuth, async (c) => {
+  const { plan } = await c.req.json<{ plan: 'standard' | 'pro' }>();
+  if (!['standard', 'pro'].includes(plan)) return c.json({ error: 'Invalid plan' }, 400);
+
+  const user = await c.env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(c.get('userId')).first<any>();
+  const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, { apiVersion: '2024-12-18.acacia' });
+
+  // Create Stripe customer on first upgrade
+  let customerId = user.stripe_customer_id;
+  if (!customerId) {
+    const customer = await stripe.customers.create({ email: user.email, name: user.name, meta { userId: user.id } });
+    customerId = customer.id;
+    await c.env.DB.prepare('UPDATE users SET stripe_customer_id = ? WHERE id = ?').bind(customerId, user.id).run();
   }
+
+  const priceId = plan === 'standard' ? c.env.STRIPE_PRICE_STANDARD : c.env.STRIPE_PRICE_PRO;
+  const session = await stripe.checkout.sessions.create({
+    customer: customerId,
+    payment_method_types: ['card'],
+    line_items: [{ price: priceId, quantity: 1 }],
+    mode: 'subscription',
+    success_url: `${c.env.APP_URL}/dashboard?upgrade=success&plan=${plan}`,
+    cancel_url: `${c.env.APP_URL}/pricing`,
+    meta { userId: user.id, plan },
+    subscription_ { meta { userId: user.id, plan } },
+  });
+
+  c.env.EVENTS.writeDataPoint({ blobs: ['checkout_started', plan], doubles: [1], indexes: [user.id] });
+  return c.json({ url: session.url });
 });
 
-app.post('/api/login', async (c) => {
-    const body = await c.req.formData();
-    const email = body.get('email') as string;
-    const password = body.get('password') as string;
+app.post('/billing/portal', requireAuth, async (c) => {
+  const user = await c.env.DB.prepare('SELECT stripe_customer_id FROM users WHERE id = ?').bind(c.get('userId')).first<any>();
+  if (!user?.stripe_customer_id) return c.json({ error: 'No billing account found' }, 400);
 
-    if (!email || !password) {
-        return c.json({ success: false, error: 'Email and password are required' }, 400);
-    }
-
-    const user = await c.env.USERS.prepare('SELECT id, password, role FROM users WHERE email = ?').bind(email).first<User>();
-
-    if (!user) {
-        return c.json({ success: false, error: 'Invalid credentials' }, 401);
-    }
-
-    const passwordIsValid = await bcrypt.compare(password, user.password);
-    if (!passwordIsValid) {
-        return c.json({ success: false, error: 'Invalid credentials' }, 401);
-    }
-    
-    await createSession(c, user);
-
-    return c.redirect('https://insighthunter.app/dashboard.html', 302);
+  const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, { apiVersion: '2024-12-18.acacia' });
+  const portal = await stripe.billingPortal.sessions.create({
+    customer: user.stripe_customer_id,
+    return_url: `${c.env.APP_URL}/account/billing`,
+  });
+  return c.json({ url: portal.url });
 });
 
-// --- SESSION VALIDATION ROUTE ---
+// Stripe webhook — source of truth for all plan state changes
+app.post('/billing/webhook', async (c) => {
+  const sig = c.req.header('stripe-signature');
+  if (!sig) return c.json({ error: 'Missing signature' }, 400);
 
-app.get('/api/validate-session', async (c) => {
-    if (!c.env.JWT_SECRET) {
-        console.error('JWT_SECRET not configured');
-        return c.json({ success: false, error: 'Internal server configuration error.' }, 500);
+  const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, { apiVersion: '2024-12-18.acacia' });
+  let event: Stripe.Event;
+  try {
+    event = await stripe.webhooks.constructEventAsync(await c.req.text(), sig, c.env.STRIPE_WEBHOOK_SECRET);
+  } catch {
+    return c.json({ error: 'Invalid signature' }, 400);
+  }
+
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const s = event.data.object as Stripe.Checkout.Session;
+      const { userId, plan } = s.metadata ?? {};
+      if (userId && plan) {
+        await c.env.DB.prepare(
+          `UPDATE users SET plan = ?, subscription_status = 'active', stripe_subscription_id = ? WHERE id = ?`
+        ).bind(plan, s.subscription, userId).run();
+        // Invalidate all sessions so next request re-reads new plan
+        await c.env.SESSIONS.put(`plan_update:${userId}`, plan, { expirationTtl: 300 });
+        c.env.EVENTS.writeDataPoint({ blobs: ['subscription_activated', plan], doubles: [1], indexes: [userId] });
+      }
+      break;
     }
-
-    const sessionId = getCookie(c, 'session_id');
-    if (!sessionId) {
-        return c.json({ success: false, error: 'No session cookie provided.' }, 401);
+    case 'customer.subscription.updated': {
+      const sub = event.data.object as Stripe.Subscription;
+      const { userId, plan } = sub.metadata ?? {};
+      if (userId && plan) {
+        await c.env.DB.prepare(
+          `UPDATE users SET plan = ?, subscription_status = ? WHERE stripe_subscription_id = ?`
+        ).bind(plan, sub.status, sub.id).run();
+      }
+      break;
     }
-
-    const sessionData = await c.env.SESSIONS.get(`session:${sessionId}`);
-    if (!sessionData) {
-        return c.json({ success: false, error: 'Invalid or expired session.' }, 401);
+    case 'customer.subscription.deleted': {
+      const sub = event.data.object as Stripe.Subscription;
+      await c.env.DB.prepare(
+        `UPDATE users SET plan = 'lite', subscription_status = 'cancelled', stripe_subscription_id = NULL WHERE stripe_subscription_id = ?`
+      ).bind(sub.id).run();
+      break;
     }
-
-    const { token } = JSON.parse(sessionData);
-    if (!token) {
-        return c.json({ success: false, error: 'No token found in session.' }, 401);
+    case 'invoice.payment_failed': {
+      const inv = event.data.object as Stripe.Invoice;
+      const cid = typeof inv.customer === 'string' ? inv.customer : inv.customer?.id;
+      if (cid) await c.env.DB.prepare(`UPDATE users SET subscription_status = 'past_due' WHERE stripe_customer_id = ?`).bind(cid).run();
+      break;
     }
-
-    try {
-        const secret = new TextEncoder().encode(c.env.JWT_SECRET);
-        const payload = await verify(token, secret) as JwtPayload;
-        return c.json({ success: true, userId: payload.userId, role: payload.role });
-
-    } catch (e) {
-        console.error('JWT Verification Error:', e);
-        return c.json({ success: false, error: 'Invalid or expired token.' }, 401);
+    case 'invoice.payment_succeeded': {
+      const inv = event.data.object as Stripe.Invoice;
+      const cid = typeof inv.customer === 'string' ? inv.customer : inv.customer?.id;
+      if (cid) await c.env.DB.prepare(`UPDATE users SET subscription_status = 'active' WHERE stripe_customer_id = ?`).bind(cid).run();
+      break;
     }
+  }
+  return c.json({ received: true });
 });
 
-// --- GENERIC HANDLERS ---
+// ─── Plan Enforcement (called by other Workers via Service Binding) ────────────
 
-app.onError((err, c) => {
-  console.error(`Hono Error: ${err}`);
-  return c.json({ success: false, error: 'Internal Server Error' }, 500);
+app.get('/internal/plan/:userId', async (c) => {
+  // Called by bookkeeping + lite workers via service binding — not public
+  const userId = c.req.param('userId');
+  const user = await c.env.DB.prepare('SELECT plan, subscription_status FROM users WHERE id = ?').bind(userId).first<any>();
+  if (!user) return c.json({ error: 'User not found' }, 404);
+  return c.json({ plan: user.plan, status: user.subscription_status, limits: PLAN_LIMITS[user.plan as Plan] });
 });
 
-app.notFound((c) => {
-  return c.json({ success: false, error: 'Not Found' }, 404);
-});
+app.get('/health', (c) => c.json({ status: 'ok', service: 'insighthunter-auth' }));
 
 export default app;
