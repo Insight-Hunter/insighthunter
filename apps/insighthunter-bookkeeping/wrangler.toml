@@ -1,34 +1,52 @@
-account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
 name = "insighthunter-bookkeeping"
-main = "src/backend/index.ts"
-compatibility_date = "2024-07-29"
+main = "apps/insighthunter-bookkeeping/src/backend/index.ts"
+compatibility_date = "2026-02-26"
 compatibility_flags = ["nodejs_compat"]
 
-[observability]
-enabled = true
-head_sampling_rate = 1
+[[queues.producers]]
+binding = "TODO_QUEUE"
+queue = "bookkeeping-todos"
 
-[[routes]]
-pattern = "bookkeeping.insighthunter.app/api/*"
-zone_name = "insighthunter.app"
+[[queues.consumers]]
+queue = "bookkeeping-todos"
+max_batch_size = 10
+max_wait_time_ms = 5000
 
-[[migrations]]
-tag = "v1"
-new_classes = ["SubscriptionManager", "BookkeepingLedger", "InvoiceManager", "BankConnectionManager"]
+# Durable Objects for holding state
+[[durable_objects.bindings]]
+name = "LEDGER"
+class_name = "BookkeepingLedger"
 
-[durable_objects]
-bindings = [
-  { name = "SUBSCRIPTION_MANAGER", class_name = "SubscriptionManager" },
-  { name = "BOOKKEEPING_LEDGER", class_name = "BookkeepingLedger" },
-  { name = "INVOICE_MANAGER", class_name = "InvoiceManager" },
-  { name = "BANK_CONNECTION_MANAGER", class_name = "BankConnectionManager" }
-]
+[[durable_objects.bindings]]
+name = "INVOICES"
+class_name = "InvoiceManager"
 
-[[r2_buckets]]
-binding = "SPREADSHEET_UPLOADS"
-bucket_name = "insighthunter-uploads"
+[[durable_objects.bindings]]
+name = "BANK_CONNECTION"
+class_name = "BankConnectionManager"
 
+[[durable_objects.bindings]]
+name = "SUBSCRIPTIONS"
+class_name = "SubscriptionManager"
+
+# D1 Database for relational data (users, accounts, etc)
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-bookkeeping"
+database_id = "c1b333a5-e87a-426d-92a0-49658231c6a6"
+
+# KV for caching
+[[kv_namespaces]]
+binding = "CACHE"
+id = "a6b8254f3a734a1288c4b910b82f7d5d"
+preview_id = "a6b8254f3a734a1288c4b910b82f7d5d"
+
+
+# Environment Variables
 [vars]
-QUICKBOOKS_ENVIRONMENT = "sandbox"
-QUICKBOOKS_REDIRECT_URI = "https://bookkeeping.insighthunter.app/api/auth/quickbooks/callback"
-FRONTEND_URL = "https://bookkeeping.insighthunter.app"
+PLAID_CLIENT_ID = "your-plaid-client-id"
+PLAID_SECRET = "your-plaid-secret"
+
+# Dev Environment
+[env.dev.vars]
+PLAID_ENV = "sandbox"

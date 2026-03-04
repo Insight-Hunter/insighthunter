@@ -1,45 +1,121 @@
+# /wrangler.toml  (repo root — used for CI/CD deploys from root)
 name = "insighthunter-main"
 main = "apps/insighthunter-main/src/index.ts"
-compatibility_date = "2026-02-26"
+compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
 
-# Shared D1 Database (same as auth worker)
+workers_dev = false
+
+# Custom domain — no wildcard suffix
+routes = [
+  { pattern = "insighthunter.app", custom_domain = true }
+]
+
+# ─── Static Assets ───────────────────────────────────────────────────────────
+[assets]
+directory = "apps/insighthunter-main/dist"   # ← KEY FIX: was "./dist" (empty at root)
+binding = "ASSETS"
+not_found_handling = "none"                  # Worker handles 404s manually
+html_handling = "none"                       # Worker handles trailing slash
+run_worker_first = ["/api/*"]
+
+# ─── Workers AI ──────────────────────────────────────────────────────────────
+[ai]
+binding = "AI"
+
+# ─── Vectorize (CFO semantic search / embeddings) ────────────────────────────
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "insight-cfo-embeddings"
+
+# ─── CFO Agent (Durable Object) ──────────────────────────────────────────────
+[durable_objects]
+bindings = [
+  { name = "CFO_AGENT", class_name = "CfoAgent" }
+]
+
+# Migrations — append only, NEVER edit or delete existing tags
+[[migrations]]
+tag = "v1"
+new_classes = ["CfoAgent"]
+
+# ─── D1 Database ─────────────────────────────────────────────────────────────
 [[d1_databases]]
 binding = "USERS"
 database_name = "insight-users"
 database_id = "97eb1afb-543e-44d4-b465-a3859742aeba"
 
-# KV for caching sessions/dashboard data
+# ─── KV Namespace ────────────────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "CACHE"
 id = "af7391791e95423b82c1cd877c0992e3"
 preview_id = "af7391791e95423b82c1cd877c0992e3"
 
-# Static Assets - serves signup.html, shop.html, etc.
-# [site]
-# path = "apps/insighthunter-main/public"
-
-# Environment Variables
-[vars]
-AUTH_API_URL = "https://auth.insighthunter.app"
-JWT_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
-SITE_URL = "https://insighthunter.app"
-STRIPE_SECRET = "sk_test_your-stripe-secret-key"
-LEMON_SQUEEZY_WEBHOOK_SECRET = "ls_your-lemon-squeezy-secret"
-
-# Full Observability
+# ─── Observability ───────────────────────────────────────────────────────────
 [observability]
 enabled = true
 head_sampling_rate = 1
 
-# Dev Environment (optional)
-[env.dev.vars]
-AUTH_API_URL = "http://localhost:8787"
-SITE_URL = "http://localhost:8787"
-
-
-# Production Environment
-[env.production.vars]
+# ─── Non-Secret Vars ─────────────────────────────────────────────────────────
+# Secrets set via: npx wrangler secret put <NAME>
+# Never put JWT_SECRET, STRIPE_SECRET, etc. here
+[vars]
+ENVIRONMENT = "production"
 AUTH_API_URL = "https://auth.insighthunter.app"
 SITE_URL = "https://insighthunter.app"
 
+# ─── Staging ─────────────────────────────────────────────────────────────────
+[env.staging]
+name = "insighthunter-staging"
+compatibility_date = "2025-04-01"
+workers_dev = true
+
+[env.staging.durable_objects]
+bindings = [
+  { name = "CFO_AGENT", class_name = "CfoAgent" }
+]
+
+[[env.staging.vectorize]]
+binding = "VECTORIZE"
+index_name = "insight-cfo-embeddings-staging"
+
+[[env.staging.d1_databases]]
+binding = "USERS"
+database_name = "insight-users-staging"
+database_id = "97eb1afb-543e-44d4-b465-a3859742aeba"
+
+[[env.staging.kv_namespaces]]
+binding = "CACHE"
+id = "af7391791e95423b82c1cd877c0992e3"
+preview_id = "af7391791e95423b82c1cd877c0992e3"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+AUTH_API_URL = "https://auth-staging.insighthunter.app"
+SITE_URL = "https://staging.insighthunter.app"
+
+# ─── Dev ─────────────────────────────────────────────────────────────────────
+[env.dev]
+name = "insighthunter-dev"
+compatibility_date = "2025-04-01"
+workers_dev = true
+
+[env.dev.durable_objects]
+bindings = [
+  { name = "CFO_AGENT", class_name = "CfoAgent" }
+]
+
+[[env.dev.d1_databases]]
+binding = "USERS"
+database_name = "insight-users-staging"
+database_id = "97eb1afb-543e-44d4-b465-a3859742aeba"
+
+[[env.dev.kv_namespaces]]
+binding = "CACHE"
+id = "af7391791e95423b82c1cd877c0992e3"
+preview_id = "af7391791e95423b82c1cd877c0992e3"
+
+[env.dev.vars]
+ENVIRONMENT = "dev"
+AUTH_API_URL = "http://localhost:8787"
+SITE_URL = "http://localhost:8787"

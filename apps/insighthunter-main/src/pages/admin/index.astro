@@ -1,9 +1,9 @@
 ---
-import DashboardLayout from '../../layouts/DashboardLayout.astro';
-import AdminStats from '../../components/islands/admin/AdminStats.svelte';
-import UserTable from '../../components/islands/admin/UserTable.svelte';
-import SystemHealth from '../../components/islands/admin/SystemHealth.svelte';
-import RecentActivity from '../../components/islands/admin/RecentActivity.svelte';
+import DashboardLayout from './../../layouts/DashboardLayout.astro';
+import AdminStats from './../../components/islands/admin/AdminStats.svelte';
+import UserTable from './../../components/islands/admin/UserTable.svelte';
+import SystemHealth from './../../components/islands/admin/SystemHealth.svelte';
+import RecentActivity from './../../components/islands/admin/RecentActivity.svelte';
 
 // Admin-only guard — check for admin role beyond basic auth
 const user = Astro.locals.user;

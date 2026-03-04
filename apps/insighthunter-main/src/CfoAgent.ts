@@ -1,5 +1,27 @@
 // apps/insighthunter-main/src/CfoAgent.ts
 import { Agent } from "agents";
+import { embedAndUpsert, semanticSearch } from "./vectorEmbeddings";
+
+// POST /embed — index a new transaction or document
+app.post("/embed", async (c) => {
+  const { userId, documents } = await c.req.json();
+  const result = await embedAndUpsert(c.env, documents);
+  return c.json(result);
+});
+
+// GET /search?q=late+invoices&userId=xxx
+app.get("/search", async (c) => {
+  const query  = c.req.query("q") ?? "";
+  const userId = c.req.query("userId") ?? "";
+  const type   = c.req.query("type") as any;
+
+  const results = await semanticSearch(c.env, query, userId, {
+    topK: 5,
+    type,
+    minScore: 0.4,
+  });
+  return c.json({ results });
+});
 
 interface Env {
   CFO_AGENT: DurableObjectNamespace;

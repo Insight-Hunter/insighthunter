@@ -1,104 +1,121 @@
+# apps/insighthunter-main/wrangler.toml
 name = "insighthunter-main"
-main = "src/index.ts"
-compatibility_date = "2025-03-07"
+main = "./src/index.ts"
+compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
 
-# ─── Observability ────────────────────────────────────────────
+workers_dev = false
+
+# Custom domain — no wildcard suffix on custom_domain routes
+routes = [
+  { pattern = "insighthunter.app", custom_domain = true }
+]
+
+# ─── Static Assets ───────────────────────────────────────────────────────────
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "none"     # Worker handles 404s manually in index.ts
+html_handling = "none"          # Worker handles trailing slash — avoids redirect conflict
+run_worker_first = ["/api/*"]   # Worker intercepts only /api/* routes
+
+# ─── Workers AI ──────────────────────────────────────────────────────────────
+[ai]
+binding = "AI"
+
+# ─── Vectorize (CFO semantic search / embeddings) ────────────────────────────
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "insighthunter-embeddings"
+
+# ─── CFO Agent (Durable Object) ──────────────────────────────────────────────
+[durable_objects]
+bindings = [
+  { name = "CFO_AGENT", class_name = "CfoAgent" }
+]
+
+# Migrations — append only, never edit or delete existing tags
+[[migrations]]
+tag = "v1"
+new_classes = ["CfoAgent"]
+
+# ─── D1 Database ─────────────────────────────────────────────────────────────
+[[d1_databases]]
+binding = "USERS"
+database_name = "insight-users"
+database_id = "97eb1afb-543e-44d4-b465-a3859742aeba"
+
+# ─── KV Namespace (session cache / dashboard data) ───────────────────────────
+[[kv_namespaces]]
+binding = "CACHE"
+id = "af7391791e95423b82c1cd877c0992e3"
+preview_id = "af7391791e95423b82c1cd877c0992e3"
+
+# ─── Observability ───────────────────────────────────────────────────────────
 [observability]
 enabled = true
 head_sampling_rate = 1
 
-# ─── Static Frontend (SPA) ────────────────────────────────────
-[assets]
-directory = "./public"
-not_found_handling = "single-page-application"
-binding = "ASSETS"
-
-# ─── Environment Variables ────────────────────────────────────
+# ─── Non-Secret Vars (production defaults) ───────────────────────────────────
+# Secrets (JWT_SECRET, STRIPE_SECRET, LEMON_SQUEEZY_WEBHOOK_SECRET)
+# must be set via: npx wrangler secret put <NAME>
 [vars]
 ENVIRONMENT = "production"
-APP_URL = "https://insight.hunterturner.com"
-PRO_PLAN_PRICE_CENTS = "19900"
-REPORT_ONE_OFF_PRICE_CENTS = "10000"
+AUTH_API_URL = "https://auth.insighthunter.app"
+SITE_URL = "https://insighthunter.app"
 
-# ─── D1 — Users, Orgs, Invoices, Financials ──────────────────
-[[d1_databases]]
-binding = "DB"
-database_name = "insighthunter-db"
-database_id = "aa2b9aa2-f1dd-4fdc-b4b0-d9b4bdc2ea57"
+# ─── Staging Environment ─────────────────────────────────────────────────────
+[env.staging]
+name = "insighthunter-staging"
+compatibility_date = "2025-04-01"
+workers_dev = true
 
-# ─── KV — Sessions ────────────────────────────────────────────
-[[kv_namespaces]]
-binding = "SESSIONS"
-id = "60e34ba310ca40c79edec05470c7a271"
-preview_id = "60e34ba310ca40c79edec05470c7a271"
+[env.staging.durable_objects]
+bindings = [
+  { name = "CFO_AGENT", class_name = "CfoAgent" }
+]
 
-# ─── KV — Config & Feature Flags ─────────────────────────────
-[[kv_namespaces]]
-binding = "CONFIG"
-id = "e412ddb53db24e10bb59735e62732bf0"
-preview_id = "e412ddb53db24e10bb59735e62732bf0"
+[[env.staging.vectorize]]
+binding = "VECTORIZE"
+index_name = "insighthunter-embeddings-staging"
 
-# ─── R2 — PDF Reports ─────────────────────────────────────────
-[[r2_buckets]]
-binding = "REPORTS"
-bucket_name = "insighthunter-reports"
+[[env.staging.d1_databases]]
+binding = "USERS"
+database_name = "insight-users-staging"
+database_id = "97eb1afb-543e-44d4-b465-a3859742aeba"
 
-# ─── R2 — CSV Uploads ─────────────────────────────────────────
-[[r2_buckets]]
-binding = "UPLOADS"
-bucket_name = "insighthunter-uploads"
+[[env.staging.kv_namespaces]]
+binding = "CACHE"
+id = "af7391791e95423b82c1cd877c0992e3"
+preview_id = "af7391791e95423b82c1cd877c0992e3"
 
-# ─── Queues — Producers ───────────────────────────────────────
-[[queues.producers]]
-binding = "REPORT_QUEUE"
-queue = "insighthunter-report-queue"
+[env.staging.vars]
+ENVIRONMENT = "staging"
+AUTH_API_URL = "https://auth-staging.insighthunter.app"
+SITE_URL = "https://staging.insighthunter.app"
 
-[[queues.producers]]
-binding = "AI_JOB_QUEUE"
-queue = "insighthunter-ai-job-queue"
+# ─── Dev Environment ─────────────────────────────────────────────────────────
+[env.dev]
+name = "insighthunter-dev"
+compatibility_date = "2025-04-01"
+workers_dev = true
 
-# ─── Queues — Consumers ───────────────────────────────────────
-[[queues.consumers]]
-queue = "insighthunter-report-queue"
-dead_letter_queue = "insighthunter-report-dlq"
-retry_delay = 60
+[env.dev.durable_objects]
+bindings = [
+  { name = "CFO_AGENT", class_name = "CfoAgent" }
+]
 
-[[queues.consumers]]
-queue = "insighthunter-ai-job-queue"
-dead_letter_queue = "insighthunter-ai-job-dlq"
-retry_delay = 120
+[[env.dev.d1_databases]]
+binding = "USERS"
+database_name = "insight-users-staging"
+database_id = "97eb1afb-543e-44d4-b465-a3859742aeba"
 
-# ─── Workers AI ───────────────────────────────────────────────
-[ai]
-binding = "AI"
+[[env.dev.kv_namespaces]]
+binding = "CACHE"
+id = "af7391791e95423b82c1cd877c0992e3"
+preview_id = "af7391791e95423b82c1cd877c0992e3"
 
-# ─── Vectorize — Semantic Financial Search ───────────────────
-[[vectorize]]
-binding = "VECTORS"
-index_name = "insighthunter-embeddings"
-
-# ─── Analytics Engine ─────────────────────────────────────────
-[[analytics_engine_datasets]]
-binding = "ANALYTICS"
-dataset = "insighthunter_events"
-
-# ─── Durable Objects — CFO Agent ─────────────────────────────
-[[durable_objects.bindings]]
-name = "CFO_AGENT"
-class_name = "CfoAgent"
-
-# ─── DO Migrations ────────────────────────────────────────────
-[[migrations]]
-tag = "v1"
-new_sqlite_classes = ["CfoAgent"]
-
-# ─── Cron Triggers ────────────────────────────────────────────
-[triggers]
-crons = ["0 8 * * *"]
-
-# ─── Secrets (set via CLI — never commit these) ───────────────
-# npx wrangler secret put JWT_SECRET
-# npx wrangler secret put STRIPE_SECRET_KEY
-# npx wrangler secret put STRIPE_WEBHOOK_SECRET
-# npx wrangler secret put OPENAI_API_KEY
+[env.dev.vars]
+ENVIRONMENT = "dev"
+AUTH_API_URL = "http://localhost:8787"
+SITE_URL = "http://localhost:8787"
