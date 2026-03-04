@@ -1,0 +1,81 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+  activeNav?: "dashboard" | "users" | "reports" | "forecasts" | "settings";
+}
+
+const {
+  title = "Insight Hunter Admin",
+  description = "AI-Powered Auto-CFO",
+  activeNav,
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title} — Insight Hunter</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="bg-gray-950 text-gray-100 min-h-screen flex">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 border-r border-gray-800 flex flex-col p-4 gap-2">
+      <div class="text-xl font-bold text-white mb-6 px-2">
+        📊 Insight Hunter
+      </div>
+      <nav class="flex flex-col gap-1">
+        <a href="/admin/dashboard" class={`nav-item ${activeNav === "dashboard" ? "active" : ""}`}>
+          Dashboard
+        </a>
+        <a href="/admin/users" class={`nav-item ${activeNav === "users" ? "active" : ""}`}>
+          Users
+        </a>
+        <a href="/admin/reports" class={`nav-item ${activeNav === "reports" ? "active" : ""}`}>
+          Reports
+        </a>
+        <a href="/admin/forecasts" class={`nav-item ${activeNav === "forecasts" ? "active" : ""}`}>
+          Forecasts
+        </a>
+        <a href="/admin/settings" class={`nav-item ${activeNav === "settings" ? "active" : ""}`}>
+          Settings
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col">
+      <header class="h-14 bg-gray-900 border-b border-gray-800 flex items-center px-6 justify-between">
+        <h1 class="text-lg font-semibold text-white">{title}</h1>
+        <span class="text-sm text-gray-400">Admin</span>
+      </header>
+      <div class="flex-1 p-6 overflow-auto">
+        <slot />
+      </div>
+    </main>
+
+  </body>
+</html>
+
+<style>
+  .nav-item {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    transition: background 0.15s;
+  }
+  .nav-item:hover {
+    background: #1f2937;
+    color: #fff;
+  }
+  .nav-item.active {
+    background: #1d4ed8;
+    color: #fff;
+    font-weight: 600;
+  }
+</style>

@@ -8,11 +8,7 @@ export default defineConfig({
     platformProxy: { enabled: true }
   }),
   integrations: [svelte()],
-  vite: {
-    resolve: {
-      alias: {
-        '@': '/src'
-      }
-    }
-  }
+  image: {
+    service: { entrypoint: "astro/assets/services/compile" },
+  } 
 });

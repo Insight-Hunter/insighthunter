@@ -6,4 +6,5 @@ export default defineConfig({
   root: 'apps/insighthunter-main',
   output: 'static',
   integrations: [sentry(), spotlightjs()]
+
 });

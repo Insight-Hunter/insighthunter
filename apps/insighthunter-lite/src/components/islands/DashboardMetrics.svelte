@@ -13,6 +13,8 @@
   const date = new Date(report.created_at).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric'
   });
+
+  const net = report.total_income - report.total_expenses;
 </script>
 
 <div class="dashboard">
@@ -45,7 +47,6 @@
     </div>
     <div class="metric-card">
       <div class="label">Net P&L</div>
-      {@const net = report.total_income - report.total_expenses}
       <div class="value" class:pos={net >= 0} class:neg={net < 0}>{fmt(net)}</div>
     </div>
   </div>
