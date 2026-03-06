@@ -9,7 +9,7 @@ export default defineConfig({
   site: 'https://insighthunter.app',
 
   // Hybrid: static pages pre-render to HTML, API routes run at edge
-  output: 'hybrid',
+  output: 'static',
 
   adapter: cloudflare({
     // Cloudflare platform APIs available in Astro.locals.runtime

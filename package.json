@@ -5,8 +5,7 @@
   "workspaces": [
     "apps/*",
     "packages/types",
-    "packages/utils",
-    "packages/agents"
+    "packages/utils"
   ],
   "scripts": {
     "dev:main":    "cd apps/insighthunter-main && astro dev",

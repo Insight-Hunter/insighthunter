@@ -1,7 +1,7 @@
 {
   "name": "insighthunter-main",
   "version": "1.0.0",
-  "type":  "module",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "wrangler dev",
@@ -11,12 +11,13 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
+    "@astrojs/sitemap": "^3.7.0",
     "@astrojs/svelte": "^7.2.5",
+    "@insighthunter/agents": "workspace:*",
+    "@insighthunter/auth-middleware": "workspace:*",
     "astro": "^5.18.0",
     "miniflare": "^4.20260305.0",
-    "svelte": "^5.0.0",
-    "@insighthunter/auth-middleware": "workspace:*",
-    "@insighthunter/agents": "workspace:*"
+    "svelte": "^5.0.0"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
