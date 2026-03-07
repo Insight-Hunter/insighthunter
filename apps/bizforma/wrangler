@@ -1,0 +1,59 @@
+{
+  // Bizforma — InsightHunters Business Formation Assistant
+  "name": "bizforma",
+  "main": "src/worker.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Serve the React SPA from the /dist build output
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
+  },
+
+  // Observability — view logs in Cloudflare dashboard
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  // D1 — relational database for business data, compliance events, documents
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bizforma_db",
+      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+    }
+  ],
+
+  // KV — session storage and fast business data cache
+  "kv_namespaces": [
+    {
+      "binding": "BUSINESS_DATA",
+      "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID",
+      "preview_id": "REPLACE_WITH_YOUR_KV_PREVIEW_ID"
+    }
+  ],
+
+  // R2 — object storage for formation documents (EIN letters, Articles, etc.)
+  "r2_buckets": [
+    {
+      "binding": "DOCUMENTS",
+      "bucket_name": "bizforma-documents"
+    }
+  ],
+
+  // Workers AI — llama-3.1 for name suggestions, entity recommendations, compliance calendar, chat
+  "ai": {
+    "binding": "AI"
+  },
+
+  // Environment variables (non-secret)
+  "vars": {
+    "ENVIRONMENT": "production"
+  }
+
+  // Secrets — set these with: wrangler secret put ANTHROPIC_API_KEY
+  // ANTHROPIC_API_KEY — optional, for Claude-powered premium AI features
+}
