@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target":               "ESNext",
+    "module":               "ESNext",
+    "moduleResolution":     "bundler",
+    "lib":                  ["ESNext"],
+    "strict":               true,
+    "verbatimModuleSyntax": true,
+    "noUnusedLocals":       true,
+    "noUnusedParameters":   true,
+    "noEmit":               true,
+    "types":                ["@cloudflare/workers-types"]
+  },
+  "include": ["src/**/*"]
+}

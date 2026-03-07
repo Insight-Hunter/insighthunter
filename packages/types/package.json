@@ -1,7 +1,20 @@
 {
   "name": "@insighthunter/types",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
-  "main": "./index.ts",
-  "types": "./index.ts"
+  "type": "module",
+  "exports": {
+    ".":            { "types": "./src/index.ts" },
+    "./auth":       { "types": "./src/auth/index.ts" },
+    "./financial":  { "types": "./src/financial/index.ts" },
+    "./env":        { "types": "./src/env/index.ts" },
+    "./common":     { "types": "./src/common/index.ts" }
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250310.0",
+    "typescript":                "^5.8.2"
+  }
 }
