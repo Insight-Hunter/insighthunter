@@ -1,26 +1,29 @@
 {
-  "name": "insighthunter-main",
-  "version": "1.0.0",
-  "type": "module",
+  "name": "@insighthunter/main",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "deploy": "astro build && wrangler deploy"
+    "deploy": "wrangler pages deploy dist",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src --ext .ts,.astro,.svelte"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^12.6.12",
-    "@astrojs/sitemap": "^3.7.0",
-    "@astrojs/svelte": "^7.2.5",
-    "@insighthunter/agents": "workspace:*",
-    "@insighthunter/auth-middleware": "workspace:*",
-    "astro": "^5.18.0",
-    "miniflare": "^4.20260305.0",
-    "svelte": "^5.0.0"
+    "astro": "^5.4.0",
+    "@astrojs/cloudflare": "^12.3.0",
+    "@astrojs/svelte": "^7.0.5",
+    "svelte": "^5.22.5",
+    "hono": "^4.7.4",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "wrangler": "^4.69.0"
+    "@cloudflare/workers-types": "^4.20250310.0",
+    "wrangler": "^4.2.0",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.8"
   }
 }
