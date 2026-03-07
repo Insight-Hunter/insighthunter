@@ -1,0 +1,10 @@
+# robots.txt for Business Formation Assistant
+
+User-agent: *
+Allow: /
+
+# Disallow API routes from being indexed
+Disallow: /api/
+
+# Sitemap (update with your actual domain after deployment)
+# Sitemap: https://your-domain.com/sitemap.xml
