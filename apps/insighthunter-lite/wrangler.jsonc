@@ -10,13 +10,13 @@
   "kv_namespaces": [
     {
       "binding": "IH_SESSIONS",
-      "id": "REPLACE_WITH_KV_ID",
-      "preview_id": "REPLACE_WITH_PREVIEW_KV_ID"
+      "id": "88a8b6dd2b464effa9025e3f0020cc5e",
+      "preview_id": "88a8b6dd2b464effa9025e3f0020cc5e"
     },
     {
       "binding": "IH_CACHE",
-      "id": "REPLACE_WITH_CACHE_KV_ID",
-      "preview_id": "REPLACE_WITH_PREVIEW_CACHE_KV_ID"
+      "id":  "b3623f7961cb4d9cbc190bc8ef981b3a",
+      "preview_id": "b3623f7961cb4d9cbc190bc8ef981b3a"
     }
   ],
   "vars": {
