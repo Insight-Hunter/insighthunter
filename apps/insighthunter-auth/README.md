@@ -17,7 +17,7 @@ JWT issuance · Session management · PBKDF2 password hashing · RBAC · Email v
 cp .env.example .dev.vars
 
 # Create D1 database
-wrangler d1 create insighthunter-auth-db
+wrangler d1 create insighthunter-auth
 
 # Create KV namespaces
 wrangler kv:namespace create SESSIONS

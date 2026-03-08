@@ -14,8 +14,8 @@
     "test:coverage":  "vitest run --coverage",
     "lint":           "eslint src --ext .ts",
     "lint:fix":       "eslint src --ext .ts --fix",
-    "migrate:local":  "wrangler d1 migrations apply insighthunter-auth-db --local",
-    "migrate:remote": "wrangler d1 migrations apply insighthunter-auth-db --remote"
+    "migrate:local":  "wrangler d1 migrations apply insighthunter-auth --local",
+    "migrate:remote": "wrangler d1 migrations apply insighthunter-auth --remote"
   },
   "dependencies": {
     "hono": "^4.7.4",
