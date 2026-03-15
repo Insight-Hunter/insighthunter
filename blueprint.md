@@ -1,39 +1,44 @@
-# Blueprint: Shopping Cart & Payment Flow
-
-This document outlines the plan for implementing a shopping cart and payment flow using Stripe.
+# InsightHunter - Blueprint
 
 ## Overview
 
-The goal is to create a seamless and secure payment experience for users. This will be achieved by integrating Stripe into the existing Next.js application. The implementation will consist of a backend API endpoint to handle payment logic and a frontend component for user interaction.
+InsightHunter is a powerful and intuitive platform designed to help users discover, analyze, and share market insights. It provides a comprehensive suite of tools for tracking market trends, identifying key opportunities, and making data-driven decisions. The platform is built with a modern, responsive design that ensures a seamless experience across all devices.
 
-## Features
+## Project Outline
 
-- **Shopping Cart:** A simple UI to display product information and a purchase button.
-- **Stripe Checkout:** Integration with Stripe Checkout for a secure and user-friendly payment process.
-- **Backend API:** A Node.js endpoint to create a Stripe Checkout Session.
-- **Success and Cancellation Pages:** Pages to handle redirects from Stripe after a payment attempt.
+### Features
 
-## File Structure
+- **User Authentication:** Secure user authentication system with login and signup functionality.
+- **Campaign Management:** Tools for creating, managing, and tracking marketing campaigns.
+- **Insight Discovery:** Advanced analytics and data visualization to uncover market trends and opportunities.
+- **Secure Payments:** Integration with Stripe for processing payments securely.
+- **Comprehensive Legal Section:** Detailed legal information, including terms of service, privacy policy, and more.
 
-- `pages/api/stripe/create-checkout-session.ts`: Backend API route to create a Stripe Checkout Session.
-- `components/ShoppingCart.tsx`: Frontend React component for the shopping cart UI.
-- `pages/shop.tsx`: Page to display the shopping cart.
-- `pages/success.tsx`: Page to display after a successful payment.
-- `pages/cancel.tsx`: Page to display after a cancelled payment.
+### Design and Styling
 
-## Backend Implementation (Node.js)
+- **Framework:** Next.js with the App Router.
+- **Styling:** Tailwind CSS for a utility-first approach to styling.
+- **UI Components:** A rich set of reusable UI components, including buttons, forms, and navigation elements.
+- **Responsive Design:** A mobile-first design that adapts to different screen sizes.
+- **Color Palette:** A modern and vibrant color palette that enhances the user experience.
 
-- **Endpoint:** `POST /api/stripe/create-checkout-session`
-- **Logic:**
-  - Receives product information from the frontend.
-  - Creates a Stripe Checkout Session with line items, price, and currency.
-  - Specifies `success_url` and `cancel_url` for redirects.
-  - Returns the session ID to the frontend.
+### Technical Stack
 
-## Frontend Implementation (React)
+- **Frontend:** Next.js, React, TypeScript
+- **Styling:** Tailwind CSS
+- **Payments:** Stripe
 
-- **Component:** `ShoppingCart.tsx`
-- **Logic:**
-  - Displays product details and a "Buy Now" button.
-  - On button click, sends a request to the backend API.
-  - On receiving the session ID, redirects the user to Stripe Checkout using `@stripe/stripe-js`.
+## Current Plan
+
+### Objective
+
+Deploy the application to a suitable hosting environment.
+
+### Steps
+
+1. **Attempted Deployment:** The initial attempt to deploy the application to Firebase Hosting failed.
+2. **Diagnosis:** The deployment failed because Firebase Hosting does not support server-side rendered applications.
+3. **Alternative Solution:** The recommended solution is to use Firebase App Hosting, which is designed for hosting modern web applications.
+4. **Next Actions:**
+    - Assist the user in setting up and configuring Firebase App Hosting.
+    - Guide the user through the process of deploying the application to the new environment.

@@ -21,4 +21,3 @@ export default function MetricCard({ title, value, icon }: MetricCardProps) {
     </motion.div>
   );
 }
-h

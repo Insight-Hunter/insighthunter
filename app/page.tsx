@@ -1,3 +1,4 @@
+
 'use client';
 
 import { motion } from 'framer-motion';
@@ -7,6 +8,25 @@ export default function LandingPage() {
   const FADE_IN = {
     hidden: { opacity: 0, y: 10 },
     visible: { opacity: 1, y: 0 },
+  };
+
+  const handleCheckout = async () => {
+    try {
+      const res = await fetch('/api/checkout_sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}), 
+      });
+      const { url } = await res.json();
+      if (url) {
+        window.location.href = url;
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -65,6 +85,12 @@ export default function LandingPage() {
                     View Pricing
                 </button>
             </Link>
+            <button 
+              className="w-full sm:w-auto px-8 py-4 text-base font-semibold text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 transform hover:scale-105 transition-all duration-300 ease-in-out"
+              onClick={handleCheckout}
+            >
+              Buy Now
+            </button>
           </motion.div>
         </main>
       </div>
