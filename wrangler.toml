@@ -92,4 +92,4 @@ STRIPE_PUBLISHABLE_KEY = "pk_test_51TAyRXF3gri2YoH2uAWOfNsiNwgdE8v7EBlK3IsysoOLg
   wrangler secret put STRIPE_WEBHOOK_SECRET
   wrangler secret put SESSION_SALT
   wrangler secret put SENDGRID_API_KEY
-#──────────────────────────────────────────────────────────────────────────────
+# wrangler login
