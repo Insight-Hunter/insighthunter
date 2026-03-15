@@ -1,0 +1,185 @@
+name = "insighthunter-bizforma"
+main = "worker/index.ts"
+compatibility_date = "2026-02-26"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[[d1_databases]]
+binding       = "DB"
+database_name = "bizforma_db"
+database_id   = "4f48922a-76be-4f04-aa0e-6c834c6c99a5"
+
+[[kv_namespaces]]
+binding    = "KV"
+id         = "3600803d634a42b8b45e27a5dcf68aa4"
+preview_id = "3600803d634a42b8b45e27a5dcf68aa4"
+
+[[r2_buckets]]
+binding     = "R2"
+bucket_name = "bizforma-documents"
+
+[[queues.producers]]
+binding = "DOCUMENT_QUEUE"
+queue   = "bizforma-documents"
+
+[[queues.producers]]
+binding = "REMINDER_QUEUE"
+queue   = "bizforma-reminders"
+
+[[queues.consumers]]
+queue             = "bizforma-documents"
+max_batch_size    = 5
+max_batch_timeout = 30
+max_retries       = 3
+dead_letter_queue = "bizforma-documents-dlq"
+
+[[queues.consumers]]
+queue             = "bizforma-reminders"
+max_batch_size    = 20
+max_batch_timeout = 60
+max_retries       = 3
+dead_letter_queue = "bizforma-reminders-dlq"
+
+[[durable_objects.bindings]]
+name       = "FORMATION_AGENT"
+class_name = "FormationAgent"
+
+[[durable_objects.bindings]]
+name       = "COMPLIANCE_AGENT"
+class_name = "ComplianceAgent"
+
+[[migrations]]
+tag         = "v1"
+new_classes = ["FormationAgent", "ComplianceAgent"]
+
+[[workflows]]
+name       = "FORMATION_WORKFLOW"
+binding    = "FORMATION_WORKFLOW"
+class_name = "FormationWorkflow"
+
+[[workflows]]
+name       = "COMPLIANCE_WORKFLOW"
+binding    = "COMPLIANCE_WORKFLOW"
+class_name = "ComplianceWorkflow"
+
+[ai]
+binding = "AI"
+
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "insighthunter_bizforma_events"
+
+[[services]]
+binding = "AUTH_WORKER"
+service = "insighthunter-auth"
+
+[[services]]
+binding = "BOOKKEEPING_WORKER"
+service = "insighthunter-bookkeeping"
+
+[vars]
+ENVIRONMENT  = "development"
+CORS_ORIGINS = "http://localhost:3000,https://insighthunter.app"
+APP_BASE_URL = "http://localhost:3000"
+
+# wrangler secret put JWT_SECRET
+# wrangler secret put ANTHROPIC_API_KEY   (optional: premium Claude features)
+
+[env.staging]
+[env.staging.vars]
+ENVIRONMENT  = "staging"
+CORS_ORIGINS = "https://staging.insighthunter.app"
+APP_BASE_URL = "https://staging.insighthunter.app"
+
+[[env.staging.d1_databases]]
+binding       = "DB"
+database_name = "bizforma_db"
+database_id   = "<STAGING_D1_ID>"
+
+[[env.staging.kv_namespaces]]
+binding    = "KV"
+id         = "<STAGING_KV_ID>"
+preview_id = "<STAGING_KV_ID>"
+
+[[env.staging.r2_buckets]]
+binding     = "R2"
+bucket_name = "bizforma-documents-staging"
+
+[env.production]
+[env.production.vars]
+ENVIRONMENT  = "production"
+CORS_ORIGINS = "https://insighthunter.app"
+APP_BASE_URL = "https://insighthunter.app"
+
+[[env.production.d1_databases]]
+binding       = "DB"
+database_name = "bizforma_db"
+database_id   = "<PROD_D1_ID>"
+
+[[env.production.kv_namespaces]]
+binding    = "KV"
+id         = "<PROD_KV_ID>"
+preview_id = "<PROD_KV_ID>"
+
+[[env.production.r2_buckets]]
+binding     = "R2"
+bucket_name = "bizforma-documents-prod"
+
+[[env.production.queues.producers]]
+binding = "DOCUMENT_QUEUE"
+queue   = "bizforma-documents"
+
+[[env.production.queues.producers]]
+binding = "REMINDER_QUEUE"
+queue   = "bizforma-reminders"
+
+[[env.production.queues.consumers]]
+queue             = "bizforma-documents"
+max_batch_size    = 5
+max_batch_timeout = 30
+max_retries       = 3
+dead_letter_queue = "bizforma-documents-dlq"
+
+[[env.production.queues.consumers]]
+queue             = "bizforma-reminders"
+max_batch_size    = 20
+max_batch_timeout = 60
+max_retries       = 3
+dead_letter_queue = "bizforma-reminders-dlq"
+
+[[env.production.durable_objects.bindings]]
+name       = "FORMATION_AGENT"
+class_name = "FormationAgent"
+
+[[env.production.durable_objects.bindings]]
+name       = "COMPLIANCE_AGENT"
+class_name = "ComplianceAgent"
+
+[[env.production.workflows]]
+name       = "FORMATION_WORKFLOW"
+binding    = "FORMATION_WORKFLOW"
+class_name = "FormationWorkflow"
+
+[[env.production.workflows]]
+name       = "COMPLIANCE_WORKFLOW"
+binding    = "COMPLIANCE_WORKFLOW"
+class_name = "ComplianceWorkflow"
+
+[env.production.ai]
+binding = "AI"
+
+[[env.production.analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "insighthunter_bizforma_events"
+
+[[env.production.services]]
+binding = "AUTH_WORKER"
+service = "insighthunter-auth"
+environment = "production"
+
+[[env.production.services]]
+binding = "BOOKKEEPING_WORKER"
+service = "insighthunter-bookkeeping"
+environment = "production"

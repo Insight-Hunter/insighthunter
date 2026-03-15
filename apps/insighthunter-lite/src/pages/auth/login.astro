@@ -1,0 +1,72 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+const next = Astro.url.searchParams.get("next") ?? "/dashboard";
+const expired = Astro.url.searchParams.has("expired");
+---
+<AuthLayout title="Sign In">
+  {expired && (
+    <p class="mb-4 rounded-lg bg-yellow-900/40 border border-yellow-700 px-4 py-2 text-sm text-yellow-300">
+      Your session expired. Please sign in again.
+    </p>
+  )}
+  <h1 class="text-2xl font-semibold text-white mb-1">Welcome back</h1>
+  <p class="text-sm text-slate-400 mb-6">Sign in to your Insight Hunter account.</p>
+  <form id="login-form" novalidate class="space-y-4">
+    <input type="hidden" name="next" value={next} />
+    <div>
+      <label for="email" class="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
+      <input id="email" name="email" type="email" required autocomplete="email"
+        class="ih-input" placeholder="you@company.com" />
+    </div>
+    <div>
+      <label for="password" class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+      <input id="password" name="password" type="password" required autocomplete="current-password"
+        class="ih-input" placeholder="Your password" />
+    </div>
+    <div id="error-msg" class="hidden rounded-lg bg-red-900/40 border border-red-700 px-4 py-2 text-sm text-red-300"></div>
+    <button type="submit" class="ih-btn-primary w-full">Sign In</button>
+  </form>
+  <p class="mt-6 text-center text-sm text-slate-500">
+    <a href="/auth/forgot-password" class="text-brand-400 hover:text-brand-300 underline underline-offset-2">Forgot password?</a>
+  </p>
+  <p class="mt-2 text-center text-sm text-slate-500">
+    No account? <a href="/auth/register" class="text-brand-400 hover:text-brand-300 underline underline-offset-2">Sign up free</a>
+  </p>
+</AuthLayout>
+
+<style lang="postcss">
+  .ih-input  { @apply w-full rounded-lg border border-surface-700 bg-surface-900 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 transition; }
+  .ih-btn-primary { @apply rounded-lg bg-brand-600 hover:bg-brand-500 disabled:bg-surface-700 disabled:cursor-not-allowed px-4 py-2.5 text-sm font-semibold text-white transition-colors; }
+</style>
+
+<script>
+  const form     = document.getElementById("login-form") as HTMLFormElement;
+  const errorMsg = document.getElementById("error-msg")!;
+  const submitBtn = form.querySelector("button[type=submit]") as HTMLButtonElement;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Signing in…";
+    errorMsg.classList.add("hidden");
+
+    const fd = new FormData(form);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: fd.get("email"), password: fd.get("password") }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.message || "Login failed.");
+      }
+      window.location.href = (fd.get("next") as string) || "/dashboard";
+    } catch (err) {
+      errorMsg.textContent = err?.message || "Login failed.";
+      errorMsg.classList.remove("hidden");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Sign In";
+    }
+  });
+</script>

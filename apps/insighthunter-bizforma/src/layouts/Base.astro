@@ -1,0 +1,179 @@
+---
+export interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = 'Bizforma — Business Formation Assistant',
+  description = 'InsightHunters full business formation assistant. From concept to compliance in 11 steps.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0a14" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
+
+    <!-- Apple PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Bizforma" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167.png" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+
+    <!-- SEO -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+
+    <!-- Apple SF Pro font stack via system fonts -->
+    <style>
+      :root {
+        /* SF Pro / Apple system font stack */
+        --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+                     'Helvetica Neue', Arial, sans-serif;
+        --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+        /* Apple HIG color palette — dark mode primary */
+        --bg-primary:    #0a0a14;
+        --bg-secondary:  #111118;
+        --bg-elevated:   #1c1c24;
+        --bg-grouped:    #161620;
+
+        /* Labels */
+        --label-primary:    rgba(255,255,255,0.92);
+        --label-secondary:  rgba(255,255,255,0.56);
+        --label-tertiary:   rgba(255,255,255,0.32);
+        --label-quaternary: rgba(255,255,255,0.18);
+
+        /* Apple accent blues */
+        --accent-blue:   #0a84ff;
+        --accent-teal:   #5ac8fa;
+        --accent-indigo: #5e5ce6;
+        --accent-purple: #bf5af2;
+        --accent-pink:   #ff375f;
+        --accent-orange: #ff9f0a;
+        --accent-green:  #30d158;
+
+        /* Fills */
+        --fill-primary:    rgba(255,255,255,0.12);
+        --fill-secondary:  rgba(255,255,255,0.08);
+        --fill-tertiary:   rgba(255,255,255,0.05);
+        --fill-quaternary: rgba(255,255,255,0.03);
+
+        /* Separators */
+        --separator:       rgba(255,255,255,0.10);
+        --separator-opaque: #38383a;
+
+        /* Materials */
+        --material-thin:       rgba(28,28,36,0.72);
+        --material-regular:    rgba(28,28,36,0.82);
+        --material-thick:      rgba(28,28,36,0.90);
+        --material-chrome:     rgba(12,12,20,0.94);
+
+        /* Corner radii — Apple HIG */
+        --radius-sm:  8px;
+        --radius-md:  12px;
+        --radius-lg:  16px;
+        --radius-xl:  20px;
+        --radius-2xl: 28px;
+        --radius-pill: 999px;
+
+        /* Spacing (4px grid) */
+        --space-1: 4px;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+        --space-5: 20px;
+        --space-6: 24px;
+        --space-8: 32px;
+        --space-10: 40px;
+        --space-12: 48px;
+        --space-16: 64px;
+
+        /* Motion — Apple spring-like */
+        --spring-fast:   cubic-bezier(0.34, 1.56, 0.64, 1);
+        --spring-normal: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+
+        /* Safe areas */
+        --safe-top:    env(safe-area-inset-top, 0px);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-left:   env(safe-area-inset-left, 0px);
+        --safe-right:  env(safe-area-inset-right, 0px);
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      html {
+        font-family: var(--font-sans);
+        background: var(--bg-primary);
+        color: var(--label-primary);
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        padding-top: var(--safe-top);
+        padding-bottom: var(--safe-bottom);
+      }
+
+      /* Apple-style focus ring */
+      :focus-visible {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: 2px;
+        border-radius: var(--radius-sm);
+      }
+
+      /* iOS-style tap highlight */
+      * {
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar { width: 6px; height: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb {
+        background: var(--fill-secondary);
+        border-radius: var(--radius-pill);
+      }
+
+      /* Selection */
+      ::selection {
+        background: rgba(10, 132, 255, 0.3);
+        color: var(--label-primary);
+      }
+    </style>
+  </head>
+
+  <body>
+    <slot />
+
+    <!-- PWA Service Worker registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>

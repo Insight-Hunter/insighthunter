@@ -1,0 +1,20 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "target":               "ESNext",
+    "module":               "ESNext",
+    "moduleResolution":     "bundler",
+    "strict":               true,
+    "verbatimModuleSyntax": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*":            ["src/*"],
+      "@components/*":  ["components/*"],
+      "@layouts/*":     ["src/layouts/*"],
+      "@lib/*":         ["src/lib/*"],
+      "@types/*":       ["src/types/*"]
+    },
+    "types": ["@cloudflare/workers-types"]
+  },
+  "include": ["src/**/*", "scripts/**/*", ".astro/**/*"]
+}

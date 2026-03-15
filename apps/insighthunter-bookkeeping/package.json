@@ -1,0 +1,24 @@
+{
+  "name": "insighthunter-bookkeeping",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev":         "wrangler dev --port 8788",
+    "deploy":      "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:prod": "wrangler deploy --env production",
+    "db:migrate":  "wrangler d1 migrations apply insighthunter-bookkeeping",
+    "db:migrate:remote": "wrangler d1 migrations apply insighthunter-bookkeeping --remote",
+    "type-check":  "tsc --noEmit",
+    "test":        "vitest run",
+    "test:watch":  "vitest"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250224.0",
+    "typescript":                "^5.4.5",
+    "vitest":                    "^2.1.9",
+    "@cloudflare/vitest-pool-workers": "^0.6.0",
+    "wrangler":                  "^3.95.0"
+  }
+}

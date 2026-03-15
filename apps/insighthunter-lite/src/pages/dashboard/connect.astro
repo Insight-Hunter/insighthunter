@@ -1,0 +1,35 @@
+---
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+const success = Astro.url.searchParams.has("success");
+const error   = Astro.url.searchParams.has("error");
+---
+<DashboardLayout title="Connect QuickBooks">
+  <div class="max-w-lg mx-auto mt-8">
+    {success && (
+      <div class="mb-6 rounded-xl bg-emerald-900/40 border border-emerald-700 px-5 py-4 text-sm text-emerald-300">
+        ✓ QuickBooks connected successfully! Your financial data is now syncing.
+      </div>
+    )}
+    {error && (
+      <div class="mb-6 rounded-xl bg-red-900/40 border border-red-700 px-5 py-4 text-sm text-red-300">
+        Connection failed. Please try again or contact support.
+      </div>
+    )}
+    <div class="bg-surface-800 border border-surface-700 rounded-2xl p-8 text-center">
+      <div class="text-5xl mb-4">📒</div>
+      <h2 class="text-xl font-semibold text-white mb-2">Connect QuickBooks Online</h2>
+      <p class="text-sm text-slate-400 mb-8 leading-relaxed">
+        Sync your company's P&amp;L, cash flow, and account balances directly from QuickBooks Online. Insight Hunter reads your data — it never writes or modifies your books.
+      </p>
+      <a
+        href="/api/qbo/connect"
+        class="inline-block rounded-xl bg-brand-600 hover:bg-brand-500 px-8 py-3 text-sm font-semibold text-white transition-colors shadow-lg shadow-brand-600/20"
+      >
+        Connect QuickBooks →
+      </a>
+      <p class="mt-4 text-xs text-slate-500">
+        You'll be redirected to Intuit to authorize access. Read-only permissions only.
+      </p>
+    </div>
+  </div>
+</DashboardLayout>

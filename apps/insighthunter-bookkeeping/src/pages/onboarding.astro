@@ -1,0 +1,9 @@
+---
+// src/pages/onboarding.astro
+import AppLayout from '@/layouts/AppLayout.astro';
+import OnboardingWizard from '@/components/onboarding/OnboardingWizard';
+---
+
+<AppLayout title="Welcome to InsightHunter">
+  <OnboardingWizard client:load />
+</AppLayout>

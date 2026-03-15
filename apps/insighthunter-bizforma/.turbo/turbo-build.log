@@ -1,0 +1,20 @@
+
+
+> bizforma@2.0.0 build /home/user/insighthunter/apps/bizforma
+> astro build
+
+[2m01:08:12[22m [34m[@astrojs/cloudflare][39m Enabling sessions with Cloudflare KV with the "SESSION" KV binding.
+[2m01:08:12[22m [34m[@astrojs/cloudflare][39m If you see the error "Invalid binding `SESSION`" in your build output, you need to add the binding to your wrangler config file.
+[33m[1m01:08:13[22m [WARN] [adapter][39m Cloudflare does not support sharp at runtime. However, you can configure `imageService: "compile"` to optimize images with sharp on prerendered pages during build time.
+[2m01:08:14[22m [34m[vite][39m Re-optimizing dependencies because lockfile has changed
+[2m01:08:17[22m [34m[content][39m Syncing content
+[2m01:08:18[22m [34m[content][39m Synced content
+[2m01:08:18[22m [34m[types][39m Generated [2m4.55s[22m
+[2m01:08:18[22m [34m[build][39m output: [34m"static"[39m
+[2m01:08:18[22m [34m[build][39m mode: [34m"server"[39m
+[2m01:08:18[22m [34m[build][39m directory: [34m/home/user/insighthunter/apps/bizforma/dist/[39m
+[2m01:08:18[22m [34m[build][39m adapter: [32m@astrojs/cloudflare[39m
+[2m01:08:18[22m [34m[build][39m Collecting build info...
+[2m01:08:18[22m [34m[build][39m [32m✓ Completed in 5.74s.[39m
+[2m01:08:18[22m [34m[build][39m Building server entrypoints...
+[2K[1G[31m[1m01:08:22[22m [ERROR] [vite][39m [31m✗[39m Build failed in 3.39s
