@@ -1,0 +1,14 @@
+name = "insighthunter-cron"
+main = "src/index.ts"
+compatibility_date = "2025-11-01"
+
+[triggers]
+crons = ["0 0 * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-auth-db"
+database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
+
+# Secrets to set:
+# wrangler secret put NOTIFY_EMAIL
