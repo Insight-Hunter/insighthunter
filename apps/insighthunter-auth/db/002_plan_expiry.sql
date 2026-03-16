@@ -1,0 +1,3 @@
+ALTER TABLE users ADD COLUMN plan_expires   TEXT    DEFAULT NULL;
+ALTER TABLE users ADD COLUMN plan_source    TEXT    NOT NULL DEFAULT 'free';
+ALTER TABLE users ADD COLUMN bizforma_paid  INTEGER NOT NULL DEFAULT 0;
