@@ -44,7 +44,7 @@ echo "." > $ROOT/src/workflows/ImportWorkflow.ts
 echo "." > $ROOT/src/workflows/ReconciliationWorkflow.ts
 
 # db
-echo "." > $ROOT/src/db/schema.sql
+echo "." > $ROOT/src/hema.sql
 echo "." > $ROOT/src/db/migrations/0001_init.sql
 echo "." > $ROOT/src/db/migrations/0002_journal.sql
 echo "." > $ROOT/src/db/migrations/0003_categories.sql

@@ -1,5 +1,5 @@
 name = "insighthunter-bookkeeping"
-main = "src/backend/index.ts"
+main = "src/index.ts"
 compatibility_date = "2026-02-26"
 compatibility_flags = ["nodejs_compat"]
 
@@ -11,6 +11,11 @@ enabled = true
 binding       = "DB"
 database_name = "insighthunter-bookkeeping"
 database_id   = "c1b333a5-e87a-426d-92a0-49658231c6a6"
+
+[[d1_databases]]
+binding       = "insighthunter_bookkeeping_db"
+database_name = "insighthunter-bookkeeping-db"
+database_id   = "66f80a2f-de09-4686-8e09-b71b83aaa8ba"
 
 # ── KV Namespace (binding name matches Env interface: KV) ─────────────────────
 # Previously named CACHE in prior config — renamed to align with service code.
