@@ -1,6 +1,6 @@
 name               = "insighthunter-auth"
 main               = "src/index.ts"
-compatibility_date = "2025-03-07"
+compatibility_date = "2025-11-01"
 compatibility_flags = ["nodejs_compat"]
 
 [observability]
@@ -13,6 +13,11 @@ database_name  = "insighthunter-auth"
 database_id    = "36b4a6b7-3509-4cd2-9cdc-7a35990affd5"
 migrations_dir = "migrations"
 
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-auth-db"
+database_id = "REPLACE_WITH_D1_ID"
+
 # KV — session tokens + reset tokens + email verification
 [[kv_namespaces]]
 binding    = "SESSIONS"
@@ -23,6 +28,10 @@ preview_id = "60e34ba310ca40c79edec05470c7a271"
 binding    = "TOKENS"
 id         = "029a6b1c13a24c89b0dbd39e4b5f6021"
 preview_id = "029a6b1c13a24c89b0dbd39e4b5f6021"
+
+[[kv_namespaces]]
+binding = "AUTH_KV"
+id = "REPLACE_WITH_KV_ID"
 
 # Analytics Engine — auth events
 [[analytics_engine_datasets]]
@@ -42,6 +51,10 @@ REFRESH_EXPIRY      = "2592000"
 RATE_LIMIT_WINDOW   = "60"
 RATE_LIMIT_MAX      = "20"
 BCRYPT_ROUNDS       = "12"
+SITE_URL = "https://insighthunter.app"
 
 # Secrets — add via: wrangler secret put SECRET_NAME
 # Required: JWT_SECRET, REFRESH_SECRET, MAILCHANNELS_API_KEY (or RESEND_API_KEY)
+# Secrets (set via CLI — never commit):
+# wrangler secret put JWT_SECRET
+# wrangler secret put RESEND_API_KEY
