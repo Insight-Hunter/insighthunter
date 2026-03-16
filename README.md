@@ -1,4 +1,4 @@
-git ad
+
 # insighthunter-main
 
 Marketing site + dashboard PWA for [insighthunter.app](https://insighthunter.app).
