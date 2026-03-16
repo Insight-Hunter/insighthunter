@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Create Account — Insight Hunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0D1117;--navy-2:#0F1929;--navy-3:#141E30;--navy-card:#161B22;--navy-border:#1E2A3A;
+  --gold:#C9972B;--gold-l:#D4A843;--gold-d:#8A6820;
+  --white:#FFF;--g1:#E2E8F0;--g2:#94A3B8;--g3:#64748B;--g4:#334155;
+  --green:#10B981;--red:#EF4444;--blue:#3B82F6;--amber:#F59E0B}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.btn-gold{padding:.45rem 1.25rem;border-radius:8px;background:var(--gold);color:var(--navy);
+  font-size:.875rem;font-weight:700;cursor:pointer;border:none;transition:background .2s,transform .15s;display:inline-block}
+.btn-gold:hover{background:var(--gold-l);transform:translateY(-1px)}
+.btn-ghost{padding:.45rem 1.1rem;border-radius:8px;border:1px solid var(--navy-border);
+  background:transparent;color:var(--g1);font-size:.875rem;font-weight:500;cursor:pointer;
+  transition:border-color .2s;display:inline-block}
+.btn-ghost:hover{border-color:var(--gold-d)}
+
+body{display:flex;flex-direction:column;min-height:100vh;
+  background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(201,151,43,.06) 0%,transparent 70%),var(--navy)}
+.auth-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:5rem 1.5rem 3rem}
+.auth-card{width:100%;max-width:440px;background:var(--navy-card);
+  border:1px solid var(--navy-border);border-radius:18px;padding:2.5rem}
+.auth-logo{display:flex;flex-direction:column;align-items:center;gap:.5rem;margin-bottom:2rem;text-align:center}
+.auth-logo svg{width:48px;height:48px}
+.auth-logo h1{font-size:1.25rem;font-weight:800;letter-spacing:-.02em}
+.auth-logo p{font-size:.8rem;color:var(--g3)}
+.fg{margin-bottom:1.1rem}
+.fg label{display:block;font-size:.78rem;font-weight:600;color:var(--g2);margin-bottom:.4rem;letter-spacing:.03em}
+.fg input{width:100%;padding:.7rem 1rem;border-radius:9px;font-size:.9rem;
+  background:var(--navy-3);border:1px solid var(--navy-border);color:var(--white);
+  font-family:'Inter',sans-serif;transition:border-color .2s;outline:none}
+.fg input:focus{border-color:var(--gold-d)}
+.auth-submit{width:100%;padding:.8rem;border-radius:9px;background:var(--gold);color:var(--navy);
+  font-size:.95rem;font-weight:700;border:none;cursor:pointer;margin-top:.5rem;
+  transition:background .2s;box-shadow:0 4px 20px rgba(201,151,43,.25)}
+.auth-submit:hover{background:var(--gold-l)}
+.auth-divider{text-align:center;font-size:.78rem;color:var(--g3);margin:1.25rem 0;position:relative}
+.auth-divider::before,.auth-divider::after{content:'';position:absolute;top:50%;
+  width:42%;height:1px;background:var(--navy-border)}
+.auth-divider::before{left:0}.auth-divider::after{right:0}
+.auth-link{text-align:center;font-size:.82rem;color:var(--g3);margin-top:1.25rem}
+.auth-link a{color:var(--gold-l);font-weight:600}
+</style>
+</head>
+<body>
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:64px;background:rgba(13,17,23,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--navy-border)">
+  <a href="/" style="display:flex;align-items:center;gap:8px"><svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#141E30"/><path d="M16 4L16 9M13 6L19 6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M10 9L10 24L22 24L22 9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 24L25 24" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M13 14L15.5 17L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:.95rem;font-weight:700">Insight Hunter</span></a>
+</nav>
+<div class="auth-wrap">
+<div class="auth-card">
+  <div class="auth-logo">
+    <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#141E30"/><path d="M16 4L16 9M13 6L19 6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M10 9L10 24L22 24L22 9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 24L25 24" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M13 14L15.5 17L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h1>Create your account</h1>
+    <p>Free forever. No credit card required.</p>
+  </div>
+  <form onsubmit="event.preventDefault();window.location='/dashboard/index.html'">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+      <div class="fg"><label>First Name</label><input type="text" placeholder="Jane" required/></div>
+      <div class="fg"><label>Last Name</label><input type="text" placeholder="Smith" required/></div>
+    </div>
+    <div class="fg"><label>Email</label><input type="email" placeholder="you@company.com" required/></div>
+    <div class="fg"><label>Password</label><input type="password" placeholder="Min 8 characters" required/></div>
+    <div class="fg"><label>Business Name <span style="color:var(--g3)">(optional)</span></label><input type="text" placeholder="Acme LLC"/></div>
+    <button type="submit" class="auth-submit">Create Free Account →</button>
+  </form>
+  <div class="auth-link">Already have an account? <a href="/auth/login.html">Sign in</a></div>
+</div></div>
+</body>
+</html>

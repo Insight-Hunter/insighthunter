@@ -1,0 +1,70 @@
+/* src/components/TransactionRow.css */
+.transaction-row {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.transaction-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.transaction-summary:hover {
+  background: var(--bg-light);
+}
+
+.summary-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.transaction-date {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.transaction-description {
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.transaction-amount {
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.transaction-details {
+  padding: 0 1rem 1rem;
+  background: var(--bg-light);
+}
+
+.transaction-details table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transaction-details th {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.transaction-details td {
+  padding: 0.5rem;
+}

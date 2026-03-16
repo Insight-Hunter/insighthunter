@@ -1,0 +1,50 @@
+{
+  "name": "insighthunter-bizforma",
+  "main": "src/backend/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bizforma-db",
+      "database_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2_DOCS",
+      "bucket_name": "bizforma-documents"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "FORMATION_AGENT",
+        "class_name": "FormationAgent"
+      },
+      {
+        "name": "COMPLIANCE_AGENT",
+        "class_name": "ComplianceAgent"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["FormationAgent", "ComplianceAgent"]
+    }
+  ],
+  "analytics_engine_datasets": [
+    {
+      "binding": "ANALYTICS",
+      "dataset": "bizforma-requests"
+    }
+  ],
+  "vars": {
+    "AUTH_WORKER_URL": "https://auth.insighthunter.workers.dev"
+  }
+}

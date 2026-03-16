@@ -1,0 +1,273 @@
+2026-03-12 20:42:12.794 [info] Extension host with pid 85 started
+2026-03-12 20:42:12.817 [info] ExtensionService#_doActivateExtension vscode.emmet, startup: false, activationEvent: 'onLanguage'
+2026-03-12 20:42:12.825 [info] ExtensionService#_doActivateExtension google.code-documentation-agent, startup: false, activationEvent: '*'
+2026-03-12 20:42:12.826 [info] ExtensionService#_doActivateExtension vscode.git-base, startup: false, activationEvent: '*', root cause: vscode.git
+2026-03-12 20:42:12.830 [info] ExtensionService#_doActivateExtension google.monospace, startup: false, activationEvent: '*'
+2026-03-12 20:42:12.831 [info] ExtensionService#_doActivateExtension google.monospace-aida, startup: false, activationEvent: '*'
+2026-03-12 20:42:12.832 [info] ExtensionService#_doActivateExtension google.studio-ai-plugin, startup: false, activationEvent: '*'
+2026-03-12 20:42:12.834 [info] ExtensionService#_doActivateExtension Google.validation-agent-extension, startup: false, activationEvent: '*'
+2026-03-12 20:42:18.821 [info] ExtensionService#_doActivateExtension vscode.npm, startup: true, activationEvent: 'workspaceContains:package.json'
+2026-03-12 20:42:18.928 [info] Lock '/home/user/.codeoss-cloudworkstations/data/User/workspaceStorage/-10a716c0/vscode.lock': Lock acquired.
+2026-03-12 20:42:19.067 [info] ExtensionService#_doActivateExtension vscode.git, startup: false, activationEvent: '*'
+2026-03-12 20:42:19.068 [info] ExtensionService#_doActivateExtension vscode.github, startup: false, activationEvent: '*'
+2026-03-12 20:42:21.695 [info] ExtensionService#_doActivateExtension google.agent-management, startup: false, activationEvent: 'api', root cause: google.monospace-aida
+2026-03-12 20:42:23.094 [info] ExtensionService#_doActivateExtension vscode.configuration-editing, startup: false, activationEvent: 'onLanguage:jsonc'
+2026-03-12 20:42:23.097 [info] ExtensionService#_doActivateExtension vscode.json-language-features, startup: false, activationEvent: 'onLanguage:jsonc'
+2026-03-12 20:42:23.098 [info] ExtensionService#_doActivateExtension vscode.typescript-language-features, startup: false, activationEvent: 'onLanguage:jsonc'
+2026-03-12 20:42:24.111 [info] Eager extensions activated
+2026-03-12 20:42:24.113 [info] ExtensionService#_doActivateExtension google.collaboration-extension, startup: false, activationEvent: 'onStartupFinished'
+2026-03-12 20:42:24.114 [info] ExtensionService#_doActivateExtension vscode.debug-auto-launch, startup: false, activationEvent: 'onStartupFinished'
+2026-03-12 20:42:24.114 [info] ExtensionService#_doActivateExtension google.lighthouse-extension, startup: false, activationEvent: 'onStartupFinished'
+2026-03-12 20:42:24.117 [info] ExtensionService#_doActivateExtension vscode.merge-conflict, startup: false, activationEvent: 'onStartupFinished'
+2026-03-12 20:42:24.118 [info] ExtensionService#_doActivateExtension google.gemini-cli-vscode-ide-companion, startup: false, activationEvent: 'onStartupFinished'
+2026-03-12 20:42:26.945 [error] Error: Unknown thread ID
+	at RZ.changeCurrentThread (/nix/store/41mclky8ra02v2czh07gvliwkq8h5l2g-monospace-aida/extension.js:476:6947)
+	at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-03-12 20:42:28.074 [error] Error: Rpc timed out: boq-token-generate
+	at Timeout.<anonymous> (/nix/store/41mclky8ra02v2czh07gvliwkq8h5l2g-monospace-aida/extension.js:267:7457)
+	at listOnTimeout (node:internal/timers:581:17)
+	at process.processTimers (node:internal/timers:519:7)
+2026-03-12 20:42:28.358 [info] ExtensionService#_doActivateExtension vscode.extension-editing, startup: false, activationEvent: 'onLanguage:json'
+2026-03-12 20:43:28.875 [info] ExtensionService#_doActivateExtension google.nix-language, startup: false, activationEvent: 'onLanguage:nix'
+2026-03-12 20:46:32.645 [info] ExtensionService#_doActivateExtension vscode.media-preview, startup: false, activationEvent: 'onCustomEditor:imagePreview.previewEditor'
+2026-03-12 20:46:32.907 [info] ExtensionService#_doActivateExtension vscode.css-language-features, startup: false, activationEvent: 'onLanguage:css'
+2026-03-12 20:49:33.021 [info] ExtensionService#_doActivateExtension vscode.markdown-language-features, startup: false, activationEvent: 'onLanguage:markdown'
+2026-03-12 20:49:35.143 [info] ExtensionService#_doActivateExtension vscode.markdown-math, startup: false, activationEvent: 'api', root cause: vscode.markdown-language-features
+2026-03-12 20:52:05.735 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1120
+2026-03-12 20:52:40.960 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1201
+2026-03-12 20:53:04.006 [info] ExtensionService#_doActivateExtension vscode.html-language-features, startup: false, activationEvent: 'onLanguage:html'
+2026-03-12 20:53:18.837 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1201
+2026-03-12 20:53:30.100 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1201
+2026-03-12 20:53:47.653 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1201
+2026-03-12 20:53:57.253 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1201
+2026-03-12 20:54:16.633 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1201
+2026-03-12 20:55:44.222 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1282
+2026-03-12 20:56:01.101 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1201
+2026-03-12 21:08:08.231 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1202
+2026-03-12 21:09:23.763 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:09:24.634 [warning] [Decorations] CAPPING events from decorations provider vscode.git 2224
+2026-03-12 21:09:46.519 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1203
+2026-03-12 21:09:51.641 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1204
+2026-03-12 21:09:58.746 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1204
+2026-03-12 21:10:44.158 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1204
+2026-03-12 21:10:55.869 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1204
+2026-03-12 21:12:07.017 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1204
+2026-03-12 21:12:27.108 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1204
+2026-03-12 21:12:58.306 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1204
+2026-03-12 21:13:03.519 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:13:03.519 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:13:08.515 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1205
+2026-03-12 21:13:13.614 [warning] [Decorations] CAPPING events from decorations provider vscode.git 1205
+2026-03-12 21:17:07.336 [error] Error: ENOENT: no such file or directory, open '/home/user/.codeoss-cloudworkstations/data/User/workspaceStorage/-10a716c0/vscode.lock'
+	at async open (node:internal/fs/promises:639:25)
+	at async Object.readFile (node:internal/fs/promises:1246:14)
+	at async Zy (file:///nix/store/c4v11xch4fil6z7g5m41470zfhfyvdl0-code-oss/out/vs/workbench/api/node/extensionHostProcess.js:191:6083)
+	at async file:///nix/store/c4v11xch4fil6z7g5m41470zfhfyvdl0-code-oss/out/vs/workbench/api/node/extensionHostProcess.js:191:5090
+2026-03-12 21:17:07.362 [info] Lock '/home/user/.codeoss-cloudworkstations/data/User/workspaceStorage/-10a716c0/vscode.lock': The lock was lost unexpectedly.
+2026-03-12 21:17:07.363 [error] Error: ENOENT: no such file or directory, utime '/home/user/.codeoss-cloudworkstations/data/User/workspaceStorage/-10a716c0/vscode.lock'
+	at async Object.utimes (node:internal/fs/promises:1138:10)
+	at async file:///nix/store/c4v11xch4fil6z7g5m41470zfhfyvdl0-code-oss/out/vs/workbench/api/node/extensionHostProcess.js:191:5208
+2026-03-12 21:17:07.363 [info] Lock '/home/user/.codeoss-cloudworkstations/data/User/workspaceStorage/-10a716c0/vscode.lock': Could not update mtime.
+2026-03-12 21:17:09.438 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:18:49.149 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3097
+2026-03-12 21:19:36.022 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3124
+2026-03-12 21:19:56.042 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3125
+2026-03-12 21:20:16.559 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3127
+2026-03-12 21:20:41.540 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3278
+2026-03-12 21:22:29.968 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3281
+2026-03-12 21:23:06.648 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:23:25.445 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:23:31.090 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3281
+2026-03-12 21:23:44.736 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3280
+2026-03-12 21:23:49.908 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3279
+2026-03-12 21:23:55.242 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:23:55.243 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:23:55.243 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:24:01.340 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:24:01.340 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:24:01.340 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:24:01.340 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:24:02.284 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3281
+2026-03-12 21:24:15.368 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:24:15.368 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:24:15.368 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:24:15.368 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:24:15.369 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:24:31.997 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3281
+2026-03-12 21:24:55.096 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3281
+2026-03-12 21:25:05.610 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:25:05.610 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:25:05.611 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:25:05.611 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:25:05.611 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:25:05.611 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:25:08.791 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:25:19.397 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:25:19.397 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:25:19.397 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:25:19.397 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:25:19.397 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:25:19.397 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:25:19.397 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:25:31.549 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:25:37.386 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:25:42.766 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:25:52.287 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:26:04.512 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:26:41.877 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:26:53.108 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:29:40.283 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:40.299 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:40.299 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:40.299 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:40.299 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:40.299 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:40.299 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:40.299 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:41.888 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:29:47.086 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:29:57.278 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:57.278 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:57.279 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:57.279 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:57.279 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:57.279 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:57.279 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:57.279 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:57.279 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:29:57.660 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:30:03.982 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3282
+2026-03-12 21:30:09.249 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3283
+2026-03-12 21:30:14.402 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3284
+2026-03-12 21:30:29.475 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:30:29.475 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:30:29.476 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:30:29.476 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:30:29.476 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:30:29.476 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:30:29.476 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:30:29.476 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:30:29.476 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:30:29.476 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:30:29.856 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3284
+2026-03-12 21:32:47.528 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3284
+2026-03-12 21:33:13.508 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3284
+2026-03-12 21:33:18.233 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:18.233 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:18.233 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:18.233 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:18.233 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:18.233 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:18.233 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:18.233 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:18.233 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:18.234 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:18.234 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:18.786 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3284
+2026-03-12 21:33:46.146 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:46.146 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:46.146 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:46.146 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:46.147 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:46.147 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:46.147 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:46.148 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:46.148 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:46.148 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:46.148 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:33:46.149 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:34:00.895 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3284
+2026-03-12 21:34:06.054 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3285
+2026-03-12 21:34:11.307 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3286
+2026-03-12 21:34:16.456 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3286
+2026-03-12 21:34:21.822 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3286
+2026-03-12 21:34:41.474 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3286
+2026-03-12 21:34:46.711 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3287
+2026-03-12 21:34:52.182 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3288
+2026-03-12 21:34:57.338 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3288
+2026-03-12 21:35:05.703 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3288
+2026-03-12 21:35:11.144 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3288
+2026-03-12 21:35:12.744 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:35:12.744 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:35:12.744 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:35:12.744 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:35:12.744 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:35:12.745 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:35:12.745 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:35:12.745 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:35:12.745 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:35:12.745 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:35:12.745 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:35:12.748 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:35:12.748 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:35:16.311 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3288
+2026-03-12 21:37:08.280 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.281 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.281 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.281 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.281 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.281 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.281 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.281 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.281 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.281 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.281 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.281 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.282 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.282 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:37:08.639 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3288
+2026-03-12 21:37:39.710 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3289
+2026-03-12 21:37:45.226 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3289
+2026-03-12 21:37:58.671 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3289
+2026-03-12 21:38:10.768 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3289
+2026-03-12 21:38:15.130 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.131 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.131 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.131 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.131 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.131 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.132 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.132 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.132 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.132 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.132 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.133 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.133 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.133 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:15.133 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:38:16.015 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3289
+2026-03-12 21:38:35.801 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3289
+2026-03-12 21:40:03.716 [warning] [Decorations] CAPPING events from decorations provider vscode.git 3289
+2026-03-12 21:40:12.377 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.378 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.378 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.378 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.378 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.378 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.378 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.379 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.379 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.379 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.379 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.379 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.379 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.379 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.379 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:12.379 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.745 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.746 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.746 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.746 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.746 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.746 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.746 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.746 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.746 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.746 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.747 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.747 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.747 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.747 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.747 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.747 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099
+2026-03-12 21:40:46.747 [error] @https://firebase-insighthunter-1773348109985.cluster-muh7x464abftkrqshm4vshlbtu.cloudworkstations.dev/cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/static/out/vs/code/browser/workbench/workbench.js:1288:27099

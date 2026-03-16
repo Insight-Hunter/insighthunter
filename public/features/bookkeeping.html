@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="Keep your books clean automatically. Chart of accounts, transaction categorization, reconciliation, and real-time P&L — no accountant required."/>
+<title>Bookkeeping — Insight Hunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0D1117;--navy-2:#0F1929;--navy-3:#141E30;--navy-card:#161B22;--navy-border:#1E2A3A;
+  --gold:#C9972B;--gold-l:#D4A843;--gold-d:#8A6820;
+  --white:#FFF;--g1:#E2E8F0;--g2:#94A3B8;--g3:#64748B;--g4:#334155;
+  --green:#10B981;--red:#EF4444;--blue:#3B82F6;--amber:#F59E0B;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(1.5rem,5vw,4rem);height:64px;background:rgba(13,17,23,.88);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--navy-border)}
+.nl{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nl svg{width:32px;height:32px}
+.nl span{font-size:1.05rem;font-weight:700;letter-spacing:-.02em}
+.nav-links{display:flex;align-items:center;gap:2rem;list-style:none}
+.nav-links a{color:var(--g2);font-size:.875rem;font-weight:500;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--white)}
+.nav-cta{display:flex;gap:.75rem;align-items:center}
+.btn-ghost{padding:.45rem 1.1rem;border-radius:8px;border:1px solid var(--navy-border);
+  background:transparent;color:var(--g1);font-size:.875rem;font-weight:500;cursor:pointer;
+  transition:border-color .2s,color .2s}
+.btn-ghost:hover{border-color:var(--gold-d);color:var(--white)}
+.btn-gold{padding:.45rem 1.25rem;border-radius:8px;background:var(--gold);color:var(--navy);
+  font-size:.875rem;font-weight:700;cursor:pointer;border:none;
+  transition:background .2s,transform .15s}
+.btn-gold:hover{background:var(--gold-l);transform:translateY(-1px)}
+.nh{display:none;background:none;border:none;cursor:pointer;padding:4px}
+.nh span{display:block;width:22px;height:2px;background:var(--g2);margin:5px 0;border-radius:2px}
+footer{background:var(--navy-3);border-top:1px solid var(--navy-border);
+  padding:3rem clamp(1.5rem,5vw,4rem) 2rem;margin-top:auto}
+.footer-grid{max-width:1280px;margin:0 auto;display:grid;
+  grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem}
+.footer-brand p{font-size:.82rem;color:var(--g3);line-height:1.7;margin-top:.75rem;max-width:220px}
+.footer-col h4{font-size:.75rem;font-weight:700;color:var(--g3);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem}
+.footer-col a{display:block;font-size:.82rem;color:var(--g2);
+  margin-bottom:.5rem;transition:color .2s}
+.footer-col a:hover{color:var(--gold-l)}
+.footer-bottom{max-width:1280px;margin:2rem auto 0;
+  border-top:1px solid var(--navy-border);padding-top:1.25rem;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:.75rem;color:var(--g3)}
+.section{padding:5rem clamp(1.5rem,5vw,4rem)}
+.section-inner{max-width:1280px;margin:0 auto}
+.section-label{font-size:.72rem;font-weight:700;color:var(--gold);
+  text-transform:uppercase;letter-spacing:.12em;margin-bottom:.75rem}
+.section-title{font-size:clamp(1.75rem,3vw,2.75rem);font-weight:800;
+  letter-spacing:-.03em;line-height:1.1;margin-bottom:1rem}
+.section-sub{font-size:1rem;color:var(--g2);line-height:1.7;max-width:560px}
+.card{background:var(--navy-card);border:1px solid var(--navy-border);
+  border-radius:14px;padding:1.5rem;transition:border-color .2s,transform .2s}
+.card:hover{border-color:rgba(201,151,43,.3);transform:translateY(-2px)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;
+  border-radius:100px;font-size:.72rem;font-weight:600;
+  border:1px solid rgba(201,151,43,.3);background:rgba(201,151,43,.08);color:var(--gold-l);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:1.25rem}
+.badge span{width:6px;height:6px;background:var(--gold);border-radius:50%}
+@media(max-width:1024px){.footer-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){
+  .nav-links{display:none}.nh{display:block}
+  .footer-grid{grid-template-columns:1fr}}
+
+.feat-hero{padding:5rem clamp(1.5rem,5vw,4rem) 3rem;
+  display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;
+  max-width:1280px;margin:0 auto}
+.feat-hero h1{font-size:clamp(1.75rem,3.5vw,2.75rem);font-weight:800;letter-spacing:-.03em;margin-bottom:1rem}
+.feat-hero p{font-size:1rem;color:var(--g2);line-height:1.75;margin-bottom:2rem}
+.feat-mock{background:var(--navy-card);border:1px solid var(--navy-border);
+  border-radius:16px;padding:2rem;aspect-ratio:4/3;display:flex;flex-direction:column;
+  gap:1rem;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.feat-mock-bar{display:flex;gap:6px;align-items:center;padding-bottom:1rem;border-bottom:1px solid var(--navy-border)}
+.feat-mock-dot{width:10px;height:10px;border-radius:50%}
+.mock-line{height:10px;border-radius:5px;background:var(--navy-border)}
+.mock-line.gold{background:linear-gradient(90deg,var(--gold) 0%,rgba(201,151,43,.2) 100%)}
+.feats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;padding:0 clamp(1.5rem,5vw,4rem) 5rem;max-width:1280px;margin:0 auto}
+.feat-item{display:flex;align-items:flex-start;gap:.85rem;padding:1.1rem 1.25rem;
+  background:var(--navy-card);border:1px solid var(--navy-border);border-radius:12px;
+  transition:border-color .2s}
+.feat-item:hover{border-color:rgba(201,151,43,.25)}
+.feat-check{width:18px;height:18px;flex-shrink:0;margin-top:1px}
+.feat-item p{font-size:.85rem;color:var(--g2);line-height:1.5}
+.cta-band{background:var(--navy-3);border-top:1px solid var(--navy-border);
+  padding:4rem clamp(1.5rem,5vw,4rem);text-align:center}
+@media(max-width:768px){.feat-hero{grid-template-columns:1fr}.feats-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nl"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="8" fill="#141E30"/>
+  <path d="M16 4L16 9M13 6L19 6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M10 9L10 24L22 24L22 9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M7 24L25 24" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M13 24L13 19L19 19L19 24" stroke="#C9972B" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M13 14L15.5 17L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg><span>Insight Hunter</span></a>
+  <ul class="nav-links"><li><a href="/#features">Features</a></li><li><a href="/pricing.html">Pricing</a></li><li><a href="/about.html">About</a></li><li><a href="/contact.html">Contact</a></li></ul>
+  <div class="nav-cta">
+    <a href="/auth/login.html" class="btn-ghost">Sign In</a>
+    <a href="/auth/register.html" class="btn-gold">Get Started</a>
+  </div>
+  <button class="nh" aria-label="Menu" onclick="this.previousElementSibling.previousElementSibling.style.display=this.previousElementSibling.previousElementSibling.style.display==='flex'?'none':'flex'">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<main style="padding-top:64px">
+<div style="background:radial-gradient(ellipse 60% 50% at 50% 0%,#10B98112 0%,transparent 70%);padding-top:2rem">
+<div class="feat-hero">
+  <div>
+    <div class="badge" style="border-color:#10B98144;background:#10B98111;color:#10B981"><span style="background:#10B981"></span>Accounting & Reports</div>
+    <h1>Bookkeeping</h1>
+    <p>Keep your books clean automatically. Chart of accounts, transaction categorization, reconciliation, and real-time P&L — no accountant required.</p>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+      <a href="/auth/register.html" class="btn-gold" style="padding:.7rem 1.5rem;font-size:.9rem;border-radius:9px;display:inline-block">Get Started Free</a>
+      <a href="/pricing.html" class="btn-ghost" style="padding:.7rem 1.5rem;font-size:.9rem;border-radius:9px;display:inline-block">View Pricing</a>
+    </div>
+  </div>
+  <div class="feat-mock">
+    <div class="feat-mock-bar">
+      <div class="feat-mock-dot" style="background:#EF4444"></div>
+      <div class="feat-mock-dot" style="background:#F59E0B"></div>
+      <div class="feat-mock-dot" style="background:#10B981"></div>
+      <span style="font-size:.65rem;color:var(--g3);margin-left:8px">Bookkeeping — Insight Hunter</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:.6rem;flex:1;justify-content:center"><div class="mock-line  gold" style="width:60%;opacity:0.8"></div><div class="mock-line" style="width:67%;opacity:0.3"></div><div class="mock-line" style="width:74%;opacity:0.3"></div><div class="mock-line  gold" style="width:81%;opacity:0.8"></div><div class="mock-line" style="width:88%;opacity:0.3"></div><div class="mock-line" style="width:95%;opacity:0.3"></div><div class="mock-line  gold" style="width:102%;opacity:0.8"></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem">
+      <div style="height:36px;border-radius:6px;background:#10B98122;border:1px solid #10B98133"></div>
+      <div style="height:36px;border-radius:6px;background:#10B98122;border:1px solid #10B98133"></div>
+      <div style="height:36px;border-radius:6px;background:#10B98115;border:1px solid #10B98122"></div>
+    </div>
+  </div>
+</div>
+</div>
+<div style="padding:3rem clamp(1.5rem,5vw,4rem) 2rem;max-width:1280px;margin:0 auto">
+  <div class="section-label">Everything Included</div>
+  <h2 class="section-title" style="margin-bottom:2rem">What You Get with Bookkeeping</h2>
+</div>
+<div class="feats-grid"><div class="feat-item"><svg class="feat-check" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#10B981" fill-opacity=".15"/><path d="M5 9l3 3 5-5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><p>Auto-generated Chart of Accounts on business formation</p></div><div class="feat-item"><svg class="feat-check" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#10B981" fill-opacity=".15"/><path d="M5 9l3 3 5-5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><p>Transaction import via CSV or direct feed</p></div><div class="feat-item"><svg class="feat-check" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#10B981" fill-opacity=".15"/><path d="M5 9l3 3 5-5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><p>AI-powered expense categorization</p></div><div class="feat-item"><svg class="feat-check" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#10B981" fill-opacity=".15"/><path d="M5 9l3 3 5-5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><p>Real-time P&L statement and balance sheet</p></div><div class="feat-item"><svg class="feat-check" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#10B981" fill-opacity=".15"/><path d="M5 9l3 3 5-5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><p>Bank reconciliation workflow</p></div><div class="feat-item"><svg class="feat-check" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#10B981" fill-opacity=".15"/><path d="M5 9l3 3 5-5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><p>Invoicing with payment status tracking</p></div><div class="feat-item"><svg class="feat-check" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#10B981" fill-opacity=".15"/><path d="M5 9l3 3 5-5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><p>Month-end close checklist</p></div><div class="feat-item"><svg class="feat-check" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#10B981" fill-opacity=".15"/><path d="M5 9l3 3 5-5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><p>Export-ready reports for your accountant or CPA</p></div></div>
+<div class="cta-band">
+  <div class="badge" style="margin-bottom:1.25rem;border-color:#10B98144;background:#10B98111;color:#10B981"><span style="background:#10B981"></span>Ready to get started?</div>
+  <h2 style="font-size:1.75rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.75rem">Try Bookkeeping Free Today</h2>
+  <p style="color:var(--g2);font-size:.95rem;margin-bottom:1.75rem">No credit card required. Set up in minutes.</p>
+  <a href="/auth/register.html" class="btn-gold" style="padding:.8rem 2rem;font-size:.95rem;border-radius:10px;display:inline-block">Create Free Account</a>
+</div></main>
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="nl" style="gap:8px">
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#141E30"/><path d="M16 4L16 9M13 6L19 6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M10 9L10 24L22 24L22 9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 24L25 24" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M13 14L15.5 17L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="font-size:.95rem;font-weight:700">Insight Hunter</span>
+      </a>
+      <p>Your smart business finance assistant. Formation, bookkeeping, forecasting, and compliance in one platform.</p>
+    </div>
+    <div class="footer-col"><h4>Platform</h4>
+      <a href="/features/bizforma.html">BizForma</a>
+      <a href="/features/bookkeeping.html">Bookkeeping</a>
+      <a href="/features/insight-pro.html">Insight Pro</a>
+      <a href="/features/scout.html">Scout</a>
+    </div>
+    <div class="footer-col"><h4>Company</h4>
+      <a href="/about.html">About</a>
+      <a href="/pricing.html">Pricing</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/dashboard/index.html">Dashboard</a>
+    </div>
+    <div class="footer-col"><h4>Legal</h4>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Insight Hunter. All rights reserved.</span>
+    <span>Built on <span style="color:var(--gold)">Cloudflare Edge</span></span>
+  </div>
+</footer>
+</body>
+</html>

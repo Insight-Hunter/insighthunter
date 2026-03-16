@@ -1,0 +1,124 @@
+---
+import type { User } from "@/types";
+interface Props {
+  title?:    string;
+  subtitle?: string;
+}
+const { title = "Dashboard", subtitle } = Astro.props;
+const user = Astro.locals.user as User | undefined;
+
+const nav = [
+  { href: "/dashboard",             icon: "📊", label: "Overview"      },
+  { href: "/dashboard/profit-loss", icon: "📈", label: "Profit & Loss" },
+  { href: "/dashboard/cash-flow",   icon: "💰", label: "Cash Flow"     },
+  { href: "/dashboard/ai",          icon: "🤖", label: "Insight AI"    },
+  { href: "/dashboard/reports",     icon: "📄", label: "Reports"       },
+  { href: "/dashboard/connect",     icon: "🔗", label: "QuickBooks"    },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title} — InsightHunter</title>
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="stylesheet" href="/src/styles/global.css" />
+  </head>
+
+  <body class="h-full flex flex-col">
+
+    <!-- ── Top Nav Bar ─────────────────────────────────────────────────── -->
+    <header class="shrink-0 h-16 flex items-center px-4 md:px-8 gap-4 z-50"
+      style="background: rgba(7,13,42,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(124,58,237,0.2);">
+
+      <!-- Logo -->
+      <a href="/dashboard" class="flex items-center gap-2.5 shrink-0 mr-2">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+          style="background: linear-gradient(135deg,#7c3aed,#3b82f6); box-shadow: 0 0 16px rgba(124,58,237,0.5);">
+          <span class="text-white font-black text-xs">IH</span>
+        </div>
+        <span class="font-black text-sm tracking-wider text-gradient hidden sm:block">INSIGHTHUNTER</span>
+        <span class="text-[9px] font-bold tracking-widest text-violet-400 border border-violet-500/40 rounded px-1 py-0.5 hidden sm:block">LITE</span>
+      </a>
+
+      <!-- Desktop nav pills -->
+      <nav class="hidden md:flex items-center gap-1 flex-1">
+        {nav.map(({ href, icon, label }) => (
+          <a
+            href={href}
+            class:list={[
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+              currentPath === href
+                ? "text-white bg-violet-600/20 border border-violet-500/30"
+                : "text-slate-400 hover:text-white hover:bg-white/5"
+            ]}
+          >
+            <span class="text-sm">{icon}</span>
+            {label}
+          </a>
+        ))}
+      </nav>
+
+      <!-- Right side: tier badge + user + settings -->
+      <div class="ml-auto flex items-center gap-3">
+        <!-- Upgrade nudge -->
+        <a href="/upgrade"
+          class="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
+          style="background: linear-gradient(90deg,rgba(236,72,153,0.15),rgba(124,58,237,0.15)); border: 1px solid rgba(236,72,153,0.3); color: #f0abfc;">
+          ⚡ Upgrade
+        </a>
+
+        <!-- Notifications -->
+        <button class="relative w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition"
+          style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);">
+          <span class="text-sm">🔔</span>
+          <span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-violet-500"></span>
+        </button>
+
+        <!-- Avatar -->
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white shrink-0"
+          style="background: linear-gradient(135deg,#7c3aed,#3b82f6);">
+          {user?.name?.[0]?.toUpperCase() ?? "U"}
+        </div>
+      </div>
+    </header>
+
+    <!-- ── Mobile bottom nav ───────────────────────────────────────────── -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around px-2 py-2"
+      style="background: rgba(7,13,42,0.95); backdrop-filter: blur(16px); border-top: 1px solid rgba(124,58,237,0.2);">
+      {nav.slice(0,5).map(({ href, icon, label }) => (
+        <a href={href}
+          class:list={[
+            "flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl text-[10px] transition-all",
+            currentPath === href ? "text-violet-400" : "text-slate-500 hover:text-slate-300"
+          ]}>
+          <span class="text-lg leading-none">{icon}</span>
+          {label}
+        </a>
+      ))}
+    </nav>
+
+    <!-- ── Main content ────────────────────────────────────────────────── -->
+    <main class="flex-1 overflow-y-auto pb-24 md:pb-8">
+
+      <!-- Page header band -->
+      {(title !== "Overview" || subtitle) && (
+        <div class="px-4 md:px-8 pt-6 pb-2">
+          <h1 class="text-2xl font-black text-white tracking-tight">{title}</h1>
+          {subtitle && <p class="text-sm text-slate-400 mt-0.5">{subtitle}</p>}
+        </div>
+      )}
+
+      <div class="px-4 md:px-8 py-4">
+        <slot />
+      </div>
+    </main>
+
+  </body>
+</html>

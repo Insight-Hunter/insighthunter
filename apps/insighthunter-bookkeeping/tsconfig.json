@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target":           "ES2022",
+    "module":           "ES2022",
+    "moduleResolution": "bundler",
+    "lib":              ["ES2022"],
+    "types":            ["@cloudflare/workers-types"],
+    "strict":           true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": false,
+    "skipLibCheck":     true,
+    "outDir":           "./dist",
+    "rootDir":          "./src",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@insighthunter/types": ["./src/types"]
+    }
+  },
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

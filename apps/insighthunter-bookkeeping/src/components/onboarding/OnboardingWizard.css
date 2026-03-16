@@ -1,0 +1,74 @@
+/* src/components/onboarding/OnboardingWizard.css */
+.onboarding-container {
+    display: flex;
+    height: 100vh;
+}
+
+.onboarding-sidebar {
+    width: 300px;
+    padding: 2rem;
+    background-color: #f7fafc;
+    border-right: 1px solid #e2e8f0;
+}
+
+.onboarding-main {
+    flex: 1;
+    padding: 2rem;
+}
+
+.steps-list {
+    margin-top: 2rem;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+}
+
+.step-item.active {
+    opacity: 1;
+}
+
+.step-item.completed {
+    opacity: 1;
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #cbd5e0;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.step-item.completed .step-number {
+    background-color: #48bb78;
+}
+
+.step-title {
+    font-weight: bold;
+}
+
+.step-description {
+    font-size: 0.875rem;
+    color: #718096;
+}
+
+.onboarding-step {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

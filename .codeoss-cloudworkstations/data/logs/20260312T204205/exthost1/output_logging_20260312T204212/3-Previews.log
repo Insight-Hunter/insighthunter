@@ -1,0 +1,32 @@
+2026-03-12T20:43:28Z [web] <Firebase Studio> Starting preview...
+2026-03-12T20:43:28Z [web] Waiting for your web server to start serving
+2026-03-12T20:43:29Z [web] 
+2026-03-12T20:43:29Z [web] > out@0.1.0 dev
+2026-03-12T20:43:29Z [web] > next dev --port 9002 --hostname 0.0.0.0
+2026-03-12T20:43:29Z [web] 
+2026-03-12T20:43:32Z [web] <Firebase Studio> ▶️ Preview running
+2026-03-12T20:43:33Z [web]   Downloading swc package @next/swc-wasm-nodejs... to /home/user/.cache/next-swc
+2026-03-12T20:43:36Z [web] Error: ⚠ Attempted to load @next/swc-linux-x64-gnu, but an error occurred: Error parsing /home/user/insighthunter/node_modules/@next/swc-linux-x64-gnu/package.json: Unexpected end of JSON input
+2026-03-12T20:43:36Z [web] 
+2026-03-12T20:43:36Z [web] Error: ⚠ Attempted to load @next/swc-linux-x64-musl, but an error occurred: libc.musl-x86_64.so.1: cannot open shared object file: No such file or directory
+2026-03-12T20:43:36Z [web] 
+2026-03-12T20:43:36Z [web] ▲ Next.js 16.1.6 (Turbopack)
+2026-03-12T20:43:36Z [web] - Local:         http://localhost:9002
+2026-03-12T20:43:36Z [web] - Network:       http://0.0.0.0:9002
+2026-03-12T20:43:36Z [web] 
+2026-03-12T20:43:36Z [web] ✓ Starting...
+2026-03-12T20:43:36Z [web] Attention: Next.js now collects completely anonymous telemetry regarding usage.
+2026-03-12T20:43:36Z [web] This information is used to shape Next.js' roadmap and prioritize features.
+2026-03-12T20:43:36Z [web] You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+2026-03-12T20:43:36Z [web] https://nextjs.org/telemetry
+2026-03-12T20:43:36Z [web] 
+2026-03-12T20:43:36Z [web]   Skipping creating a lockfile at /home/user/insighthunter/.next/dev/lock because we're using WASM bindings
+2026-03-12T20:43:37Z [web] Error: Error: `turbo.createProject` is not supported by the wasm bindings.
+2026-03-12T20:43:37Z [web]     at ignore-listed frames
+2026-03-12T20:43:37Z [web] 
+2026-03-12T20:43:38Z [web] Error: ⚠ Attempted to load @next/swc-linux-x64-gnu, but an error occurred: Error parsing /home/user/insighthunter/node_modules/@next/swc-linux-x64-gnu/package.json: Unexpected end of JSON input
+2026-03-12T20:43:38Z [web] 
+2026-03-12T20:43:38Z [web] Error: ⚠ Attempted to load @next/swc-linux-x64-musl, but an error occurred: libc.musl-x86_64.so.1: cannot open shared object file: No such file or directory
+2026-03-12T20:43:38Z [web] 
+2026-03-12T20:43:39Z [web] [?25h
+2026-03-12T20:43:39Z [web] <Firebase Studio> ✘ Preview shutdown unexpectedly

@@ -1,0 +1,94 @@
+name = "insighthunter"
+compatibility_date = "2025-03-07"
+compatibility_flags = ["nodejs_compat"]
+# account_id = "18e61a3669253dcfd0c7eec6be36a3"
+pages_build_output_dir = ".next"
+
+
+#──────────────────────────────────────────────────────────────────────────────
+# InsightHunter — Root Wrangler Config
+# Path: /wrangler.toml
+# Purpose: Shared baseline + workspace references for all workers/pages
+#──────────────────────────────────────────────────────────────────────────────
+
+# [observability]
+# enabled = true
+# head_sampling_rate = 1
+
+[[services]]
+binding = "AUTH"
+service = "insighthunter-auth"
+
+#──────────────────────────────────────────────────────────────────────────────
+# SHARED D1 — all workers bind to this same database
+#──────────────────────────────────────────────────────────────────────────────
+[[d1_databases]]
+binding      = "DB"
+database_name = "insighthunter-db"
+database_id  = "aa2b9aa2-f1dd-4fdc-b4b0"
+
+#──────────────────────────────────────────────────────────────────────────────
+# SHARED KV — sessions
+#──────────────────────────────────────────────────────────────────────────────
+[[kv_namespaces]]
+binding    = "SESSIONS"
+id         = "60e34ba310ca40c79edec05470c7a271"
+preview_id = "60e34ba310ca40c79edec05470c7a271"
+
+#──────────────────────────────────────────────────────────────────────────────
+# SHARED KV — rate limiting
+#──────────────────────────────────────────────────────────────────────────────
+[[kv_namespaces]]
+binding    = "RATE_LIMIT"
+id         = "f75a15f1df8c42cdb2e623d8cb324a23"
+preview_id = "f75a15f1df8c42cdb2e623d8cb324a23"
+
+#──────────────────────────────────────────────────────────────────────────────
+# SHARED R2 — general storage
+#──────────────────────────────────────────────────────────────────────────────
+[[r2_buckets]]
+binding     = "STORAGE"
+bucket_name = "insighthunter-storage"
+
+#──────────────────────────────────────────────────────────────────────────────
+# SHARED R2 — documents (BizForma, reports)
+#──────────────────────────────────────────────────────────────────────────────
+[[r2_buckets]]
+binding     = "DOCUMENTS"
+bucket_name = "insighthunter-documents"
+
+#──────────────────────────────────────────────────────────────────────────────
+# SHARED QUEUE — email delivery pipeline
+#──────────────────────────────────────────────────────────────────────────────
+[[queues.producers]]
+binding = "EMAIL_QUEUE"
+queue   = "insighthunter-emails"
+
+#──────────────────────────────────────────────────────────────────────────────
+# SHARED ANALYTICS ENGINE
+#──────────────────────────────────────────────────────────────────────────────
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "insighthunter_events"
+
+#──────────────────────────────────────────────────────────────────────────────
+# GLOBAL VARS (non-secret)
+#──────────────────────────────────────────────────────────────────────────────
+[vars]
+APP_NAME              = "insighthunter"
+APP_URL               = "https://insighthunter.app"
+APP_ENV               = "production"
+AUTH_WORKER_URL       = "https://auth.insighthunter.app"
+BIZFORMA_API_URL      = "https://bizforma.insighthunter.app"
+AI_WORKER_URL         = "https://ai.insighthunter.app"
+STRIPE_PUBLISHABLE_KEY = "pk_test_51TAyRXF3gri2YoH2uAWOfNsiNwgdE8v7EBlK3IsysoOLgugarYbRjbz1VLt8N2cud02VYAQKv02hrzZNCqE18Gz600iEP577MK"
+
+#──────────────────────────────────────────────────────────────────────────────
+# SECRETS — never store values here, set via CLI
+# Run once per environment:
+#  wrangler secret put JWT_SECRET
+#  wrangler secret put STRIPE_SECRET_KEY
+#  wrangler secret put STRIPE_WEBHOOK_SECRET
+#  wrangler secret put SESSION_SALT
+#  wrangler secret put SENDGRID_API_KEY
+# wrangler login

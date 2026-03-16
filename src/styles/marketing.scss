@@ -1,0 +1,53 @@
+@use './theme' as *;
+
+.mkt-page {
+  background-color: $mkt-bg;
+  color: $mkt-text;
+  min-height: 100vh;
+}
+
+// ─── Hero ────────────────────────────────────────────────────────────────────
+.hero-section {
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 45%, #0f2040 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(34,197,94,0.08) 0%, transparent 70%);
+  }
+}
+
+// ─── Pricing Cards ───────────────────────────────────────────────────────────
+.pricing-card {
+  background: $mkt-surface;
+  border: 1px solid $mkt-border;
+  border-radius: $radius-xl;
+  padding: 2rem;
+  @include transition;
+
+  &:hover { box-shadow: $shadow-md; transform: translateY(-2px); }
+
+  &--highlight {
+    border-color: $color-accent;
+    box-shadow: 0 0 0 1px $color-accent, $shadow-md;
+    position: relative;
+  }
+}
+
+// ─── Feature Grid ────────────────────────────────────────────────────────────
+.feature-card {
+  background: $mkt-surface;
+  border: 1px solid $mkt-border;
+  border-radius: $radius-xl;
+  padding: 1.5rem;
+  @include transition;
+
+  &:hover {
+    border-color: rgba(34,197,94,0.4);
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+}
