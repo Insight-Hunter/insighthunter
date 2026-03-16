@@ -8,15 +8,10 @@ enabled = true
 
 # D1 — users, sessions, roles
 [[d1_databases]]
-binding        = "DB"
-database_name  = "insighthunter-auth"
-database_id    = "36b4a6b7-3509-4cd2-9cdc-7a35990affd5"
-migrations_dir = "migrations"
-
-[[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-auth-db"
-database_id = "REPLACE_WITH_D1_ID"
+database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
+migrations_dir = "migrations"
 
 # KV — session tokens + reset tokens + email verification
 [[kv_namespaces]]
@@ -31,7 +26,8 @@ preview_id = "029a6b1c13a24c89b0dbd39e4b5f6021"
 
 [[kv_namespaces]]
 binding = "AUTH_KV"
-id = "REPLACE_WITH_KV_ID"
+id = "8ac9bbaeda4d410db31878ebb8b8a3f1"
+preview_id = "8ac9bbaeda4d410db31878ebb8b8a3f1"
 
 # Analytics Engine — auth events
 [[analytics_engine_datasets]]
