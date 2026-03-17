@@ -1,0 +1,25 @@
+{
+  "name": "insighthunter-pbx",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-11-01",
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter-auth-db",
+      "database_id": "REPLACE_WITH_YOUR_AUTH_D1_ID"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "REPLACE_WITH_YOUR_KV_ID"
+    }
+  ]
+  // Secrets:
+  // wrangler secret put TWILIO_ACCOUNT_SID
+  // wrangler secret put TWILIO_AUTH_TOKEN
+  // wrangler secret put TWILIO_TWIML_APP_SID
+  // wrangler secret put JWT_SECRET
+  // wrangler secret put WORKER_URL   (https://insighthunter-pbx.workers.dev)
+}

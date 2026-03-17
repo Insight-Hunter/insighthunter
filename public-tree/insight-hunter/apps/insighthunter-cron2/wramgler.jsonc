@@ -1,0 +1,17 @@
+{
+    "name": "insighthunter-cron",
+    "main": "src/index.ts",
+    "compatibility_date": "2025-11-01",
+    "observability": { "enabled": true },
+    "triggers": {
+      "crons": ["0 0 * * *"]
+    },
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "insighthunter-auth-db",
+        "database_id": "REPLACE_WITH_YOUR_AUTH_D1_ID"
+      }
+    ]
+  }
+  
