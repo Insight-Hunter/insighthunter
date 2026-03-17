@@ -1,13 +1,517 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Insights · Insight Hunter</title>
-  <link rel="stylesheet" href="/assets/css/global.css" />
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AI Insights — Insight Hunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0D1117;--navy-card:#161B22;--navy-mid:#1C2433;--navy-border:#1E2A3A;
+  --gold:#C9972B;--gold-l:#D4A843;--gold-dim:rgba(201,151,43,.12);
+  --g1:#E2E8F0;--g2:#94A3B8;--g3:#64748B;--g4:#2D3748;
+  --green:#10B981;--green-dim:rgba(16,185,129,.1);
+  --red:#EF4444;--red-dim:rgba(239,68,68,.1);
+  --amber:#F59E0B;--amber-dim:rgba(245,158,11,.1);
+  --blue:#3B82F6;--blue-dim:rgba(59,130,246,.1);
+  --purple:#8B5CF6;--purple-dim:rgba(139,92,246,.1);
+}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--g1);margin:0;display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--navy-card);border-right:1px solid var(--navy-border);
+  display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
+.sidebar-logo{display:flex;align-items:center;gap:9px;padding:1.25rem;font-size:.9rem;font-weight:800;
+  letter-spacing:-.02em;border-bottom:1px solid var(--navy-border);color:#fff}
+.nav-section{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--g4);padding:.9rem 1.25rem .35rem}
+.nav-item{display:flex;align-items:center;gap:.65rem;padding:.55rem 1rem;margin:.1rem .6rem;
+  border-radius:8px;font-size:.8rem;color:var(--g2);text-decoration:none;transition:.15s}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--g1)}
+.nav-item.active{background:var(--gold-dim);color:var(--gold-l);font-weight:600}
+.sidebar-bottom{margin-top:auto;padding:.75rem;border-top:1px solid var(--navy-border)}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow-y:auto}
+.top-bar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 1.75rem;
+  border-bottom:1px solid var(--navy-border);position:sticky;top:0;z-index:50;
+  background:rgba(13,17,23,.95);backdrop-filter:blur(14px);flex-shrink:0}
+.content{padding:1.75rem;flex:1}
+.card{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;overflow:hidden;margin-bottom:1.25rem}
+.card-head{padding:.85rem 1.25rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--navy-border)}
+.card-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3)}
+.card-body{padding:1.25rem}
+.kpi-grid{display:grid;gap:1rem;margin-bottom:1.5rem}
+.kpi{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;padding:1.1rem 1.25rem;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.green::before{background:var(--green)}.kpi.red::before{background:var(--red)}
+.kpi.gold::before{background:var(--gold)}.kpi.blue::before{background:var(--blue)}
+.kpi-lbl{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3);margin-bottom:.35rem}
+.kpi-val{font-size:1.55rem;font-weight:900;letter-spacing:-.03em;color:#fff;line-height:1}
+.kpi-sub{font-size:.7rem;color:var(--g3);margin-top:.3rem}
+.btn-gold{background:var(--gold);color:#0D1117;font-weight:700;border:none;border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;padding:.48rem 1rem;transition:.15s;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem}
+.btn-gold:hover{background:var(--gold-l)}
+.btn-ghost{background:none;border:1px solid var(--navy-border);color:var(--g2);border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:.78rem;padding:.42rem .9rem;transition:.15s;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem}
+.btn-ghost:hover{color:var(--g1);border-color:var(--g3)}
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:.63rem;font-weight:700}
+.pill-green{background:var(--green-dim);color:var(--green)}.pill-red{background:var(--red-dim);color:var(--red)}
+.pill-amber{background:var(--amber-dim);color:var(--amber)}.pill-blue{background:var(--blue-dim);color:var(--blue)}
+.pill-purple{background:var(--purple-dim);color:var(--purple)}.pill-gold{background:var(--gold-dim);color:var(--gold-l)}
+.tab-bar{display:flex;border:1px solid var(--navy-border);border-radius:10px;overflow:hidden;width:fit-content;margin-bottom:1.25rem}
+.tab-btn{padding:.52rem 1.2rem;font-size:.8rem;font-weight:600;background:none;color:var(--g2);border:none;cursor:pointer;font-family:'Inter',sans-serif;border-right:1px solid var(--navy-border);transition:.15s;white-space:nowrap}
+.tab-btn:last-child{border:none}
+.tab-btn.active{background:var(--gold-dim);color:var(--gold-l)}
+input,select{background:rgba(255,255,255,.04);border:1px solid var(--navy-border);color:var(--g1);
+  border-radius:8px;padding:.5rem .8rem;font-family:'Inter',sans-serif;font-size:.8rem;outline:none;transition:.2s}
+input:focus,select:focus{border-color:rgba(201,151,43,.45)}
+select option{background:var(--navy-card)}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:.5rem 1rem;text-align:left;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g3);border-bottom:2px solid var(--navy-border)}
+.tbl td{padding:.6rem 1rem;font-size:.8rem;border-bottom:1px solid rgba(30,42,58,.5);vertical-align:middle}
+.tbl tr:last-child td{border:none}
+.tbl tr:hover td{background:rgba(255,255,255,.012)}
+.tbl .total-row td{border-top:2px solid var(--navy-border);font-weight:800;color:#fff;background:rgba(255,255,255,.018);border-bottom:none}
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);
+  background-size:200%;animation:shimmer 1.5s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+.bar-h{display:flex;align-items:center;gap:.65rem;margin-bottom:.55rem}
+.bar-h:last-child{margin-bottom:0}
+.bar-track{flex:1;background:rgba(255,255,255,.05);border-radius:4px;height:7px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:.5s}
+@media print{.sidebar,.top-bar,.no-print{display:none!important}.main{display:block}.content{padding:.5rem}}
+</style>
 </head>
 <body>
-  <!-- Insights -->
-  <script src="/assets/js/utils.js"></script>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#141E30"/>
+    <path d="M16 4v5M13 6h6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M10 9v15h12V9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 24h18" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M13 14l2.5 3L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Insight Hunter
+  </div>
+  <div class="nav-section">Platform</div>
+  <a href="index.html"       class="nav-item "><span style="width:16px;text-align:center">◫</span> Overview</a>
+  <a href="bizforma.html"    class="nav-item "><span style="width:16px;text-align:center">📋</span> BizForma</a>
+  <a href="bookkeeping.html" class="nav-item "><span style="width:16px;text-align:center">📒</span> Bookkeeping</a>
+  <a href="reports.html"     class="nav-item "><span style="width:16px;text-align:center">📊</span> Reports</a>
+  <a href="forecast.html"    class="nav-item "><span style="width:16px;text-align:center">📈</span> Forecast</a>
+  <a href="insights.html"    class="nav-item active"><span style="width:16px;text-align:center">✦</span> AI Insights</a>
+  <div class="nav-section">Business</div>
+  <a href="payroll.html"     class="nav-item "><span style="width:16px;text-align:center">💳</span> Payroll</a>
+  <a href="pbx.html"         class="nav-item "><span style="width:16px;text-align:center">📞</span> PBX</a>
+  <a href="settings.html"    class="nav-item "><span style="width:16px;text-align:center">⚙</span> Settings</a>
+  <div class="sidebar-bottom">
+    <a href="upgrade.html" class="nav-item" style="background:rgba(201,151,43,.07);color:var(--gold-l);font-weight:600"><span style="width:16px;text-align:center">⚡</span> Upgrade Plan</a>
+  </div>
+</aside>
+<div class="main">
+  <div class="top-bar">
+    <span style="font-size:.95rem;font-weight:700;letter-spacing:-.02em;color:#fff">✦ AI Insights</span>
+    <div style="width:30px;height:30px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(201,151,43,.3);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--gold-l)">U</div>
+  </div>
+  <div class="content">
+
+<!-- Header -->
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+  <div>
+    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.25rem">
+      <span style="font-size:1.35rem;font-weight:900;letter-spacing:-.03em;color:#fff">AI Insights</span>
+      <span class="pill pill-purple" style="font-size:.62rem">Beta</span>
+    </div>
+    <div style="font-size:.78rem;color:var(--g3)">Your CFO-grade financial intelligence, updated daily.</div>
+  </div>
+  <div style="display:flex;gap:.6rem">
+    <button onclick="refreshInsights()" class="btn-ghost" id="refresh-btn">↻ Refresh</button>
+    <a href="reports.html" class="btn-gold">📊 View Full Report</a>
+  </div>
+</div>
+
+<!-- Health Score -->
+<div style="display:grid;grid-template-columns:1fr 3fr;gap:1.25rem;margin-bottom:1.5rem;align-items:stretch">
+  <!-- Score ring -->
+  <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.75rem">
+    <div style="font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3);margin-bottom:.85rem">Business Health Score</div>
+    <div style="position:relative;width:110px;height:110px;margin-bottom:.9rem">
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="10"/>
+        <circle cx="55" cy="55" r="46" fill="none" id="score-ring"
+          stroke="var(--green)" stroke-width="10" stroke-linecap="round"
+          stroke-dasharray="289" stroke-dashoffset="289"
+          transform="rotate(-90 55 55)" style="transition:stroke-dashoffset 1.2s ease"/>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <span id="score-val" style="font-size:1.75rem;font-weight:900;color:#fff;line-height:1">—</span>
+        <span style="font-size:.6rem;color:var(--g3)">/100</span>
+      </div>
+    </div>
+    <span id="score-label" class="pill" style="font-size:.68rem">—</span>
+    <div style="font-size:.65rem;color:var(--g3);text-align:center;margin-top:.6rem;line-height:1.5" id="score-desc"></div>
+  </div>
+
+  <!-- Metric grid -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+    <div class="kpi green"><div class="kpi-lbl">MTD Revenue</div><div class="kpi-val" id="ins-income" style="color:var(--green)">—</div><div class="kpi-sub" id="ins-income-s">vs last month</div></div>
+    <div class="kpi red"><div class="kpi-lbl">MTD Expenses</div><div class="kpi-val" id="ins-expense" style="color:var(--red)">—</div><div class="kpi-sub" id="ins-expense-s">vs last month</div></div>
+    <div class="kpi gold"><div class="kpi-lbl">Net Profit</div><div class="kpi-val" id="ins-net">—</div><div class="kpi-sub" id="ins-margin">—</div></div>
+    <div class="kpi blue"><div class="kpi-lbl">Cash Balance</div><div class="kpi-val" id="ins-cash" style="color:var(--gold-l)">—</div><div class="kpi-sub" id="ins-accounts">— accounts</div></div>
+    <div class="kpi" style="border-top:3px solid var(--purple)"><div class="kpi-lbl">Runway</div><div class="kpi-val" id="ins-runway" style="color:var(--purple)">—</div><div class="kpi-sub">months at burn rate</div></div>
+    <div class="kpi" style="border-top:3px solid var(--amber)"><div class="kpi-lbl">Burn Rate</div><div class="kpi-val" id="ins-burn" style="color:var(--amber)">—</div><div class="kpi-sub">avg monthly expense</div></div>
+  </div>
+</div>
+
+<!-- Insight Cards + CFO Chat -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem">
+
+  <!-- Generated Insights -->
+  <div>
+    <div class="card">
+      <div class="card-head">
+        <span class="card-label">✦ AI-Generated Insights</span>
+        <span id="insights-ts" style="font-size:.65rem;color:var(--g3)"></span>
+      </div>
+      <div id="insight-list" style="padding:.85rem 1.1rem">
+        <div class="skeleton" style="height:180px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alerts & Flags -->
+  <div>
+    <div class="card">
+      <div class="card-head"><span class="card-label">⚠ Alerts & Action Items</span><span id="alert-count" class="pill pill-amber"></span></div>
+      <div id="alert-list" style="padding:.85rem 1.1rem">
+        <div class="skeleton" style="height:180px"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CFO Chat -->
+<div class="card" style="margin-bottom:1.25rem">
+  <div class="card-head">
+    <span class="card-label">✦ Ask Your CFO</span>
+    <span class="pill pill-purple">Powered by Workers AI</span>
+  </div>
+  <div id="chat-msgs" style="min-height:200px;max-height:340px;overflow-y:auto;padding:1rem 1.25rem;display:flex;flex-direction:column;gap:.75rem">
+    <div style="display:flex;gap:.65rem;align-items:flex-start">
+      <div style="width:28px;height:28px;border-radius:8px;background:var(--purple-dim);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0">✦</div>
+      <div style="background:var(--navy-mid);border:1px solid var(--navy-border);border-radius:12px 12px 12px 3px;padding:.7rem 1rem;font-size:.82rem;color:var(--g2);max-width:80%;line-height:1.6">
+        Hello! I'm your AI CFO. Ask me anything about your finances — cash flow, profitability, payroll costs, or what to focus on this month.
+      </div>
+    </div>
+  </div>
+  <div style="padding:.75rem 1.25rem;border-top:1px solid var(--navy-border);display:flex;gap:.65rem">
+    <input id="chat-input" placeholder="e.g. What's my biggest expense category? or How long will cash last?" style="flex:1;padding:.6rem 1rem;border-radius:10px"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"/>
+    <button onclick="sendChat()" class="btn-gold" id="chat-send" style="padding:.6rem 1.1rem">Send</button>
+  </div>
+  <div style="padding:0 1.25rem .75rem;display:flex;gap:.5rem;flex-wrap:wrap">
+    <button onclick="quickAsk('What is my profit margin this month?')"          class="btn-ghost" style="font-size:.7rem;padding:.28rem .7rem">Profit margin</button>
+    <button onclick="quickAsk('How long will my cash last at this burn rate?')" class="btn-ghost" style="font-size:.7rem;padding:.28rem .7rem">Cash runway</button>
+    <button onclick="quickAsk('Which expense category should I cut first?')"    class="btn-ghost" style="font-size:.7rem;padding:.28rem .7rem">Cut expenses</button>
+    <button onclick="quickAsk('Am I on track for my revenue goal this year?')"  class="btn-ghost" style="font-size:.7rem;padding:.28rem .7rem">Revenue goal</button>
+    <button onclick="quickAsk('What is my biggest risk right now?')"            class="btn-ghost" style="font-size:.7rem;padding:.28rem .7rem">Top risk</button>
+  </div>
+</div>
+
+<!-- Ratio Analysis -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+  <div class="card">
+    <div class="card-head"><span class="card-label">Key Financial Ratios</span></div>
+    <div class="card-body" id="ratio-panel">
+      <div class="skeleton" style="height:140px"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-label">Top Expense Categories</span></div>
+    <div class="card-body" id="top-expenses">
+      <div class="skeleton" style="height:140px"></div>
+    </div>
+  </div>
+</div>
+
+  </div>
+</div>
+<script>
+const API=''
+const fmt  = n => '$'+(+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+const fmtK = n => { const a=Math.abs(n); return (n<0?'-':'')+(a>=1000?'$'+(a/1000).toFixed(1)+'k':fmt(a)) }
+const $ = id => document.getElementById(id)
+
+let financials={}, lastMonthData={}, accounts=[], trend=[]
+
+// ── Load all data ──────────────────────────────────────────────
+async function loadAll(){
+  const now=new Date(), y=now.getFullYear()
+  const m=String(now.getMonth()+1).padStart(2,'0')
+  const last=new Date(y,now.getMonth()+1,0).getDate()
+  const from=`${y}-${m}-01`, to=`${y}-${m}-${last}`
+  // Last month
+  const lm=now.getMonth()===0?{y:y-1,m:12}:{y,m:now.getMonth()}
+  const lmLast=new Date(lm.y,lm.m,0).getDate()
+  const lmFrom=`${lm.y}-${String(lm.m).padStart(2,'0')}-01`
+  const lmTo=`${lm.y}-${String(lm.m).padStart(2,'0')}-${lmLast}`
+
+  try{
+    const [sumRes,lmRes,acctRes,trendRes]=await Promise.all([
+      fetch(`${API}/api/bookkeeping/summary?from=${from}&to=${to}`,{credentials:'include'}),
+      fetch(`${API}/api/bookkeeping/summary?from=${lmFrom}&to=${lmTo}`,{credentials:'include'}),
+      fetch(`${API}/api/bookkeeping/accounts`,{credentials:'include'}),
+      fetch(`${API}/api/bookkeeping/trend`,{credentials:'include'}),
+    ])
+    financials     = await sumRes.json()
+    lastMonthData  = await lmRes.json()
+    const ad       = await acctRes.json(); accounts=ad.accounts||[]
+    const td       = await trendRes.json(); trend=td.trend||[]
+
+    renderKPIs()
+    renderScore()
+    renderInsights()
+    renderAlerts()
+    renderRatios()
+    renderTopExpenses()
+  }catch(e){console.error(e)}
+}
+
+// ── KPIs ───────────────────────────────────────────────────────
+function renderKPIs(){
+  const f=financials, lm=lastMonthData
+  const delta=(a,b)=>b>0?((a-b)/b*100).toFixed(1):null
+  const sign=(n,v)=>v===null?'this month':`${n>0?'▲':'▼'}${Math.abs(v)}% vs last mo.`
+
+  $('ins-income').textContent   = fmtK(f.income)
+  $('ins-expense').textContent  = fmtK(f.expense)
+  $('ins-net').textContent      = fmtK(f.net)
+  $('ins-net').style.color      = f.net>=0?'var(--green)':'var(--red)'
+  const margin = f.income>0?((f.net/f.income)*100).toFixed(1):'0'
+  $('ins-margin').textContent   = `${margin}% net margin`
+
+  const dI=delta(f.income,lm.income), dE=delta(f.expense,lm.expense)
+  $('ins-income-s').textContent  = sign(f.income-lm.income, dI)
+  $('ins-expense-s').textContent = sign(f.expense-lm.expense, dE)
+
+  const cash=accounts.filter(a=>['checking','savings','asset'].includes(a.type)).reduce((s,a)=>s+(a.balance||0),0)
+  $('ins-cash').textContent     = fmtK(cash)
+  $('ins-accounts').textContent = accounts.length+' account'+(accounts.length!==1?'s':'')
+
+  // Burn rate = avg of last 3 months expense from trend
+  const months=[], now=new Date()
+  for(let i=2;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`)}
+  const recentExp=trend.filter(t=>t.type==='expense'&&months.includes(t.month)).map(t=>+t.total)
+  const burn=recentExp.length?recentExp.reduce((s,v)=>s+v,0)/recentExp.length:f.expense
+  $('ins-burn').textContent     = fmtK(burn)+'/mo'
+  const runway=burn>0?(cash/burn):0
+  $('ins-runway').textContent   = runway>0?runway.toFixed(1)+'mo':'∞'
+}
+
+// ── Health Score ───────────────────────────────────────────────
+function renderScore(){
+  const f=financials
+  let score=50, reasons=[]
+  // Profitability (0-35pts)
+  if(f.income>0){const m=f.net/f.income;if(m>.2){score+=35;reasons.push('Strong profitability')}else if(m>.1){score+=25}else if(m>.0){score+=12}else{score-=10;reasons.push('Operating at a loss')}}
+  // Revenue present (0-20pts)
+  if(f.income>0){score+=20}else{score-=10;reasons.push('No income recorded this month')}
+  // Expense control (0-15pts)
+  if(f.income>0&&f.expense/f.income<.7){score+=15;reasons.push('Healthy expense ratio')}else if(f.income>0&&f.expense/f.income<.9){score+=8}
+  score=Math.max(5,Math.min(100,score))
+
+  $('score-val').textContent = score
+  const ring=$('score-ring')
+  const circumference=289
+  ring.style.strokeDashoffset=circumference-(circumference*(score/100))
+  ring.style.stroke=score>=75?'var(--green)':score>=50?'var(--amber)':'var(--red)'
+
+  const label=score>=75?'Healthy':score>=50?'Fair':'Needs Attention'
+  const labelClass=score>=75?'pill-green':score>=50?'pill-amber':'pill-red'
+  $('score-label').textContent=label; $('score-label').className='pill '+labelClass
+  $('score-desc').textContent=reasons[0]||'Keep tracking to improve your score.'
+}
+
+// ── AI Insights (computed, not yet LLM) ───────────────────────
+function renderInsights(){
+  const f=financials, lm=lastMonthData
+  const insights=[]
+  const margin=f.income>0?(f.net/f.income*100):0
+  const iDelta=lm.income>0?((f.income-lm.income)/lm.income*100):null
+  const eDelta=lm.expense>0?((f.expense-lm.expense)/lm.expense*100):null
+  const cash=accounts.filter(a=>['checking','savings','asset'].includes(a.type)).reduce((s,a)=>s+(a.balance||0),0)
+  const burn=f.expense||1
+  const runway=cash/burn
+
+  if(iDelta!==null&&iDelta>5)  insights.push({icon:'📈',c:'var(--green)', t:`Revenue is up ${iDelta.toFixed(1)}% vs last month — you\'re growing. Keep monitoring pipeline to sustain this trend.`})
+  else if(iDelta!==null&&iDelta<-5) insights.push({icon:'⚠️',c:'var(--amber)',t:`Revenue dropped ${Math.abs(iDelta).toFixed(1)}% vs last month. Review your sales pipeline and outstanding invoices.`})
+  else insights.push({icon:'📊',c:'var(--blue)',t:`Revenue is tracking near last month\'s pace. Consider strategies to increase new client acquisition.`})
+
+  if(margin>20) insights.push({icon:'✅',c:'var(--green)',t:`Profit margin is ${margin.toFixed(1)}% — well above the 10% healthy benchmark for small businesses.`})
+  else if(margin>0) insights.push({icon:'💡',c:'var(--gold-l)',t:`Profit margin is ${margin.toFixed(1)}%. To reach the 20% benchmark, consider reducing your top 2 expense categories.`})
+  else insights.push({icon:'🚨',c:'var(--red)',t:`Operating at a loss this month. Immediate action: audit variable expenses and prioritize revenue-generating activities.`})
+
+  if(runway>6) insights.push({icon:'🏦',c:'var(--green)',t:`Cash runway is ${runway.toFixed(1)} months — healthy. You have time to invest in growth or build an emergency reserve.`})
+  else if(runway>2) insights.push({icon:'⏳',c:'var(--amber)',t:`Cash runway is ${runway.toFixed(1)} months. Prioritize collections, reduce discretionary spend, and consider a credit line buffer.`})
+  else insights.push({icon:'🚨',c:'var(--red)',t:`Critical: Cash runway is under 2 months. Immediately defer non-essential expenses and accelerate collections.`})
+
+  const topExp=(f.by_category||[]).filter(c=>c.type==='expense').sort((a,b)=>b.total-a.total)[0]
+  if(topExp) insights.push({icon:'💸',c:'var(--purple)',t:`"${topExp.name}" is your largest expense category at ${fmt(topExp.total)} this period (${f.expense>0?((topExp.total/f.expense)*100).toFixed(1):0}% of total expenses).`})
+
+  $('insights-ts').textContent='Updated '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+  $('insight-list').innerHTML=insights.map(i=>`
+    <div style="display:flex;gap:.65rem;align-items:flex-start;padding:.7rem;border-radius:10px;background:var(--navy-mid);border:1px solid var(--navy-border);margin-bottom:.6rem">
+      <span style="font-size:1.1rem;flex-shrink:0;margin-top:1px">${i.icon}</span>
+      <p style="font-size:.8rem;color:var(--g2);line-height:1.65;margin:0">${i.t}</p>
+    </div>`).join('')
+}
+
+// ── Alerts ─────────────────────────────────────────────────────
+function renderAlerts(){
+  const f=financials
+  const alerts=[]
+  if(f.net<0) alerts.push({sev:'high',  icon:'🚨',t:'Net loss this period — expenses exceed income.'})
+  if(f.income===0) alerts.push({sev:'high',icon:'⚠️',t:'No income recorded this month. Add transactions.'})
+  const cash=accounts.filter(a=>['checking','savings','asset'].includes(a.type)).reduce((s,a)=>s+(a.balance||0),0)
+  const runway=f.expense>0?cash/f.expense:99
+  if(runway<3&&runway>0)  alerts.push({sev:'high',  icon:'⏳',t:`Cash runway under ${runway.toFixed(1)} months.`})
+  if(f.income>0&&f.expense/f.income>.85) alerts.push({sev:'med',icon:'📉',t:'Expense ratio above 85%. Review overhead.'})
+  if(!accounts.length) alerts.push({sev:'med',icon:'🏦',t:'No bank accounts linked. Add an account in Bookkeeping.'})
+  if(accounts.some(a=>a.balance<0)) alerts.push({sev:'high',icon:'❗',t:'One or more accounts have a negative balance.'})
+  if(!alerts.length) alerts.push({sev:'ok',icon:'✅',t:'No critical alerts. Your finances look healthy!'})
+  $('alert-count').textContent=alerts.filter(a=>a.sev!=='ok').length+' alerts'
+  $('alert-count').className='pill '+(alerts.some(a=>a.sev==='high')?'pill-red':'pill-amber')
+  $('alert-list').innerHTML=alerts.map(a=>`
+    <div style="display:flex;gap:.65rem;align-items:flex-start;padding:.65rem .8rem;border-radius:10px;margin-bottom:.55rem;
+      background:${a.sev==='high'?'rgba(239,68,68,.07)':a.sev==='med'?'rgba(245,158,11,.07)':'rgba(16,185,129,.07)'};
+      border:1px solid ${a.sev==='high'?'rgba(239,68,68,.2)':a.sev==='med'?'rgba(245,158,11,.2)':'rgba(16,185,129,.2)'}">
+      <span style="font-size:1rem;flex-shrink:0">${a.icon}</span>
+      <span style="font-size:.8rem;color:var(--g2);line-height:1.5">${a.t}</span>
+    </div>`).join('')
+}
+
+// ── Ratios ─────────────────────────────────────────────────────
+function renderRatios(){
+  const f=financials
+  const margin  = f.income>0?(f.net/f.income*100).toFixed(1)+'%':'N/A'
+  const expRatio= f.income>0?(f.expense/f.income*100).toFixed(1)+'%':'N/A'
+  const cash=accounts.filter(a=>['checking','savings','asset'].includes(a.type)).reduce((s,a)=>s+(a.balance||0),0)
+  const liab=accounts.filter(a=>['credit','loan'].includes(a.type)).reduce((s,a)=>s+Math.abs(a.balance||0),0)
+  const currentRatio=liab>0?(cash/liab).toFixed(2):'∞'
+
+  const ratios=[
+    {name:'Net Profit Margin',  val:margin,       good:+margin>10,  bench:'> 10%'},
+    {name:'Expense Ratio',      val:expRatio,      good:+expRatio<80,bench:'< 80%'},
+    {name:'Current Ratio',      val:currentRatio,  good:+currentRatio>1.5,bench:'> 1.5'},
+    {name:'Revenue This Month', val:fmtK(f.income),good:f.income>0, bench:'Positive'},
+  ]
+  $('ratio-panel').innerHTML=ratios.map(r=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:.55rem 0;border-bottom:1px solid rgba(30,42,58,.5)">
+      <div>
+        <div style="font-size:.8rem;color:var(--g1);font-weight:500">${r.name}</div>
+        <div style="font-size:.65rem;color:var(--g3)">Benchmark: ${r.bench}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <span style="font-size:.9rem;font-weight:800;${r.good?'color:var(--green)':'color:var(--amber)'}">${r.val}</span>
+        <span style="font-size:.8rem">${r.good?'✅':'⚠️'}</span>
+      </div>
+    </div>`).join('')
+}
+
+// ── Top Expenses ───────────────────────────────────────────────
+function renderTopExpenses(){
+  const cats=(financials.by_category||[]).filter(c=>c.type==='expense').sort((a,b)=>b.total-a.total).slice(0,6)
+  const total=cats.reduce((s,c)=>s+c.total,0)||1
+  $('top-expenses').innerHTML=cats.length?cats.map(c=>`
+    <div class="bar-h">
+      <div style="display:flex;align-items:center;gap:.5rem;min-width:0;width:160px">
+        ${c.color?`<span style="width:8px;height:8px;border-radius:50%;background:${c.color};flex-shrink:0"></span>`:''}
+        <span style="font-size:.78rem;color:var(--g2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name||'Other'}</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round((c.total/total)*100)}%;background:var(--red)"></div></div>
+      <span style="font-size:.78rem;font-weight:700;color:var(--red);min-width:65px;text-align:right">${fmt(c.total)}</span>
+    </div>`).join('')
+  :`<div style="font-size:.8rem;color:var(--g3);text-align:center;padding:1.5rem">No expense data yet.</div>`
+}
+
+// ── CFO Chat ───────────────────────────────────────────────────
+function quickAsk(q){ $('chat-input').value=q; sendChat() }
+
+async function sendChat(){
+  const input=$('chat-input')
+  const q=input.value.trim()
+  if(!q) return
+  input.value=''; $('chat-send').disabled=true
+
+  const msgs=$('chat-msgs')
+  msgs.innerHTML+=`
+    <div style="display:flex;justify-content:flex-end">
+      <div style="background:var(--gold-dim);border:1px solid rgba(201,151,43,.2);border-radius:12px 12px 3px 12px;
+        padding:.65rem .9rem;font-size:.82rem;color:var(--g1);max-width:75%;line-height:1.6">${q}</div>
+    </div>`
+  msgs.scrollTop=msgs.scrollHeight
+
+  // Typing indicator
+  const tid='typing-'+Date.now()
+  msgs.innerHTML+=`<div id="${tid}" style="display:flex;gap:.65rem;align-items:flex-start">
+    <div style="width:28px;height:28px;border-radius:8px;background:var(--purple-dim);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0">✦</div>
+    <div style="background:var(--navy-mid);border:1px solid var(--navy-border);border-radius:12px 12px 12px 3px;padding:.7rem 1rem;font-size:.82rem;color:var(--g3)">
+      <span style="letter-spacing:.15em">•••</span>
+    </div></div>`
+  msgs.scrollTop=msgs.scrollHeight
+
+  // Try Workers AI — fallback to computed answer
+  let answer
+  try{
+    const context=buildFinancialContext()
+    const r=await fetch(`${API}/api/ai/chat`,{
+      method:'POST',credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({question:q,context})
+    })
+    if(r.ok){const d=await r.json(); answer=d.answer}
+  }catch(e){}
+
+  if(!answer) answer=computedAnswer(q)
+
+  document.getElementById(tid)?.remove()
+  msgs.innerHTML+=`
+    <div style="display:flex;gap:.65rem;align-items:flex-start">
+      <div style="width:28px;height:28px;border-radius:8px;background:var(--purple-dim);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0">✦</div>
+      <div style="background:var(--navy-mid);border:1px solid var(--navy-border);border-radius:12px 12px 12px 3px;
+        padding:.7rem 1rem;font-size:.82rem;color:var(--g2);max-width:80%;line-height:1.65">${answer}</div>
+    </div>`
+  msgs.scrollTop=msgs.scrollHeight
+  $('chat-send').disabled=false
+}
+
+function buildFinancialContext(){
+  const f=financials
+  return `MTD income:${f.income},expense:${f.expense},net:${f.net},margin:${f.income>0?(f.net/f.income*100).toFixed(1):0}%`
+}
+
+function computedAnswer(q){
+  const f=financials,ql=q.toLowerCase()
+  const cash=accounts.filter(a=>['checking','savings','asset'].includes(a.type)).reduce((s,a)=>s+(a.balance||0),0)
+  const margin=f.income>0?(f.net/f.income*100).toFixed(1):0
+  const runway=f.expense>0?(cash/f.expense).toFixed(1):'>12'
+  const fmt2=n=>'$'+(+n||0).toLocaleString('en-US',{minimumFractionDigits:2})
+  if(ql.includes('margin')||ql.includes('profit')) return `Your net profit margin this month is <strong>${margin}%</strong>. Income: ${fmt2(f.income)} · Expenses: ${fmt2(f.expense)} · Net: ${fmt2(f.net)}.${+margin<10?' Consider reviewing your top expense categories to improve this.':' This is a healthy margin — keep it up!'}`
+  if(ql.includes('runway')||ql.includes('cash last')) return `At your current monthly burn rate of ${fmt2(f.expense)}, your cash balance of ${fmt2(cash)} gives you approximately <strong>${runway} months</strong> of runway.${+runway<3?' This is a critical level — take immediate steps to reduce burn or increase cash.':`${+runway<6?' Consider building a larger buffer.':' This is a solid position.'}`}`
+  if(ql.includes('cut')||ql.includes('expense')||ql.includes('reduce')){
+    const top=(f.by_category||[]).filter(c=>c.type==='expense').sort((a,b)=>b.total-a.total)[0]
+    return top?`Your largest expense this month is <strong>${top.name}</strong> at ${fmt2(top.total)}. Reducing this category by 20% would save ${fmt2(top.total*.2)}/month.`:'No expense data available yet. Add transactions to get personalized recommendations.'
+  }
+  if(ql.includes('revenue')||ql.includes('income')||ql.includes('goal')) return `Your revenue this month is <strong>${fmt2(f.income)}</strong>. ${f.income>0?`At this run rate you\'re tracking toward ${fmt2(f.income*12)} annually.`:'No income recorded yet this month.'}`
+  if(ql.includes('risk')) return `Based on your current data, your top risks are: ${f.net<0?'1) Operating at a net loss. ':''}${+runway<3?'1) Low cash runway. ':''}${f.income===0?'1) No revenue this month. ':''} Review the Alerts section for specific action items.`
+  return `Based on your financial data: Revenue ${fmt2(f.income)} · Expenses ${fmt2(f.expense)} · Net ${fmt2(f.net)} · Margin ${margin}% · Cash runway ~${runway} months. For deeper analysis, review the Reports tab or ask a more specific question.`
+}
+
+function refreshInsights(){
+  $('refresh-btn').textContent='↻ Refreshing…'
+  loadAll().then(()=>{ $('refresh-btn').textContent='↻ Refresh' })
+}
+
+document.addEventListener('DOMContentLoaded', loadAll)
+</script>
 </body>
 </html>
