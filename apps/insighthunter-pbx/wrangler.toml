@@ -34,7 +34,7 @@ id = "3e5244e82b41420abb911004beebbc8b"
 
 [[kv_namespaces]]
 binding = "KV"
-id = "REPLACE_WITH_YOUR_KV_ID"
+id = "81f739c9c7c74a719fec310c959a3881"
 
 [[queues.producers]]
 binding = "CAMPAIGN_QUEUE"

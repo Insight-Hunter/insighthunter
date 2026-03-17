@@ -1,10 +1,22 @@
 account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
 name = "insighthunter-payroll"
 main = "src/index.ts"
-compatibility_date = "2024-07-25"
+compatibility_date = "2025-11-01"
+
+[observability]
+enabled = true
 
 [build]
 command = "npm install && npm run build"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-auth-db"
+database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "8ac9bbaeda4d410db31878ebb8b8a3f1"
 
 [[routes]]
 pattern = "payroll.insighthunter.app/api/*"
@@ -17,3 +29,7 @@ service = "insighthunter-auth"
 [[services]]
 binding = "AGENTS_WORKER"
 service = "insighthunter-agents"
+
+# Secrets:
+# wrangler secret put JWT_SECRET
+# wrangler secret put STRIPE_KEY
