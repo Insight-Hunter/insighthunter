@@ -1,8 +1,11 @@
 name = "insighthunter-pbx"
 main = "src/index.ts"
 account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
-compatibility_date = "2024-07-25"
+compatibility_date = "2025-11-01"
 compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
 
 [ai]
 binding = "AI"
@@ -11,6 +14,11 @@ binding = "AI"
 binding = "PBX_DB"
 database_name = "cloud-pbx-db"
 database_id = "c18c8520-c3eb-47e7-9bbe-cbb9e251ccb8"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-auth-db"
+database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
 
 [[r2_buckets]]
 binding = "VOICEMAIL_BUCKET"
@@ -23,6 +31,10 @@ bucket_name = "cloud-pbx-recordings"
 [[kv_namespaces]]
 binding = "SMS_CONVERSATIONS"
 id = "3e5244e82b41420abb911004beebbc8b"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_WITH_YOUR_KV_ID"
 
 [[queues.producers]]
 binding = "CAMPAIGN_QUEUE"
@@ -49,3 +61,10 @@ service = "insighthunter-auth"
 [[services]]
 binding = "AGENTS_WORKER"
 service = "insighthunter-agents"
+
+# Secrets:
+# wrangler secret put TWILIO_ACCOUNT_SID
+# wrangler secret put TWILIO_AUTH_TOKEN
+# wrangler secret put TWILIO_TWIML_APP_SID
+# wrangler secret put JWT_SECRET
+# wrangler secret put WORKER_URL   (https://insighthunter-pbx.workers.dev)

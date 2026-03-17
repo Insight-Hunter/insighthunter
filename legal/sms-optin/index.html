@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SMS Opt-In — Insight Hunter</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0D1117;--card:#161B22;--border:#1E2A3A;--gold:#C9972B;--gold-l:#D4A843;
+  --g1:#E2E8F0;--g2:#94A3B8;--g3:#64748B;--green:#10B981;--red:#EF4444;--white:#FFF}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;
+  background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(201,151,43,.06),transparent 60%),var(--navy)}
+.widget{background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:2.5rem 2rem;max-width:440px;width:100%}
+.logo{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:700;margin-bottom:1.75rem}
+h1{font-size:1.25rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.45rem}
+.sub{font-size:.8rem;color:var(--g2);line-height:1.65;margin-bottom:1.5rem}
+label{display:block;font-size:.73rem;font-weight:600;color:var(--g2);margin-bottom:.35rem}
+input[type=tel],input[type=text]{width:100%;padding:.65rem .9rem;border-radius:9px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--white);
+  font-family:'Inter',sans-serif;font-size:.875rem;outline:none;transition:.2s;margin-bottom:1rem}
+input:focus{border-color:rgba(201,151,43,.5)}
+.msg-types{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1.25rem}
+.msg-type{display:flex;align-items:flex-start;gap:.6rem;padding:.65rem .85rem;border-radius:9px;
+  border:1px solid var(--border);cursor:pointer;transition:.15s}
+.msg-type:hover{border-color:rgba(201,151,43,.25)}
+.msg-type input{margin-top:2px;flex-shrink:0;accent-color:var(--gold)}
+.msg-type-text{font-size:.78rem;color:var(--g2);line-height:1.5}
+.msg-type-text strong{color:var(--white);font-weight:600}
+.legal{font-size:.68rem;color:var(--g3);line-height:1.65;margin-bottom:1.25rem;
+  padding:.85rem;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid var(--border)}
+.legal a{color:var(--gold-l)}
+.btn{width:100%;padding:.75rem;border-radius:10px;background:var(--gold);color:var(--navy);
+  font-size:.9rem;font-weight:700;border:none;cursor:pointer;transition:.2s}
+.btn:hover{background:var(--gold-l)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.success{display:none;text-align:center;padding:1rem 0}
+.success .icon{font-size:2.5rem;margin-bottom:.75rem}
+.success h2{font-size:1.1rem;font-weight:700;margin-bottom:.4rem}
+.success p{font-size:.8rem;color:var(--g2);line-height:1.6}
+.err{color:var(--red);font-size:.75rem;margin-bottom:.75rem;display:none}
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="logo">
+    <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#141E30"/><path d="M16 4v5M13 6h6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M10 9v15h12V9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 24h18" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M13 14l2.5 3L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Insight Hunter
+  </div>
+
+  <div id="form-view">
+    <h1>Stay Connected via Text</h1>
+    <p class="sub">Enter your number to receive text messages from <strong id="biz-name">our team</strong>. Message &amp; data rates may apply. Reply STOP at any time to unsubscribe.</p>
+
+    <label>Mobile Phone Number</label>
+    <input type="tel" id="phone" placeholder="+1 (404) 555-0100" autocomplete="tel"/>
+
+    <label>I'd like to receive (select all that apply)</label>
+    <div class="msg-types">
+      <label class="msg-type">
+        <input type="checkbox" name="msg_type" value="transactional" checked/>
+        <div class="msg-type-text"><strong>Order & Account Updates</strong> — confirmations, receipts, and account alerts</div>
+      </label>
+      <label class="msg-type">
+        <input type="checkbox" name="msg_type" value="marketing"/>
+        <div class="msg-type-text"><strong>Promotions & Offers</strong> — special deals and business news</div>
+      </label>
+    </div>
+
+    <div class="legal">
+      By providing your phone number and clicking "Opt In", you expressly consent to receive
+      text messages from <strong id="biz-name-2">Insight Hunter</strong> at the number provided.
+      Message frequency may vary. Message &amp; data rates may apply.
+      Reply <strong>STOP</strong> to unsubscribe, <strong>HELP</strong> for help.
+      View our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms of Service</a>.
+      You are not required to consent as a condition of purchase.
+    </div>
+
+    <div class="err" id="err-msg"></div>
+    <button class="btn" id="submit-btn" onclick="submitConsent()">Opt In to Text Messages</button>
+  </div>
+
+  <div class="success" id="success-view">
+    <div class="icon">✅</div>
+    <h2>You're opted in!</h2>
+    <p>You'll receive a confirmation text shortly.<br/>Reply <strong>STOP</strong> at any time to unsubscribe.</p>
+  </div>
+</div>
+
+<script>
+// Pre-fill business name from query params
+const params = new URLSearchParams(location.search)
+const bizName = params.get('business') || 'our team'
+document.getElementById('biz-name').textContent = bizName
+document.getElementById('biz-name-2').textContent = bizName
+
+function formatPhone(v) {
+  const d = v.replace(/\D/g,'')
+  if (d.length === 10) return `+1${d}`
+  if (d.length === 11 && d[0] === '1') return `+${d}`
+  return null
+}
+
+async function submitConsent() {
+  const rawPhone = document.getElementById('phone').value
+  const phone = formatPhone(rawPhone)
+  const errEl = document.getElementById('err-msg')
+  const btn = document.getElementById('submit-btn')
+
+  errEl.style.display = 'none'
+  if (!phone) { errEl.textContent = 'Please enter a valid 10-digit US phone number.'; errEl.style.display = 'block'; return }
+
+  const types = [...document.querySelectorAll('input[name=msg_type]:checked')].map(c => c.value)
+  const messageType = types.includes('marketing') && types.includes('transactional') ? 'mixed'
+    : types.includes('marketing') ? 'marketing' : 'transactional'
+
+  btn.disabled = true
+  btn.textContent = 'Saving...'
+
+  try {
+    const userId = params.get('user_id') || ''
+    const programName = params.get('program') || bizName
+    const optInText = `Opted in on ${location.href} at ${new Date().toISOString()}`
+
+    const res = await fetch('/api/pbx/consent/collect', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        phone_number: phone,
+        consent_type: 'web_form',
+        message_type: messageType,
+        program_name: programName,
+        opt_in_message: optInText,
+        _user_id: userId
+      })
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Failed to record consent.')
+    document.getElementById('form-view').style.display = 'none'
+    document.getElementById('success-view').style.display = 'block'
+  } catch(e) {
+    errEl.textContent = e.message
+    errEl.style.display = 'block'
+    btn.disabled = false
+    btn.textContent = 'Opt In to Text Messages'
+  }
+}
+</script>
+</body>
+</html>
