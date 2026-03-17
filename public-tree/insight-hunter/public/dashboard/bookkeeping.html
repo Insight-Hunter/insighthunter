@@ -1,13 +1,712 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bookkeeping · Insight Hunter</title>
-  <link rel="stylesheet" href="/assets/css/global.css" />
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Bookkeeping — Insight Hunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0D1117;--navy-card:#161B22;--navy-border:#1E2A3A;--gold:#C9972B;--gold-l:#D4A843;
+  --g1:#E2E8F0;--g2:#94A3B8;--g3:#64748B;--g4:#334155;
+  --green:#10B981;--red:#EF4444;--amber:#F59E0B;--blue:#3B82F6}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--g1);margin:0;display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--navy-card);border-right:1px solid var(--navy-border);
+  display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
+.sidebar-logo{display:flex;align-items:center;gap:9px;padding:1.25rem;font-size:.9rem;font-weight:800;
+  letter-spacing:-.02em;border-bottom:1px solid var(--navy-border);color:#fff}
+.nav-section{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--g4);padding:.9rem 1.25rem .35rem}
+.nav-item{display:flex;align-items:center;gap:.65rem;padding:.55rem 1rem;margin:.1rem .6rem;
+  border-radius:8px;font-size:.8rem;color:var(--g2);text-decoration:none;transition:.15s}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--g1)}
+.nav-item.active{background:rgba(201,151,43,.1);color:var(--gold-l);font-weight:600}
+.sidebar-bottom{margin-top:auto;padding:.75rem;border-top:1px solid var(--navy-border)}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow-y:auto}
+.top-bar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 1.75rem;
+  border-bottom:1px solid var(--navy-border);position:sticky;top:0;
+  background:rgba(13,17,23,.95);backdrop-filter:blur(14px);z-index:50;flex-shrink:0}
+.content{padding:1.75rem;flex:1}
+.kpi-row{display:grid;gap:1rem;margin-bottom:1.5rem}
+.kpi{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:12px;padding:1.1rem 1.25rem}
+.kpi-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3);margin-bottom:.35rem}
+.kpi-value{font-size:1.6rem;font-weight:900;letter-spacing:-.03em}
+.kpi-delta{font-size:.7rem;margin-top:.2rem;color:var(--g3)}
+.panel{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:12px;margin-bottom:1.25rem}
+.panel-head{padding:.9rem 1.25rem;display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid var(--navy-border)}
+.panel-head-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--g3)}
+.btn-gold{background:var(--gold);color:#0D1117;font-weight:700;border:none;border-radius:8px;
+  cursor:pointer;transition:.15s;font-family:'Inter',sans-serif;font-size:.82rem;padding:.5rem 1.1rem}
+.btn-gold:hover{background:var(--gold-l)}
+.btn-ghost{background:none;border:1px solid var(--navy-border);color:var(--g1);border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:.82rem;padding:.5rem 1rem}
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:.65rem;font-weight:700}
+.pill-green{background:rgba(16,185,129,.12);color:var(--green)}
+.pill-blue{background:rgba(59,130,246,.12);color:var(--blue)}
+.pill-red{background:rgba(239,68,68,.12);color:var(--red)}
+.pill-amber{background:rgba(245,158,11,.12);color:var(--amber)}
+.pill-gray{background:rgba(100,116,139,.12);color:var(--g2)}
+input,select,textarea{background:rgba(255,255,255,.04);border:1px solid var(--navy-border);
+  color:var(--g1);border-radius:8px;padding:.55rem .85rem;font-family:'Inter',sans-serif;
+  font-size:.82rem;outline:none;transition:.2s}
+input:focus,select:focus,textarea:focus{border-color:rgba(201,151,43,.45)}
+select option{background:var(--navy-card)}
+label.fl{display:block;font-size:.68rem;font-weight:600;color:var(--g2);margin-bottom:.3rem}
+.field{margin-bottom:.85rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+.modal-overlay{display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.78);backdrop-filter:blur(6px);align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:18px;
+  width:calc(100% - 2rem);overflow:hidden;max-height:90vh;display:flex;flex-direction:column}
+.modal-head{padding:1.1rem 1.5rem;border-bottom:1px solid var(--navy-border);
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.modal-body{padding:1.5rem;overflow-y:auto;flex:1}
+.modal-foot{padding:1rem 1.5rem;border-top:1px solid var(--navy-border);
+  display:flex;justify-content:flex-end;gap:.65rem;flex-shrink:0}
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.04) 75%);
+  background-size:200%;animation:shimmer 1.5s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+tr.tx-row:hover{background:rgba(255,255,255,.015)}
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;padding:.65rem 1.25rem;
+  border-radius:10px;font-size:.82rem;font-weight:600;transition:.3s;
+  transform:translateY(80px);opacity:0;pointer-events:none}
+#toast.show{transform:translateY(0);opacity:1}
+</style>
 </head>
 <body>
-  <!-- Bookkeeping -->
-  <script src="/assets/js/utils.js"></script>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#141E30"/><path d="M16 4v5M13 6h6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M10 9v15h12V9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 24h18" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M13 14l2.5 3L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Insight Hunter
+  </div>
+  <div class="nav-section">Platform</div>
+  <a href="index.html"       class="nav-item"><span style="width:16px;text-align:center">◫</span> Overview</a>
+  <a href="bizforma.html"    class="nav-item"><span style="width:16px;text-align:center">📋</span> BizForma</a>
+  <a href="bookkeeping.html" class="nav-item active"><span style="width:16px;text-align:center">📒</span> Bookkeeping</a>
+  <a href="reports.html"     class="nav-item"><span style="width:16px;text-align:center">📊</span> Reports</a>
+  <a href="forecast.html"    class="nav-item"><span style="width:16px;text-align:center">📈</span> Forecast</a>
+  <a href="insights.html"    class="nav-item"><span style="width:16px;text-align:center">✦</span> AI Insights</a>
+  <div class="nav-section">Business</div>
+  <a href="payroll.html"     class="nav-item"><span style="width:16px;text-align:center">💳</span> Payroll</a>
+  <a href="pbx.html"         class="nav-item"><span style="width:16px;text-align:center">📞</span> PBX</a>
+  <a href="settings.html"    class="nav-item"><span style="width:16px;text-align:center">⚙</span> Settings</a>
+  <div class="sidebar-bottom">
+    <a href="upgrade.html" class="nav-item" style="background:rgba(201,151,43,.07);color:var(--gold-l);font-weight:600"><span style="width:16px;text-align:center">⚡</span> Upgrade Plan</a>
+  </div>
+</aside>
+<div class="main">
+  <div class="top-bar">
+    <span style="font-size:.95rem;font-weight:700;letter-spacing:-.02em;color:#fff">Bookkeeping</span>
+    <div style="width:30px;height:30px;border-radius:50%;background:rgba(201,151,43,.12);border:1px solid rgba(201,151,43,.2);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--gold-l)">U</div>
+  </div>
+  <div class="content">
+
+<!-- Header -->
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+  <div>
+    <div style="font-size:1.35rem;font-weight:900;letter-spacing:-.03em;margin-bottom:.2rem;color:#fff">Bookkeeping</div>
+    <div style="font-size:.78rem;color:var(--g3)" id="bk-sub">Loading…</div>
+  </div>
+  <div style="display:flex;gap:.65rem;flex-wrap:wrap">
+    <select id="period-select" onchange="loadSummary()" style="font-size:.78rem;padding:.45rem .85rem;min-width:160px">
+      <option value="this-month">This Month</option>
+      <option value="last-month">Last Month</option>
+      <option value="this-quarter">This Quarter</option>
+      <option value="ytd">Year to Date</option>
+    </select>
+    <button onclick="openAddTx()" class="btn-gold">+ Add Transaction</button>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+  <div class="kpi">
+    <div class="kpi-label">Total Income</div>
+    <div class="kpi-value" id="kpi-income" style="color:var(--green)">—</div>
+    <div class="kpi-delta" id="kpi-income-lbl">Period total</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Total Expenses</div>
+    <div class="kpi-value" id="kpi-expense" style="color:var(--red)">—</div>
+    <div class="kpi-delta" id="kpi-expense-lbl">Period total</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Net Profit</div>
+    <div class="kpi-value" id="kpi-net">—</div>
+    <div class="kpi-delta" id="kpi-margin">— margin</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Cash Balance</div>
+    <div class="kpi-value" id="kpi-cash" style="color:var(--gold-l)">—</div>
+    <div class="kpi-delta" id="kpi-accounts-count">across all accounts</div>
+  </div>
+</div>
+
+<!-- Tab Bar -->
+<div style="display:flex;border:1px solid var(--navy-border);border-radius:10px;overflow:hidden;margin-bottom:1.25rem;width:fit-content">
+  <button id="tab-transactions" onclick="setTab('transactions')" style="padding:.55rem 1.25rem;font-size:.82rem;font-weight:600;background:rgba(201,151,43,.1);color:var(--gold-l);border:none;border-right:1px solid var(--navy-border);cursor:pointer;font-family:'Inter',sans-serif">📒 Transactions</button>
+  <button id="tab-accounts"     onclick="setTab('accounts')"     style="padding:.55rem 1.25rem;font-size:.82rem;font-weight:600;background:none;color:var(--g2);border:none;border-right:1px solid var(--navy-border);cursor:pointer;font-family:'Inter',sans-serif">🏦 Accounts</button>
+  <button id="tab-categories"   onclick="setTab('categories')"   style="padding:.55rem 1.25rem;font-size:.82rem;font-weight:600;background:none;color:var(--g2);border:none;cursor:pointer;font-family:'Inter',sans-serif">🏷 Categories</button>
+</div>
+
+<!-- TRANSACTIONS -->
+<div id="panel-transactions">
+  <!-- Filters -->
+  <div class="panel" style="padding:.85rem 1.25rem;margin-bottom:1rem">
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+      <input type="date" id="filter-from" style="font-size:.78rem;padding:.4rem .7rem;width:140px" onchange="loadTransactions()"/>
+      <span style="font-size:.75rem;color:var(--g3)">to</span>
+      <input type="date" id="filter-to"   style="font-size:.78rem;padding:.4rem .7rem;width:140px" onchange="loadTransactions()"/>
+      <select id="filter-type" style="font-size:.78rem;padding:.4rem .7rem;min-width:130px" onchange="loadTransactions()">
+        <option value="">All Types</option>
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+      <select id="filter-cat" style="font-size:.78rem;padding:.4rem .7rem;min-width:160px" onchange="loadTransactions()">
+        <option value="">All Categories</option>
+      </select>
+      <button onclick="clearFilters()" style="font-size:.72rem;padding:.38rem .8rem;border-radius:7px;background:none;border:1px solid var(--navy-border);color:var(--g2);cursor:pointer;font-family:'Inter',sans-serif">Clear</button>
+      <span style="font-size:.72rem;color:var(--g3);margin-left:auto" id="tx-count"></span>
+    </div>
+  </div>
+  <div class="panel" style="padding:0;overflow:hidden">
+    <div id="tx-table"><div style="padding:2rem"><div class="skeleton" style="height:140px"></div></div></div>
+    <div id="tx-pagination" style="padding:.75rem 1.25rem;border-top:1px solid var(--navy-border);display:flex;gap:.5rem;align-items:center;justify-content:space-between;display:none">
+      <span style="font-size:.72rem;color:var(--g3)" id="tx-page-info"></span>
+      <div style="display:flex;gap:.4rem">
+        <button id="pg-prev" onclick="changePage(-1)" class="btn-ghost" style="font-size:.72rem;padding:.35rem .75rem">← Prev</button>
+        <button id="pg-next" onclick="changePage(1)"  class="btn-ghost" style="font-size:.72rem;padding:.35rem .75rem">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ACCOUNTS -->
+<div id="panel-accounts" style="display:none">
+  <div style="display:flex;justify-content:flex-end;margin-bottom:.75rem">
+    <button onclick="openAddAccount()" class="btn-gold">+ Add Account</button>
+  </div>
+  <div id="accounts-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem"></div>
+</div>
+
+<!-- CATEGORIES -->
+<div id="panel-categories" style="display:none">
+  <div style="display:flex;justify-content:flex-end;margin-bottom:.75rem">
+    <button onclick="openAddCategory()" class="btn-gold">+ Add Category</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+    <div>
+      <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--green);margin-bottom:.65rem">Income</div>
+      <div id="cat-income-list"></div>
+    </div>
+    <div>
+      <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--red);margin-bottom:.65rem">Expense</div>
+      <div id="cat-expense-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Add / Edit Transaction ═══════════════════════════ -->
+<div id="modal-tx" class="modal-overlay">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-head">
+      <span style="font-size:.95rem;font-weight:700;color:#fff" id="tx-modal-title">Add Transaction</span>
+      <button onclick="closeModal('modal-tx')" style="background:none;border:none;color:var(--g3);font-size:1.35rem;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="tx-id"/>
+      <!-- Type toggle -->
+      <div style="display:flex;gap:0;border:1px solid var(--navy-border);border-radius:9px;overflow:hidden;margin-bottom:1.1rem">
+        <button id="type-income-btn"  onclick="setTxType('income')"  style="flex:1;padding:.6rem;font-size:.82rem;font-weight:700;background:rgba(16,185,129,.1);color:var(--green);border:none;cursor:pointer;font-family:'Inter',sans-serif;border-right:1px solid var(--navy-border)">↑ Income</button>
+        <button id="type-expense-btn" onclick="setTxType('expense')" style="flex:1;padding:.6rem;font-size:.82rem;font-weight:700;background:none;color:var(--g2);border:none;cursor:pointer;font-family:'Inter',sans-serif">↓ Expense</button>
+      </div>
+      <input type="hidden" id="tx-type" value="income"/>
+      <div class="grid2">
+        <div class="field"><label class="fl">Date *</label><input id="tx-date" type="date"/></div>
+        <div class="field"><label class="fl">Amount ($) *</label><input id="tx-amount" type="number" min="0.01" step="0.01" placeholder="0.00"/></div>
+      </div>
+      <div class="field"><label class="fl">Description *</label><input id="tx-desc" placeholder="e.g. Client invoice #1042"/></div>
+      <div class="grid2">
+        <div class="field">
+          <label class="fl">Account *</label>
+          <select id="tx-account"><option value="">Select account…</option></select>
+        </div>
+        <div class="field">
+          <label class="fl">Category</label>
+          <select id="tx-category"><option value="">Uncategorized</option></select>
+        </div>
+      </div>
+      <div class="field"><label class="fl">Notes</label><textarea id="tx-notes" rows="2" style="resize:none" placeholder="Optional memo…"></textarea></div>
+      <label style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;color:var(--g2);cursor:pointer;margin-top:.25rem">
+        <input type="checkbox" id="tx-reconciled" style="width:15px;height:15px;accent-color:var(--gold)"/>
+        Mark as reconciled
+      </label>
+    </div>
+    <div class="modal-foot">
+      <button onclick="closeModal('modal-tx')" class="btn-ghost">Cancel</button>
+      <button onclick="saveTx()" class="btn-gold">Save Transaction</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Add Account ══════════════════════════════════════ -->
+<div id="modal-account" class="modal-overlay">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-head">
+      <span style="font-size:.95rem;font-weight:700;color:#fff">Add Account</span>
+      <button onclick="closeModal('modal-account')" style="background:none;border:none;color:var(--g3);font-size:1.35rem;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label class="fl">Account Name *</label><input id="acct-name" placeholder="Business Checking"/></div>
+      <div class="grid2">
+        <div class="field">
+          <label class="fl">Type</label>
+          <select id="acct-type">
+            <option value="checking">Checking</option>
+            <option value="savings">Savings</option>
+            <option value="credit">Credit Card</option>
+            <option value="loan">Loan</option>
+            <option value="asset">Asset</option>
+            <option value="equity">Equity</option>
+          </select>
+        </div>
+        <div class="field"><label class="fl">Opening Balance ($)</label><input id="acct-balance" type="number" value="0" step="0.01"/></div>
+      </div>
+      <div class="field"><label class="fl">Bank / Institution</label><input id="acct-institution" placeholder="Chase, Wells Fargo…"/></div>
+    </div>
+    <div class="modal-foot">
+      <button onclick="closeModal('modal-account')" class="btn-ghost">Cancel</button>
+      <button onclick="saveAccount()" class="btn-gold">Add Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Add Category ═════════════════════════════════════ -->
+<div id="modal-cat" class="modal-overlay">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-head">
+      <span style="font-size:.95rem;font-weight:700;color:#fff">Add Category</span>
+      <button onclick="closeModal('modal-cat')" style="background:none;border:none;color:var(--g3);font-size:1.35rem;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label class="fl">Name *</label><input id="cat-name" placeholder="e.g. Software & Tools"/></div>
+      <div class="grid2">
+        <div class="field">
+          <label class="fl">Type</label>
+          <select id="cat-type"><option value="expense">Expense</option><option value="income">Income</option></select>
+        </div>
+        <div class="field"><label class="fl">Color</label><input id="cat-color" type="color" value="#3B82F6" style="height:38px;padding:.2rem .3rem;cursor:pointer"/></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button onclick="closeModal('modal-cat')" class="btn-ghost">Cancel</button>
+      <button onclick="saveCategory()" class="btn-gold">Add Category</button>
+    </div>
+  </div>
+</div>
+
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+const API = ''
+let categories = [], accounts = [], allTx = []
+let currentPage = 0, totalTx = 0
+const PAGE_SIZE = 50
+
+const $ = id => document.getElementById(id)
+const fmt = n => '$' + (+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+const fmtDate = iso => iso ? new Date(iso+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'
+
+function toast(msg, type='success') {
+  const el = $('toast')
+  el.textContent = msg
+  el.style.background = type==='error' ? 'rgba(239,68,68,.9)' : type==='info' ? 'rgba(59,130,246,.9)' : 'rgba(16,185,129,.9)'
+  el.style.color = '#fff'
+  el.classList.add('show')
+  setTimeout(() => el.classList.remove('show'), 3200)
+}
+function closeModal(id) { $(id).classList.remove('open') }
+
+// ── Tab ───────────────────────────────────────────────────────
+function setTab(tab) {
+  ['transactions','accounts','categories'].forEach(t => {
+    const btn = $('tab-'+t), panel = $('panel-'+t)
+    const on = t === tab
+    btn.style.background = on ? 'rgba(201,151,43,.1)' : 'none'
+    btn.style.color      = on ? 'var(--gold-l)' : 'var(--g2)'
+    panel.style.display  = on ? 'block' : 'none'
+  })
+  if (tab === 'accounts')   renderAccounts()
+  if (tab === 'categories') renderCategories()
+}
+
+// ── Period helper ─────────────────────────────────────────────
+function getPeriodDates() {
+  const now   = new Date()
+  const y     = now.getFullYear()
+  const m     = now.getMonth()
+  const p     = $('period-select').value
+  const pad   = n => String(n).padStart(2,'0')
+  const iso   = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
+  if (p === 'this-month')   return { from: `${y}-${pad(m+1)}-01`, to: iso(new Date(y,m+1,0)) }
+  if (p === 'last-month')   return { from: `${y}-${pad(m)}-01`,   to: iso(new Date(y,m,0)) }
+  if (p === 'this-quarter') {
+    const q = Math.floor(m/3)
+    return { from: iso(new Date(y,q*3,1)), to: iso(new Date(y,q*3+3,0)) }
+  }
+  return { from: `${y}-01-01`, to: iso(now) }  // YTD
+}
+
+// ── Init ──────────────────────────────────────────────────────
+async function initPage() {
+  prefillFilters()
+  await Promise.all([loadCategories(), loadAccounts()])
+  loadSummary()
+  loadTransactions()
+}
+
+function prefillFilters() {
+  const now = new Date(), y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0')
+  const last = new Date(y, now.getMonth()+1, 0).getDate()
+  $('filter-from').value = `${y}-${m}-01`
+  $('filter-to').value   = `${y}-${m}-${last}`
+}
+
+// ── Summary KPIs ──────────────────────────────────────────────
+async function loadSummary() {
+  try {
+    const { from, to } = getPeriodDates()
+    const r = await fetch(`${API}/api/bookkeeping/summary?from=${from}&to=${to}`, { credentials:'include' })
+    const d = await r.json()
+    const period = $('period-select').options[$('period-select').selectedIndex].text
+    $('bk-sub').textContent = `${period}  ·  ${fmtDate(from)} – ${fmtDate(to)}`
+    $('kpi-income').textContent  = fmt(d.income)
+    $('kpi-expense').textContent = fmt(d.expense)
+    const net = d.net
+    $('kpi-net').textContent   = fmt(net)
+    $('kpi-net').style.color   = net >= 0 ? 'var(--green)' : 'var(--red)'
+    const margin = d.income > 0 ? ((net/d.income)*100).toFixed(1) : '0'
+    $('kpi-margin').textContent = `${margin}% margin`
+    // cash = sum of checking/savings accounts
+    const cash = accounts.filter(a=>['checking','savings','asset'].includes(a.type))
+                         .reduce((s,a) => s + (a.balance||0), 0)
+    $('kpi-cash').textContent = fmt(cash)
+    $('kpi-accounts-count').textContent = accounts.length + ' account' + (accounts.length!==1?'s':'')
+  } catch(e) { console.error(e) }
+}
+
+// ── Accounts ──────────────────────────────────────────────────
+async function loadAccounts() {
+  try {
+    const r = await fetch(`${API}/api/bookkeeping/accounts`, { credentials:'include' })
+    const d = await r.json()
+    accounts = d.accounts || []
+    populateAccountSelect()
+  } catch(e) {}
+}
+
+function populateAccountSelect() {
+  const sel = $('tx-account')
+  sel.innerHTML = '<option value="">Select account…</option>'
+  accounts.forEach(a => {
+    const o = document.createElement('option')
+    o.value = a.id; o.textContent = `${a.name} (${fmt(a.balance)})`
+    sel.appendChild(o)
+  })
+}
+
+function renderAccounts() {
+  const el = $('accounts-grid')
+  if (!accounts.length) {
+    el.innerHTML = `<div style="grid-column:1/-1;padding:3rem;text-align:center">
+      <div style="font-size:1.75rem;margin-bottom:.6rem">🏦</div>
+      <div style="font-size:.9rem;font-weight:700;margin-bottom:.3rem;color:#fff">No accounts yet</div>
+      <div style="font-size:.78rem;color:var(--g3);margin-bottom:1rem">Add your business checking, savings, or credit card accounts.</div>
+      <button onclick="openAddAccount()" class="btn-gold">+ Add Account</button></div>`
+    return
+  }
+  const typeIcon = { checking:'🏦', savings:'💰', credit:'💳', loan:'📋', asset:'🏢', equity:'📈' }
+  el.innerHTML = accounts.map(a => `
+    <div class="panel" style="padding:0;overflow:hidden;cursor:default">
+      <div style="padding:1rem 1.25rem;display:flex;justify-content:space-between;align-items:flex-start">
+        <div style="display:flex;align-items:center;gap:.6rem">
+          <span style="font-size:1.25rem">${typeIcon[a.type]||'🏦'}</span>
+          <div>
+            <div style="font-size:.88rem;font-weight:700;color:#fff">${a.name}</div>
+            <div style="font-size:.68rem;color:var(--g3)">${a.institution||a.type}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:1.1rem;font-weight:900;${a.balance>=0?'color:var(--green)':'color:var(--red)'}">${fmt(a.balance)}</div>
+          <div style="font-size:.65rem;color:var(--g3)">balance</div>
+        </div>
+      </div>
+      <div style="padding:.6rem 1.25rem;border-top:1px solid var(--navy-border);display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:.68rem;color:var(--g3)">Opening: ${fmt(a.opening_balance)}</span>
+        <span class="pill ${a.type==='credit'||a.type==='loan'?'pill-amber':'pill-blue'}" style="font-size:.6rem">${a.type}</span>
+      </div>
+    </div>`).join('')
+}
+
+async function openAddAccount() {
+  $('acct-name').value=''; $('acct-type').value='checking'
+  $('acct-balance').value='0'; $('acct-institution').value=''
+  $('modal-account').classList.add('open')
+}
+
+async function saveAccount() {
+  const name = $('acct-name').value.trim()
+  if (!name) return toast('Account name required','error')
+  const r = await fetch(`${API}/api/bookkeeping/accounts`, {
+    method:'POST', credentials:'include',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ name, type:$('acct-type').value,
+      opening_balance:+$('acct-balance').value, institution:$('acct-institution').value })
+  })
+  const d = await r.json()
+  if (!r.ok) return toast(d.error||'Failed','error')
+  toast('Account added ✓')
+  closeModal('modal-account')
+  await loadAccounts()
+  renderAccounts()
+  loadSummary()
+}
+
+// ── Categories ────────────────────────────────────────────────
+async function loadCategories() {
+  try {
+    const r = await fetch(`${API}/api/bookkeeping/categories`, { credentials:'include' })
+    const d = await r.json()
+    categories = d.categories || []
+    populateCategorySelects()
+  } catch(e) {}
+}
+
+function populateCategorySelects() {
+  const filterSel = $('filter-cat')
+  const txSel     = $('tx-category')
+  filterSel.innerHTML = '<option value="">All Categories</option>'
+  txSel.innerHTML     = '<option value="">Uncategorized</option>'
+  categories.forEach(c => {
+    const mkOpt = (sel) => {
+      const o = document.createElement('option')
+      o.value = c.id; o.textContent = c.name
+      sel.appendChild(o)
+    }
+    mkOpt(filterSel); mkOpt(txSel)
+  })
+}
+
+function renderCategories() {
+  const inc = categories.filter(c=>c.type==='income')
+  const exp = categories.filter(c=>c.type==='expense')
+  const row = c => `<div style="display:flex;align-items:center;gap:.6rem;padding:.55rem .85rem;
+    background:var(--navy-card);border:1px solid var(--navy-border);border-radius:8px;margin-bottom:.4rem">
+    <span style="width:10px;height:10px;border-radius:50%;background:${c.color};flex-shrink:0"></span>
+    <span style="font-size:.82rem;color:var(--g1)">${c.name}</span>
+  </div>`
+  $('cat-income-list').innerHTML  = inc.map(row).join('') || '<div style="font-size:.78rem;color:var(--g3);padding:.5rem">None yet</div>'
+  $('cat-expense-list').innerHTML = exp.map(row).join('') || '<div style="font-size:.78rem;color:var(--g3);padding:.5rem">None yet</div>'
+}
+
+function openAddCategory() {
+  $('cat-name').value=''; $('cat-type').value='expense'; $('cat-color').value='#3B82F6'
+  $('modal-cat').classList.add('open')
+}
+
+async function saveCategory() {
+  const name = $('cat-name').value.trim()
+  if (!name) return toast('Name required','error')
+  const r = await fetch(`${API}/api/bookkeeping/categories`, {
+    method:'POST', credentials:'include',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ name, type:$('cat-type').value, color:$('cat-color').value })
+  })
+  if (!r.ok) return toast('Failed','error')
+  toast('Category added ✓')
+  closeModal('modal-cat')
+  await loadCategories()
+  renderCategories()
+}
+
+// ── Transactions ──────────────────────────────────────────────
+async function loadTransactions() {
+  try {
+    const from  = $('filter-from').value
+    const to    = $('filter-to').value
+    const type  = $('filter-type').value
+    const cat   = $('filter-cat').value
+    let url = `${API}/api/bookkeeping/transactions?limit=${PAGE_SIZE}&offset=${currentPage*PAGE_SIZE}`
+    if (from) url += `&from=${from}`
+    if (to)   url += `&to=${to}`
+    if (type) url += `&type=${type}`
+    if (cat)  url += `&category_id=${cat}`
+    const r = await fetch(url, { credentials:'include' })
+    const { transactions: tx = [], total } = await r.json()
+    allTx  = tx
+    totalTx = total
+    renderTransactions(tx, total)
+  } catch(e) { console.error(e) }
+}
+
+function renderTransactions(tx, total) {
+  const el = $('tx-table')
+  $('tx-count').textContent = total ? `${total} transaction${total!==1?'s':''}` : ''
+  if (!tx.length) {
+    el.innerHTML = `<div style="padding:3rem;text-align:center">
+      <div style="font-size:1.75rem;margin-bottom:.6rem">📒</div>
+      <div style="font-size:.9rem;font-weight:700;margin-bottom:.3rem;color:#fff">No transactions found</div>
+      <div style="font-size:.78rem;color:var(--g3);margin-bottom:1rem">Add your first transaction or adjust the filters.</div>
+      <button onclick="openAddTx()" class="btn-gold">+ Add Transaction</button></div>`
+    $('tx-pagination').style.display = 'none'
+    return
+  }
+  el.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+    <thead><tr style="border-bottom:2px solid var(--navy-border)">
+      ${['Date','Description','Category','Account','Amount','',''].map(h=>`
+      <th style="padding:.55rem 1rem;text-align:left;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g3)">${h}</th>`).join('')}
+    </tr></thead><tbody>
+    ${tx.map(t => {
+      const catDot = t.category_color
+        ? `<span style="width:8px;height:8px;border-radius:50%;background:${t.category_color};display:inline-block;margin-right:5px;vertical-align:middle"></span>`
+        : ''
+      return `<tr class="tx-row" style="border-bottom:1px solid rgba(30,42,58,.5)">
+        <td style="padding:.62rem 1rem;font-size:.78rem;color:var(--g3);white-space:nowrap">${fmtDate(t.date)}</td>
+        <td style="padding:.62rem 1rem">
+          <div style="font-size:.82rem;color:var(--g1);font-weight:500">${t.description}</div>
+          ${t.reconciled ? '<span style="font-size:.62rem;color:var(--green)">✓ reconciled</span>' : ''}
+          ${t.notes ? `<div style="font-size:.68rem;color:var(--g3);margin-top:1px">${t.notes}</div>` : ''}
+        </td>
+        <td style="padding:.62rem 1rem;font-size:.78rem;color:var(--g2)">${catDot}${t.category_name||'—'}</td>
+        <td style="padding:.62rem 1rem;font-size:.75rem;color:var(--g3)">${t.account_name||'—'}</td>
+        <td style="padding:.62rem 1rem;font-size:.88rem;font-weight:700;${t.type==='income'?'color:var(--green)':'color:var(--red)'};white-space:nowrap">
+          ${t.type==='income'?'+':'−'}${fmt(t.amount)}
+        </td>
+        <td style="padding:.62rem .5rem"><span class="pill ${t.type==='income'?'pill-green':'pill-red'}">${t.type}</span></td>
+        <td style="padding:.62rem 1rem">
+          <div style="display:flex;gap:.35rem">
+            <button onclick="editTx('${t.id}')" style="font-size:.68rem;padding:.28rem .6rem;border-radius:6px;background:none;border:1px solid var(--navy-border);color:var(--g2);cursor:pointer;font-family:'Inter',sans-serif">Edit</button>
+            <button onclick="deleteTx('${t.id}')" style="font-size:.68rem;padding:.28rem .6rem;border-radius:6px;background:none;border:1px solid rgba(239,68,68,.3);color:var(--red);cursor:pointer;font-family:'Inter',sans-serif">Del</button>
+          </div>
+        </td>
+      </tr>`
+    }).join('')}
+    </tbody></table></div>`
+
+  const pages = Math.ceil(totalTx / PAGE_SIZE)
+  const pg = $('tx-pagination')
+  if (pages > 1) {
+    pg.style.display = 'flex'
+    $('tx-page-info').textContent = `Page ${currentPage+1} of ${pages}  ·  ${totalTx} total`
+    $('pg-prev').disabled = currentPage === 0
+    $('pg-next').disabled = currentPage >= pages - 1
+  } else { pg.style.display = 'none' }
+}
+
+function changePage(dir) {
+  currentPage += dir
+  loadTransactions()
+}
+
+function clearFilters() {
+  $('filter-type').value = ''
+  $('filter-cat').value  = ''
+  prefillFilters()
+  currentPage = 0
+  loadTransactions()
+}
+
+// ── Add / Edit Transaction ────────────────────────────────────
+function openAddTx() {
+  $('tx-id').value   = ''
+  $('tx-modal-title').textContent = 'Add Transaction'
+  $('tx-date').value = new Date().toISOString().split('T')[0]
+  $('tx-amount').value = $('tx-desc').value = $('tx-notes').value = ''
+  $('tx-account').value = $('tx-category').value = ''
+  $('tx-reconciled').checked = false
+  setTxType('income')
+  $('modal-tx').classList.add('open')
+}
+
+function editTx(id) {
+  const t = allTx.find(x => x.id === id)
+  if (!t) return
+  $('tx-id').value           = t.id
+  $('tx-modal-title').textContent = 'Edit Transaction'
+  $('tx-date').value         = t.date
+  $('tx-amount').value       = t.amount
+  $('tx-desc').value         = t.description
+  $('tx-notes').value        = t.notes || ''
+  $('tx-account').value      = t.account_id || ''
+  $('tx-category').value     = t.category_id || ''
+  $('tx-reconciled').checked = !!t.reconciled
+  setTxType(t.type)
+  $('modal-tx').classList.add('open')
+}
+
+function setTxType(type) {
+  $('tx-type').value = type
+  $('type-income-btn').style.background  = type==='income'  ? 'rgba(16,185,129,.1)' : 'none'
+  $('type-income-btn').style.color       = type==='income'  ? 'var(--green)'         : 'var(--g2)'
+  $('type-expense-btn').style.background = type==='expense' ? 'rgba(239,68,68,.1)'   : 'none'
+  $('type-expense-btn').style.color      = type==='expense' ? 'var(--red)'            : 'var(--g2)'
+  // filter category list
+  const sel = $('tx-category')
+  Array.from(sel.options).forEach(o => {
+    if (!o.value) return
+    const cat = categories.find(c => c.id === o.value)
+    o.style.display = cat && cat.type !== type ? 'none' : ''
+  })
+}
+
+async function saveTx() {
+  const id = $('tx-id').value
+  const payload = {
+    date:        $('tx-date').value,
+    description: $('tx-desc').value.trim(),
+    amount:      +$('tx-amount').value,
+    type:        $('tx-type').value,
+    account_id:  $('tx-account').value,
+    category_id: $('tx-category').value || undefined,
+    notes:       $('tx-notes').value.trim(),
+    reconciled:  $('tx-reconciled').checked,
+  }
+  if (!payload.date || !payload.description || !payload.amount || !payload.account_id)
+    return toast('Fill all required fields','error')
+
+  const url    = id ? `/api/bookkeeping/transactions/${id}` : '/api/bookkeeping/transactions'
+  const method = id ? 'PUT' : 'POST'
+  const r = await fetch(API + url, {
+    method, credentials:'include',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  })
+  const d = await r.json()
+  if (!r.ok) return toast(d.error||'Failed','error')
+  toast(id ? 'Updated ✓' : 'Transaction saved ✓')
+  closeModal('modal-tx')
+  await loadAccounts()
+  loadTransactions()
+  loadSummary()
+}
+
+async function deleteTx(id) {
+  if (!confirm('Delete this transaction? This will reverse the account balance.')) return
+  const r = await fetch(`${API}/api/bookkeeping/transactions/${id}`,
+    { method:'DELETE', credentials:'include' })
+  if (!r.ok) return toast('Delete failed','error')
+  toast('Deleted ✓')
+  await loadAccounts()
+  loadTransactions()
+  loadSummary()
+}
+
+document.addEventListener('DOMContentLoaded', initPage)
+</script>
 </body>
 </html>
