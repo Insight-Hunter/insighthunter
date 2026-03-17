@@ -1,13 +1,460 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PBX · Insight Hunter</title>
-  <link rel="stylesheet" href="/assets/css/global.css" />
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PBX Communications — Insight Hunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0D1117;--navy-card:#161B22;--navy-border:#1E2A3A;--gold:#C9972B;--gold-l:#D4A843;
+  --g1:#E2E8F0;--g2:#94A3B8;--g3:#64748B;--g4:#334155;--white:#FFF;
+  --green:#10B981;--red:#EF4444;--amber:#F59E0B;--blue:#3B82F6}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);margin:0;display:flex;min-height:100vh}
+/* Sidebar */
+.sidebar{width:220px;flex-shrink:0;background:var(--navy-card);border-right:1px solid var(--navy-border);
+  display:flex;flex-direction:column;height:100vh;position:sticky;top:0}
+.sidebar-logo{display:flex;align-items:center;gap:9px;padding:1.25rem 1.25rem;font-size:.9rem;font-weight:800;
+  letter-spacing:-.02em;border-bottom:1px solid var(--navy-border)}
+.nav-section{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--g4);padding:.9rem 1.25rem .35rem}
+.nav-item{display:flex;align-items:center;gap:.65rem;padding:.55rem 1rem;margin:.1rem .6rem;
+  border-radius:8px;font-size:.8rem;color:var(--g2);text-decoration:none;transition:.15s;cursor:pointer}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--g1)}
+.nav-item.active{background:rgba(201,151,43,.1);color:var(--gold-l);font-weight:600}
+.nav-item .icon{width:16px;text-align:center;font-size:.85rem}
+.sidebar-bottom{margin-top:auto;padding:.75rem;border-top:1px solid var(--navy-border)}
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow-y:auto}
+.top-bar{height:56px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.75rem;border-bottom:1px solid var(--navy-border);position:sticky;top:0;
+  background:rgba(13,17,23,.95);backdrop-filter:blur(14px);z-index:50}
+.top-bar-title{font-size:.95rem;font-weight:700;letter-spacing:-.02em}
+.content{padding:1.75rem;flex:1}
+.dash-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem}
+.dash-title{font-size:1.35rem;font-weight:900;letter-spacing:-.03em;margin-bottom:.2rem}
+.dash-sub{font-size:.78rem;color:var(--g3)}
+/* KPIs */
+.kpi-row{display:grid;gap:1rem;margin-bottom:1.5rem}
+.kpi{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:12px;padding:1.1rem 1.25rem}
+.kpi-label{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--g3);margin-bottom:.35rem}
+.kpi-value{font-size:1.65rem;font-weight:900;letter-spacing:-.03em;color:var(--white)}
+.kpi-delta{font-size:.72rem;margin-top:.2rem;color:var(--g3)}
+/* Panel */
+.panel{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:12px;padding:1.25rem;margin-bottom:1.25rem}
+.panel-title{font-size:.82rem;font-weight:700;letter-spacing:-.01em;margin-bottom:1rem;color:var(--g1)}
+/* Buttons */
+.btn-gold{background:var(--gold);color:var(--navy);font-weight:700;border:none;border-radius:8px;cursor:pointer;
+  transition:.15s;font-family:'Inter',sans-serif}
+.btn-gold:hover{background:var(--gold-l)}
+/* Pills */
+.pill{display:inline-block;padding:2px 8px;border-radius:100px;font-size:.65rem;font-weight:700}
+.pill-green{background:rgba(16,185,129,.12);color:var(--green)}
+.pill-blue{background:rgba(59,130,246,.12);color:var(--blue)}
+.pill-amber{background:rgba(245,158,11,.12);color:var(--amber)}
+.pill-red{background:rgba(239,68,68,.12);color:var(--red)}
+.pill-gold{background:rgba(201,151,43,.12);color:var(--gold-l)}
+/* Skeleton */
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);
+  background-size:200%;animation:shimmer 1.4s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* Toast */
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;padding:.65rem 1.25rem;border-radius:10px;
+  font-size:.82rem;font-weight:600;transition:.3s;transform:translateY(100px);opacity:0;pointer-events:none}
+#toast.show{transform:translateY(0);opacity:1}
+</style>
 </head>
 <body>
-  <!-- PBX -->
-  <script src="/assets/js/utils.js"></script>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#141E30"/><path d="M16 4v5M13 6h6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M10 9v15h12V9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 24h18" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M13 14l2.5 3L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Insight Hunter
+  </div>
+  <div class="nav-section">Platform</div>
+  <a href="index.html"          class="nav-item"><span class="icon">◫</span> Overview</a>
+  <a href="bizforma.html"       class="nav-item"><span class="icon">📋</span> BizForma</a>
+  <a href="bookkeeping.html"    class="nav-item"><span class="icon">📒</span> Bookkeeping</a>
+  <a href="reports.html"        class="nav-item"><span class="icon">📊</span> Reports</a>
+  <a href="forecast.html"       class="nav-item"><span class="icon">📈</span> Forecast</a>
+  <a href="insights.html"       class="nav-item"><span class="icon">✦</span> AI Insights</a>
+  <div class="nav-section">Business</div>
+  <a href="payroll.html"        class="nav-item"><span class="icon">💳</span> Payroll</a>
+  <a href="pbx.html"            class="nav-item active"><span class="icon">📞</span> PBX</a>
+  <a href="settings.html"       class="nav-item"><span class="icon">⚙</span> Settings</a>
+  <div class="sidebar-bottom">
+    <a href="upgrade.html" class="nav-item" style="background:rgba(201,151,43,.07);color:var(--gold-l);font-weight:600"><span class="icon">⚡</span> Upgrade Plan</a>
+  </div>
+</aside>
+<div class="main">
+  <div class="top-bar">
+    <span class="top-bar-title">PBX Communications</span>
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <div style="width:28px;height:28px;border-radius:50%;background:rgba(201,151,43,.15);border:1px solid rgba(201,151,43,.3);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--gold-l)">U</div>
+    </div>
+  </div>
+  <div class="content">
+
+<div class="dash-header">
+  <div>
+    <div class="dash-title">PBX Communications</div>
+    <div class="dash-sub" id="pbx-number-display">Loading your business number…</div>
+  </div>
+  <div style="display:flex;gap:.65rem;flex-wrap:wrap">
+    <button onclick="openSMSCompose()" class="btn-gold" style="font-size:.82rem;padding:.5rem 1.1rem">+ New SMS</button>
+    <button onclick="openIVR()" style="padding:.5rem 1.1rem;border-radius:8px;border:1px solid var(--navy-border);background:none;color:var(--g1);font-size:.82rem;cursor:pointer">⚙ IVR Config</button>
+  </div>
+</div>
+
+<div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+  <div class="kpi"><div class="kpi-label">Today's Calls</div><div class="kpi-value" id="kpi-calls">—</div></div>
+  <div class="kpi"><div class="kpi-label">Voicemails</div><div class="kpi-value" id="kpi-vmail" style="color:var(--amber)">—</div><div class="kpi-delta" id="kpi-unlistened"></div></div>
+  <div class="kpi"><div class="kpi-label">SMS Inbox</div><div class="kpi-value" id="kpi-sms">—</div></div>
+  <div class="kpi"><div class="kpi-label">Number Status</div><div class="kpi-value" id="kpi-status" style="font-size:.9rem;color:var(--green)">—</div></div>
+</div>
+
+<!-- Tab Bar -->
+<div style="display:flex;gap:0;border:1px solid var(--navy-border);border-radius:10px;overflow:hidden;margin-bottom:1.25rem;width:fit-content">
+  <button class="tab-btn" id="tab-calls"     onclick="setTab('calls')"     style="padding:.55rem 1.25rem;font-size:.82rem;font-weight:600;background:rgba(201,151,43,.1);color:var(--gold-l);border:none;border-right:1px solid var(--navy-border);cursor:pointer;font-family:'Inter',sans-serif">📞 Calls</button>
+  <button class="tab-btn" id="tab-voicemail" onclick="setTab('voicemail')" style="padding:.55rem 1.25rem;font-size:.82rem;font-weight:600;background:none;color:var(--g2);border:none;border-right:1px solid var(--navy-border);cursor:pointer;font-family:'Inter',sans-serif">🎙 Voicemail</button>
+  <button class="tab-btn" id="tab-sms"       onclick="setTab('sms')"       style="padding:.55rem 1.25rem;font-size:.82rem;font-weight:600;background:none;color:var(--g2);border:none;border-right:1px solid var(--navy-border);cursor:pointer;font-family:'Inter',sans-serif">💬 SMS</button>
+  <button class="tab-btn" id="tab-ivr"       onclick="setTab('ivr')"       style="padding:.55rem 1.25rem;font-size:.82rem;font-weight:600;background:none;color:var(--g2);border:none;cursor:pointer;font-family:'Inter',sans-serif">⚙ IVR</button>
+</div>
+
+<!-- CALLS -->
+<div id="panel-calls" class="panel" style="padding:0;overflow:hidden">
+  <div style="padding:.9rem 1.25rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--navy-border)">
+    <span style="font-size:.72rem;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.09em">Call Log</span>
+    <button onclick="loadCalls()" style="font-size:.72rem;color:var(--gold-l);background:none;border:none;cursor:pointer">↻ Refresh</button>
+  </div>
+  <div id="calls-table"><div style="padding:2rem"><div class="skeleton" style="height:110px;border-radius:8px"></div></div></div>
+</div>
+
+<!-- VOICEMAIL -->
+<div id="panel-voicemail" class="panel" style="padding:0;overflow:hidden;display:none">
+  <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--navy-border)">
+    <span style="font-size:.72rem;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.09em">Voicemails</span>
+  </div>
+  <div id="vmail-list"><div style="padding:2rem"><div class="skeleton" style="height:80px;border-radius:8px"></div></div></div>
+</div>
+
+<!-- SMS -->
+<div id="panel-sms" style="display:none">
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:1rem;height:500px">
+    <div class="panel" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
+      <div style="padding:.7rem 1rem;border-bottom:1px solid var(--navy-border);font-size:.68rem;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.09em">Conversations</div>
+      <div id="sms-convos" style="flex:1;overflow-y:auto"></div>
+    </div>
+    <div class="panel" style="padding:0;display:flex;flex-direction:column;overflow:hidden">
+      <div style="padding:.75rem 1.25rem;border-bottom:1px solid var(--navy-border);font-size:.82rem;font-weight:600;color:var(--g1)" id="sms-thread-header">← Select a conversation</div>
+      <div id="sms-thread" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem"></div>
+      <div style="padding:.75rem 1rem;border-top:1px solid var(--navy-border);display:flex;gap:.5rem">
+        <input id="sms-reply-input" type="text" placeholder="Reply…" onkeydown="if(event.key==='Enter')sendSMSReply()"
+          style="flex:1;padding:.5rem .85rem;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--navy-border);color:var(--white);font-size:.82rem;font-family:'Inter',sans-serif;outline:none"/>
+        <button onclick="sendSMSReply()" class="btn-gold" style="font-size:.78rem;padding:.5rem .9rem">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IVR -->
+<div id="panel-ivr" class="panel" style="display:none;max-width:620px">
+  <div class="panel-title">IVR Menu Configuration</div>
+  <div style="margin-bottom:1.25rem">
+    <label style="font-size:.72rem;font-weight:600;color:var(--g2);display:block;margin-bottom:.4rem">Greeting (read aloud to callers)</label>
+    <textarea id="ivr-greeting" rows="3"
+      style="width:100%;padding:.65rem .9rem;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid var(--navy-border);color:var(--white);font-family:'Inter',sans-serif;font-size:.82rem;resize:vertical;outline:none;line-height:1.6"
+      placeholder="Thank you for calling. Press 1 for sales, 2 for support, or hold for voicemail."></textarea>
+  </div>
+  <div style="margin-bottom:1.25rem">
+    <div style="font-size:.72rem;font-weight:600;color:var(--g2);margin-bottom:.65rem">Call Routing — Digit → Forward To Number</div>
+    <div id="ivr-routes-ui" style="display:flex;flex-direction:column;gap:.5rem"></div>
+    <button onclick="addRoute()" style="margin-top:.65rem;font-size:.75rem;padding:.4rem .9rem;border-radius:7px;background:none;border:1px solid var(--navy-border);color:var(--g2);cursor:pointer;font-family:'Inter',sans-serif">+ Add Route</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding:.9rem;background:rgba(255,255,255,.02);border-radius:9px;border:1px solid var(--navy-border)">
+    <input type="checkbox" id="ivr-voicemail" checked style="width:16px;height:16px;accent-color:var(--gold)"/>
+    <div>
+      <div style="font-size:.82rem;color:var(--g1);font-weight:500">Voicemail fallback</div>
+      <div style="font-size:.7rem;color:var(--g3)">Callers who don't press a key are sent to voicemail</div>
+    </div>
+  </div>
+  <button onclick="saveIVR()" class="btn-gold" style="font-size:.85rem;padding:.65rem 1.75rem">Save IVR Config</button>
+</div>
+
+<!-- SMS Compose Modal -->
+<div id="sms-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);align-items:center;justify-content:center">
+  <div style="background:var(--navy-card);border:1px solid var(--navy-border);border-radius:16px;padding:2rem;max-width:420px;width:calc(100% - 2rem)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+      <span style="font-size:.95rem;font-weight:700">New SMS</span>
+      <button onclick="closeSMSModal()" style="background:none;border:none;color:var(--g3);font-size:1.35rem;cursor:pointer;line-height:1">×</button>
+    </div>
+    <label style="font-size:.72rem;font-weight:600;color:var(--g2);display:block;margin-bottom:.35rem">To (US number)</label>
+    <input id="sms-to" type="tel" placeholder="+14045550100"
+      style="width:100%;padding:.6rem .9rem;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--navy-border);color:var(--white);font-size:.82rem;margin-bottom:.85rem;outline:none;font-family:'Inter',sans-serif"/>
+    <label style="font-size:.72rem;font-weight:600;color:var(--g2);display:block;margin-bottom:.35rem">Message</label>
+    <textarea id="sms-body" rows="4" maxlength="160"
+      style="width:100%;padding:.6rem .9rem;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--navy-border);color:var(--white);font-size:.82rem;resize:none;margin-bottom:.25rem;outline:none;font-family:'Inter',sans-serif;line-height:1.6"></textarea>
+    <div style="font-size:.65rem;color:var(--g3);text-align:right;margin-bottom:.75rem"><span id="char-count">0</span>/160</div>
+    <div style="font-size:.68rem;color:var(--g3);margin-bottom:1rem;padding:.65rem .85rem;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15);border-radius:8px">
+      ⚠️ Only send to opted-in recipients. Non-compliant sends are blocked.
+    </div>
+    <div style="display:flex;gap:.6rem">
+      <button onclick="closeSMSModal()" style="flex:1;padding:.6rem;border-radius:8px;background:none;border:1px solid var(--navy-border);color:var(--g2);font-size:.82rem;cursor:pointer;font-family:'Inter',sans-serif">Cancel</button>
+      <button onclick="sendNewSMS()" class="btn-gold" style="flex:1;font-size:.82rem;padding:.6rem">Send</button>
+    </div>
+  </div>
+</div>
+
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+function toast(msg, type='success') {
+  const el = document.getElementById('toast')
+  el.textContent = msg
+  el.style.background = type==='error' ? 'rgba(239,68,68,.9)' : 'rgba(16,185,129,.9)'
+  el.style.color = '#fff'
+  el.classList.add('show')
+  setTimeout(() => el.classList.remove('show'), 3200)
+}
+function fmtDate(iso) {
+  if (!iso) return '—'
+  const d = new Date(iso)
+  const now = new Date()
+  if (d.toDateString()===now.toDateString()) return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})
+  return d.toLocaleDateString([],{month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})
+}
+</script>
+<script>
+const API = ''  // same-origin or replace with https://insighthunter-pbx.workers.dev
+let activeConvo = null
+let allSMS = []
+let ivrRoutes = []
+
+function setTab(tab) {
+  ['calls','voicemail','sms','ivr'].forEach(t => {
+    const btn   = document.getElementById('tab-' + t)
+    const panel = document.getElementById('panel-' + t)
+    const on = t === tab
+    btn.style.background = on ? 'rgba(201,151,43,.1)' : 'none'
+    btn.style.color = on ? 'var(--gold-l)' : 'var(--g2)'
+    panel.style.display = on ? 'block' : 'none'
+  })
+  if (tab === 'calls')     loadCalls()
+  if (tab === 'voicemail') loadVoicemails()
+  if (tab === 'sms')       loadSMS()
+  if (tab === 'ivr')       loadIVR()
+}
+
+async function loadNumber() {
+  try {
+    const r = await fetch(API + '/api/pbx/numbers', { credentials:'include' })
+    const { numbers = [] } = await r.json()
+    const n = numbers.find(x => x.status === 'active')
+    const el = document.getElementById('pbx-number-display')
+    const ks = document.getElementById('kpi-status')
+    el.textContent = n ? `${n.phone_number}  ·  ${n.friendly_name}` : 'No number provisioned — click Manage Number'
+    ks.textContent = n ? 'Active' : 'No Number'
+    ks.style.color = n ? 'var(--green)' : 'var(--amber)'
+  } catch(e) {}
+}
+
+async function loadCalls() {
+  try {
+    const r = await fetch(API + '/api/pbx/calls?limit=30', { credentials:'include' })
+    const { calls = [] } = await r.json()
+    const today = calls.filter(c => new Date(c.created_at).toDateString() === new Date().toDateString())
+    document.getElementById('kpi-calls').textContent = today.length
+    const el = document.getElementById('calls-table')
+    if (!calls.length) { el.innerHTML='<div style="padding:2.5rem;text-align:center;font-size:.82rem;color:var(--g3)">No calls yet. Your call log will appear here.</div>'; return }
+    el.innerHTML = `<table style="width:100%;border-collapse:collapse">
+      <thead><tr style="border-bottom:2px solid var(--navy-border)">
+        ${['Dir','From','To','Duration','Status','Time'].map(h=>`<th style="padding:.55rem 1.25rem;text-align:left;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--g3)">${h}</th>`).join('')}
+      </tr></thead><tbody>
+      ${calls.map(c=>`<tr style="border-bottom:1px solid rgba(30,42,58,.5)">
+        <td style="padding:.65rem 1.25rem"><span class="pill ${c.direction==='inbound'?'pill-blue':'pill-green'}">${c.direction==='inbound'?'↓ In':'↑ Out'}</span></td>
+        <td style="padding:.65rem 1rem;font-size:.82rem;color:var(--g1)">${c.from_number}</td>
+        <td style="padding:.65rem 1rem;font-size:.8rem;color:var(--g2)">${c.to_number}</td>
+        <td style="padding:.65rem 1rem;font-size:.8rem;color:var(--g2);text-align:center">${c.duration?Math.floor(c.duration/60)+'m '+c.duration%60+'s':'—'}</td>
+        <td style="padding:.65rem 1rem"><span class="pill ${c.status==='completed'?'pill-green':c.status==='ringing'?'pill-amber':'pill-red'}">${c.status}</span></td>
+        <td style="padding:.65rem 1.25rem;font-size:.7rem;color:var(--g3)">${fmtDate(c.created_at)}</td>
+      </tr>`).join('')}
+      </tbody></table>`
+  } catch(e) { console.error(e) }
+}
+
+async function loadVoicemails() {
+  try {
+    const r = await fetch(API + '/api/pbx/voicemails', { credentials:'include' })
+    const { voicemails = [] } = await r.json()
+    const unlistened = voicemails.filter(v => !v.listened).length
+    document.getElementById('kpi-vmail').textContent = voicemails.length
+    document.getElementById('kpi-unlistened').textContent = unlistened ? `${unlistened} new` : ''
+    const el = document.getElementById('vmail-list')
+    if (!voicemails.length) { el.innerHTML='<div style="padding:2rem;text-align:center;font-size:.82rem;color:var(--g3)">No voicemails yet.</div>'; return }
+    el.innerHTML = voicemails.map(v=>`
+      <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--navy-border);${!v.listened?'background:rgba(201,151,43,.03)':''}">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">
+          <span style="font-size:.85rem;font-weight:${!v.listened?700:500};color:var(--g1)">${v.from_number}</span>
+          ${!v.listened?'<span class="pill pill-gold" style="font-size:.6rem">New</span>':''}
+          <span style="font-size:.68rem;color:var(--g3);margin-left:auto">${v.duration}s · ${fmtDate(v.created_at)}</span>
+        </div>
+        ${v.transcription?`<div style="font-size:.78rem;color:var(--g2);line-height:1.6;margin-bottom:.6rem;font-style:italic;padding:.5rem .75rem;background:rgba(255,255,255,.03);border-radius:7px">"${v.transcription}"</div>`:'<div style="font-size:.7rem;color:var(--g3);margin-bottom:.55rem">Transcription processing…</div>'}
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <audio controls style="height:28px;max-width:260px" src="${v.recording_url}" onplay="markListened('${v.id}')"></audio>
+          <button onclick="openSMSComposeTo('${v.from_number}')" style="font-size:.7rem;padding:.3rem .7rem;border-radius:6px;background:none;border:1px solid var(--navy-border);color:var(--g2);cursor:pointer;font-family:'Inter',sans-serif">Reply SMS</button>
+        </div>
+      </div>`).join('')
+  } catch(e) { console.error(e) }
+}
+
+async function markListened(id) {
+  await fetch(API + '/api/pbx/voicemails/' + id + '/listen', { method:'POST', credentials:'include' })
+}
+
+async function loadSMS() {
+  try {
+    const r = await fetch(API + '/api/pbx/sms', { credentials:'include' })
+    const { messages = [] } = await r.json()
+    allSMS = messages
+    document.getElementById('kpi-sms').textContent = messages.filter(m=>m.direction==='inbound').length
+    const contacts = {}
+    messages.forEach(m => {
+      const k = m.direction==='inbound' ? m.from_number : m.to_number
+      if (!contacts[k]) contacts[k] = []
+      contacts[k].push(m)
+    })
+    const el = document.getElementById('sms-convos')
+    if (!Object.keys(contacts).length) { el.innerHTML='<div style="padding:1rem;font-size:.78rem;color:var(--g3)">No messages yet.</div>'; return }
+    el.innerHTML = Object.entries(contacts).map(([num,msgs])=>{
+      const last = msgs[msgs.length-1]
+      return `<div onclick="openConvo('${num}')" style="padding:.75rem 1rem;border-bottom:1px solid var(--navy-border);cursor:pointer;transition:.15s" onmouseover="this.style.background='rgba(255,255,255,.03)'" onmouseout="this.style.background='none'">
+        <div style="font-size:.82rem;font-weight:600;color:var(--g1);margin-bottom:.18rem">${num}</div>
+        <div style="font-size:.7rem;color:var(--g3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${last.body}</div>
+      </div>`
+    }).join('')
+  } catch(e) { console.error(e) }
+}
+
+function openConvo(phone) {
+  activeConvo = phone
+  document.getElementById('sms-thread-header').textContent = phone
+  const msgs = allSMS.filter(m => m.from_number===phone || m.to_number===phone)
+  const thread = document.getElementById('sms-thread')
+  thread.innerHTML = msgs.map(m=>`
+    <div style="max-width:78%;${m.direction==='outbound'?'align-self:flex-end':'align-self:flex-start'}">
+      <div style="padding:.6rem .9rem;border-radius:${m.direction==='outbound'?'12px 12px 2px 12px':'12px 12px 12px 2px'};
+        background:${m.direction==='outbound'?'rgba(201,151,43,.14)':'rgba(255,255,255,.05)'};
+        border:1px solid ${m.direction==='outbound'?'rgba(201,151,43,.22)':'var(--navy-border)'};
+        font-size:.82rem;color:var(--g1);line-height:1.55">${m.body}</div>
+      <div style="font-size:.62rem;color:var(--g3);margin-top:.2rem;${m.direction==='outbound'?'text-align:right':''}">${fmtDate(m.created_at)}</div>
+    </div>`).join('')
+  thread.scrollTop = thread.scrollHeight
+}
+
+async function sendSMSReply() {
+  const body = document.getElementById('sms-reply-input').value.trim()
+  if (!body || !activeConvo) return
+  await doSend(activeConvo, body)
+  document.getElementById('sms-reply-input').value = ''
+  await loadSMS()
+  openConvo(activeConvo)
+}
+
+async function sendNewSMS() {
+  const to = document.getElementById('sms-to').value.trim()
+  const body = document.getElementById('sms-body').value.trim()
+  if (!to || !body) { toast('Please fill in both fields','error'); return }
+  await doSend(to, body)
+  closeSMSModal()
+}
+
+async function doSend(to, body) {
+  try {
+    const r = await fetch(API + '/api/pbx/sms/send', {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ to, body })
+    })
+    const d = await r.json()
+    if (!r.ok) { toast(d.error || 'Send failed','error'); return }
+    toast('Sent ✓')
+    loadSMS()
+  } catch(e) { toast('Send failed','error') }
+}
+
+async function loadIVR() {
+  try {
+    const r = await fetch(API + '/api/pbx/ivr', { credentials:'include' })
+    const { ivr } = await r.json()
+    if (ivr) {
+      document.getElementById('ivr-greeting').value = ivr.greeting || ''
+      document.getElementById('ivr-voicemail').checked = ivr.voicemail_enabled !== false
+      ivrRoutes = Object.entries(ivr.routes || {}).map(([digit,label]) => ({ digit, label, forward_to:'' }))
+    }
+    renderIVRRoutes()
+  } catch(e) { console.error(e) }
+}
+
+function renderIVRRoutes() {
+  document.getElementById('ivr-routes-ui').innerHTML = ivrRoutes.map((r,i)=>`
+    <div style="display:grid;grid-template-columns:60px 1fr 1fr auto;gap:.5rem;align-items:center">
+      <div style="font-size:.72rem;text-align:center;padding:.5rem;background:rgba(201,151,43,.08);border:1px solid rgba(201,151,43,.2);border-radius:8px;color:var(--gold-l);font-weight:700">Press ${r.digit}</div>
+      <input value="${r.label}" onchange="ivrRoutes[${i}].label=this.value" placeholder="Label (e.g. sales)"
+        style="padding:.48rem .75rem;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--navy-border);color:var(--white);font-size:.78rem;outline:none;font-family:'Inter',sans-serif"/>
+      <input value="${r.forward_to||''}" onchange="ivrRoutes[${i}].forward_to=this.value" placeholder="+14045551234"
+        style="padding:.48rem .75rem;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--navy-border);color:var(--white);font-size:.78rem;outline:none;font-family:'Inter',sans-serif"/>
+      <button onclick="ivrRoutes.splice(${i},1);renderIVRRoutes()" style="padding:.35rem .6rem;border-radius:6px;background:none;border:1px solid rgba(239,68,68,.3);color:var(--red);font-size:.75rem;cursor:pointer">✕</button>
+    </div>`).join('')
+}
+
+function addRoute() {
+  ivrRoutes.push({ digit: String(ivrRoutes.length+1), label:'', forward_to:'' })
+  renderIVRRoutes()
+}
+
+async function saveIVR() {
+  const greeting  = document.getElementById('ivr-greeting').value.trim()
+  const vmEnabled = document.getElementById('ivr-voicemail').checked
+  const routes    = {}
+  ivrRoutes.forEach(r => { if (r.label) routes[r.digit] = r.label })
+  for (const r of ivrRoutes) {
+    if (r.label && r.forward_to) {
+      await fetch(API + '/api/pbx/routes', {
+        method:'POST', credentials:'include',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ label:r.label, forward_to:r.forward_to })
+      })
+    }
+  }
+  const res = await fetch(API + '/api/pbx/ivr', {
+    method:'PUT', credentials:'include',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ greeting, routes, voicemail_enabled: vmEnabled })
+  })
+  if (res.ok) toast('IVR config saved ✓')
+  else toast('Save failed','error')
+}
+
+function openSMSCompose() { openSMSComposeTo('') }
+function openSMSComposeTo(phone) {
+  document.getElementById('sms-to').value = phone
+  document.getElementById('sms-body').value = ''
+  document.getElementById('sms-modal').style.display = 'flex'
+}
+function closeSMSModal() { document.getElementById('sms-modal').style.display = 'none' }
+function openIVR() { setTab('ivr') }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const body = document.getElementById('sms-body')
+  if (body) body.addEventListener('input', () => {
+    document.getElementById('char-count').textContent = body.value.length
+  })
+  loadNumber()
+  loadCalls()
+})
+</script>
 </body>
 </html>
