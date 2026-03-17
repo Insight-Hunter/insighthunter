@@ -4,6 +4,12 @@ main = "src/backend/index.ts"
 compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
 
+# Secrets to set:
+# wrangler secret put STRIPE_SECRET_KEY
+# wrangler secret put STRIPE_WEBHOOK_SECRET
+# wrangler secret put JWT_SECRET
+# wrangler secret put APP_URL  (https://insighthunter.app)
+
 [observability]
 enabled = true
 head_sampling_rate = 1

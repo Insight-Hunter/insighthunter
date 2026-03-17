@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "paths": {
-      "@insighthunter/types": ["./apps/insighthunter-bookkeeping/src/types"]
-    }
-  }
-}
