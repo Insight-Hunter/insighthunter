@@ -1,13 +1,394 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Forecast · Insight Hunter</title>
-  <link rel="stylesheet" href="/assets/css/global.css" />
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Forecast — Insight Hunter</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0D1117;--navy-card:#161B22;--navy-mid:#1C2433;--navy-border:#1E2A3A;
+  --gold:#C9972B;--gold-l:#D4A843;--gold-dim:rgba(201,151,43,.12);
+  --g1:#E2E8F0;--g2:#94A3B8;--g3:#64748B;--g4:#2D3748;
+  --green:#10B981;--green-dim:rgba(16,185,129,.1);
+  --red:#EF4444;--red-dim:rgba(239,68,68,.1);
+  --amber:#F59E0B;--amber-dim:rgba(245,158,11,.1);
+  --blue:#3B82F6;--blue-dim:rgba(59,130,246,.1);
+  --purple:#8B5CF6;--purple-dim:rgba(139,92,246,.1);
+}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--g1);margin:0;display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--navy-card);border-right:1px solid var(--navy-border);
+  display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
+.sidebar-logo{display:flex;align-items:center;gap:9px;padding:1.25rem;font-size:.9rem;font-weight:800;
+  letter-spacing:-.02em;border-bottom:1px solid var(--navy-border);color:#fff}
+.nav-section{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--g4);padding:.9rem 1.25rem .35rem}
+.nav-item{display:flex;align-items:center;gap:.65rem;padding:.55rem 1rem;margin:.1rem .6rem;
+  border-radius:8px;font-size:.8rem;color:var(--g2);text-decoration:none;transition:.15s}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--g1)}
+.nav-item.active{background:var(--gold-dim);color:var(--gold-l);font-weight:600}
+.sidebar-bottom{margin-top:auto;padding:.75rem;border-top:1px solid var(--navy-border)}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow-y:auto}
+.top-bar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 1.75rem;
+  border-bottom:1px solid var(--navy-border);position:sticky;top:0;z-index:50;
+  background:rgba(13,17,23,.95);backdrop-filter:blur(14px);flex-shrink:0}
+.content{padding:1.75rem;flex:1}
+.card{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;overflow:hidden;margin-bottom:1.25rem}
+.card-head{padding:.85rem 1.25rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--navy-border)}
+.card-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3)}
+.card-body{padding:1.25rem}
+.kpi{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;padding:1.1rem 1.25rem;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.green::before{background:var(--green)}.kpi.red::before{background:var(--red)}
+.kpi.gold::before{background:var(--gold)}.kpi.blue::before{background:var(--blue)}
+.kpi.purple::before{background:var(--purple)}
+.kpi-lbl{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3);margin-bottom:.35rem}
+.kpi-val{font-size:1.5rem;font-weight:900;letter-spacing:-.03em;color:#fff;line-height:1}
+.kpi-sub{font-size:.7rem;color:var(--g3);margin-top:.3rem}
+.btn-gold{background:var(--gold);color:#0D1117;font-weight:700;border:none;border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;padding:.48rem 1rem;transition:.15s;display:inline-flex;align-items:center;gap:.4rem;text-decoration:none}
+.btn-gold:hover{background:var(--gold-l)}
+.btn-ghost{background:none;border:1px solid var(--navy-border);color:var(--g2);border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:.78rem;padding:.42rem .9rem;transition:.15s;display:inline-flex;align-items:center;gap:.4rem;text-decoration:none}
+.btn-ghost:hover{color:var(--g1);border-color:var(--g3)}
+.btn-danger{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--red);border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;padding:.48rem 1rem;transition:.15s}
+.btn-danger:hover{background:rgba(239,68,68,.2)}
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:.63rem;font-weight:700}
+.pill-green{background:var(--green-dim);color:var(--green)}.pill-red{background:var(--red-dim);color:var(--red)}
+.pill-amber{background:var(--amber-dim);color:var(--amber)}.pill-blue{background:var(--blue-dim);color:var(--blue)}
+.pill-purple{background:var(--purple-dim);color:var(--purple)}.pill-gold{background:var(--gold-dim);color:var(--gold-l)}
+.pill-gray{background:rgba(100,116,139,.12);color:var(--g2)}
+input,select,textarea{background:rgba(255,255,255,.04);border:1px solid var(--navy-border);color:var(--g1);
+  border-radius:8px;padding:.5rem .85rem;font-family:'Inter',sans-serif;font-size:.82rem;outline:none;transition:.2s;width:100%}
+input:focus,select:focus,textarea:focus{border-color:rgba(201,151,43,.45);background:rgba(255,255,255,.06)}
+select option{background:var(--navy-card)}
+label.fl{display:block;font-size:.68rem;font-weight:600;color:var(--g3);margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.05em}
+.field{margin-bottom:.9rem}
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);
+  background-size:200%;animation:shimmer 1.5s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+.bar-track{flex:1;background:rgba(255,255,255,.05);border-radius:4px;height:8px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:.6s}
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;padding:.65rem 1.25rem;border-radius:10px;
+  font-size:.82rem;font-weight:600;transform:translateY(80px);opacity:0;pointer-events:none;transition:.3s}
+#toast.show{transform:translateY(0);opacity:1}
+.toggle{width:40px;height:22px;border-radius:11px;background:var(--navy-border);cursor:pointer;
+  position:relative;transition:.2s;border:none;flex-shrink:0}
+.toggle.on{background:var(--gold)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;
+  border-radius:50%;background:#fff;transition:.2s}
+.toggle.on::after{left:21px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:.85rem 0;
+  border-bottom:1px solid rgba(30,42,58,.5)}
+.settings-row:last-child{border:none}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:.5rem 1rem;text-align:left;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g3);border-bottom:2px solid var(--navy-border)}
+.tbl td{padding:.65rem 1rem;font-size:.8rem;border-bottom:1px solid rgba(30,42,58,.5);vertical-align:middle}
+.tbl tr:last-child td{border:none}
+</style>
 </head>
 <body>
-  <!-- Forecast -->
-  <script src="/assets/js/utils.js"></script>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#141E30"/>
+    <path d="M16 4v5M13 6h6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M10 9v15h12V9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 24h18" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M13 14l2.5 3L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Insight Hunter
+  </div>
+  <div class="nav-section">Platform</div>
+  <a href="index.html"       class="nav-item "><span style="width:16px;text-align:center">◫</span> Overview</a>
+  <a href="bizforma.html"    class="nav-item "><span style="width:16px;text-align:center">📋</span> BizForma</a>
+  <a href="bookkeeping.html" class="nav-item "><span style="width:16px;text-align:center">📒</span> Bookkeeping</a>
+  <a href="reports.html"     class="nav-item "><span style="width:16px;text-align:center">📊</span> Reports</a>
+  <a href="forecast.html"    class="nav-item active"><span style="width:16px;text-align:center">📈</span> Forecast</a>
+  <a href="insights.html"    class="nav-item "><span style="width:16px;text-align:center">✦</span> AI Insights</a>
+  <div class="nav-section">Business</div>
+  <a href="payroll.html"     class="nav-item "><span style="width:16px;text-align:center">💳</span> Payroll</a>
+  <a href="pbx.html"         class="nav-item "><span style="width:16px;text-align:center">📞</span> PBX</a>
+  <a href="settings.html"    class="nav-item "><span style="width:16px;text-align:center">⚙</span> Settings</a>
+  <div class="sidebar-bottom">
+    <a href="upgrade.html" class="nav-item " style="background:rgba(201,151,43,.07);color:var(--gold-l);font-weight:600"><span style="width:16px;text-align:center">⚡</span> Upgrade Plan</a>
+  </div>
+</aside>
+<div class="main">
+
+  <div class="top-bar">
+    <span style="font-size:.95rem;font-weight:700;letter-spacing:-.02em;color:#fff">Forecast</span>
+    <div style="width:30px;height:30px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(201,151,43,.3);
+      display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--gold-l)">U</div>
+  </div>
+  <div class="content">
+
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+  <div>
+    <div style="font-size:1.35rem;font-weight:900;letter-spacing:-.03em;color:#fff;margin-bottom:.2rem">Forecast</div>
+    <div style="font-size:.78rem;color:var(--g3)">Projections based on your historical transaction data.</div>
+  </div>
+  <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center">
+    <select id="fc-months" onchange="buildForecast()" style="min-width:160px">
+      <option value="3">Next 3 Months</option>
+      <option value="6" selected>Next 6 Months</option>
+      <option value="12">Next 12 Months</option>
+    </select>
+    <button onclick="buildForecast()" class="btn-ghost">↻ Recalculate</button>
+    <a href="reports.html" class="btn-gold">📊 View History</a>
+  </div>
+</div>
+
+<!-- Projected KPIs -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem">
+  <div class="kpi green"><div class="kpi-lbl">Projected Revenue</div><div class="kpi-val" id="fc-income" style="color:var(--green)">—</div><div class="kpi-sub" id="fc-income-s">next period</div></div>
+  <div class="kpi red"><div class="kpi-lbl">Projected Expenses</div><div class="kpi-val" id="fc-expense" style="color:var(--red)">—</div><div class="kpi-sub">next period</div></div>
+  <div class="kpi gold"><div class="kpi-lbl">Projected Net</div><div class="kpi-val" id="fc-net">—</div><div class="kpi-sub" id="fc-net-s">—</div></div>
+  <div class="kpi purple"><div class="kpi-lbl">Revenue Growth</div><div class="kpi-val" id="fc-growth" style="color:var(--purple)">—</div><div class="kpi-sub" id="fc-growth-s">avg monthly trend</div></div>
+</div>
+
+<!-- Chart -->
+<div class="card">
+  <div class="card-head">
+    <span class="card-label">Revenue & Expense Forecast</span>
+    <div style="display:flex;gap:1rem;font-size:.7rem;color:var(--g3)">
+      <span style="display:flex;align-items:center;gap:.35rem"><span style="width:10px;height:10px;border-radius:2px;background:var(--green)"></span>Projected Revenue</span>
+      <span style="display:flex;align-items:center;gap:.35rem"><span style="width:10px;height:10px;border-radius:2px;background:var(--red)"></span>Projected Expenses</span>
+      <span style="display:flex;align-items:center;gap:.35rem"><span style="width:10px;height:10px;border-radius:3px;border:1.5px dashed var(--gold)"></span>Net Profit</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div id="fc-chart" style="display:flex;align-items:flex-end;gap:10px;height:160px;margin-bottom:.5rem">
+      <div class="skeleton" style="flex:1;height:100%"></div>
+    </div>
+    <div id="fc-labels" style="display:flex;gap:10px"></div>
+  </div>
+</div>
+
+<!-- Forecast Table + Goal Tracker side by side -->
+<div style="display:grid;grid-template-columns:3fr 2fr;gap:1.25rem">
+
+  <!-- Monthly Table -->
+  <div class="card">
+    <div class="card-head"><span class="card-label">Month-by-Month Projection</span></div>
+    <div style="overflow-x:auto">
+      <table class="tbl" id="fc-table">
+        <tbody><tr><td colspan="5"><div class="skeleton" style="height:120px;margin:.75rem"></div></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Goal Tracker -->
+  <div>
+    <div class="card">
+      <div class="card-head"><span class="card-label">Revenue Goals</span></div>
+      <div class="card-body">
+        <div class="field">
+          <label class="fl">Monthly Revenue Target ($)</label>
+          <input type="number" id="goal-monthly" placeholder="e.g. 10000" onchange="updateGoals()"/>
+        </div>
+        <div class="field">
+          <label class="fl">Annual Revenue Target ($)</label>
+          <input type="number" id="goal-annual" placeholder="e.g. 120000" onchange="updateGoals()"/>
+        </div>
+        <div id="goal-results" style="margin-top:.5rem"></div>
+      </div>
+    </div>
+
+    <!-- Assumptions -->
+    <div class="card">
+      <div class="card-head"><span class="card-label">Forecast Assumptions</span></div>
+      <div class="card-body" style="padding:.9rem 1.1rem">
+        <div id="assumptions-list"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+const API = ''
+const fmt  = n => '$'+(+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+const fmtK = n => { const a=Math.abs(n); return (n<0?'-':'')+(a>=1000?'$'+(a/1000).toFixed(1)+'k':fmt(a)) }
+const $ = id => document.getElementById(id)
+
+let trendRaw=[], projected=[]
+
+// ── Linear regression ─────────────────────────────────────────
+function linReg(points){
+  const n=points.length; if(n<2) return{slope:0,intercept:points[0]||0}
+  const sumX=points.reduce((s,_,i)=>s+i,0)
+  const sumY=points.reduce((s,v)=>s+v,0)
+  const sumXY=points.reduce((s,v,i)=>s+i*v,0)
+  const sumXX=points.reduce((s,_,i)=>s+i*i,0)
+  const slope=(n*sumXY-sumX*sumY)/(n*sumXX-sumX*sumX)
+  const intercept=(sumY-slope*sumX)/n
+  return{slope,intercept}
+}
+
+async function loadTrend(){
+  try{
+    const r=await fetch(`${API}/api/bookkeeping/trend`,{credentials:'include'})
+    const{trend=[]}=await r.json()
+    trendRaw=trend
+    buildForecast()
+  }catch(e){ buildForecast() }
+}
+
+function buildForecast(){
+  const months=12, fcMonths=+$('fc-months').value
+  const now=new Date()
+
+  // Build 12-month historical buckets
+  const hist=[]
+  for(let i=months-1;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1)
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`
+    hist.push({key,income:0,expense:0})
+  }
+  trendRaw.forEach(r=>{
+    const b=hist.find(h=>h.key===r.month)
+    if(b) r.type==='income'?(b.income=+r.total):(b.expense=+r.total)
+  })
+
+  const incPts = hist.map(h=>h.income)
+  const expPts = hist.map(h=>h.expense)
+  const incReg  = linReg(incPts)
+  const expReg  = linReg(expPts)
+  const avgInc  = incPts.reduce((s,v)=>s+v,0)/incPts.length||0
+  const avgExp  = expPts.reduce((s,v)=>s+v,0)/expPts.length||0
+
+  // Project forward
+  projected=[]
+  for(let i=1;i<=fcMonths;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()+i,1)
+    const lbl=d.toLocaleDateString('en-US',{month:'short',year:'2-digit'})
+    const idx=months+i
+    const inc=Math.max(0, incReg.intercept + incReg.slope*idx)
+    const exp=Math.max(0, expReg.intercept + expReg.slope*idx)
+    projected.push({lbl,month:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,income:inc,expense:exp,net:inc-exp})
+  }
+
+  const totInc=projected.reduce((s,p)=>s+p.income,0)
+  const totExp=projected.reduce((s,p)=>s+p.expense,0)
+  const totNet=totInc-totExp
+  const growthPct=avgInc>0?(incReg.slope/avgInc*100):0
+
+  $('fc-income').textContent  = fmtK(totInc)
+  $('fc-expense').textContent = fmtK(totExp)
+  $('fc-net').textContent     = fmtK(totNet)
+  $('fc-net').style.color     = totNet>=0?'var(--green)':'var(--red)'
+  $('fc-net-s').textContent   = totNet>=0?'projected profit':'projected loss'
+  $('fc-growth').textContent  = (growthPct>=0?'+':'')+growthPct.toFixed(1)+'%'
+  $('fc-growth').style.color  = growthPct>=0?'var(--green)':'var(--red)'
+  $('fc-income-s').textContent= `next ${fcMonths} months total`
+
+  renderChart()
+  renderTable()
+  renderAssumptions(avgInc,avgExp,incReg.slope,expReg.slope)
+  updateGoals()
+}
+
+function renderChart(){
+  const maxVal=Math.max(...projected.flatMap(p=>[p.income,p.expense]),1)
+  const pct=v=>Math.max(3,Math.round((v/maxVal)*100))
+  $('fc-chart').innerHTML=projected.map(p=>`
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+      <div style="display:flex;gap:2px;align-items:flex-end;height:150px;width:100%">
+        <div style="flex:1;background:var(--green);border-radius:4px 4px 0 0;height:${pct(p.income)}%;opacity:.85;transition:.5s" title="${fmt(p.income)}"></div>
+        <div style="flex:1;background:var(--red);border-radius:4px 4px 0 0;height:${pct(p.expense)}%;opacity:.75;transition:.5s" title="${fmt(p.expense)}"></div>
+        <div style="flex:1;border-radius:4px 4px 0 0;height:${pct(Math.max(0,p.net))}%;
+          ${p.net>=0?'background:rgba(201,151,43,.5)':'background:rgba(239,68,68,.3)'};
+          border:1.5px dashed ${p.net>=0?'var(--gold)':'var(--red)'};border-bottom:none;transition:.5s" title="Net: ${fmt(p.net)}"></div>
+      </div>
+    </div>`).join('')
+  $('fc-labels').innerHTML=projected.map(p=>`<div style="flex:1;font-size:.58rem;color:var(--g3);text-align:center;white-space:nowrap;overflow:hidden">${p.lbl}</div>`).join('')
+}
+
+function renderTable(){
+  $('fc-table').innerHTML=`
+    <thead><tr>
+      <th>Month</th>
+      <th style="text-align:right">Revenue</th>
+      <th style="text-align:right">Expenses</th>
+      <th style="text-align:right">Net Profit</th>
+      <th style="text-align:right">Margin</th>
+    </tr></thead>
+    <tbody>${projected.map((p,i)=>{
+      const margin=p.income>0?((p.net/p.income)*100).toFixed(1):'—'
+      return`<tr>
+        <td style="font-weight:600;color:#fff">${p.lbl}</td>
+        <td style="text-align:right;color:var(--green)">${fmtK(p.income)}</td>
+        <td style="text-align:right;color:var(--red)">${fmtK(p.expense)}</td>
+        <td style="text-align:right;font-weight:700;${p.net>=0?'color:var(--green)':'color:var(--red)'}">${p.net>=0?fmtK(p.net):'('+fmtK(Math.abs(p.net))+')'}</td>
+        <td style="text-align:right;color:var(--g3)">${margin==='—'?'—':margin+'%'}</td>
+      </tr>`
+    }).join('')}</tbody>
+    <tfoot><tr style="border-top:2px solid var(--navy-border);background:rgba(255,255,255,.018)">
+      <td style="padding:.7rem 1rem;font-weight:800;color:#fff">TOTAL</td>
+      <td style="text-align:right;font-weight:800;color:var(--green);padding:.7rem 1rem">${fmtK(projected.reduce((s,p)=>s+p.income,0))}</td>
+      <td style="text-align:right;font-weight:800;color:var(--red);padding:.7rem 1rem">${fmtK(projected.reduce((s,p)=>s+p.expense,0))}</td>
+      <td style="text-align:right;font-weight:800;padding:.7rem 1rem;${projected.reduce((s,p)=>s+p.net,0)>=0?'color:var(--green)':'color:var(--red)'}">${fmtK(projected.reduce((s,p)=>s+p.net,0))}</td>
+      <td></td>
+    </tfoot>`
+}
+
+function renderAssumptions(avgInc,avgExp,slopeInc,slopeExp){
+  const n=trendRaw.filter(t=>t.type==='income').length
+  $('assumptions-list').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:.6rem">
+      <div style="padding:.6rem .75rem;background:var(--navy-mid);border:1px solid var(--navy-border);border-radius:8px">
+        <div style="font-size:.65rem;color:var(--g3);margin-bottom:.2rem">Method</div>
+        <div style="font-size:.78rem;color:var(--g1);font-weight:600">Linear regression · ${n} data points</div>
+      </div>
+      <div style="padding:.6rem .75rem;background:var(--navy-mid);border:1px solid var(--navy-border);border-radius:8px">
+        <div style="font-size:.65rem;color:var(--g3);margin-bottom:.2rem">Avg Monthly Revenue</div>
+        <div style="font-size:.78rem;color:var(--green);font-weight:600">${fmtK(avgInc)}</div>
+      </div>
+      <div style="padding:.6rem .75rem;background:var(--navy-mid);border:1px solid var(--navy-border);border-radius:8px">
+        <div style="font-size:.65rem;color:var(--g3);margin-bottom:.2rem">Avg Monthly Expenses</div>
+        <div style="font-size:.78rem;color:var(--red);font-weight:600">${fmtK(avgExp)}</div>
+      </div>
+      <div style="padding:.6rem .75rem;background:var(--navy-mid);border:1px solid var(--navy-border);border-radius:8px">
+        <div style="font-size:.65rem;color:var(--g3);margin-bottom:.2rem">Revenue Trend ($/mo)</div>
+        <div style="font-size:.78rem;font-weight:600;${slopeInc>=0?'color:var(--green)':'color:var(--red)'}">${slopeInc>=0?'+':''}${fmtK(slopeInc)}/month</div>
+      </div>
+      <div style="font-size:.65rem;color:var(--g3);line-height:1.5;margin-top:.25rem">
+        ⚠ Forecasts are estimates based on historical trends. Actual results may vary.
+      </div>
+    </div>`
+}
+
+function updateGoals(){
+  const monthly=+$('goal-monthly').value||0
+  const annual =+$('goal-annual').value||0
+  if(!monthly&&!annual){$('goal-results').innerHTML='';return}
+  const fcMonths=+$('fc-months').value
+  const results=[]
+  if(monthly){
+    const count=projected.filter(p=>p.income>=monthly).length
+    const pct=Math.round(count/fcMonths*100)
+    results.push(`<div style="margin-bottom:.6rem;padding:.65rem .85rem;border-radius:8px;background:${pct>=70?'var(--green-dim)':'var(--amber-dim)'};border:1px solid ${pct>=70?'rgba(16,185,129,.2)':'rgba(245,158,11,.2)'}">
+      <div style="font-size:.68rem;color:var(--g3);margin-bottom:.2rem">Monthly Goal: ${fmt(monthly)}</div>
+      <div style="font-size:.82rem;font-weight:700;color:${pct>=70?'var(--green)':'var(--amber)'}">On track ${count}/${fcMonths} months (${pct}%)</div>
+    </div>`)
+  }
+  if(annual){
+    const projAnnual=projected.slice(0,12).reduce((s,p)=>s+p.income,0)
+    const pct=Math.round((projAnnual/annual)*100)
+    results.push(`<div style="padding:.65rem .85rem;border-radius:8px;background:${pct>=90?'var(--green-dim)':'var(--amber-dim)'};border:1px solid ${pct>=90?'rgba(16,185,129,.2)':'rgba(245,158,11,.2)'}">
+      <div style="font-size:.68rem;color:var(--g3);margin-bottom:.2rem">Annual Goal: ${fmt(annual)}</div>
+      <div style="font-size:.82rem;font-weight:700;color:${pct>=90?'var(--green)':'var(--amber)'}">Projected ${pct}% of goal (${fmtK(projAnnual)})</div>
+    </div>`)
+  }
+  $('goal-results').innerHTML=results.join('')
+}
+
+document.addEventListener('DOMContentLoaded', loadTrend)
+</script>
 </body>
 </html>
