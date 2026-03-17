@@ -1,0 +1,17 @@
+{
+  "name": "insighthunter-bookkeeping",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-11-01",
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter-auth-db",
+      "database_id": "REPLACE_WITH_YOUR_D1_ID"
+    }
+  ],
+  "kv_namespaces": [
+    { "binding": "KV", "id": "REPLACE_WITH_YOUR_KV_ID" }
+  ]
+  // wrangler secret put JWT_SECRET
+}

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Insight Hunter — Your smart business finance assistant. Formation, Bookkeeping, Forecasting, Compliance — all in one platform." />
+  <title>Insight Hunter — Smart Business Finance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #0D1117;
+      --navy-2:    #0F1929;
+      --navy-3:    #141E30;
+      --navy-card: #161B22;
+      --navy-border: #1E2A3A;
+      --gold:      #C9972B;
+      --gold-light:#D4A843;
+      --gold-dim:  #8A6820;
+      --white:     #FFFFFF;
+      --gray-1:    #E2E8F0;
+      --gray-2:    #94A3B8;
+      --gray-3:    #64748B;
+      --gray-4:    #334155;
+      --green:     #10B981;
+      --red:       #EF4444;
+      --blue:      #3B82F6;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
+      height: 64px;
+      background: rgba(13,17,23,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--navy-border);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 32px; height: 32px;
+    }
+    .nav-logo-text {
+      font-size: 1.1rem; font-weight: 700; color: var(--white);
+      letter-spacing: -0.02em;
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--gray-2); text-decoration: none; font-size: 0.875rem;
+      font-weight: 500; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .btn-ghost {
+      padding: 0.45rem 1.1rem; border-radius: 8px;
+      border: 1px solid var(--navy-border);
+      background: transparent; color: var(--gray-1);
+      font-size: 0.875rem; font-weight: 500;
+      cursor: pointer; text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--gold-dim); color: var(--white); }
+    .btn-gold {
+      padding: 0.45rem 1.25rem; border-radius: 8px;
+      background: var(--gold); color: var(--navy);
+      font-size: 0.875rem; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      border: none;
+    }
+    .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    .nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--gray-2); margin: 5px 0; border-radius: 2px; transition: 0.3s; }
+
+    /* ── HERO SECTION ── */
+    .hero {
+      min-height: 100vh;
+      padding: 100px clamp(1.5rem, 5vw, 4rem) 0;
+      display: flex; flex-direction: column;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 30%, rgba(201,151,43,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 80% 20%, rgba(201,151,43,0.05) 0%, transparent 60%),
+        var(--navy);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9972B' fill-opacity='0.025'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none; opacity: 0.5;
+    }
+
+    .hero-main {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 2rem;
+      align-items: center;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+      padding-bottom: 3rem;
+    }
+
+    /* LEFT — copy */
+    .hero-copy { display: flex; flex-direction: column; gap: 1.5rem; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 100px;
+      border: 1px solid rgba(201,151,43,0.35);
+      background: rgba(201,151,43,0.08);
+      font-size: 0.75rem; font-weight: 600;
+      color: var(--gold-light); letter-spacing: 0.06em; text-transform: uppercase;
+      width: fit-content;
+    }
+    .hero-eyebrow span { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+    .hero-headline {
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      font-weight: 800; line-height: 1.1;
+      letter-spacing: -0.03em; color: var(--white);
+    }
+    .hero-headline em { font-style: normal; color: var(--gold); }
+    .hero-sub {
+      font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+      color: var(--gray-2); line-height: 1.7; font-weight: 400;
+    }
+    .hero-pills {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .pill {
+      padding: 5px 12px; border-radius: 100px;
+      background: var(--navy-card);
+      border: 1px solid var(--navy-border);
+      font-size: 0.78rem; font-weight: 500; color: var(--gray-2);
+    }
+    .hero-btns {
+      display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;
+    }
+    .btn-hero-primary {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0.75rem 1.75rem; border-radius: 10px;
+      background: var(--gold); color: var(--navy);
+      font-size: 0.95rem; font-weight: 700;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px rgba(201,151,43,0.3);
+    }
+    .btn-hero-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,151,43,0.4); }
+    .btn-hero-secondary {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0.75rem 1.75rem; border-radius: 10px;
+      background: transparent; color: var(--white);
+      font-size: 0.95rem; font-weight: 600;
+      text-decoration: none; border: 1px solid var(--navy-border); cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-hero-secondary:hover { border-color: var(--gold-dim); background: rgba(201,151,43,0.06); }
+    .hero-trust {
+      display: flex; align-items: center; gap: 1rem;
+      font-size: 0.78rem; color: var(--gray-3);
+    }
+    .hero-trust strong { color: var(--gray-2); }
+
+    /* CENTER — brand */
+    .hero-brand {
+      display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+      padding: 0 1rem;
+    }
+    .brand-logo-wrap {
+      width: 88px; height: 88px;
+      background: var(--navy-3);
+      border: 2px solid rgba(201,151,43,0.3);
+      border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 40px rgba(201,151,43,0.15), 0 0 80px rgba(201,151,43,0.06);
+    }
+    .brand-logo-wrap svg { width: 52px; height: 52px; }
+    .brand-name {
+      font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em;
+      color: var(--white); text-align: center;
+    }
+    .brand-sub {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em;
+      color: var(--gold); text-transform: uppercase; text-align: center;
+    }
+
+    /* RIGHT — dashboard mockup */
+    .hero-dashboard {
+      display: flex; justify-content: flex-end; align-items: center;
+    }
+    .dashboard-device {
+      width: 100%; max-width: 420px;
+      background: var(--navy-card);
+      border: 1px solid var(--navy-border);
+      border-radius: 16px;
+      box-shadow:
+        0 0 0 1px rgba(201,151,43,0.15),
+        0 24px 80px rgba(0,0,0,0.6),
+        0 0 60px rgba(201,151,43,0.08);
+      overflow: hidden;
+      transform: perspective(1000px) rotateY(-8deg) rotateX(2deg);
+      transition: transform 0.4s ease;
+    }
+    .dashboard-device:hover { transform: perspective(1000px) rotateY(-4deg) rotateX(1deg); }
+    .device-bar {
+      height: 36px; background: #0A0F18;
+      border-bottom: 1px solid var(--navy-border);
+      display: flex; align-items: center; padding: 0 14px; gap: 6px;
+    }
+    .device-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .device-title {
+      margin-left: 8px; font-size: 0.72rem; font-weight: 600; color: var(--gray-2);
+    }
+    .device-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .device-kpis { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .kpi-card {
+      background: var(--navy-3); border: 1px solid var(--navy-border);
+      border-radius: 8px; padding: 10px 10px 8px;
+    }
+    .kpi-label { font-size: 0.6rem; color: var(--gray-3); font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .kpi-val { font-size: 1rem; font-weight: 700; color: var(--white); }
+    .kpi-delta { font-size: 0.6rem; margin-top: 2px; }
+    .up { color: var(--green); } .down { color: var(--red); }
+    .device-chart { background: var(--navy-3); border: 1px solid var(--navy-border); border-radius: 8px; padding: 12px; }
+    .chart-title { font-size: 0.65rem; color: var(--gray-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; }
+    .chart-area {
+      height: 64px; width: 100%; position: relative; overflow: hidden;
+    }
+    .chart-area svg { width: 100%; height: 100%; }
+    .device-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .device-list { background: var(--navy-3); border: 1px solid var(--navy-border); border-radius: 8px; padding: 10px; }
+    .list-title { font-size: 0.6rem; color: var(--gray-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+    .list-item-name { font-size: 0.65rem; color: var(--gray-2); }
+    .list-item-badge {
+      font-size: 0.55rem; font-weight: 600; padding: 1px 6px;
+      border-radius: 100px;
+    }
+    .badge-green { background: rgba(16,185,129,0.15); color: var(--green); }
+    .badge-amber { background: rgba(245,158,11,0.15); color: #F59E0B; }
+    .badge-blue  { background: rgba(59,130,246,0.15);  color: var(--blue); }
+    .ai-card { background: rgba(201,151,43,0.06); border: 1px solid rgba(201,151,43,0.2); border-radius: 8px; padding: 10px; }
+    .ai-label { font-size: 0.6rem; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .ai-text { font-size: 0.65rem; color: var(--gray-2); line-height: 1.5; }
+
+    /* ── APPS SECTION ── */
+    .apps-section {
+      max-width: 1280px; margin: 0 auto; width: 100%;
+      padding: 2.5rem clamp(1.5rem, 5vw, 4rem) 4rem;
+    }
+    .apps-label {
+      text-align: center; font-size: 0.75rem; font-weight: 600;
+      color: var(--gray-3); letter-spacing: 0.12em; text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .apps-divider {
+      height: 1px; background: linear-gradient(90deg, transparent, var(--navy-border) 30%, var(--navy-border) 70%, transparent);
+      margin-bottom: 1.5rem;
+    }
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 0.75rem;
+    }
+    .app-tile {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0.6rem; padding: 1rem 0.5rem;
+      background: var(--navy-card);
+      border: 1px solid var(--navy-border);
+      border-radius: 14px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s, box-shadow 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .app-tile::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(201,151,43,0.08) 0%, transparent 70%);
+      opacity: 0; transition: opacity 0.25s;
+    }
+    .app-tile:hover {
+      border-color: rgba(201,151,43,0.4);
+      background: #1A2030;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(201,151,43,0.08);
+    }
+    .app-tile:hover::before { opacity: 1; }
+    .app-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--navy-3); border: 1px solid var(--navy-border);
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s;
+    }
+    .app-tile:hover .app-icon { border-color: rgba(201,151,43,0.35); }
+    .app-icon svg { width: 24px; height: 24px; }
+    .app-name { font-size: 0.68rem; font-weight: 600; color: var(--gray-2); text-align: center; line-height: 1.3; transition: color 0.2s; }
+    .app-tile:hover .app-name { color: var(--white); }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      border-top: 1px solid var(--navy-border);
+      border-bottom: 1px solid var(--navy-border);
+      background: var(--navy-3);
+      padding: 1.25rem clamp(1.5rem, 5vw, 4rem);
+    }
+    .stats-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: flex; flex-wrap: wrap; justify-content: space-around; gap: 1.5rem;
+    }
+    .stat { text-align: center; }
+    .stat-val { font-size: 1.5rem; font-weight: 800; color: var(--white); letter-spacing: -0.03em; }
+    .stat-val span { color: var(--gold); }
+    .stat-label { font-size: 0.75rem; color: var(--gray-3); font-weight: 500; margin-top: 2px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .hero-main { grid-template-columns: 1fr 1fr; }
+      .hero-brand { display: none; }
+      .apps-grid { grid-template-columns: repeat(5, 1fr); }
+    }
+    @media (max-width: 768px) {
+      nav { padding: 0 1.25rem; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: block; }
+      .hero-main { grid-template-columns: 1fr; }
+      .hero-dashboard { justify-content: center; }
+      .dashboard-device { transform: none; max-width: 100%; }
+      .apps-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .hero-btns { flex-direction: column; align-items: stretch; }
+      .btn-hero-primary, .btn-hero-secondary { text-align: center; justify-content: center; }
+      .apps-grid { grid-template-columns: repeat(2, 1fr); }
+      .device-kpis { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav>
+  <a href="/" class="nav-logo">
+    <svg class="nav-logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="32" height="32" rx="8" fill="#141E30"/>
+      <path d="M16 6 L16 10 M13 8 L19 8" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M11 10 L11 22 L21 22 L21 10" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M8 22 L24 22" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M13 22 L13 18 L19 18 L19 22" stroke="#C9972B" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M13 14 L15.5 17 L19.5 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="nav-logo-text">Insight Hunter</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="/pricing.html">Pricing</a></li>
+    <li><a href="/about.html">About</a></li>
+    <li><a href="/contact.html">Contact</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="/auth/login.html" class="btn-ghost">Sign In</a>
+    <a href="/auth/register.html" class="btn-gold">Get Started</a>
+  </div>
+  <button class="nav-hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero">
+  <div class="hero-main">
+
+    <!-- LEFT: Copy -->
+    <div class="hero-copy">
+      <div class="hero-eyebrow">
+        <span></span> Now in open beta — no credit card required
+      </div>
+      <h1 class="hero-headline">
+        Stop Flying<br/>Blind.<br/>
+        <em>Know Your Numbers.</em>
+      </h1>
+      <p class="hero-sub">
+        Insight Hunter is your smart business finance assistant — AI-powered formation, bookkeeping, forecasting, and compliance in one unified platform built for small businesses.
+      </p>
+      <div class="hero-pills">
+        <span class="pill">Business Formation</span>
+        <span class="pill">Bookkeeping</span>
+        <span class="pill">Cash Flow Forecasting</span>
+        <span class="pill">Compliance</span>
+        <span class="pill">AI CFO Insights</span>
+      </div>
+      <div class="hero-btns">
+        <a href="/auth/register.html" class="btn-hero-primary">
+          Get Started Free
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#demo" class="btn-hero-secondary">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 5.5l4 2.5-4 2.5V5.5z" fill="currentColor"/></svg>
+          View Demo
+        </a>
+      </div>
+      <div class="hero-trust">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1l1.8 3.6L14 5.4l-3 2.9.7 4.1L8 10.4l-3.7 2 .7-4.1-3-2.9 4.2-.8L8 1z" fill="#C9972B"/></svg>
+        <span>Trusted by <strong>small businesses & freelancers</strong> · Built on Cloudflare Edge</span>
+      </div>
+    </div>
+
+    <!-- CENTER: Brand -->
+    <div class="hero-brand">
+      <div class="brand-logo-wrap">
+        <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M26 4 L26 12 M21 7 L31 7" stroke="#C9972B" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M14 12 L14 40 L38 40 L38 12" stroke="#C9972B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 40 L44 40" stroke="#C9972B" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M20 40 L20 30 L32 30 L32 40" stroke="#C9972B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M19 22 L23.5 28 L33 18" stroke="#C9972B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="brand-name">Insight Hunter</div>
+      <div class="brand-sub">Smart Finance Platform</div>
+    </div>
+
+    <!-- RIGHT: Dashboard Mockup -->
+    <div class="hero-dashboard">
+      <div class="dashboard-device">
+        <div class="device-bar">
+          <div class="device-dot" style="background:#EF4444"></div>
+          <div class="device-dot" style="background:#F59E0B"></div>
+          <div class="device-dot" style="background:#10B981"></div>
+          <span class="device-title">Dashboard — Insight Hunter</span>
+        </div>
+        <div class="device-body">
+          <div class="device-kpis">
+            <div class="kpi-card">
+              <div class="kpi-label">MRR</div>
+              <div class="kpi-val">$4.2k</div>
+              <div class="kpi-delta up">↑ 12%</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Runway</div>
+              <div class="kpi-val">8 mo</div>
+              <div class="kpi-delta" style="color:var(--gray-3)">stable</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Invoices</div>
+              <div class="kpi-val">6</div>
+              <div class="kpi-delta" style="color:#F59E0B">pending</div>
+            </div>
+          </div>
+          <div class="device-chart">
+            <div class="chart-title">Cash Flow Forecast</div>
+            <div class="chart-area">
+              <svg viewBox="0 0 300 64" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#C9972B" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="#C9972B" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,50 C20,48 40,38 60,32 C80,26 100,40 120,28 C140,16 160,20 180,14 C200,8 220,18 240,12 C260,6 280,10 300,8" fill="none" stroke="#C9972B" stroke-width="2"/>
+                <path d="M0,50 C20,48 40,38 60,32 C80,26 100,40 120,28 C140,16 160,20 180,14 C200,8 220,18 240,12 C260,6 280,10 300,8 L300,64 L0,64 Z" fill="url(#chartGrad)"/>
+                <path d="M0,56 C20,55 40,52 60,50 C80,48 100,54 120,50 C140,46 160,48 180,44 C200,40 220,42 240,39 C260,36 280,38 300,36" fill="none" stroke="#3B82F6" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+              </svg>
+            </div>
+          </div>
+          <div class="device-row">
+            <div class="device-list">
+              <div class="list-title">Formation Status</div>
+              <div class="list-item"><span class="list-item-name">TechCo LLC</span><span class="list-item-badge badge-green">Active</span></div>
+              <div class="list-item"><span class="list-item-name">EIN Filing</span><span class="list-item-badge badge-amber">Pending</span></div>
+              <div class="list-item"><span class="list-item-name">State Reg</span><span class="list-item-badge badge-blue">In Review</span></div>
+            </div>
+            <div class="ai-card">
+              <div class="ai-label">AI Insight</div>
+              <div class="ai-text">Your Q1 burn rate is 18% below forecast. Consider accelerating your growth budget before month-end.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- APPS ROW -->
+  <div class="apps-section" id="features">
+    <div class="apps-divider"></div>
+    <div class="apps-label">Included Apps — Click to Explore</div>
+    <div class="apps-grid">
+
+      <a href="/features/bizforma.html" class="app-tile">
+        <div class="app-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/><path d="M10 11h.01M14 11h.01"/>
+          </svg>
+        </div>
+        <span class="app-name">BizForma</span>
+      </a>
+
+      <a href="/features/bookkeeping.html" class="app-tile">
+        <div class="app-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><path d="M8 7h8M8 11h5"/>
+          </svg>
+        </div>
+        <span class="app-name">Bookkeeping</span>
+      </a>
+
+      <a href="/features/insight-lite.html" class="app-tile">
+        <div class="app-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+          </svg>
+        </div>
+        <span class="app-name">Insight Lite</span>
+      </a>
+
+      <a href="/features/insight-standard.html" class="app-tile">
+        <div class="app-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+          </svg>
+        </div>
+        <span class="app-name">Insight Standard</span>
+      </a>
+
+      <a href="/features/insight-pro.html" class="app-tile">
+        <div class="app-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        </div>
+        <span class="app-name">Insight Pro</span>
+      </a>
+
+      <a href="/features/scout.html" class="app-tile">
+        <div class="app-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v3M11 14h.01"/>
+          </svg>
+        </div>
+        <span class="app-name">Scout</span>
+      </a>
+
+      <a href="/features/pbx.html" class="app-tile">
+        <div class="app-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.09 1.17 2 2 0 012.07 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/>
+          </svg>
+        </div>
+        <span class="app-name">PBX</span>
+      </a>
+
+      <a href="/features/payroll.html" class="app-tile">
+        <div class="app-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 010 7H6"/>
+          </svg>
+        </div>
+        <span class="app-name">Payroll</span>
+      </a>
+
+      <a href="/features/website-services.html" class="app-tile">
+        <div class="app-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><circle cx="7.5" cy="6" r=".5" fill="#C9972B"/><circle cx="10.5" cy="6" r=".5" fill="#C9972B"/><path d="M7 14l2 2 4-4"/>
+          </svg>
+        </div>
+        <span class="app-name">Website Services</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STATS ═══════════════ -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat"><div class="stat-val">9<span>+</span></div><div class="stat-label">Integrated Apps</div></div>
+    <div class="stat"><div class="stat-val"><span>$0</span></div><div class="stat-label">To Get Started</div></div>
+    <div class="stat"><div class="stat-val">100<span>%</span></div><div class="stat-label">Edge-Deployed</div></div>
+    <div class="stat"><div class="stat-val">AI<span>-First</span></div><div class="stat-label">CFO Intelligence</div></div>
+  </div>
+</div>
+
+<script>
+  // Mobile nav toggle
+  const hamburger = document.querySelector('.nav-hamburger');
+  const navLinks = document.querySelector('.nav-links');
+  hamburger.addEventListener('click', () => {
+    navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+    navLinks.style.flexDirection = 'column';
+    navLinks.style.position = 'absolute';
+    navLinks.style.top = '64px';
+    navLinks.style.left = '0';
+    navLinks.style.right = '0';
+    navLinks.style.background = 'rgba(13,17,23,0.97)';
+    navLinks.style.padding = '1rem 1.5rem';
+    navLinks.style.borderBottom = '1px solid #1E2A3A';
+    navLinks.style.backdropFilter = 'blur(12px)';
+  });
+</script>
+</body>
+</html>
