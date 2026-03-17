@@ -1,0 +1,306 @@
+insighthunter/                                    ← monorepo root
+├── package.json                                  ← npm workspaces config
+├── .gitignore
+├── README.md
+├── sitemap.xml                                   ← moved from insighthunter-main/
+├── robots.txt                                    ← fix typo from "robotts.txt"
+│
+├── apps/
+│   │
+│   ├── insighthunter-main/                       ← MIGRATE: 21 HTML → Astro + Svelte
+│   │   ├── astro.config.mjs                      ← NEW
+│   │   ├── wrangler.toml                         ← KEEP + update
+│   │   ├── svelte.config.js                      ← NEW
+│   │   ├── package.json                          ← UPDATE: add astro, svelte deps
+│   │   ├── package-lock.json
+│   │   ├── tsconfig.json                         ← NEW
+│   │   │
+│   │   ├── public/                               ← static assets only (no HTML)
+│   │   │   ├── .assetsignore                     ← NEW (Cloudflare Workers required)
+│   │   │   ├── favicon.ico
+│   │   │   ├── manifest.webmanifest
+│   │   │   ├── robots.txt
+│   │   │   └── icons/
+│   │   │       ├── icon-192.png
+│   │   │       └── icon-512.png
+│   │   │
+│   │   └── src/
+│   │       ├── env.d.ts                          ← NEW: D1/KV bindings types
+│   │       │
+│   │       ├── styles/
+│   │       │   ├── styles.css                    ← MOVED from public/styles.css
+│   │       │   ├── marketing.css                 ← MOVED from public/marketing/
+│   │       │   └── dashboard.css                 ← NEW: dashboard overrides
+│   │       │
+│   │       ├── layouts/
+│   │       │   ├── Layout.astro                  ← NEW: wraps all pages, imports styles.css
+│   │       │   ├── DashboardLayout.astro         ← NEW: auth-gated dashboard shell
+│   │       │   └── MarketingLayout.astro         ← NEW: marketing pages shell
+│   │       │
+│   │       ├── pages/
+│   │       │   │
+│   │       │   │   ── CONVERTED from public/*.html ──
+│   │       │   ├── index.astro                   ← WAS: public/index.html
+│   │       │   ├── about.astro                   ← WAS: public/about.html
+│   │       │   ├── features.astro                ← WAS: public/features.html
+│   │       │   ├── pricing.astro                 ← WAS: public/pricing.html
+│   │       │   ├── docs.astro                    ← WAS: public/docs.html
+│   │       │   ├── support.astro                 ← WAS: public/support.html
+│   │       │   │
+│   │       │   ├── auth/
+│   │       │   │   ├── login.astro               ← WAS: public/login.html
+│   │       │   │   ├── signup.astro              ← WAS: public/signup.html (+ signup.js/ts)
+│   │       │   │   └── logout.astro              ← NEW
+│   │       │   │
+│   │       │   ├── dashboard/
+│   │       │   │   ├── index.astro               ← WAS: public/dashboard.html
+│   │       │   │   ├── bookkeeping.astro         ← WAS: public/bookkeeping.html
+│   │       │   │   ├── clients.astro             ← WAS: public/clients.html
+│   │       │   │   ├── compliance.astro          ← WAS: public/compliance.html
+│   │       │   │   ├── reconciliation.astro      ← WAS: public/reconciliation.html
+│   │       │   │   ├── reports.astro             ← WAS: public/reports.html
+│   │       │   │   └── settings.astro            ← WAS: public/settings.html
+│   │       │   │
+│   │       │   ├── admin/
+│   │       │   │   ├── index.astro               ← WAS: public/admin.html
+│   │       │   │   └── compliance.astro          ← WAS: public/admin-compliance.html
+│   │       │   │
+│   │       │   ├── account/
+│   │       │   │   ├── index.astro               ← WAS: public/my-account.html + my-account.ts
+│   │       │   │   └── billing.astro             ← NEW
+│   │       │   │
+│   │       │   ├── shop/
+│   │       │   │   ├── index.astro               ← WAS: public/shop.html
+│   │       │   │   ├── checkout.astro            ← WAS: public/checkout.html
+│   │       │   │   └── success.astro             ← WAS: public/checkout-success.html
+│   │       │   │
+│   │       │   ├── features/                     ← WAS: public/features/*.html
+│   │       │   │   ├── bizforma.astro
+│   │       │   │   ├── bookkeeping.astro
+│   │       │   │   ├── insight-lite.astro
+│   │       │   │   ├── insight-pro.astro
+│   │       │   │   ├── insight-standard.astro
+│   │       │   │   ├── pbx.astro
+│   │       │   │   ├── scout.astro
+│   │       │   │   └── website-services.astro
+│   │       │   │
+│   │       │   ├── marketing/                    ← WAS: public/marketing/*.html
+│   │       │   │   ├── index.astro
+│   │       │   │   ├── about.astro
+│   │       │   │   ├── contact.astro
+│   │       │   │   ├── faq.astro
+│   │       │   │   ├── pricing.astro
+│   │       │   │   ├── blog/
+│   │       │   │   │   ├── index.astro
+│   │       │   │   │   └── [slug].astro          ← WAS: post.html (dynamic route)
+│   │       │   │   └── legal/
+│   │       │   │       ├── privacy.astro
+│   │       │   │       └── terms.astro
+│   │       │   │
+│   │       │   └── api/                          ← server endpoints (edge)
+│   │       │       ├── auth/
+│   │       │       │   ├── signup.ts
+│   │       │       │   ├── login.ts
+│   │       │       │   └── logout.ts
+│   │       │       ├── revenue.ts
+│   │       │       ├── reports.ts
+│   │       │       └── quickbooks/
+│   │       │           ├── connect.ts
+│   │       │           └── callback.ts
+│   │       │
+│   │       └── components/
+│   │           │
+│   │           ├── ui/                           ← Pure Astro (zero JS, static)
+│   │           │   ├── Nav.astro
+│   │           │   ├── Footer.astro
+│   │           │   ├── Hero.astro
+│   │           │   ├── PricingCard.astro
+│   │           │   └── FeatureCard.astro
+│   │           │
+│   │           └── islands/                      ← Svelte interactive islands
+│   │               ├── auth/
+│   │               │   ├── SignupForm.svelte      ← WAS: public/signup.js + signup.ts merged
+│   │               │   └── LoginForm.svelte
+│   │               ├── dashboard/
+│   │               │   ├── RevenueChart.svelte
+│   │               │   ├── CashFlowChart.svelte
+│   │               │   ├── ForecastWidget.svelte
+│   │               │   └── TransactionTable.svelte
+│   │               ├── shop/
+│   │               │   ├── PlanSelector.svelte
+│   │               │   └── StripeCheckout.svelte
+│   │               └── shared/
+│   │                   ├── Notification.svelte
+│   │                   └── LoadingSpinner.svelte
+│   │
+│   ├── insighthunter-bookkeeping/                ← MIGRATE: TSX → Svelte islands
+│   │   ├── astro.config.mjs                      ← UPDATE: add Svelte, remove React
+│   │   ├── wrangler.toml                         ← KEEP
+│   │   ├── package.json                          ← SWAP: react → svelte
+│   │   ├── tsconfig.json
+│   │   │
+│   │   ├── public/                               ← KEEP AS-IS
+│   │   │   ├── icons/
+│   │   │   ├── manifest.webmanifest
+│   │   │   ├── robots.txt
+│   │   │   └── sw.js
+│   │   │
+│   │   └── src/
+│   │       ├── env.d.ts                          ← KEEP
+│   │       │
+│   │       ├── backend/                          ← KEEP ENTIRELY AS-IS
+│   │       │   ├── ai/
+│   │       │   │   └── reconciliation-engine.ts
+│   │       │   ├── durable-objects/
+│   │       │   │   ├── BankConnectionManager.ts
+│   │       │   │   ├── BookkeepingLedger.ts
+│   │       │   │   ├── InvoiceManager.ts
+│   │       │   │   └── SubscriptionManager.ts
+│   │       │   ├── integrations/
+│   │       │   │   └── quickbooks.ts
+│   │       │   ├── utils/
+│   │       │   │   └── pricing.ts
+│   │       │   ├── enhanced-ledger.tsx           ← convert to .ts (remove JSX)
+│   │       │   ├── index.ts
+│   │       │   └── invoice-management.ts
+│   │       │
+│   │       ├── styles/                           ← KEEP
+│   │       │   ├── bookkeeping.css
+│   │       │   └── tables.css
+│   │       │
+│   │       ├── types/                            ← KEEP (will share via packages/)
+│   │       │   ├── auth.ts
+│   │       │   ├── banking.ts
+│   │       │   ├── bookkeeping.ts
+│   │       │   ├── index.ts
+│   │       │   ├── invoice.ts
+│   │       │   └── subscriptions.ts
+│   │       │
+│   │       ├── utils/                            ← KEEP
+│   │       │   ├── dateUtils.ts
+│   │       │   └── ledgerMath.ts
+│   │       │
+│   │       ├── hooks/                            ← CONVERT to Svelte stores
+│   │       │   ├── books.store.ts                ← WAS: useBooks.ts
+│   │       │   ├── reconciliation.store.ts       ← WAS: useReconciliation.ts
+│   │       │   └── reports.store.ts              ← WAS: useReports.ts
+│   │       │
+│   │       ├── layouts/
+│   │       │   └── AppLayout.astro               ← KEEP
+│   │       │
+│   │       ├── pages/                            ← KEEP structure, update imports
+│   │       │   ├── clients.astro
+│   │       │   ├── dashboard.astro
+│   │       │   ├── onboarding.astro
+│   │       │   ├── pricing.astro
+│   │       │   ├── reconciliations.astro
+│   │       │   ├── reports.astro
+│   │       │   ├── settings.astro
+│   │       │   └── signup.astro
+│   │       │
+│   │       └── components/
+│   │           ├── auth/
+│   │           │   └── SignupForm.svelte          ← WAS: SignupForm.tsx
+│   │           ├── banking/
+│   │           │   └── PlaidLink.svelte           ← WAS: PlaidLink.tsx
+│   │           ├── bookkeeping/                   ← ALL .tsx → .svelte (CSS merged in)
+│   │           │   ├── AccountSelector.svelte
+│   │           │   ├── AIReconciliation.svelte
+│   │           │   ├── BudgetTracker.svelte
+│   │           │   ├── InsightsPanel.svelte
+│   │           │   ├── InvoiceManager.svelte
+│   │           │   ├── LedgerTable.svelte
+│   │           │   ├── MetricsDashboard.svelte
+│   │           │   ├── ReportCard.svelte
+│   │           │   └── TransactionRow.svelte
+│   │           ├── onboarding/
+│   │           │   ├── CompanySetup.svelte
+│   │           │   └── OnboardingWizard.svelte
+│   │           ├── payment/
+│   │           │   └── PricingCards.svelte
+│   │           ├── quickbooks/
+│   │           │   └── QuickBooksConnect.svelte
+│   │           ├── shared/
+│   │           │   └── NavBar.svelte
+│   │           ├── upload/
+│   │           │   └── SpreadsheetUploader.svelte
+│   │           ├── ReconciliationCard.svelte
+│   │           └── ReconciliationWizard.svelte
+│   │
+│   ├── insighthunter-auth/                       ← KEEP ENTIRELY AS-IS ✅
+│   │   ├── migrations/
+│   │   ├── src/
+│   │   │   └── index.ts
+│   │   ├── package.json
+│   │   └── wrangler.toml
+│   │
+│   ├── insighthunter-lite/                       ← MIGRATE: index.tsx → Astro + Svelte
+│   │   ├── astro.config.mjs                      ← NEW
+│   │   ├── wrangler.toml                         ← KEEP
+│   │   ├── package.json
+│   │   ├── public/
+│   │   │   ├── manifest.json
+│   │   │   ├── sample-transactions.csv           ← KEEP
+│   │   │   └── sw.js
+│   │   └── src/
+│   │       ├── pages/
+│   │       │   ├── index.astro                   ← WAS: index.html + index.tsx
+│   │       │   └── upload.astro                  ← WAS: upload.html
+│   │       └── components/
+│   │           └── islands/
+│   │               └── CSVUploader.svelte         ← WAS: src/index.tsx core logic
+│   │
+│   ├── bizforma/                                 ← FLESH OUT
+│   │   ├── astro.config.mjs
+│   │   ├── wrangler.toml
+│   │   ├── package.json
+│   │   └── src/
+│   │       └── pages/
+│   │           └── index.astro
+│   │
+│   ├── insighthunter-pbx/                        ← MIGRATE: HTML → Astro
+│   │   ├── astro.config.mjs                      ← NEW
+│   │   ├── wrangler.toml                         ← KEEP
+│   │   ├── schema.sql                            ← KEEP
+│   │   ├── package.json
+│   │   └── src/
+│   │       ├── pages/
+│   │       │   ├── index.astro                   ← WAS: public/index.html
+│   │       │   └── dashboard.astro               ← WAS: src/dashboard.html
+│   │       └── backend/
+│   │           └── index.ts                      ← WAS: src/index.ts
+│   │
+│   ├── insighthunter-marketing/                  ← FLESH OUT (stub → Astro)
+│   │   ├── astro.config.mjs
+│   │   ├── wrangler.toml
+│   │   └── package.json
+│   │
+│   ├── insighthunter-mobile/                     ← FUTURE: PWA shell
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
+│   ├── insighthunter-scout/                      ← FUTURE: stub
+│   │   └── package.json
+│   ├── insighthunter-standard/                   ← FUTURE: stub
+│   │   └── package.json
+│   └── insighthunter-pro-services/               ← FUTURE: stub
+│       └── package.json
+│
+└── packages/                                     ← NEW: shared across all apps
+    ├── types/
+    │   ├── package.json
+    │   └── src/
+    │       ├── user.ts                           ← from bookkeeping/types/auth.ts
+    │       ├── bookkeeping.ts                    ← from bookkeeping/types/bookkeeping.ts
+    │       ├── invoice.ts                        ← from bookkeeping/types/invoice.ts
+    │       ├── banking.ts                        ← from bookkeeping/types/banking.ts
+    │       ├── subscriptions.ts
+    │       └── index.ts
+    │
+    └── utils/
+        ├── package.json
+        └── src/
+            ├── formatCurrency.ts
+            ├── dateUtils.ts                      ← from bookkeeping/utils/dateUtils.ts
+            ├── ledgerMath.ts                     ← from bookkeeping/utils/ledgerMath.ts
+            └── index.ts
