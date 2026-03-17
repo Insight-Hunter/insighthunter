@@ -1,23 +1,23 @@
 {
- "compilerOptions": {
-    "target":               "ESNext",
-    "module":               "ESNext",
-    "moduleResolution":     "bundler",
-    "lib":                  ["ESNext"],
-    "strict":               true,
-    "verbatimModuleSyntax": true,
-    "noUnusedLocals":       true,
-    "noUnusedParameters":   true,
-    "noImplicitReturns":    true,
-    "baseUrl":              ".",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext"],
+    "types": ["@cloudflare/workers-types"],
+    "strict": true,
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "baseUrl": ".",
     "paths": {
-      "@/*":         ["src/*"],
-      "@routes/*":   ["src/routes/*"],
+      "@/*": ["src/*"],
+      "@routes/*": ["src/routes/*"],
       "@services/*": ["src/services/*"],
-      "@lib/*":      ["src/lib/*"],
-      "@types/*":    ["src/types/*"]
-    },
-    "types": ["@cloudflare/workers-types"]
+      "@lib/*": ["src/lib/*"],
+      "@types/*": ["src/types/*"]
+    }
   },
-  "include": ["src/**/*", "tests/**/*"]
+  "include": ["src/**/*.ts", "tests/**/*.ts"]
 }

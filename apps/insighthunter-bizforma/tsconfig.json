@@ -10,7 +10,8 @@
     "paths": {
       "@backend/*": ["src/backend/*"],
       "@frontend/*": ["src/frontend/*"]
-    }
+    },
+    "noEmit": true
   },
-  "include": ["src"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }
