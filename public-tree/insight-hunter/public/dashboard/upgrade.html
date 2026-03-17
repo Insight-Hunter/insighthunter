@@ -1,13 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Upgrade · Insight Hunter</title>
-  <link rel="stylesheet" href="/assets/css/global.css" />
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>⚡ Upgrade — Insight Hunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0D1117;--navy-card:#161B22;--navy-mid:#1C2433;--navy-border:#1E2A3A;
+  --gold:#C9972B;--gold-l:#D4A843;--gold-dim:rgba(201,151,43,.12);
+  --g1:#E2E8F0;--g2:#94A3B8;--g3:#64748B;--g4:#2D3748;
+  --green:#10B981;--green-dim:rgba(16,185,129,.1);
+  --red:#EF4444;--red-dim:rgba(239,68,68,.1);
+  --amber:#F59E0B;--amber-dim:rgba(245,158,11,.1);
+  --blue:#3B82F6;--blue-dim:rgba(59,130,246,.1);
+  --purple:#8B5CF6;--purple-dim:rgba(139,92,246,.1);
+}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--g1);margin:0;display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--navy-card);border-right:1px solid var(--navy-border);
+  display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
+.sidebar-logo{display:flex;align-items:center;gap:9px;padding:1.25rem;font-size:.9rem;font-weight:800;
+  letter-spacing:-.02em;border-bottom:1px solid var(--navy-border);color:#fff}
+.nav-section{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--g4);padding:.9rem 1.25rem .35rem}
+.nav-item{display:flex;align-items:center;gap:.65rem;padding:.55rem 1rem;margin:.1rem .6rem;
+  border-radius:8px;font-size:.8rem;color:var(--g2);text-decoration:none;transition:.15s}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--g1)}
+.nav-item.active{background:var(--gold-dim);color:var(--gold-l);font-weight:600}
+.sidebar-bottom{margin-top:auto;padding:.75rem;border-top:1px solid var(--navy-border)}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow-y:auto}
+.top-bar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 1.75rem;
+  border-bottom:1px solid var(--navy-border);position:sticky;top:0;z-index:50;
+  background:rgba(13,17,23,.95);backdrop-filter:blur(14px);flex-shrink:0}
+.content{padding:1.75rem;flex:1}
+.card{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;overflow:hidden;margin-bottom:1.25rem}
+.card-head{padding:.85rem 1.25rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--navy-border)}
+.card-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3)}
+.card-body{padding:1.25rem}
+.kpi{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;padding:1.1rem 1.25rem;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.green::before{background:var(--green)}.kpi.red::before{background:var(--red)}
+.kpi.gold::before{background:var(--gold)}.kpi.blue::before{background:var(--blue)}
+.kpi.purple::before{background:var(--purple)}
+.kpi-lbl{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3);margin-bottom:.35rem}
+.kpi-val{font-size:1.5rem;font-weight:900;letter-spacing:-.03em;color:#fff;line-height:1}
+.kpi-sub{font-size:.7rem;color:var(--g3);margin-top:.3rem}
+.btn-gold{background:var(--gold);color:#0D1117;font-weight:700;border:none;border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;padding:.48rem 1rem;transition:.15s;display:inline-flex;align-items:center;gap:.4rem;text-decoration:none}
+.btn-gold:hover{background:var(--gold-l)}
+.btn-ghost{background:none;border:1px solid var(--navy-border);color:var(--g2);border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:.78rem;padding:.42rem .9rem;transition:.15s;display:inline-flex;align-items:center;gap:.4rem;text-decoration:none}
+.btn-ghost:hover{color:var(--g1);border-color:var(--g3)}
+.btn-danger{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--red);border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;padding:.48rem 1rem;transition:.15s}
+.btn-danger:hover{background:rgba(239,68,68,.2)}
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:.63rem;font-weight:700}
+.pill-green{background:var(--green-dim);color:var(--green)}.pill-red{background:var(--red-dim);color:var(--red)}
+.pill-amber{background:var(--amber-dim);color:var(--amber)}.pill-blue{background:var(--blue-dim);color:var(--blue)}
+.pill-purple{background:var(--purple-dim);color:var(--purple)}.pill-gold{background:var(--gold-dim);color:var(--gold-l)}
+.pill-gray{background:rgba(100,116,139,.12);color:var(--g2)}
+input,select,textarea{background:rgba(255,255,255,.04);border:1px solid var(--navy-border);color:var(--g1);
+  border-radius:8px;padding:.5rem .85rem;font-family:'Inter',sans-serif;font-size:.82rem;outline:none;transition:.2s;width:100%}
+input:focus,select:focus,textarea:focus{border-color:rgba(201,151,43,.45);background:rgba(255,255,255,.06)}
+select option{background:var(--navy-card)}
+label.fl{display:block;font-size:.68rem;font-weight:600;color:var(--g3);margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.05em}
+.field{margin-bottom:.9rem}
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);
+  background-size:200%;animation:shimmer 1.5s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+.bar-track{flex:1;background:rgba(255,255,255,.05);border-radius:4px;height:8px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:.6s}
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;padding:.65rem 1.25rem;border-radius:10px;
+  font-size:.82rem;font-weight:600;transform:translateY(80px);opacity:0;pointer-events:none;transition:.3s}
+#toast.show{transform:translateY(0);opacity:1}
+.toggle{width:40px;height:22px;border-radius:11px;background:var(--navy-border);cursor:pointer;
+  position:relative;transition:.2s;border:none;flex-shrink:0}
+.toggle.on{background:var(--gold)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;
+  border-radius:50%;background:#fff;transition:.2s}
+.toggle.on::after{left:21px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:.85rem 0;
+  border-bottom:1px solid rgba(30,42,58,.5)}
+.settings-row:last-child{border:none}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:.5rem 1rem;text-align:left;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g3);border-bottom:2px solid var(--navy-border)}
+.tbl td{padding:.65rem 1rem;font-size:.8rem;border-bottom:1px solid rgba(30,42,58,.5);vertical-align:middle}
+.tbl tr:last-child td{border:none}
+</style>
 </head>
 <body>
-  <!-- Upgrade -->
-  <script src="/assets/js/utils.js"></script>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#141E30"/>
+    <path d="M16 4v5M13 6h6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M10 9v15h12V9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 24h18" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M13 14l2.5 3L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Insight Hunter
+  </div>
+  <div class="nav-section">Platform</div>
+  <a href="index.html"       class="nav-item "><span style="width:16px;text-align:center">◫</span> Overview</a>
+  <a href="bizforma.html"    class="nav-item "><span style="width:16px;text-align:center">📋</span> BizForma</a>
+  <a href="bookkeeping.html" class="nav-item "><span style="width:16px;text-align:center">📒</span> Bookkeeping</a>
+  <a href="reports.html"     class="nav-item "><span style="width:16px;text-align:center">📊</span> Reports</a>
+  <a href="forecast.html"    class="nav-item "><span style="width:16px;text-align:center">📈</span> Forecast</a>
+  <a href="insights.html"    class="nav-item "><span style="width:16px;text-align:center">✦</span> AI Insights</a>
+  <div class="nav-section">Business</div>
+  <a href="payroll.html"     class="nav-item "><span style="width:16px;text-align:center">💳</span> Payroll</a>
+  <a href="pbx.html"         class="nav-item "><span style="width:16px;text-align:center">📞</span> PBX</a>
+  <a href="settings.html"    class="nav-item "><span style="width:16px;text-align:center">⚙</span> Settings</a>
+  <div class="sidebar-bottom">
+    <a href="upgrade.html" class="nav-item active" style="background:rgba(201,151,43,.07);color:var(--gold-l);font-weight:600"><span style="width:16px;text-align:center">⚡</span> Upgrade Plan</a>
+  </div>
+</aside>
+<div class="main">
+
+  <div class="top-bar">
+    <span style="font-size:.95rem;font-weight:700;letter-spacing:-.02em;color:#fff">⚡ Upgrade</span>
+    <div style="width:30px;height:30px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(201,151,43,.3);
+      display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--gold-l)">U</div>
+  </div>
+  <div class="content">
+
+<div style="text-align:center;margin-bottom:2.5rem">
+  <div style="display:inline-flex;align-items:center;gap:.5rem;background:var(--gold-dim);border:1px solid rgba(201,151,43,.25);border-radius:100px;padding:.35rem 1rem;margin-bottom:1rem">
+    <span style="font-size:.75rem;color:var(--gold-l);font-weight:600">⚡ Simple, transparent pricing</span>
+  </div>
+  <div style="font-size:1.9rem;font-weight:900;letter-spacing:-.04em;color:#fff;margin-bottom:.65rem">Upgrade Your Plan</div>
+  <div style="font-size:.9rem;color:var(--g3);max-width:480px;margin:0 auto;line-height:1.6">Enterprise-grade financial tools built for small business. No surprise fees.</div>
+
+  <!-- Billing toggle -->
+  <div style="display:inline-flex;align-items:center;gap:.75rem;margin-top:1.25rem;background:var(--navy-card);border:1px solid var(--navy-border);border-radius:100px;padding:.35rem .85rem">
+    <span id="lbl-monthly" style="font-size:.8rem;font-weight:600;color:var(--g1)">Monthly</span>
+    <button id="billing-toggle" class="toggle on" onclick="toggleBilling()" style="margin:0" aria-label="billing cycle"></button>
+    <span id="lbl-annual" style="font-size:.8rem;font-weight:600;color:var(--gold-l)">Annual <span style="background:var(--green-dim);color:var(--green);font-size:.65rem;padding:1px 6px;border-radius:100px;margin-left:3px">Save 20%</span></span>
+  </div>
+</div>
+
+<!-- Plan Cards -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem">
+
+  <!-- Free -->
+  <div class="card" id="plan-free" style="padding:0">
+    <div style="padding:1.4rem 1.25rem;border-bottom:1px solid var(--navy-border)">
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--g3);margin-bottom:.5rem">Free</div>
+      <div style="font-size:2rem;font-weight:900;letter-spacing:-.04em;color:#fff;line-height:1">$0</div>
+      <div style="font-size:.75rem;color:var(--g3);margin-top:.2rem">forever</div>
+      <div style="font-size:.75rem;color:var(--g3);margin-top:.65rem;line-height:1.5">Perfect for solo operators just getting started.</div>
+    </div>
+    <div style="padding:1.25rem">
+      <div id="btn-free" style="text-align:center;padding:.6rem;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--navy-border);font-size:.8rem;font-weight:700;color:var(--g2)">Current Plan</div>
+      <ul style="list-style:none;margin-top:1.1rem;display:flex;flex-direction:column;gap:.55rem">
+        ${[['✓ Bookkeeping — 100 tx/mo','green'],['✓ 1 bank account','green'],
+           ['✓ Basic P&L report','green'],['✓ BizForma (1 entity)','green'],
+           ['✗ Payroll','gray'],['✗ PBX / Phone','gray'],
+           ['✗ AI Insights','gray'],['✗ Reports export','gray']
+          ].map(([t,c])=>`<li style="font-size:.78rem;color:var(--${c==='green'?'g2':'g4'})">${t}</li>`).join('')}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Starter — highlighted -->
+  <div class="card" id="plan-starter" style="padding:0;border-color:rgba(201,151,43,.4);position:relative">
+    <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--gold);color:#0D1117;font-size:.65rem;font-weight:800;padding:3px 12px;border-radius:100px;white-space:nowrap">MOST POPULAR</div>
+    <div style="padding:1.4rem 1.25rem;border-bottom:1px solid rgba(201,151,43,.2)">
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--gold-l);margin-bottom:.5rem">Starter</div>
+      <div style="font-size:2rem;font-weight:900;letter-spacing:-.04em;color:#fff;line-height:1"><span id="price-starter">$29</span><span style="font-size:.75rem;font-weight:400;color:var(--g3)" id="cycle-starter">/mo</span></div>
+      <div style="font-size:.72rem;color:var(--g3);margin-top:.2rem" id="billing-starter">billed monthly</div>
+      <div style="font-size:.75rem;color:var(--g3);margin-top:.65rem;line-height:1.5">For growing businesses managing finances day-to-day.</div>
+    </div>
+    <div style="padding:1.25rem">
+      <button onclick="selectPlan('starter')" style="width:100%;padding:.65rem;border-radius:8px;background:var(--gold);border:none;font-size:.82rem;font-weight:800;color:#0D1117;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s">Upgrade to Starter</button>
+      <ul style="list-style:none;margin-top:1.1rem;display:flex;flex-direction:column;gap:.55rem">
+        ${[['✓ Unlimited transactions','green'],['✓ Up to 5 accounts','green'],
+           ['✓ Full P&L + CSV export','green'],['✓ BizForma (3 entities)','green'],
+           ['✓ Payroll — up to 5 employees','green'],['✓ PBX — 1 number + SMS','green'],
+           ['✗ AI Insights / CFO Chat','gray'],['✗ Priority support','gray']
+          ].map(([t,c])=>`<li style="font-size:.78rem;color:var(--${c==='green'?'g2':'g4'})">${t}</li>`).join('')}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Pro -->
+  <div class="card" id="plan-pro" style="padding:0">
+    <div style="padding:1.4rem 1.25rem;border-bottom:1px solid var(--navy-border)">
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);margin-bottom:.5rem">Pro</div>
+      <div style="font-size:2rem;font-weight:900;letter-spacing:-.04em;color:#fff;line-height:1"><span id="price-pro">$79</span><span style="font-size:.75rem;font-weight:400;color:var(--g3)" id="cycle-pro">/mo</span></div>
+      <div style="font-size:.72rem;color:var(--g3);margin-top:.2rem" id="billing-pro">billed monthly</div>
+      <div style="font-size:.75rem;color:var(--g3);margin-top:.65rem;line-height:1.5">For teams that want AI-powered insights and forecasting.</div>
+    </div>
+    <div style="padding:1.25rem">
+      <button onclick="selectPlan('pro')" style="width:100%;padding:.65rem;border-radius:8px;background:var(--navy-mid);border:1px solid var(--purple);font-size:.82rem;font-weight:800;color:var(--purple);cursor:pointer;font-family:'Inter',sans-serif;transition:.15s">Upgrade to Pro</button>
+      <ul style="list-style:none;margin-top:1.1rem;display:flex;flex-direction:column;gap:.55rem">
+        ${[['✓ Everything in Starter','green'],['✓ Unlimited accounts','green'],
+           ['✓ AI Insights + CFO Chat','green'],['✓ Cash flow forecast','green'],
+           ['✓ Payroll — up to 25 employees','green'],['✓ PBX — 3 numbers + IVR','green'],
+           ['✓ BizForma — unlimited entities','green'],['✗ Dedicated account manager','gray']
+          ].map(([t,c])=>`<li style="font-size:.78rem;color:var(--${c==='green'?'g2':'g4'})">${t}</li>`).join('')}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Business -->
+  <div class="card" id="plan-business" style="padding:0;border-color:rgba(59,130,246,.3)">
+    <div style="padding:1.4rem 1.25rem;border-bottom:1px solid rgba(59,130,246,.15)">
+      <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:.5rem">Business</div>
+      <div style="font-size:2rem;font-weight:900;letter-spacing:-.04em;color:#fff;line-height:1"><span id="price-business">$199</span><span style="font-size:.75rem;font-weight:400;color:var(--g3)" id="cycle-business">/mo</span></div>
+      <div style="font-size:.72rem;color:var(--g3);margin-top:.2rem" id="billing-business">billed monthly</div>
+      <div style="font-size:.75rem;color:var(--g3);margin-top:.65rem;line-height:1.5">For agencies and fractional CFOs managing multiple clients.</div>
+    </div>
+    <div style="padding:1.25rem">
+      <button onclick="selectPlan('business')" style="width:100%;padding:.65rem;border-radius:8px;background:var(--navy-mid);border:1px solid var(--blue);font-size:.82rem;font-weight:800;color:var(--blue);cursor:pointer;font-family:'Inter',sans-serif;transition:.15s">Upgrade to Business</button>
+      <ul style="list-style:none;margin-top:1.1rem;display:flex;flex-direction:column;gap:.55rem">
+        ${[['✓ Everything in Pro','green'],['✓ Up to 10 business profiles','green'],
+           ['✓ White-label reports','green'],['✓ Priority support + SLA','green'],
+           ['✓ Payroll — unlimited employees','green'],['✓ PBX — 10 numbers + IVR','green'],
+           ['✓ Custom integrations','green'],['✓ Dedicated account manager','green']
+          ].map(([t,c])=>`<li style="font-size:.78rem;color:var(--${c==='green'?'g2':'g4'})">${t}</li>`).join('')}
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- Feature comparison table -->
+<div class="card">
+  <div class="card-head"><span class="card-label">Full Feature Comparison</span></div>
+  <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="border-bottom:2px solid var(--navy-border)">
+          <th style="padding:.65rem 1.25rem;text-align:left;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g3);width:40%">Feature</th>
+          ${['Free','Starter','Pro','Business'].map((p,i)=>`<th style="padding:.65rem .75rem;text-align:center;font-size:.72rem;font-weight:800;color:${['var(--g2)','var(--gold-l)','var(--purple)','var(--blue)'][i]}">${p}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${[
+          ['Bookkeeping Transactions','100/mo','Unlimited','Unlimited','Unlimited'],
+          ['Bank Accounts','1','5','Unlimited','Unlimited'],
+          ['P&L Reports','Basic','Full + CSV','Full + PDF','White-label'],
+          ['Payroll Employees','—','Up to 5','Up to 25','Unlimited'],
+          ['PBX Phone Numbers','—','1','3','10'],
+          ['IVR / Call Routing','—','—','✓','✓'],
+          ['BizForma Entities','1','3','Unlimited','Multi-client'],
+          ['AI Insights','—','—','✓','✓'],
+          ['CFO Chat','—','—','✓','✓'],
+          ['Cash Flow Forecast','—','—','✓','✓'],
+          ['CSV / PDF Export','—','CSV','CSV + PDF','CSV + PDF'],
+          ['Priority Support','—','—','—','✓ + SLA'],
+          ['API Access','—','—','✓','✓'],
+          ['Custom Integrations','—','—','—','✓'],
+        ].map(([feat,...vals])=>`
+          <tr style="border-bottom:1px solid rgba(30,42,58,.5)">
+            <td style="padding:.6rem 1.25rem;font-size:.8rem;color:var(--g2)">${feat}</td>
+            ${vals.map((v,i)=>`<td style="padding:.6rem .75rem;text-align:center;font-size:.78rem;font-weight:${v==='✓'||v.includes('✓')?'700':'400'};color:${v==='—'?'var(--g4)':['var(--g2)','var(--gold-l)','var(--purple)','var(--blue)'][i]}">${v}</td>`).join('')}
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div style="margin-top:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+  ${[
+    ['Can I switch plans anytime?','Yes — upgrades take effect immediately, downgrades at end of billing period. No cancellation fees.'],
+    ['Is there a free trial?','Pro and Business plans include a 14-day free trial. No credit card required to start.'],
+    ['What happens to my data if I downgrade?','Your data is preserved. Features above your plan tier are locked (not deleted) until you upgrade again.'],
+    ['Do you offer discounts for nonprofits?','Yes — contact us for 40% nonprofit and early-stage startup pricing.'],
+  ].map(([q,a])=>`
+  <div class="card" style="padding:1.1rem 1.25rem">
+    <div style="font-size:.85rem;font-weight:700;color:#fff;margin-bottom:.4rem">${q}</div>
+    <div style="font-size:.78rem;color:var(--g3);line-height:1.6">${a}</div>
+  </div>`).join('')}
+</div>
+
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+let isAnnual = true
+
+function toggleBilling(){
+  isAnnual = !isAnnual
+  const prices = { starter:[29,23], pro:[79,63], business:[199,159] }
+  Object.entries(prices).forEach(([plan,[mo,yr]])=>{
+    const p = isAnnual ? yr : mo
+    document.getElementById('price-'+plan).textContent = '$'+p
+    document.getElementById('billing-'+plan).textContent = isAnnual ? 'billed annually' : 'billed monthly'
+  })
+  document.getElementById('lbl-annual').style.color = isAnnual ? 'var(--gold-l)' : 'var(--g2)'
+  document.getElementById('lbl-monthly').style.color = isAnnual ? 'var(--g2)' : 'var(--g1)'
+}
+
+function selectPlan(plan){
+  const labels = {starter:'Starter',pro:'Pro',business:'Business'}
+  const prices = {starter:isAnnual?23:29, pro:isAnnual?63:79, business:isAnnual?159:199}
+  if(confirm(`Upgrade to ${labels[plan]} at $${prices[plan]}/mo${isAnnual?' (billed annually)':''}?\n\nYou will be redirected to checkout.`)){
+    window.location.href = `/checkout?plan=${plan}&cycle=${isAnnual?'annual':'monthly'}`
+  }
+}
+
+// Highlight current plan based on stored plan
+const currentPlan = localStorage.getItem('ih_plan') || 'free'
+const planCard = document.getElementById('plan-'+currentPlan)
+if(planCard && currentPlan !== 'free'){
+  planCard.style.borderColor = 'rgba(16,185,129,.4)'
+}
+</script>
 </body>
 </html>
