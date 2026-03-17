@@ -1,13 +1,616 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard · Insight Hunter</title>
-  <link rel="stylesheet" href="/assets/css/global.css" />
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Dashboard — Insight Hunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0D1117;--navy-card:#161B22;--navy-mid:#1C2433;--navy-border:#1E2A3A;
+  --gold:#C9972B;--gold-l:#D4A843;--gold-dim:rgba(201,151,43,.12);
+  --g1:#E2E8F0;--g2:#94A3B8;--g3:#64748B;--g4:#2D3748;
+  --green:#10B981;--green-dim:rgba(16,185,129,.1);
+  --red:#EF4444;--red-dim:rgba(239,68,68,.1);
+  --amber:#F59E0B;--amber-dim:rgba(245,158,11,.1);
+  --blue:#3B82F6;--blue-dim:rgba(59,130,246,.1);
+  --purple:#8B5CF6;--purple-dim:rgba(139,92,246,.1);
+}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--g1);margin:0;display:flex;min-height:100vh}
+/* Sidebar */
+.sidebar{width:220px;flex-shrink:0;background:var(--navy-card);border-right:1px solid var(--navy-border);
+  display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
+.sidebar-logo{display:flex;align-items:center;gap:9px;padding:1.25rem;font-size:.9rem;font-weight:800;
+  letter-spacing:-.02em;border-bottom:1px solid var(--navy-border);color:#fff}
+.nav-section{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--g4);padding:.9rem 1.25rem .35rem}
+.nav-item{display:flex;align-items:center;gap:.65rem;padding:.55rem 1rem;margin:.1rem .6rem;
+  border-radius:8px;font-size:.8rem;color:var(--g2);text-decoration:none;transition:.15s}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--g1)}
+.nav-item.active{background:var(--gold-dim);color:var(--gold-l);font-weight:600}
+.sidebar-bottom{margin-top:auto;padding:.75rem;border-top:1px solid var(--navy-border)}
+/* Layout */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow-y:auto}
+.top-bar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 1.75rem;
+  border-bottom:1px solid var(--navy-border);position:sticky;top:0;z-index:50;
+  background:rgba(13,17,23,.95);backdrop-filter:blur(14px);flex-shrink:0}
+.content{padding:1.75rem;flex:1}
+/* Cards */
+.card{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;overflow:hidden}
+.card-head{padding:.85rem 1.25rem;display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid var(--navy-border)}
+.card-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3)}
+.card-body{padding:1.25rem}
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.kpi{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;
+  padding:1.1rem 1.25rem;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.income::before{background:var(--green)}
+.kpi.expense::before{background:var(--red)}
+.kpi.net::before{background:var(--gold)}
+.kpi.cash::before{background:var(--blue)}
+.kpi.purple::before{background:var(--purple)}
+.kpi-lbl{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3);margin-bottom:.35rem}
+.kpi-val{font-size:1.6rem;font-weight:900;letter-spacing:-.03em;color:#fff;line-height:1}
+.kpi-sub{font-size:.7rem;color:var(--g3);margin-top:.3rem}
+/* Grid layouts */
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
+/* Buttons */
+.btn-gold{background:var(--gold);color:#0D1117;font-weight:700;border:none;border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;padding:.45rem 1rem;transition:.15s}
+.btn-gold:hover{background:var(--gold-l)}
+.btn-ghost{background:none;border:1px solid var(--navy-border);color:var(--g2);border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:.78rem;padding:.38rem .85rem;transition:.15s}
+.btn-ghost:hover{color:var(--g1);border-color:var(--g3)}
+/* Pills */
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:.63rem;font-weight:700}
+.pill-green{background:var(--green-dim);color:var(--green)}
+.pill-red{background:var(--red-dim);color:var(--red)}
+.pill-amber{background:var(--amber-dim);color:var(--amber)}
+.pill-blue{background:var(--blue-dim);color:var(--blue)}
+.pill-gold{background:var(--gold-dim);color:var(--gold-l)}
+.pill-purple{background:var(--purple-dim);color:var(--purple)}
+/* Quick actions */
+.qa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.qa{display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1.1rem .75rem;
+  background:var(--navy-card);border:1px solid var(--navy-border);border-radius:12px;
+  text-decoration:none;color:var(--g2);transition:.2s;cursor:pointer;text-align:center}
+.qa:hover{background:var(--navy-mid);border-color:var(--g3);color:var(--g1);transform:translateY(-1px)}
+.qa-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.qa-label{font-size:.72rem;font-weight:600}
+/* Bar chart */
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:80px;padding:0 0 4px}
+.bar-group{display:flex;gap:2px;align-items:flex-end;flex:1}
+.bar{border-radius:3px 3px 0 0;min-height:3px;transition:.3s}
+.bar-lbl{font-size:.58rem;color:var(--g3);text-align:center;margin-top:4px;white-space:nowrap}
+/* Row items */
+.row-item{display:flex;align-items:center;justify-content:space-between;
+  padding:.6rem 0;border-bottom:1px solid rgba(30,42,58,.6)}
+.row-item:last-child{border:none}
+/* Skeleton */
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);
+  background-size:200%;animation:shimmer 1.5s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+/* Insight cards */
+.insight-card{padding:.9rem 1rem;background:var(--navy-mid);border:1px solid var(--navy-border);
+  border-radius:10px;margin-bottom:.6rem}
+.insight-card:last-child{margin-bottom:0}
+/* Status dot */
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* Module status */
+.module-row{display:flex;align-items:center;gap:.75rem;padding:.55rem 0;
+  border-bottom:1px solid rgba(30,42,58,.5)}
+.module-row:last-child{border:none}
+</style>
 </head>
 <body>
-  <!-- Dashboard -->
-  <script src="/assets/js/utils.js"></script>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#141E30"/>
+      <path d="M16 4v5M13 6h6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M10 9v15h12V9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M7 24h18" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M13 14l2.5 3L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Insight Hunter
+  </div>
+  <div class="nav-section">Platform</div>
+  <a href="index.html"       class="nav-item active"><span style="width:16px;text-align:center">◫</span> Overview</a>
+  <a href="bizforma.html"    class="nav-item"><span style="width:16px;text-align:center">📋</span> BizForma</a>
+  <a href="bookkeeping.html" class="nav-item"><span style="width:16px;text-align:center">📒</span> Bookkeeping</a>
+  <a href="reports.html"     class="nav-item"><span style="width:16px;text-align:center">📊</span> Reports</a>
+  <a href="forecast.html"    class="nav-item"><span style="width:16px;text-align:center">📈</span> Forecast</a>
+  <a href="insights.html"    class="nav-item"><span style="width:16px;text-align:center">✦</span> AI Insights</a>
+  <div class="nav-section">Business</div>
+  <a href="payroll.html"     class="nav-item"><span style="width:16px;text-align:center">💳</span> Payroll</a>
+  <a href="pbx.html"         class="nav-item"><span style="width:16px;text-align:center">📞</span> PBX</a>
+  <a href="settings.html"    class="nav-item"><span style="width:16px;text-align:center">⚙</span> Settings</a>
+  <div class="sidebar-bottom">
+    <a href="upgrade.html" class="nav-item" style="background:rgba(201,151,43,.07);color:var(--gold-l);font-weight:600">
+      <span style="width:16px;text-align:center">⚡</span> Upgrade Plan
+    </a>
+  </div>
+</aside>
+<div class="main">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <span style="font-size:.95rem;font-weight:700;letter-spacing:-.02em;color:#fff">Overview</span>
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <div style="font-size:.72rem;color:var(--g3)" id="topbar-date"></div>
+      <div style="width:30px;height:30px;border-radius:50%;background:var(--gold-dim);
+        border:1px solid rgba(201,151,43,.3);display:flex;align-items:center;
+        justify-content:center;font-size:.7rem;font-weight:700;color:var(--gold-l)">U</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+<!-- ── Welcome Header ───────────────────────────────────────── -->
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+  <div>
+    <div style="font-size:.72rem;color:var(--g3);margin-bottom:.25rem" id="dash-date"></div>
+    <div style="font-size:1.45rem;font-weight:900;letter-spacing:-.03em;color:#fff" id="dash-greeting">Good morning</div>
+    <div style="font-size:.82rem;color:var(--g3);margin-top:.2rem" id="dash-tagline">Here's your business at a glance.</div>
+  </div>
+  <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center">
+    <div style="font-size:.72rem;color:var(--g3);padding:.4rem .85rem;background:var(--navy-card);border:1px solid var(--navy-border);border-radius:8px" id="dash-period">This Month</div>
+    <a href="reports.html" class="btn-ghost">📊 Full Report</a>
+    <a href="bookkeeping.html" style="text-decoration:none"><button class="btn-gold">+ Add Transaction</button></a>
+  </div>
+</div>
+
+<!-- ── KPI Row ───────────────────────────────────────────────── -->
+<div class="kpi-grid" style="margin-bottom:1.5rem">
+  <div class="kpi income">
+    <div class="kpi-lbl">Total Income</div>
+    <div class="kpi-val" id="kpi-income" style="color:var(--green)"><div class="skeleton" style="height:28px;width:100px"></div></div>
+    <div class="kpi-sub" id="kpi-income-sub">Month to date</div>
+  </div>
+  <div class="kpi expense">
+    <div class="kpi-lbl">Total Expenses</div>
+    <div class="kpi-val" id="kpi-expense" style="color:var(--red)"><div class="skeleton" style="height:28px;width:100px"></div></div>
+    <div class="kpi-sub" id="kpi-expense-sub">Month to date</div>
+  </div>
+  <div class="kpi net">
+    <div class="kpi-lbl">Net Profit</div>
+    <div class="kpi-val" id="kpi-net"><div class="skeleton" style="height:28px;width:100px"></div></div>
+    <div class="kpi-sub" id="kpi-margin">— margin</div>
+  </div>
+  <div class="kpi cash">
+    <div class="kpi-lbl">Cash Balance</div>
+    <div class="kpi-val" id="kpi-cash" style="color:var(--gold-l)"><div class="skeleton" style="height:28px;width:100px"></div></div>
+    <div class="kpi-sub" id="kpi-cash-sub">All accounts</div>
+  </div>
+</div>
+
+<!-- ── Row 2: P&L Trend + Quick Actions ─────────────────────── -->
+<div class="grid-2-1">
+
+  <!-- P&L Trend -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-label">P&L Trend — Last 6 Months</span>
+      <a href="reports.html" style="font-size:.72rem;color:var(--gold-l);text-decoration:none">View report →</a>
+    </div>
+    <div class="card-body">
+      <div id="trend-chart" style="display:flex;align-items:flex-end;gap:8px;height:100px;margin-bottom:.5rem">
+        <div class="skeleton" style="flex:1;height:100%"></div>
+      </div>
+      <div id="trend-legend" style="display:flex;gap:1rem;font-size:.68rem;color:var(--g3)">
+        <span style="display:flex;align-items:center;gap:.35rem"><span style="width:10px;height:10px;border-radius:2px;background:var(--green);display:inline-block"></span>Income</span>
+        <span style="display:flex;align-items:center;gap:.35rem"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block"></span>Expense</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="card">
+    <div class="card-head"><span class="card-label">Quick Actions</span></div>
+    <div class="card-body" style="padding:.85rem">
+      <div class="qa-grid">
+        <a href="bookkeeping.html" class="qa">
+          <div class="qa-icon" style="background:var(--green-dim)">📒</div>
+          <span class="qa-label">Add Transaction</span>
+        </a>
+        <a href="payroll.html" class="qa">
+          <div class="qa-icon" style="background:var(--blue-dim)">▶</div>
+          <span class="qa-label">Run Payroll</span>
+        </a>
+        <a href="pbx.html" class="qa">
+          <div class="qa-icon" style="background:var(--amber-dim)">💬</div>
+          <span class="qa-label">SMS Inbox</span>
+        </a>
+        <a href="bizforma.html" class="qa">
+          <div class="qa-icon" style="background:var(--purple-dim)">📋</div>
+          <span class="qa-label">Business Entity</span>
+        </a>
+        <a href="reports.html" class="qa">
+          <div class="qa-icon" style="background:var(--gold-dim)">📊</div>
+          <span class="qa-label">Generate Report</span>
+        </a>
+        <a href="insights.html" class="qa">
+          <div class="qa-icon" style="background:rgba(139,92,246,.1)">✦</div>
+          <span class="qa-label">AI Insights</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Row 3: Recent Transactions + Payroll + PBX ────────────── -->
+<div class="grid-2-1">
+
+  <!-- Recent Transactions -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-label">Recent Transactions</span>
+      <a href="bookkeeping.html" style="font-size:.72rem;color:var(--gold-l);text-decoration:none">View all →</a>
+    </div>
+    <div style="padding:0 1.25rem 1.25rem">
+      <div id="recent-tx"><div style="padding:1.5rem 0"><div class="skeleton" style="height:100px"></div></div></div>
+    </div>
+  </div>
+
+  <!-- Payroll + PBX stacked -->
+  <div style="display:flex;flex-direction:column;gap:1.25rem">
+
+    <!-- Payroll Snapshot -->
+    <div class="card">
+      <div class="card-head">
+        <span class="card-label">Payroll</span>
+        <a href="payroll.html" style="font-size:.72rem;color:var(--gold-l);text-decoration:none">Manage →</a>
+      </div>
+      <div class="card-body" style="padding:.9rem 1.25rem">
+        <div id="payroll-snap"><div class="skeleton" style="height:70px"></div></div>
+      </div>
+    </div>
+
+    <!-- PBX Snapshot -->
+    <div class="card">
+      <div class="card-head">
+        <span class="card-label">PBX Communications</span>
+        <a href="pbx.html" style="font-size:.72rem;color:var(--gold-l);text-decoration:none">Open →</a>
+      </div>
+      <div class="card-body" style="padding:.9rem 1.25rem">
+        <div id="pbx-snap"><div class="skeleton" style="height:70px"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Row 4: AI Insights + BizForma + Module Status ─────────── -->
+<div class="grid-3">
+
+  <!-- AI Insights preview -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-label">✦ AI Insights</span>
+      <a href="insights.html" style="font-size:.72rem;color:var(--gold-l);text-decoration:none">All insights →</a>
+    </div>
+    <div class="card-body" id="ai-insights-preview" style="padding:.85rem 1.1rem">
+      <div class="skeleton" style="height:120px"></div>
+    </div>
+  </div>
+
+  <!-- BizForma / Compliance -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-label">Business & Compliance</span>
+      <a href="bizforma.html" style="font-size:.72rem;color:var(--gold-l);text-decoration:none">View →</a>
+    </div>
+    <div class="card-body" id="bizforma-snap" style="padding:.85rem 1.1rem">
+      <div class="skeleton" style="height:120px"></div>
+    </div>
+  </div>
+
+  <!-- Platform Status -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-label">Platform Modules</span>
+      <span class="pill pill-green" style="font-size:.58rem">All Systems Go</span>
+    </div>
+    <div class="card-body" style="padding:.85rem 1.1rem">
+      <div id="module-status"></div>
+    </div>
+  </div>
+
+</div>
+
+  </div>
+
+</div>
+<script>
+const API = ''
+const fmt  = n => '$'+(+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+const fmtK = n => Math.abs(n) >= 1000 ? '$'+(n/1000).toFixed(1)+'k' : fmt(n)
+const $ = id => document.getElementById(id)
+const fmtDate = iso => iso ? new Date(iso+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—'
+
+// ── Greeting ──────────────────────────────────────────────────
+function initGreeting() {
+  const now  = new Date()
+  const hr   = now.getHours()
+  const g    = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening'
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+  const mos  = ['January','February','March','April','May','June','July','August','September','October','November','December']
+  $('dash-greeting').textContent = g
+  $('dash-date').textContent     = `${days[now.getDay()]}, ${mos[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`
+  const y = now.getFullYear(), m = now.getMonth()+1
+  $('dash-period').textContent   = `${mos[now.getMonth()]} ${y}`
+}
+
+// ── Bookkeeping KPIs + Trend ───────────────────────────────────
+async function loadFinancials() {
+  try {
+    const now   = new Date()
+    const y     = now.getFullYear()
+    const m     = String(now.getMonth()+1).padStart(2,'0')
+    const last  = new Date(y,now.getMonth()+1,0).getDate()
+    const from  = `${y}-${m}-01`
+    const to    = `${y}-${m}-${last}`
+
+    const [sumRes, acctRes, trendRes] = await Promise.all([
+      fetch(`${API}/api/bookkeeping/summary?from=${from}&to=${to}`, { credentials:'include' }),
+      fetch(`${API}/api/bookkeeping/accounts`, { credentials:'include' }),
+      fetch(`${API}/api/bookkeeping/trend`, { credentials:'include' }),
+    ])
+    const { income, expense, net }    = await sumRes.json()
+    const { accounts = [] }           = await acctRes.json()
+    const { trend   = [] }            = await trendRes.json()
+
+    $('kpi-income').textContent  = fmtK(income)
+    $('kpi-expense').textContent = fmtK(expense)
+    $('kpi-net').textContent     = fmtK(net)
+    $('kpi-net').style.color     = net >= 0 ? 'var(--green)' : 'var(--red)'
+    const margin = income > 0 ? ((net/income)*100).toFixed(1) : '0'
+    $('kpi-margin').textContent  = `${margin}% margin`
+
+    const cash = accounts.filter(a=>['checking','savings','asset'].includes(a.type))
+                         .reduce((s,a) => s+(a.balance||0), 0)
+    $('kpi-cash').textContent    = fmtK(cash)
+    $('kpi-cash-sub').textContent = accounts.length + ' account'+(accounts.length!==1?'s':'')
+
+    renderTrendChart(trend)
+  } catch(e) { console.error(e) }
+}
+
+function renderTrendChart(trend) {
+  // Build month buckets for last 6 months
+  const months = []
+  const now = new Date()
+  for (let i=5; i>=0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1)
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`
+    const lbl = d.toLocaleDateString('en-US',{month:'short'})
+    months.push({ key, lbl, income:0, expense:0 })
+  }
+  trend.forEach(r => {
+    const m = months.find(x => x.key === r.month)
+    if (m) r.type==='income' ? (m.income=+r.total) : (m.expense=+r.total)
+  })
+  const maxVal = Math.max(...months.flatMap(m=>[m.income,m.expense]), 1)
+  const pct    = v => Math.max(4, Math.round((v/maxVal)*100))
+
+  $('trend-chart').innerHTML = months.map(m => `
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0">
+      <div style="display:flex;gap:2px;align-items:flex-end;height:90px;width:100%">
+        <div style="flex:1;background:var(--green);border-radius:3px 3px 0 0;height:${pct(m.income)}%;opacity:.85;transition:.4s"></div>
+        <div style="flex:1;background:var(--red);border-radius:3px 3px 0 0;height:${pct(m.expense)}%;opacity:.75;transition:.4s"></div>
+      </div>
+      <div style="font-size:.58rem;color:var(--g3);margin-top:5px">${m.lbl}</div>
+    </div>`).join('')
+}
+
+// ── Recent Transactions ────────────────────────────────────────
+async function loadRecentTx() {
+  try {
+    const r = await fetch(`${API}/api/bookkeeping/transactions?limit=6`, { credentials:'include' })
+    const { transactions: tx = [] } = await r.json()
+    if (!tx.length) {
+      $('recent-tx').innerHTML = `<div style="text-align:center;padding:1.5rem 0">
+        <div style="font-size:.82rem;color:var(--g3)">No transactions yet.</div>
+        <a href="bookkeeping.html" style="font-size:.78rem;color:var(--gold-l);text-decoration:none;margin-top:.4rem;display:block">Add your first →</a>
+      </div>`
+      return
+    }
+    $('recent-tx').innerHTML = tx.map(t => `
+      <div class="row-item">
+        <div style="display:flex;align-items:center;gap:.6rem;min-width:0">
+          <div style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem;
+            background:${t.type==='income'?'var(--green-dim)':'var(--red-dim)'}">
+            ${t.type==='income'?'↑':'↓'}
+          </div>
+          <div style="min-width:0">
+            <div style="font-size:.82rem;font-weight:500;color:var(--g1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">${t.description}</div>
+            <div style="font-size:.68rem;color:var(--g3)">${fmtDate(t.date)} ${t.category_name ? '· '+t.category_name : ''}</div>
+          </div>
+        </div>
+        <div style="font-size:.88rem;font-weight:700;${t.type==='income'?'color:var(--green)':'color:var(--red)'};flex-shrink:0;margin-left:.75rem">
+          ${t.type==='income'?'+':'−'}${fmt(t.amount)}
+        </div>
+      </div>`).join('')
+  } catch(e) {}
+}
+
+// ── Payroll Snapshot ──────────────────────────────────────────
+async function loadPayrollSnap() {
+  try {
+    const [empRes, ytdRes, runRes] = await Promise.all([
+      fetch(`${API}/api/payroll/employees`, { credentials:'include' }),
+      fetch(`${API}/api/payroll/ytd`, { credentials:'include' }),
+      fetch(`${API}/api/payroll/runs`, { credentials:'include' }),
+    ])
+    const { employees = [] } = await empRes.json()
+    const { ytd }            = await ytdRes.json()
+    const { runs = [] }      = await runRes.json()
+    const lastRun = runs[0]
+
+    $('payroll-snap').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+        <div>
+          <div style="font-size:.62rem;color:var(--g3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Active Employees</div>
+          <div style="font-size:1.35rem;font-weight:900;color:#fff">${employees.length}</div>
+          <div style="font-size:.65rem;color:var(--g3)">${employees.filter(e=>e.employment_type==='w2').length} W-2 · ${employees.filter(e=>e.employment_type==='1099').length} 1099</div>
+        </div>
+        <div>
+          <div style="font-size:.62rem;color:var(--g3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">YTD Payroll</div>
+          <div style="font-size:1.1rem;font-weight:900;color:var(--gold-l)">${fmtK(ytd?.gross||0)}</div>
+          <div style="font-size:.65rem;color:var(--g3)">${ytd?.runs||0} approved runs</div>
+        </div>
+      </div>
+      ${lastRun ? `<div style="margin-top:.75rem;padding:.5rem .75rem;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid var(--navy-border);display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:.72rem;color:var(--g3)">Last run: ${new Date(lastRun.pay_date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
+        <span style="font-size:.75rem;font-weight:700;color:var(--green)">${fmt(lastRun.total_net)} net</span>
+      </div>` : `<div style="margin-top:.75rem;text-align:center"><a href="payroll.html" style="font-size:.75rem;color:var(--gold-l);text-decoration:none">Run your first payroll →</a></div>`}`
+  } catch(e) {
+    $('payroll-snap').innerHTML = '<div style="font-size:.78rem;color:var(--g3);text-align:center;padding:.5rem 0">Could not load payroll data.</div>'
+  }
+}
+
+// ── PBX Snapshot ──────────────────────────────────────────────
+async function loadPBXSnap() {
+  try {
+    const [callRes, vmRes, smsRes, numRes] = await Promise.all([
+      fetch(`${API}/api/pbx/calls?limit=100`, { credentials:'include' }),
+      fetch(`${API}/api/pbx/voicemails`, { credentials:'include' }),
+      fetch(`${API}/api/pbx/sms`, { credentials:'include' }),
+      fetch(`${API}/api/pbx/numbers`, { credentials:'include' }),
+    ])
+    const { calls       = [] } = await callRes.json()
+    const { voicemails  = [] } = await vmRes.json()
+    const { messages    = [] } = await smsRes.json()
+    const { numbers     = [] } = await numRes.json()
+    const activeNum = numbers.find(n=>n.status==='active')
+    const todayCalls = calls.filter(c => new Date(c.created_at).toDateString()===new Date().toDateString())
+    const unread  = voicemails.filter(v=>!v.listened).length
+    const unreadSMS = messages.filter(m=>m.direction==='inbound'&&!m.read).length
+
+    $('pbx-snap').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:.65rem">
+        <div style="text-align:center">
+          <div style="font-size:1.25rem;font-weight:900;color:#fff">${todayCalls.length}</div>
+          <div style="font-size:.63rem;color:var(--g3)">Today's calls</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:1.25rem;font-weight:900;${unread>0?'color:var(--amber)':'color:#fff'}">${unread}</div>
+          <div style="font-size:.63rem;color:var(--g3)">New voicemails</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:1.25rem;font-weight:900;${unreadSMS>0?'color:var(--blue)':'color:#fff'}">${unreadSMS}</div>
+          <div style="font-size:.63rem;color:var(--g3)">Unread SMS</div>
+        </div>
+      </div>
+      <div style="padding:.4rem .7rem;background:rgba(255,255,255,.02);border:1px solid var(--navy-border);border-radius:7px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:.7rem;color:var(--g2)">${activeNum ? activeNum.phone_number : 'No number provisioned'}</span>
+        <span class="pill ${activeNum?'pill-green':'pill-amber'}">${activeNum?'Active':'Setup'}</span>
+      </div>`
+  } catch(e) {
+    $('pbx-snap').innerHTML = '<div style="font-size:.78rem;color:var(--g3);text-align:center;padding:.5rem 0">Could not load PBX data.</div>'
+  }
+}
+
+// ── AI Insights (static preview until /api/ai is live) ────────
+function renderAIInsights() {
+  const insights = [
+    { icon:'📈', color:'var(--green)',  text:'Revenue is trending 12% above last month's pace based on current transactions.' },
+    { icon:'⚠️', color:'var(--amber)', text:'3 expense categories exceed budget thresholds — Software & Tools, Marketing.' },
+    { icon:'💡', color:'var(--blue)',   text:'Cash runway estimate: 4.2 months at current burn rate.' },
+  ]
+  $('ai-insights-preview').innerHTML = insights.map(i => `
+    <div class="insight-card">
+      <div style="display:flex;gap:.6rem;align-items:flex-start">
+        <span style="font-size:1rem;flex-shrink:0;margin-top:1px">${i.icon}</span>
+        <p style="font-size:.78rem;color:var(--g2);line-height:1.6;margin:0">${i.text}</p>
+      </div>
+    </div>`).join('')
+}
+
+// ── BizForma Snapshot ──────────────────────────────────────────
+async function loadBizFormaSnap() {
+  try {
+    const r = await fetch(`${API}/api/bizforma/formations`, { credentials:'include' })
+    const { formations = [] } = await r.json()
+    if (!formations.length) {
+      $('bizforma-snap').innerHTML = `
+        <div style="text-align:center;padding:.75rem 0">
+          <div style="font-size:1.75rem;margin-bottom:.5rem">📋</div>
+          <div style="font-size:.82rem;font-weight:600;color:var(--g1);margin-bottom:.3rem">No entity on file</div>
+          <div style="font-size:.72rem;color:var(--g3);margin-bottom:.85rem;line-height:1.5">Register your LLC or Corporation to unlock compliance tracking.</div>
+          <a href="bizforma.html" class="btn-gold" style="font-size:.78rem;padding:.4rem .9rem;text-decoration:none;border-radius:8px">Start Formation →</a>
+        </div>`
+      return
+    }
+    const f = formations[0]
+    $('bizforma-snap').innerHTML = `
+      <div class="module-row">
+        <div class="dot" style="background:var(--green)"></div>
+        <span style="font-size:.82rem;color:var(--g1);font-weight:600">${f.business_name}</span>
+        <span class="pill pill-blue" style="margin-left:auto">${f.entity_type}</span>
+      </div>
+      <div class="module-row">
+        <div class="dot" style="background:var(--g3)"></div>
+        <span style="font-size:.78rem;color:var(--g2)">State: ${f.state_of_formation||'—'}</span>
+      </div>
+      <div class="module-row">
+        <div class="dot" style="background:${f.ein?'var(--green)':'var(--amber)'}"></div>
+        <span style="font-size:.78rem;color:var(--g2)">EIN: ${f.ein||'Pending'}</span>
+        <span class="pill ${f.ein?'pill-green':'pill-amber'}" style="margin-left:auto">${f.ein?'Obtained':'Needed'}</span>
+      </div>
+      <div style="margin-top:.75rem">
+        <a href="bizforma.html" style="font-size:.72rem;color:var(--gold-l);text-decoration:none">View full compliance checklist →</a>
+      </div>`
+  } catch(e) {
+    $('bizforma-snap').innerHTML = '<div style="font-size:.78rem;color:var(--g3);text-align:center;padding:.5rem 0">Could not load entity data.</div>'
+  }
+}
+
+// ── Module Status ─────────────────────────────────────────────
+function renderModuleStatus() {
+  const modules = [
+    { name:'Bookkeeping',  icon:'📒', href:'bookkeeping.html', status:'active'  },
+    { name:'Payroll',      icon:'💳', href:'payroll.html',     status:'active'  },
+    { name:'PBX',          icon:'📞', href:'pbx.html',         status:'active'  },
+    { name:'BizForma',     icon:'📋', href:'bizforma.html',    status:'active'  },
+    { name:'Reports',      icon:'📊', href:'reports.html',     status:'coming'  },
+    { name:'AI Insights',  icon:'✦',  href:'insights.html',    status:'coming'  },
+  ]
+  $('module-status').innerHTML = modules.map(m => `
+    <div class="module-row">
+      <span style="font-size:.88rem">${m.icon}</span>
+      <a href="${m.href}" style="font-size:.8rem;color:var(--g1);text-decoration:none;font-weight:500;flex:1">${m.name}</a>
+      <span class="pill ${m.status==='active'?'pill-green':'pill-amber'}">${m.status==='active'?'Live':'Soon'}</span>
+    </div>`).join('')
+}
+
+// ── Boot ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initGreeting()
+  renderAIInsights()
+  renderModuleStatus()
+  Promise.all([
+    loadFinancials(),
+    loadRecentTx(),
+    loadPayrollSnap(),
+    loadPBXSnap(),
+    loadBizFormaSnap(),
+  ])
+})
+</script>
+<script>
+  const tb = document.getElementById('topbar-date')
+  if (tb) {
+    const n = new Date()
+    tb.textContent = n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})
+  }
+</script>
 </body>
 </html>

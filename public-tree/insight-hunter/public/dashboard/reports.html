@@ -1,13 +1,452 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reports · Insight Hunter</title>
-  <link rel="stylesheet" href="/assets/css/global.css" />
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Reports — Insight Hunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0D1117;--navy-card:#161B22;--navy-mid:#1C2433;--navy-border:#1E2A3A;
+  --gold:#C9972B;--gold-l:#D4A843;--gold-dim:rgba(201,151,43,.12);
+  --g1:#E2E8F0;--g2:#94A3B8;--g3:#64748B;--g4:#2D3748;
+  --green:#10B981;--green-dim:rgba(16,185,129,.1);
+  --red:#EF4444;--red-dim:rgba(239,68,68,.1);
+  --amber:#F59E0B;--amber-dim:rgba(245,158,11,.1);
+  --blue:#3B82F6;--blue-dim:rgba(59,130,246,.1);
+  --purple:#8B5CF6;--purple-dim:rgba(139,92,246,.1);
+}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--g1);margin:0;display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--navy-card);border-right:1px solid var(--navy-border);
+  display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
+.sidebar-logo{display:flex;align-items:center;gap:9px;padding:1.25rem;font-size:.9rem;font-weight:800;
+  letter-spacing:-.02em;border-bottom:1px solid var(--navy-border);color:#fff}
+.nav-section{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--g4);padding:.9rem 1.25rem .35rem}
+.nav-item{display:flex;align-items:center;gap:.65rem;padding:.55rem 1rem;margin:.1rem .6rem;
+  border-radius:8px;font-size:.8rem;color:var(--g2);text-decoration:none;transition:.15s}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--g1)}
+.nav-item.active{background:var(--gold-dim);color:var(--gold-l);font-weight:600}
+.sidebar-bottom{margin-top:auto;padding:.75rem;border-top:1px solid var(--navy-border)}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow-y:auto}
+.top-bar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 1.75rem;
+  border-bottom:1px solid var(--navy-border);position:sticky;top:0;z-index:50;
+  background:rgba(13,17,23,.95);backdrop-filter:blur(14px);flex-shrink:0}
+.content{padding:1.75rem;flex:1}
+.card{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;overflow:hidden;margin-bottom:1.25rem}
+.card-head{padding:.85rem 1.25rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--navy-border)}
+.card-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3)}
+.card-body{padding:1.25rem}
+.kpi-grid{display:grid;gap:1rem;margin-bottom:1.5rem}
+.kpi{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;padding:1.1rem 1.25rem;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.green::before{background:var(--green)}.kpi.red::before{background:var(--red)}
+.kpi.gold::before{background:var(--gold)}.kpi.blue::before{background:var(--blue)}
+.kpi-lbl{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3);margin-bottom:.35rem}
+.kpi-val{font-size:1.55rem;font-weight:900;letter-spacing:-.03em;color:#fff;line-height:1}
+.kpi-sub{font-size:.7rem;color:var(--g3);margin-top:.3rem}
+.btn-gold{background:var(--gold);color:#0D1117;font-weight:700;border:none;border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;padding:.48rem 1rem;transition:.15s;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem}
+.btn-gold:hover{background:var(--gold-l)}
+.btn-ghost{background:none;border:1px solid var(--navy-border);color:var(--g2);border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:.78rem;padding:.42rem .9rem;transition:.15s;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem}
+.btn-ghost:hover{color:var(--g1);border-color:var(--g3)}
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:.63rem;font-weight:700}
+.pill-green{background:var(--green-dim);color:var(--green)}.pill-red{background:var(--red-dim);color:var(--red)}
+.pill-amber{background:var(--amber-dim);color:var(--amber)}.pill-blue{background:var(--blue-dim);color:var(--blue)}
+.pill-purple{background:var(--purple-dim);color:var(--purple)}.pill-gold{background:var(--gold-dim);color:var(--gold-l)}
+.tab-bar{display:flex;border:1px solid var(--navy-border);border-radius:10px;overflow:hidden;width:fit-content;margin-bottom:1.25rem}
+.tab-btn{padding:.52rem 1.2rem;font-size:.8rem;font-weight:600;background:none;color:var(--g2);border:none;cursor:pointer;font-family:'Inter',sans-serif;border-right:1px solid var(--navy-border);transition:.15s;white-space:nowrap}
+.tab-btn:last-child{border:none}
+.tab-btn.active{background:var(--gold-dim);color:var(--gold-l)}
+input,select{background:rgba(255,255,255,.04);border:1px solid var(--navy-border);color:var(--g1);
+  border-radius:8px;padding:.5rem .8rem;font-family:'Inter',sans-serif;font-size:.8rem;outline:none;transition:.2s}
+input:focus,select:focus{border-color:rgba(201,151,43,.45)}
+select option{background:var(--navy-card)}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:.5rem 1rem;text-align:left;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g3);border-bottom:2px solid var(--navy-border)}
+.tbl td{padding:.6rem 1rem;font-size:.8rem;border-bottom:1px solid rgba(30,42,58,.5);vertical-align:middle}
+.tbl tr:last-child td{border:none}
+.tbl tr:hover td{background:rgba(255,255,255,.012)}
+.tbl .total-row td{border-top:2px solid var(--navy-border);font-weight:800;color:#fff;background:rgba(255,255,255,.018);border-bottom:none}
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);
+  background-size:200%;animation:shimmer 1.5s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+.bar-h{display:flex;align-items:center;gap:.65rem;margin-bottom:.55rem}
+.bar-h:last-child{margin-bottom:0}
+.bar-track{flex:1;background:rgba(255,255,255,.05);border-radius:4px;height:7px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:.5s}
+@media print{.sidebar,.top-bar,.no-print{display:none!important}.main{display:block}.content{padding:.5rem}}
+
+@media print{
+  body{background:#fff;color:#000}
+  .sidebar,.top-bar,.no-print{display:none!important}
+  .main{display:block}.content{padding:.5rem}
+  .card{border:1px solid #ddd;break-inside:avoid}
+  .kpi{border:1px solid #ddd}
+  .tbl td,.tbl th{color:#000!important}
+}
+</style>
 </head>
 <body>
-  <!-- Reports -->
-  <script src="/assets/js/utils.js"></script>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#141E30"/>
+    <path d="M16 4v5M13 6h6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M10 9v15h12V9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 24h18" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M13 14l2.5 3L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Insight Hunter
+  </div>
+  <div class="nav-section">Platform</div>
+  <a href="index.html"       class="nav-item "><span style="width:16px;text-align:center">◫</span> Overview</a>
+  <a href="bizforma.html"    class="nav-item "><span style="width:16px;text-align:center">📋</span> BizForma</a>
+  <a href="bookkeeping.html" class="nav-item "><span style="width:16px;text-align:center">📒</span> Bookkeeping</a>
+  <a href="reports.html"     class="nav-item active"><span style="width:16px;text-align:center">📊</span> Reports</a>
+  <a href="forecast.html"    class="nav-item "><span style="width:16px;text-align:center">📈</span> Forecast</a>
+  <a href="insights.html"    class="nav-item "><span style="width:16px;text-align:center">✦</span> AI Insights</a>
+  <div class="nav-section">Business</div>
+  <a href="payroll.html"     class="nav-item "><span style="width:16px;text-align:center">💳</span> Payroll</a>
+  <a href="pbx.html"         class="nav-item "><span style="width:16px;text-align:center">📞</span> PBX</a>
+  <a href="settings.html"    class="nav-item "><span style="width:16px;text-align:center">⚙</span> Settings</a>
+  <div class="sidebar-bottom">
+    <a href="upgrade.html" class="nav-item" style="background:rgba(201,151,43,.07);color:var(--gold-l);font-weight:600"><span style="width:16px;text-align:center">⚡</span> Upgrade Plan</a>
+  </div>
+</aside>
+<div class="main">
+  <div class="top-bar">
+    <span style="font-size:.95rem;font-weight:700;letter-spacing:-.02em;color:#fff">Financial Reports</span>
+    <div style="width:30px;height:30px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(201,151,43,.3);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--gold-l)">U</div>
+  </div>
+  <div class="content">
+
+<!-- Header -->
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+  <div>
+    <div style="font-size:1.35rem;font-weight:900;letter-spacing:-.03em;color:#fff;margin-bottom:.2rem">Financial Reports</div>
+    <div style="font-size:.78rem;color:var(--g3)" id="rpt-sub">Select a period to generate your report.</div>
+  </div>
+  <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center" class="no-print">
+    <select id="rpt-period" onchange="loadAll()" style="min-width:170px">
+      <option value="this-month">This Month</option>
+      <option value="last-month">Last Month</option>
+      <option value="this-quarter">This Quarter</option>
+      <option value="last-quarter">Last Quarter</option>
+      <option value="ytd">Year to Date</option>
+      <option value="custom">Custom Range</option>
+    </select>
+    <span id="custom-dates" style="display:none;gap:.4rem;align-items:center">
+      <input type="date" id="rpt-from" onchange="loadAll()" style="font-size:.78rem;padding:.42rem .7rem;width:135px"/>
+      <span style="font-size:.72rem;color:var(--g3)">to</span>
+      <input type="date" id="rpt-to"   onchange="loadAll()" style="font-size:.78rem;padding:.42rem .7rem;width:135px"/>
+    </span>
+    <button onclick="window.print()" class="btn-ghost">🖨 Print / PDF</button>
+    <button onclick="exportCSV()" class="btn-gold">⬇ Export CSV</button>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:1.5rem">
+  <div class="kpi green"><div class="kpi-lbl">Total Income</div><div class="kpi-val" id="rk-income" style="color:var(--green)">—</div><div class="kpi-sub" id="rk-income-s"></div></div>
+  <div class="kpi red"><div class="kpi-lbl">Total Expenses</div><div class="kpi-val" id="rk-expense" style="color:var(--red)">—</div><div class="kpi-sub" id="rk-expense-s"></div></div>
+  <div class="kpi gold"><div class="kpi-lbl">Net Profit</div><div class="kpi-val" id="rk-net">—</div><div class="kpi-sub" id="rk-margin">—</div></div>
+  <div class="kpi blue"><div class="kpi-lbl">Profit Margin</div><div class="kpi-val" id="rk-margin-pct">—</div><div class="kpi-sub">of revenue</div></div>
+  <div class="kpi" style="border-top-color:var(--purple);border-top:3px solid var(--purple)"><div class="kpi-lbl">Transactions</div><div class="kpi-val" id="rk-tx-count" style="color:var(--purple)">—</div><div class="kpi-sub" id="rk-tx-sub">in period</div></div>
+</div>
+
+<!-- Tabs -->
+<div class="tab-bar no-print">
+  <button class="tab-btn active" id="tab-pnl"     onclick="setTab('pnl')">📋 P&amp;L Statement</button>
+  <button class="tab-btn"        id="tab-income"   onclick="setTab('income')">↑ Income by Category</button>
+  <button class="tab-btn"        id="tab-expense"  onclick="setTab('expense')">↓ Expense by Category</button>
+  <button class="tab-btn"        id="tab-tx"       onclick="setTab('tx')">≡ All Transactions</button>
+  <button class="tab-btn"        id="tab-trend"    onclick="setTab('trend')">📈 Monthly Trend</button>
+</div>
+
+<!-- ── P&L Statement ────────────────────────────────────────── -->
+<div id="panel-pnl">
+  <div class="card">
+    <div class="card-head">
+      <span class="card-label">Profit & Loss Statement</span>
+      <span id="pnl-period-badge" class="pill pill-blue"></span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl" id="pnl-table"><tbody><tr><td colspan="3"><div class="skeleton" style="height:180px;margin:.75rem"></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ── Income by Category ───────────────────────────────────── -->
+<div id="panel-income" style="display:none">
+  <div class="card">
+    <div class="card-head"><span class="card-label">Income by Category</span><span id="income-total-badge" class="pill pill-green"></span></div>
+    <div class="card-body" id="income-chart"></div>
+  </div>
+</div>
+
+<!-- ── Expense by Category ──────────────────────────────────── -->
+<div id="panel-expense" style="display:none">
+  <div class="card">
+    <div class="card-head"><span class="card-label">Expense by Category</span><span id="expense-total-badge" class="pill pill-red"></span></div>
+    <div class="card-body" id="expense-chart"></div>
+  </div>
+</div>
+
+<!-- ── All Transactions ──────────────────────────────────────── -->
+<div id="panel-tx" style="display:none">
+  <div class="card">
+    <div class="card-head">
+      <span class="card-label">All Transactions</span>
+      <span id="tx-badge" class="pill pill-blue"></span>
+    </div>
+    <div style="overflow-x:auto" id="tx-full-table"><div style="padding:1.25rem"><div class="skeleton" style="height:200px"></div></div></div>
+  </div>
+</div>
+
+<!-- ── Monthly Trend ──────────────────────────────────────────── -->
+<div id="panel-trend" style="display:none">
+  <div class="card">
+    <div class="card-head"><span class="card-label">Monthly Trend — Last 12 Months</span></div>
+    <div class="card-body">
+      <div id="trend-labels" style="display:flex;gap:6px;margin-bottom:.5rem"></div>
+      <div id="trend-bars"   style="display:flex;gap:6px;align-items:flex-end;height:160px;margin-bottom:.4rem"></div>
+      <div id="trend-months" style="display:flex;gap:6px"></div>
+      <div style="display:flex;gap:1.25rem;margin-top:.85rem;font-size:.7rem;color:var(--g3)">
+        <span style="display:flex;align-items:center;gap:.35rem"><span style="width:10px;height:10px;border-radius:2px;background:var(--green)"></span>Income</span>
+        <span style="display:flex;align-items:center;gap:.35rem"><span style="width:10px;height:10px;border-radius:2px;background:var(--red)"></span>Expenses</span>
+        <span style="display:flex;align-items:center;gap:.35rem"><span style="width:10px;height:10px;border-radius:2px;background:var(--gold)"></span>Net Profit</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-label">Monthly Breakdown Table</span></div>
+    <div style="overflow-x:auto"><table class="tbl" id="trend-table"></table></div>
+  </div>
+</div>
+
+  </div>
+</div>
+<script>
+const API=''
+const fmt  = n => '$'+(+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+const fmtK = n => { const a=Math.abs(n); return (n<0?'-':'')+(a>=1000?'$'+(a/1000).toFixed(1)+'k':fmt(a)) }
+const $ = id => document.getElementById(id)
+const fmtD = iso => iso ? new Date(iso+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''
+
+let summary={}, trendData=[], allTx=[], fromDate='', toDate=''
+
+// ── Period dates ───────────────────────────────────────────────
+function getPeriodDates(){
+  const now=new Date(), y=now.getFullYear(), m=now.getMonth()
+  const pad=n=>String(n).padStart(2,'0')
+  const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
+  const p=$('rpt-period').value
+  if(p==='this-month')   return{from:`${y}-${pad(m+1)}-01`,to:iso(new Date(y,m+1,0))}
+  if(p==='last-month')   return{from:`${y}-${pad(m)}-01`,to:iso(new Date(y,m,0))}
+  if(p==='this-quarter'){const q=Math.floor(m/3);return{from:iso(new Date(y,q*3,1)),to:iso(new Date(y,q*3+3,0))}}
+  if(p==='last-quarter'){const q=Math.floor(m/3)-1;const aq=q<0?3:q,ay=q<0?y-1:y;return{from:iso(new Date(ay,aq*3,1)),to:iso(new Date(ay,aq*3+3,0))}}
+  if(p==='ytd')          return{from:`${y}-01-01`,to:iso(now)}
+  if(p==='custom')       return{from:$('rpt-from').value,to:$('rpt-to').value}
+  return{from:`${y}-${pad(m+1)}-01`,to:iso(new Date(y,m+1,0))}
+}
+
+// ── Tab ────────────────────────────────────────────────────────
+function setTab(tab){
+  ['pnl','income','expense','tx','trend'].forEach(t=>{
+    const btn=$('tab-'+t),panel=$('panel-'+t)
+    const on=t===tab
+    btn.className='tab-btn'+(on?' active':'')
+    panel.style.display=on?'block':'none'
+  })
+  if(tab==='trend'&&!trendData.length) loadTrend()
+  if(tab==='tx'&&!allTx.length) loadAllTx()
+}
+
+// ── Load all ───────────────────────────────────────────────────
+async function loadAll(){
+  const p=$('rpt-period').value
+  $('custom-dates').style.display=p==='custom'?'flex':'none'
+  const{from,to}=getPeriodDates()
+  if(!from||!to) return
+  fromDate=from; toDate=to
+  $('rpt-sub').textContent=`${fmtD(from)} – ${fmtD(to)}`
+  trendData=[]; allTx=[]
+  await loadSummary(from,to)
+}
+
+async function loadSummary(from,to){
+  try{
+    const r=await fetch(`${API}/api/bookkeeping/summary?from=${from}&to=${to}`,{credentials:'include'})
+    const d=await r.json()
+    summary=d
+    // KPIs
+    $('rk-income').textContent  = fmtK(d.income)
+    $('rk-expense').textContent = fmtK(d.expense)
+    $('rk-net').textContent     = fmtK(d.net)
+    $('rk-net').style.color     = d.net>=0?'var(--green)':'var(--red)'
+    const margin = d.income>0?((d.net/d.income)*100).toFixed(1):'0'
+    $('rk-margin').textContent  = `${margin}% margin`
+    $('rk-margin-pct').textContent = margin+'%'
+    $('rk-margin-pct').style.color = d.net>=0?'var(--green)':'var(--red)'
+    // Tx count
+    const r2=await fetch(`${API}/api/bookkeeping/transactions?limit=1&from=${from}&to=${to}`,{credentials:'include'})
+    const d2=await r2.json()
+    $('rk-tx-count').textContent = d2.total||0
+    $('rk-tx-sub').textContent   = 'in period'
+    $('pnl-period-badge').textContent = `${fmtD(from)} – ${fmtD(to)}`
+    renderPnL(d)
+    renderCategoryCharts(d.by_category||[])
+  }catch(e){console.error(e)}
+}
+
+// ── P&L Table ─────────────────────────────────────────────────
+function renderPnL(d){
+  const cats   = d.by_category||[]
+  const income = cats.filter(c=>c.type==='income')
+  const expense= cats.filter(c=>c.type==='expense')
+  const totalI = income.reduce((s,c)=>s+c.total,0)
+  const totalE = expense.reduce((s,c)=>s+c.total,0)
+  const net    = totalI-totalE
+
+  const incRows = income.length
+    ? income.map(c=>`<tr><td style="padding-left:2rem;color:var(--g2)">${c.name||'Uncategorized'}</td><td></td><td style="text-align:right;color:var(--green);font-weight:600">${fmt(c.total)}</td></tr>`).join('')
+    : `<tr><td colspan="3" style="padding-left:2rem;color:var(--g3);font-size:.75rem">No income recorded for this period.</td></tr>`
+
+  const expRows = expense.length
+    ? expense.map(c=>`<tr><td style="padding-left:2rem;color:var(--g2)">${c.name||'Uncategorized'}</td><td></td><td style="text-align:right;color:var(--red);font-weight:600">(${fmt(c.total)})</td></tr>`).join('')
+    : `<tr><td colspan="3" style="padding-left:2rem;color:var(--g3);font-size:.75rem">No expenses recorded for this period.</td></tr>`
+
+  $('pnl-table').innerHTML=`
+    <thead><tr>
+      <th>Account / Category</th><th></th><th style="text-align:right">Amount</th>
+    </tr></thead><tbody>
+    <tr><td colspan="3" style="padding:.7rem 1rem;background:rgba(255,255,255,.015);font-weight:800;color:#fff;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase">INCOME</td></tr>
+    ${incRows}
+    <tr class="total-row"><td style="padding:.7rem 1rem">Total Income</td><td></td><td style="text-align:right;color:var(--green)">${fmt(totalI)}</td></tr>
+    <tr><td colspan="3" style="height:.75rem;border:none"></td></tr>
+    <tr><td colspan="3" style="padding:.7rem 1rem;background:rgba(255,255,255,.015);font-weight:800;color:#fff;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase">EXPENSES</td></tr>
+    ${expRows}
+    <tr class="total-row"><td style="padding:.7rem 1rem">Total Expenses</td><td></td><td style="text-align:right;color:var(--red)">(${fmt(totalE)})</td></tr>
+    <tr><td colspan="3" style="height:.75rem;border:none"></td></tr>
+    <tr style="background:rgba(201,151,43,.06);border-top:2px solid var(--gold)">
+      <td style="padding:1rem 1rem;font-size:1rem;font-weight:900;color:#fff;border:none">NET PROFIT / LOSS</td>
+      <td style="border:none"></td>
+      <td style="text-align:right;font-size:1rem;font-weight:900;${net>=0?'color:var(--green)':'color:var(--red)'};border:none">${net>=0?fmt(net):'('+fmt(Math.abs(net))+')'}</td>
+    </tr>
+    </tbody>`
+}
+
+// ── Category charts ────────────────────────────────────────────
+function renderCategoryCharts(cats){
+  const income = cats.filter(c=>c.type==='income').sort((a,b)=>b.total-a.total)
+  const expense= cats.filter(c=>c.type==='expense').sort((a,b)=>b.total-a.total)
+  const totalI = income.reduce((s,c)=>s+c.total,0)||1
+  const totalE = expense.reduce((s,c)=>s+c.total,0)||1
+  $('income-total-badge').textContent  = fmt(totalI)
+  $('expense-total-badge').textContent = fmt(totalE)
+  const renderBars=(el,items,total,color)=>{
+    $(el).innerHTML = items.length ? items.map(c=>`
+      <div class="bar-h">
+        <div style="display:flex;align-items:center;gap:.5rem;min-width:0;width:180px">
+          ${c.color?`<span style="width:9px;height:9px;border-radius:50%;background:${c.color};flex-shrink:0"></span>`:''}
+          <span style="font-size:.78rem;color:var(--g2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name||'Uncategorized'}</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round((c.total/total)*100)}%;background:${color}"></div></div>
+        <span style="font-size:.78rem;font-weight:700;${color==='var(--green)'?'color:var(--green)':'color:var(--red)'};min-width:72px;text-align:right">${fmt(c.total)}</span>
+        <span style="font-size:.68rem;color:var(--g3);min-width:35px;text-align:right">${((c.total/total)*100).toFixed(1)}%</span>
+      </div>`).join('')
+    : `<div style="font-size:.8rem;color:var(--g3);text-align:center;padding:1.5rem">No data for this period.</div>`
+  }
+  renderBars('income-chart',  income,  totalI, 'var(--green)')
+  renderBars('expense-chart', expense, totalE, 'var(--red)')
+}
+
+// ── All Transactions ───────────────────────────────────────────
+async function loadAllTx(){
+  try{
+    const{from,to}=getPeriodDates()
+    const r=await fetch(`${API}/api/bookkeeping/transactions?limit=500&from=${from}&to=${to}`,{credentials:'include'})
+    const{transactions:tx=[],total}=await r.json()
+    allTx=tx
+    $('tx-badge').textContent=total+' transactions'
+    $('tx-full-table').innerHTML=tx.length?`<div style="overflow-x:auto"><table class="tbl">
+      <thead><tr>
+        <th>Date</th><th>Description</th><th>Category</th><th>Account</th><th style="text-align:right">Amount</th><th>Type</th>
+      </tr></thead><tbody>
+      ${tx.map(t=>`<tr>
+        <td style="color:var(--g3);white-space:nowrap;font-size:.75rem">${fmtD(t.date)}</td>
+        <td><div style="font-size:.82rem;color:var(--g1);font-weight:500">${t.description}</div>${t.notes?`<div style="font-size:.68rem;color:var(--g3)">${t.notes}</div>`:''}</td>
+        <td>${t.category_color?`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${t.category_color}"></span>${t.category_name||'—'}</span>`:t.category_name||'—'}</td>
+        <td style="font-size:.75rem;color:var(--g3)">${t.account_name||'—'}</td>
+        <td style="text-align:right;font-weight:700;${t.type==='income'?'color:var(--green)':'color:var(--red)'}">${t.type==='income'?'+':'−'}${fmt(t.amount)}</td>
+        <td><span class="pill ${t.type==='income'?'pill-green':'pill-red'}">${t.type}</span></td>
+      </tr>`).join('')}
+      </tbody></table></div>`
+    :`<div style="text-align:center;padding:2.5rem;font-size:.82rem;color:var(--g3)">No transactions in this period.</div>`
+  }catch(e){}
+}
+
+// ── Monthly Trend ──────────────────────────────────────────────
+async function loadTrend(){
+  try{
+    const r=await fetch(`${API}/api/bookkeeping/trend`,{credentials:'include'})
+    const{trend=[]}=await r.json()
+    trendData=trend
+    // Build 12-month buckets
+    const months=[]
+    const now=new Date()
+    for(let i=11;i>=0;i--){
+      const d=new Date(now.getFullYear(),now.getMonth()-i,1)
+      const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`
+      months.push({key,lbl:d.toLocaleDateString('en-US',{month:'short',year:'2-digit'}),income:0,expense:0})
+    }
+    trend.forEach(r=>{const m=months.find(x=>x.key===r.month);if(m)r.type==='income'?(m.income=+r.total):(m.expense=+r.total)})
+    const maxVal=Math.max(...months.flatMap(m=>[m.income,m.expense]),1)
+    const pct=v=>Math.max(2,Math.round((v/maxVal)*100))
+    $('trend-bars').innerHTML=months.map(m=>`
+      <div style="flex:1;display:flex;gap:2px;align-items:flex-end;height:100%">
+        <div style="flex:1;background:var(--green);border-radius:3px 3px 0 0;height:${pct(m.income)}%;opacity:.85;position:relative" title="Income: ${fmt(m.income)}"></div>
+        <div style="flex:1;background:var(--red);border-radius:3px 3px 0 0;height:${pct(m.expense)}%;opacity:.75;position:relative" title="Expense: ${fmt(m.expense)}"></div>
+      </div>`).join('')
+    $('trend-months').innerHTML=months.map(m=>`<div style="flex:1;font-size:.58rem;color:var(--g3);text-align:center;white-space:nowrap;overflow:hidden">${m.lbl}</div>`).join('')
+    // Table
+    $('trend-table').innerHTML=`
+      <thead><tr><th>Month</th><th style="text-align:right">Income</th><th style="text-align:right">Expenses</th><th style="text-align:right">Net Profit</th><th style="text-align:right">Margin</th></tr></thead>
+      <tbody>${months.map(m=>{const net=m.income-m.expense;const mg=m.income>0?((net/m.income)*100).toFixed(1):'—';return`<tr>
+        <td style="font-weight:600;color:#fff">${m.lbl}</td>
+        <td style="text-align:right;color:var(--green)">${fmt(m.income)}</td>
+        <td style="text-align:right;color:var(--red)">${fmt(m.expense)}</td>
+        <td style="text-align:right;font-weight:700;${net>=0?'color:var(--green)':'color:var(--red)'}">${net>=0?fmt(net):'('+fmt(Math.abs(net))+')'}</td>
+        <td style="text-align:right;color:var(--g3)">${mg==='—'?'—':mg+'%'}</td>
+      </tr>`}).join('')}</tbody>`
+  }catch(e){}
+}
+
+// ── Export CSV ─────────────────────────────────────────────────
+function exportCSV(){
+  if(!allTx.length){setTab('tx');loadAllTx().then(()=>setTimeout(doExport,800))}
+  else doExport()
+}
+function doExport(){
+  const hdr='Date,Description,Category,Account,Amount,Type,Reconciled,Notes'
+  const rows=allTx.map(t=>[t.date,`"${t.description}"`,t.category_name||'',t.account_name||'',t.amount,t.type,t.reconciled?'Yes':'No',`"${t.notes||''}"`].join(','))
+  const blob=new Blob([[hdr,...rows].join('\n')],{type:'text/csv'})
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob)
+  a.download=`insighthunter-transactions-${fromDate}-${toDate}.csv`;a.click()
+}
+
+// ── Init ───────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  const now=new Date(),y=now.getFullYear(),m=String(now.getMonth()+1).padStart(2,'0'),last=new Date(y,now.getMonth()+1,0).getDate()
+  $('rpt-from').value=`${y}-${m}-01`
+  $('rpt-to').value=`${y}-${m}-${last}`
+  loadAll()
+})
+$('rpt-period')?.addEventListener('change',()=>{
+  $('custom-dates').style.display=$('rpt-period').value==='custom'?'flex':'none'
+})
+</script>
 </body>
 </html>
