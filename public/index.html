@@ -1,786 +1,853 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Insight Hunter — The Auto-CFO for Your Business</title>
-  <meta name="description" content="Formation · Bookkeeping · Forecasting · Compliance — all in one AI-powered platform for small business." />
-  <link rel="canonical" href="https://insighthunter.com/" />
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/css/main.css" />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insight Hunter — Financial Intelligence Platform</title>
   <style>
-    /* ══════════════════════════════════════════
-       DARK THEME OVERRIDES
-    ══════════════════════════════════════════ */
-    :root {
-      --dark-bg:      #080d1a;
-      --dark-surface: #0e1424;
-      --dark-card:    rgba(255,255,255,0.05);
-      --dark-border:  rgba(255,255,255,0.10);
-      --gold:         #e8a020;
-      --gold-light:   #f5c44a;
-      --gold-dim:     rgba(232,160,32,0.18);
-      --white:        #ffffff;
-      --white-70:     rgba(255,255,255,0.70);
-      --white-45:     rgba(255,255,255,0.45);
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    /* ══════════════════════════════════════════
-       CAROUSEL WRAPPER
-    ══════════════════════════════════════════ */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #080d1a;
+      color: #f1f5f9;
+      overflow-x: hidden;
+    }
+
+    /* ━━━ PARTICLES ━━━ */
+    #particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ━━━ HERO CAROUSEL WRAPPER ━━━ */
+    .hero-carousel-container {
+      position: relative;
+      z-index: 10;
+      margin: 0 auto;
+      padding: 40px 32px;
+      max-width: 1400px;
+      width: 100%;
+    }
+
     .hero-carousel {
-      position: relative; width: 100%; overflow: hidden;
-      background: var(--dark-bg);
-    }
-
-    /* Particle canvas sits behind content */
-    #particles { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-
-    /* ── Slides ── */
-    .carousel-slide {
-      position: absolute; inset: 0; opacity: 0; z-index: 1;
-      transition: opacity 0.8s ease;
-      display: flex; flex-direction: column; min-height: 100vh;
-    }
-    .carousel-slide.active { opacity: 1; z-index: 2; position: relative; }
-
-    /* ── Hero Body (3-col grid) ── */
-    .hero-body {
-      flex: 1; display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center; gap: 2rem;
-      padding: 7rem 5vw 3rem;
-      max-width: 1400px; margin: 0 auto; width: 100%;
-    }
-
-    /* Left column — headline + CTAs */
-    .hero-left { display: flex; flex-direction: column; gap: 1.5rem; }
-
-    .hero-headline {
-      font-size: clamp(2.2rem, 5vw, 3.6rem);
-      font-weight: 900; line-height: 1.1; color: var(--white);
-    }
-    .hero-headline em { font-style: normal; color: var(--gold); }
-
-    .hero-sub {
-      font-size: clamp(0.9rem, 1.5vw, 1.1rem);
-      color: var(--white-70); line-height: 1.65; max-width: 420px;
-    }
-
-    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
-
-    .btn-gold {
-      background: var(--gold); color: #000;
-      font-weight: 700; padding: 0.75rem 1.75rem;
-      border-radius: 8px; font-size: 0.97rem;
-      transition: background 0.2s, transform 0.15s;
-      border: none; cursor: pointer; display: inline-flex; align-items: center;
-    }
-    .btn-gold:hover { background: var(--gold-light); transform: translateY(-2px); }
-
-    .btn-dark-outline {
-      background: transparent; color: var(--white);
-      font-weight: 600; padding: 0.75rem 1.75rem;
-      border-radius: 8px; font-size: 0.97rem;
-      border: 1.5px solid rgba(255,255,255,0.35);
-      transition: border-color 0.2s, transform 0.15s; cursor: pointer;
-      display: inline-flex; align-items: center;
-    }
-    .btn-dark-outline:hover { border-color: #fff; transform: translateY(-2px); }
-
-    /* Center column — Logo */
-    .hero-center { display: flex; flex-direction: column; align-items: center; gap: 1rem; z-index: 1; }
-
-    .ih-logo-mark {
-      width: 110px; height: 110px;
-      filter: drop-shadow(0 0 28px rgba(232,160,32,0.65));
-    }
-    .ih-logo-name { font-size: 1.6rem; font-weight: 800; color: var(--white); text-align: center; }
-    .ih-logo-tag  { font-size: 0.85rem; font-weight: 500; color: var(--gold); letter-spacing: 0.04em; }
-
-    /* Right column — Dashboard mockup */
-    .hero-right { display: flex; justify-content: flex-end; align-items: center; }
-
-    .dash-mockup {
-      width: min(460px, 42vw);
-      background: #0e1628;
-      border: 1.5px solid rgba(232,160,32,0.35);
-      border-radius: 14px;
-      box-shadow: 0 0 60px rgba(232,160,32,0.18), 0 0 120px rgba(232,160,32,0.08);
+      position: relative;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(232, 160, 32, 0.15);
+      border-radius: 20px;
       overflow: hidden;
+      min-height: 500px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .dash-topbar {
-      background: #111928; padding: 0.7rem 1.1rem;
-      display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
+    .carousel-slides {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .dash-title { font-size: 0.82rem; font-weight: 700; color: var(--white); }
-    .dash-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--gold); }
 
-    .dash-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
-
-    /* KPI row */
-    .kpi-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.5rem; }
-    .kpi-box {
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px; padding: 0.65rem 0.75rem;
+    .carousel-slide {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 0.4fr 1.2fr;
+      gap: 2rem;
+      padding: 4rem 3rem;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+      pointer-events: none;
     }
-    .kpi-label { font-size: 0.6rem; color: var(--white-45); margin-bottom: 0.25rem; }
-    .kpi-value { font-size: 1rem; font-weight: 800; color: var(--white); }
-    .kpi-delta { font-size: 0.6rem; color: #4ade80; margin-top: 0.15rem; }
 
-    /* Mini chart */
-    .mini-chart-area {
-      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px; padding: 0.75rem; height: 80px;
-      display: flex; align-items: flex-end; gap: 4px;
+    .carousel-slide.active {
+      opacity: 1;
+      pointer-events: auto;
     }
+
+    .slide-text h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: #f1f5f9;
+    }
+
+    .slide-text p {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .slide-ctas {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: #e8a020;
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: #f0b03f;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(232, 160, 32, 0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #f1f5f9;
+      border: 2px solid #f1f5f9;
+    }
+
+    .btn-outline:hover {
+      background: rgba(241, 245, 249, 0.1);
+      border-color: #e8a020;
+      color: #e8a020;
+    }
+
+    .slide-logo {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .ih-logo {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 0 20px rgba(232, 160, 32, 0.5));
+    }
+
+    .slide-logo p {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      margin: 0;
+    }
+
+    /* ━━━ DASHBOARD MOCKUP ━━━ */
+    .dashboard-mockup {
+      background: rgba(30, 41, 59, 0.6);
+      border: 2px solid #e8a020;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 0 40px rgba(232, 160, 32, 0.15);
+      height: 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+    }
+
+    .dashboard-kpis {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .kpi-chip {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(232, 160, 32, 0.2);
+      border-radius: 8px;
+      padding: 0.8rem;
+    }
+
+    .kpi-label {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .kpi-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #e8a020;
+    }
+
+    .kpi-trend {
+      font-size: 0.7rem;
+      color: #10b981;
+      margin-top: 0.2rem;
+    }
+
+    .dashboard-chart {
+      height: 120px;
+      background: rgba(232, 160, 32, 0.05);
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 0.5rem;
+      gap: 0.3rem;
+    }
+
     .chart-bar {
-      flex: 1; border-radius: 3px 3px 0 0;
-      background: linear-gradient(to top, var(--gold), rgba(232,160,32,0.35));
-      transition: height 0.4s ease;
+      flex: 1;
+      background: linear-gradient(to top, #e8a020, #f0b03f);
+      border-radius: 3px;
+      min-height: 20%;
     }
 
-    /* Status rows */
-    .status-row {
-      display: flex; align-items: center; justify-content: space-between;
-      background: rgba(255,255,255,0.04); border-radius: 6px; padding: 0.5rem 0.7rem;
+    .dashboard-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      padding: 0.5rem 0;
+      border-top: 1px solid rgba(232, 160, 32, 0.1);
     }
-    .status-dot { width: 6px; height: 6px; border-radius: 50%; margin-right: 0.5rem; flex-shrink:0; }
-    .status-dot.green  { background: #4ade80; }
-    .status-dot.gold   { background: var(--gold); }
-    .status-dot.blue   { background: #60a5fa; }
-    .status-label { font-size: 0.65rem; color: var(--white-70); flex:1; display:flex; align-items:center; }
-    .status-val   { font-size: 0.65rem; font-weight: 700; color: var(--white); }
 
-    /* ── Apps Strip ── */
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+    }
+
+    /* ━━━ CHAT MOCKUP ━━━ */
+    .chat-mockup {
+      background: rgba(30, 41, 59, 0.6);
+      border: 2px solid #e8a020;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 0 40px rgba(232, 160, 32, 0.15);
+      height: 380px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #e8a020;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(232, 160, 32, 0.2);
+      padding-bottom: 0.8rem;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .chat-bubble {
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .bubble-user {
+      background: #e8a020;
+      color: #000;
+      align-self: flex-end;
+      max-width: 80%;
+      font-weight: 500;
+    }
+
+    .bubble-ai {
+      background: rgba(232, 160, 32, 0.15);
+      color: #cbd5e1;
+      align-self: flex-start;
+      max-width: 90%;
+      border-left: 2px solid #e8a020;
+    }
+
+    .chat-input {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(232, 160, 32, 0.2);
+      background: rgba(15, 23, 42, 0.8);
+      padding: 0.8rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      border: 1px solid rgba(232, 160, 32, 0.2);
+    }
+
+    /* ━━━ FORECAST MOCKUP ━━━ */
+    .forecast-mockup {
+      background: rgba(30, 41, 59, 0.6);
+      border: 2px solid #e8a020;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 0 40px rgba(232, 160, 32, 0.15);
+      height: 380px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .forecast-header {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #e8a020;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(232, 160, 32, 0.2);
+      padding-bottom: 0.8rem;
+    }
+
+    .forecast-chart {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      gap: 0.4rem;
+    }
+
+    .forecast-bar {
+      flex: 1;
+      background: linear-gradient(to top, #e8a020, #f0b03f);
+      border-radius: 4px;
+      min-height: 15%;
+      position: relative;
+    }
+
+    .forecast-insight {
+      background: rgba(232, 160, 32, 0.1);
+      border-left: 3px solid #e8a020;
+      padding: 0.8rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+    }
+
+    .insight-label {
+      color: #e8a020;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    /* ━━━ CAROUSEL CONTROLS ━━━ */
+    .carousel-controls {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+      z-index: 20;
+    }
+
+    .carousel-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(232, 160, 32, 0.3);
+      border: 1px solid rgba(232, 160, 32, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .carousel-dot.active {
+      background: #e8a020;
+      transform: scale(1.3);
+    }
+
+    .carousel-dot:hover {
+      background: rgba(232, 160, 32, 0.6);
+    }
+
+    .carousel-arrows {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 1rem;
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    .carousel-arrow {
+      background: rgba(232, 160, 32, 0.2);
+      border: 1px solid rgba(232, 160, 32, 0.5);
+      color: #e8a020;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      font-size: 1.2rem;
+    }
+
+    .carousel-arrow:hover {
+      background: #e8a020;
+      color: #000;
+      transform: scale(1.1);
+    }
+
+    /* ━━━ APPS STRIP ━━━ */
     .apps-strip {
-      border-top: 1px solid rgba(255,255,255,0.08);
-      padding: 1.75rem 5vw;
-      display: flex; flex-direction: column; align-items: center; gap: 1.25rem;
+      position: relative;
+      z-index: 10;
+      padding: 3rem 32px;
+      text-align: center;
     }
-    .apps-label { font-size: 0.75rem; font-weight: 700; color: var(--gold); letter-spacing: 0.14em; text-transform: uppercase; }
-    .apps-row { display: flex; gap: 1.25rem; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
-    .app-icon-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; cursor: pointer; }
+
+    .apps-label {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 2rem;
+    }
+
+    .apps-grid {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
     .app-icon {
-      width: 52px; height: 52px; border-radius: 13px;
-      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; transition: background 0.2s, border-color 0.2s, transform 0.15s;
-    }
-    .app-icon:hover { background: var(--gold-dim); border-color: var(--gold); transform: translateY(-3px); }
-    .app-name { font-size: 0.65rem; color: var(--white-70); text-align: center; font-weight: 500; }
-
-    /* ── Slide Dots ── */
-    .carousel-dots {
-      position: absolute; bottom: 1.25rem; left: 50%;
-      transform: translateX(-50%); z-index: 20;
-      display: flex; gap: 0.6rem; align-items: center;
-    }
-    .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: rgba(232,160,32,0.35); cursor: pointer;
-      transition: all 0.3s; border: none;
-    }
-    .dot.active { background: var(--gold); width: 26px; border-radius: 4px; }
-
-    /* ══════════════════════════════════════════
-       DARK NAV OVERRIDE
-    ══════════════════════════════════════════ */
-    .site-nav-dark {
-      position: absolute; top: 0; left: 0; right: 0; z-index: 100;
-      height: 60px; background: transparent;
-    }
-    .nav-inner-dark {
-      max-width: 1400px; margin: 0 auto; padding: 0 5vw;
-      height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 2rem;
-    }
-    .nav-logo-dark { font-size: 1.1rem; font-weight: 800; color: var(--white); }
-    .nav-logo-dark span { color: var(--gold); }
-    .nav-links-dark { display: flex; gap: 1.75rem; font-size: 0.88rem; font-weight: 500; }
-    .nav-links-dark a { color: var(--white-70); transition: color 0.2s; }
-    .nav-links-dark a:hover { color: var(--white); }
-    .nav-links-dark a.active { color: var(--gold); }
-    @media (max-width:768px) { .nav-links-dark { display:none; } }
-
-    /* ══════════════════════════════════════════
-       BELOW FOLD — LIGHT SECTION
-    ══════════════════════════════════════════ */
-    .below-fold { background: var(--dark-surface); }
-
-    .features-dark {
-      padding: 5rem 5vw;
-      max-width: 1400px; margin: 0 auto;
-    }
-    .section-eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
-    .section-heading-dark { font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 800; color: var(--white); margin-bottom: 0.75rem; }
-    .section-sub-dark { color: var(--white-70); font-size: 1rem; max-width: 540px; margin-bottom: 3rem; }
-
-    .features-grid-dark {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem;
-    }
-    .feature-card-dark {
-      background: var(--dark-card); border: 1px solid var(--dark-border);
-      border-radius: 12px; padding: 1.5rem;
-      transition: border-color 0.2s, background 0.2s, transform 0.2s;
-    }
-    .feature-card-dark:hover { border-color: rgba(232,160,32,0.35); background: rgba(232,160,32,0.05); transform: translateY(-3px); }
-    .feature-card-dark .icon { font-size: 1.75rem; margin-bottom: 0.75rem; }
-    .feature-card-dark h3 { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 0.4rem; }
-    .feature-card-dark p  { font-size: 0.85rem; color: var(--white-70); line-height: 1.6; }
-
-    /* Pricing dark */
-    .pricing-dark { padding: 5rem 5vw; border-top: 1px solid rgba(255,255,255,0.07); }
-    .pricing-dark-inner { max-width: 1000px; margin: 0 auto; }
-    .pricing-grid-dark { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 1.25rem; margin-top: 3rem; }
-    .pricing-card-dark {
-      background: var(--dark-card); border: 1px solid var(--dark-border);
-      border-radius: 12px; padding: 1.75rem;
-    }
-    .pricing-card-dark.featured { border-color: var(--gold); background: rgba(232,160,32,0.07); }
-    .pricing-card-dark .plan-name  { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.75rem; }
-    .pricing-card-dark .plan-price { font-size: 2.5rem; font-weight: 800; color: var(--white); line-height: 1; }
-    .pricing-card-dark .plan-price sup { font-size: 1rem; vertical-align: top; margin-top: 0.4rem; }
-    .pricing-card-dark .plan-period { font-size: 0.8rem; color: var(--white-45); margin-bottom: 1.25rem; }
-    .pricing-card-dark hr { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 1rem 0; }
-    .plan-feat { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.85rem; color: var(--white-70); margin-bottom: 0.5rem; }
-    .plan-feat .ck { color: #4ade80; flex-shrink: 0; }
-    .plan-feat .dd { color: var(--white-45); flex-shrink: 0; }
-
-    /* CTA dark */
-    .cta-dark {
-      padding: 5rem 5vw; text-align: center;
-      border-top: 1px solid rgba(255,255,255,0.07);
-    }
-    .cta-dark h2 { font-size: clamp(1.75rem,4vw,2.5rem); font-weight: 800; color: var(--white); margin-bottom: 1rem; }
-    .cta-dark p  { color: var(--white-70); max-width: 480px; margin: 0 auto 2.5rem; font-size: 1.05rem; }
-
-    /* Footer dark */
-    .footer-dark {
-      padding: 3rem 5vw 2rem;
-      border-top: 1px solid rgba(255,255,255,0.07);
-    }
-    .footer-dark-grid { display: grid; grid-template-columns: 2fr repeat(3,1fr); gap: 3rem; margin-bottom: 3rem; }
-    @media(max-width:768px){ .footer-dark-grid{grid-template-columns:1fr 1fr;} }
-    @media(max-width:480px){ .footer-dark-grid{grid-template-columns:1fr;} }
-    .footer-dark .brand-desc { font-size: 0.85rem; color: var(--white-45); margin-top: 0.75rem; max-width: 220px; line-height: 1.6; }
-    .footer-dark h4 { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
-    .footer-dark ul { display: flex; flex-direction: column; gap: 0.6rem; }
-    .footer-dark a { font-size: 0.85rem; color: var(--white-45); transition: color 0.2s; }
-    .footer-dark a:hover { color: var(--white); }
-    .footer-dark-bottom {
-      border-top: 1px solid rgba(255,255,255,0.07); padding-top: 1.25rem;
-      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
-      font-size: 0.8rem; color: var(--white-45);
+      width: 80px;
+      height: 80px;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(232, 160, 32, 0.2);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
     }
 
-    /* Responsive */
-    @media (max-width: 900px) {
-      .hero-body { grid-template-columns: 1fr; text-align: center; padding: 6rem 1.5rem 2rem; }
-      .hero-left { align-items: center; }
-      .hero-sub { max-width: 100%; }
-      .hero-center { order: -1; }
-      .hero-right { display: none; }
-      .dash-mockup { display: none; }
+    .app-icon:hover {
+      background: rgba(232, 160, 32, 0.15);
+      border-color: #e8a020;
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(232, 160, 32, 0.2);
     }
-    @media (max-width: 480px) {
-      .apps-row { gap: 0.75rem; }
-      .app-icon { width: 44px; height: 44px; font-size: 1.1rem; }
-      .app-name { font-size: 0.58rem; }
+
+    .app-label {
+      position: absolute;
+      bottom: -24px;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      white-space: nowrap;
+    }
+
+    /* ━━━ RESPONSIVE ━━━ */
+    @media (max-width: 1024px) {
+      .carousel-slide {
+        grid-template-columns: 1fr;
+        padding: 2rem;
+        min-height: 600px;
+      }
+
+      .slide-text h1 {
+        font-size: 1.8rem;
+      }
+
+      .dashboard-mockup,
+      .chat-mockup,
+      .forecast-mockup {
+        height: 300px;
+      }
+
+      .apps-grid {
+        gap: 1rem;
+      }
+
+      .app-icon {
+        width: 70px;
+        height: 70px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-carousel-container {
+        padding: 20px 16px;
+      }
+
+      .carousel-slide {
+        padding: 1.5rem 1rem;
+        min-height: 700px;
+      }
+
+      .slide-text h1 {
+        font-size: 1.5rem;
+      }
+
+      .slide-text p {
+        font-size: 0.9rem;
+      }
+
+      .btn {
+        padding: 10px 18px;
+        font-size: 0.85rem;
+      }
+
+      .dashboard-mockup,
+      .chat-mockup,
+      .forecast-mockup {
+        height: 250px;
+      }
+
+      .apps-grid {
+        gap: 0.8rem;
+      }
+
+      .app-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
-<body style="background: var(--dark-bg, #080d1a); margin:0">
-
-<!-- ════════════════════════════════════════════════════
-     DARK NAV (absolute, overlays carousel)
-════════════════════════════════════════════════════ -->
-<nav class="site-nav-dark">
-  <div class="nav-inner-dark">
-    <a href="/" class="nav-logo-dark">Insight<span>Hunter</span></a>
-    <ul class="nav-links-dark">
-      <li><a href="/features/">Features</a></li>
-      <li><a href="/pricing.html">Pricing</a></li>
-      <li><a href="/blog/">Blog</a></li>
-      <li><a href="/contact.html">Contact</a></li>
-    </ul>
-    <div style="display:flex;gap:0.75rem;align-items:center">
-      <a href="/auth/login.html"    style="font-size:0.88rem;font-weight:600;color:rgba(255,255,255,0.7);padding:0.5rem 1rem">Log In</a>
-      <a href="/auth/register.html" class="btn-gold" style="padding:0.5rem 1.25rem;font-size:0.88rem">Get Started Free</a>
-    </div>
-  </div>
-</nav>
-
-<!-- ════════════════════════════════════════════════════
-     HERO CAROUSEL
-════════════════════════════════════════════════════ -->
-<div class="hero-carousel" id="carousel">
+<body>
   <canvas id="particles"></canvas>
 
-  <!-- ── SLIDE 1: Main Hero ───────────────────────────────── -->
-  <div class="carousel-slide active" id="slide-0">
-    <div class="hero-body">
-
-      <!-- Left -->
-      <div class="hero-left">
-        <h1 class="hero-headline">The Auto-CFO for<br><em>Your Business</em></h1>
-        <p class="hero-sub">Formation · Bookkeeping · Forecasting · Compliance — all in one AI-powered platform built for small business.</p>
-        <div class="hero-btns">
-          <a href="/auth/register.html" class="btn-gold">Get Started Free</a>
-          <a href="#demo" class="btn-dark-outline">View Demo</a>
-        </div>
-      </div>
-
-      <!-- Center Logo -->
-      <div class="hero-center">
-        <svg class="ih-logo-mark" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          </defs>
-          <!-- Torch body -->
-          <rect x="48" y="52" width="14" height="36" rx="4" fill="#e8a020" opacity="0.9"/>
-          <!-- Torch head -->
-          <path d="M35 52 Q55 15 75 52 Z" fill="#e8a020"/>
-          <!-- Flame inner -->
-          <path d="M45 50 Q55 28 65 50 Q60 40 55 45 Q50 40 45 50Z" fill="#f5c44a" filter="url(#glow)"/>
-          <!-- IH letters on torch -->
-          <text x="41" y="72" font-family="Arial" font-weight="900" font-size="13" fill="#000" opacity="0.7">IH</text>
-          <!-- Vertical lines below torch -->
-          <rect x="44" y="88" width="5" height="10" rx="2" fill="#e8a020" opacity="0.6"/>
-          <rect x="52" y="86" width="5" height="12" rx="2" fill="#e8a020" opacity="0.9"/>
-          <rect x="60" y="88" width="5" height="10" rx="2" fill="#e8a020" opacity="0.6"/>
-        </svg>
-        <div class="ih-logo-name">Insight Hunter</div>
-        <div class="ih-logo-tag">Auto-CFO Platform</div>
-      </div>
-
-      <!-- Right — Dashboard Mockup -->
-      <div class="hero-right">
-        <div class="dash-mockup">
-          <div class="dash-topbar">
-            <span class="dash-title">Dashboard</span>
-            <div style="display:flex;align-items:center;gap:0.5rem">
-              <span style="font-size:0.6rem;color:rgba(255,255,255,0.5)">John's Biz</span>
-              <div class="dash-avatar"></div>
+  <div class="hero-carousel-container">
+    <div class="hero-carousel">
+      <div class="carousel-slides">
+        <!-- SLIDE 1: DASHBOARD -->
+        <div class="carousel-slide active">
+          <div class="slide-text">
+            <h1>Financial Intelligence Platform</h1>
+            <p>Formation · Bookkeeping · Forecasting · Compliance — all in one platform.</p>
+            <div class="slide-ctas">
+              <button class="btn btn-primary">Get Started Free</button>
+              <button class="btn btn-outline">View Demo</button>
             </div>
           </div>
-          <div class="dash-body">
-            <!-- KPI row -->
-            <div class="kpi-row">
-              <div class="kpi-box">
+          <div class="slide-logo">
+            <svg class="ih-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              <rect x="30" y="20" width="60" height="80" fill="#e8a020" filter="url(#glow)" rx="6"/>
+              <polygon points="45,40 60,55 75,40" fill="#080d1a"/>
+              <polygon points="45,65 60,80 75,65" fill="#080d1a"/>
+            </svg>
+            <p>Insight Hunter</p>
+          </div>
+          <div class="dashboard-mockup">
+            <div class="dashboard-header">
+              <span>📊 Financial Dashboard</span>
+              <span>Status: Active ✓</span>
+            </div>
+            <div class="dashboard-kpis">
+              <div class="kpi-chip">
                 <div class="kpi-label">Revenue</div>
-                <div class="kpi-value">$13.1K</div>
-                <div class="kpi-delta">↑ 12.4%</div>
+                <div class="kpi-value">\$1.3B</div>
+                <div class="kpi-trend">↑ 12.5%</div>
               </div>
-              <div class="kpi-box">
-                <div class="kpi-label">Net Income</div>
-                <div class="kpi-value">$11.9K</div>
-                <div class="kpi-delta">↑ 8.2%</div>
-              </div>
-              <div class="kpi-box">
-                <div class="kpi-label">Margin</div>
-                <div class="kpi-value">1.9%</div>
-                <div class="kpi-delta" style="color:#facc15">→ Flat</div>
+              <div class="kpi-chip">
+                <div class="kpi-label">Cash Flow</div>
+                <div class="kpi-value">\$118K</div>
+                <div class="kpi-trend">↑ 8.2%</div>
               </div>
             </div>
-            <!-- Chart label -->
-            <div style="font-size:0.6rem;color:rgba(255,255,255,0.4);margin-bottom:-0.4rem">Cash Flow Forecast</div>
-            <!-- Mini bar chart -->
-            <div class="mini-chart-area">
-              <div class="chart-bar" style="height:45%"></div>
-              <div class="chart-bar" style="height:60%"></div>
-              <div class="chart-bar" style="height:40%"></div>
-              <div class="chart-bar" style="height:75%"></div>
-              <div class="chart-bar" style="height:55%"></div>
-              <div class="chart-bar" style="height:85%"></div>
-              <div class="chart-bar" style="height:65%"></div>
-              <div class="chart-bar" style="height:90%;background:linear-gradient(to top,#f5c44a,rgba(245,196,74,0.5))"></div>
-              <div class="chart-bar" style="height:70%;opacity:0.5"></div>
-              <div class="chart-bar" style="height:80%;opacity:0.4"></div>
+            <div class="dashboard-chart">
+              <div class="chart-bar" style="height: 65%;"></div>
+              <div class="chart-bar" style="height: 80%;"></div>
+              <div class="chart-bar" style="height: 55%;"></div>
+              <div class="chart-bar" style="height: 90%;"></div>
+              <div class="chart-bar" style="height: 70%;"></div>
             </div>
-            <!-- Status rows -->
-            <div class="status-row">
-              <div class="status-dot green"></div>
-              <div class="status-label">Payroll processed</div>
-              <div class="status-val">✓ On time</div>
+            <div class="dashboard-row">
+              <span>Accounts</span>
+              <span class="status-badge status-active">Synced</span>
             </div>
-            <div class="status-row">
-              <div class="status-dot gold"></div>
-              <div class="status-label">Q1 tax filing</div>
-              <div class="status-val">Due in 12d</div>
-            </div>
-            <div class="status-row">
-              <div class="status-dot blue"></div>
-              <div class="status-label">AI CFO insight</div>
-              <div class="status-val">New →</div>
+            <div class="dashboard-row">
+              <span>Next Filing</span>
+              <span>Mar 25</span>
             </div>
           </div>
         </div>
-      </div>
 
-    </div>
-
-    <!-- Apps Strip -->
-    <div class="apps-strip">
-      <div class="apps-label">Included Apps</div>
-      <div class="apps-row">
-        <a href="/features/bizforma.html"         class="app-icon-wrap"><div class="app-icon">🏢</div><span class="app-name">BizForma</span></a>
-        <a href="/features/bookkeeping.html"       class="app-icon-wrap"><div class="app-icon">📒</div><span class="app-name">Bookkeeping</span></a>
-        <a href="/features/insight-lite.html"      class="app-icon-wrap"><div class="app-icon">💡</div><span class="app-name">Insight Lite</span></a>
-        <a href="/features/insight-standard.html"  class="app-icon-wrap"><div class="app-icon">📈</div><span class="app-name">Insight Standard</span></a>
-        <a href="/features/insight-pro.html"       class="app-icon-wrap"><div class="app-icon">🧠</div><span class="app-name">Insight Pro</span></a>
-        <a href="/features/scout.html"             class="app-icon-wrap"><div class="app-icon">🔍</div><span class="app-name">Scout</span></a>
-        <a href="/features/pbx.html"               class="app-icon-wrap"><div class="app-icon">📞</div><span class="app-name">PBX</span></a>
-        <a href="/features/payroll.html"           class="app-icon-wrap"><div class="app-icon">💼</div><span class="app-name">Payroll</span></a>
-        <a href="/features/website-services.html"  class="app-icon-wrap"><div class="app-icon">🌐</div><span class="app-name">Website Services</span></a>
-      </div>
-    </div>
-  </div><!-- /slide-0 -->
-
-  <!-- ── SLIDE 2: AI CFO Chat ──────────────────────────────── -->
-  <div class="carousel-slide" id="slide-1">
-    <div class="hero-body">
-      <div class="hero-left">
-        <h1 class="hero-headline">Your<br><em>AI CFO.</em><br>Ask Anything.</h1>
-        <p class="hero-sub">Real answers from real data. <em style="color:rgba(255,255,255,0.85)">"Am I on track to hit $200k?" "Which client is most profitable?" "Can I afford to hire?"</em> — instant answers, every time.</p>
-        <div class="hero-btns">
-          <a href="/auth/register.html" class="btn-gold">Try AI Chat Free</a>
-          <a href="/features/insight-pro.html" class="btn-dark-outline">Learn More</a>
-        </div>
-      </div>
-      <div class="hero-center">
-        <svg class="ih-logo-mark" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="55" cy="55" r="40" fill="rgba(232,160,32,0.1)" stroke="#e8a020" stroke-width="1.5"/>
-          <text x="38" y="65" font-family="Arial" font-weight="900" font-size="28" fill="#e8a020">AI</text>
-          <circle cx="55" cy="55" r="48" fill="none" stroke="rgba(232,160,32,0.2)" stroke-width="1"/>
-        </svg>
-        <div class="ih-logo-name">AI CFO Chat</div>
-        <div class="ih-logo-tag">Powered by Llama 3.3</div>
-      </div>
-      <div class="hero-right">
-        <div class="dash-mockup" style="padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem">
-          <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);padding-bottom:0.5rem;border-bottom:1px solid rgba(255,255,255,0.07)">AI CFO Chat</div>
-          <!-- Chat bubbles -->
-          <div style="background:rgba(255,255,255,0.06);border-radius:10px 10px 10px 2px;padding:0.65rem 0.85rem;font-size:0.72rem;color:rgba(255,255,255,0.8);max-width:90%">
-            Am I on track to hit $200k revenue this year?
-          </div>
-          <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.2);border-radius:10px 10px 2px 10px;padding:0.65rem 0.85rem;font-size:0.72rem;color:rgba(255,255,255,0.85);align-self:flex-end;max-width:95%">
-            📊 Based on your last 6 months, you're trending at <strong style="color:#f5c44a">$187k</strong>. You need <strong style="color:#f5c44a">$2,750/mo</strong> more to hit $200k. March is your best month historically — you're on track. ✅
-          </div>
-          <div style="background:rgba(255,255,255,0.06);border-radius:10px 10px 10px 2px;padding:0.65rem 0.85rem;font-size:0.72rem;color:rgba(255,255,255,0.8);max-width:90%">
-            Which expense category grew the most this quarter?
-          </div>
-          <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.2);border-radius:10px 10px 2px 10px;padding:0.65rem 0.85rem;font-size:0.72rem;color:rgba(255,255,255,0.85);align-self:flex-end;max-width:95%">
-            💡 <strong style="color:#f5c44a">Software subscriptions</strong> grew 34% QoQ, now $1,240/mo. Consider auditing unused tools.
-          </div>
-          <!-- Input bar -->
-          <div style="display:flex;gap:0.5rem;margin-top:0.25rem">
-            <div style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.65rem;color:rgba(255,255,255,0.3)">Ask your CFO...</div>
-            <div style="background:var(--gold);border-radius:6px;width:28px;display:flex;align-items:center;justify-content:center;font-size:0.75rem">→</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="apps-strip">
-      <div class="apps-label">Included Apps</div>
-      <div class="apps-row">
-        <a href="/features/bizforma.html"         class="app-icon-wrap"><div class="app-icon">🏢</div><span class="app-name">BizForma</span></a>
-        <a href="/features/bookkeeping.html"       class="app-icon-wrap"><div class="app-icon">📒</div><span class="app-name">Bookkeeping</span></a>
-        <a href="/features/insight-lite.html"      class="app-icon-wrap"><div class="app-icon">💡</div><span class="app-name">Insight Lite</span></a>
-        <a href="/features/insight-standard.html"  class="app-icon-wrap"><div class="app-icon">📈</div><span class="app-name">Insight Standard</span></a>
-        <a href="/features/insight-pro.html"       class="app-icon-wrap"><div class="app-icon">🧠</div><span class="app-name">Insight Pro</span></a>
-        <a href="/features/scout.html"             class="app-icon-wrap"><div class="app-icon">🔍</div><span class="app-name">Scout</span></a>
-        <a href="/features/pbx.html"               class="app-icon-wrap"><div class="app-icon">📞</div><span class="app-name">PBX</span></a>
-        <a href="/features/payroll.html"           class="app-icon-wrap"><div class="app-icon">💼</div><span class="app-name">Payroll</span></a>
-        <a href="/features/website-services.html"  class="app-icon-wrap"><div class="app-icon">🌐</div><span class="app-name">Website Services</span></a>
-      </div>
-    </div>
-  </div><!-- /slide-1 -->
-
-  <!-- ── SLIDE 3: Forecasting ──────────────────────────────── -->
-  <div class="carousel-slide" id="slide-2">
-    <div class="hero-body">
-      <div class="hero-left">
-        <h1 class="hero-headline">See Your<br><em>Cash Flow</em><br>Before It Happens.</h1>
-        <p class="hero-sub">AI-generated forecasts built on your actual transaction history. Know your cash position 1–12 months ahead — with plain-English explanations.</p>
-        <div class="hero-btns">
-          <a href="/auth/register.html" class="btn-gold">Start Forecasting Free</a>
-          <a href="/features/forecast.html" class="btn-dark-outline">See How It Works</a>
-        </div>
-      </div>
-      <div class="hero-center">
-        <svg class="ih-logo-mark" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="10" y="70" width="8" height="25" rx="2" fill="#e8a020" opacity="0.5"/>
-          <rect x="24" y="58" width="8" height="37" rx="2" fill="#e8a020" opacity="0.7"/>
-          <rect x="38" y="48" width="8" height="47" rx="2" fill="#e8a020" opacity="0.85"/>
-          <rect x="52" y="35" width="8" height="60" rx="2" fill="#e8a020"/>
-          <rect x="66" y="42" width="8" height="53" rx="2" fill="#e8a020" opacity="0.6" stroke-dasharray="3"/>
-          <rect x="80" y="30" width="8" height="65" rx="2" fill="#e8a020" opacity="0.4"/>
-          <rect x="94" y="22" width="8" height="73" rx="2" fill="#e8a020" opacity="0.25"/>
-          <polyline points="14,70 28,58 42,48 56,35 70,42 84,30 98,22" stroke="#f5c44a" stroke-width="2" fill="none" stroke-dasharray="4 2" opacity="0.8"/>
-        </svg>
-        <div class="ih-logo-name">Cash Flow Forecast</div>
-        <div class="ih-logo-tag">1–12 Month Projections</div>
-      </div>
-      <div class="hero-right">
-        <div class="dash-mockup">
-          <div class="dash-topbar">
-            <span class="dash-title">6-Month Forecast</span>
-            <span style="font-size:0.6rem;color:#4ade80">● Live</span>
-          </div>
-          <div class="dash-body">
-            <div style="font-size:0.62rem;color:rgba(255,255,255,0.4);margin-bottom:-0.25rem">Projected Cash Position</div>
-            <div class="mini-chart-area" style="height:100px">
-              <div class="chart-bar" style="height:55%"></div>
-              <div class="chart-bar" style="height:70%"></div>
-              <div class="chart-bar" style="height:65%"></div>
-              <div class="chart-bar" style="height:80%"></div>
-              <div class="chart-bar" style="height:75%"></div>
-              <div class="chart-bar" style="height:90%"></div>
-              <div class="chart-bar" style="height:85%;opacity:0.5;border:1px dashed rgba(232,160,32,0.4)"></div>
-              <div class="chart-bar" style="height:95%;opacity:0.4"></div>
+        <!-- SLIDE 2: ASK AI -->
+        <div class="carousel-slide">
+          <div class="slide-text">
+            <h1>Ask Your AI Finance Advisor</h1>
+            <p>Real-time answers about cash flow, forecasts, tax strategy, and compliance. Natural language. Instant insights.</p>
+            <div class="slide-ctas">
+              <button class="btn btn-primary">Get Started Free</button>
+              <button class="btn btn-outline">View Demo</button>
             </div>
-            <div class="kpi-row">
-              <div class="kpi-box"><div class="kpi-label">Apr</div><div class="kpi-value" style="font-size:0.85rem">$18.2K</div><div class="kpi-delta">↑ proj</div></div>
-              <div class="kpi-box"><div class="kpi-label">May</div><div class="kpi-value" style="font-size:0.85rem">$21.5K</div><div class="kpi-delta">↑ proj</div></div>
-              <div class="kpi-box"><div class="kpi-label">Jun</div><div class="kpi-value" style="font-size:0.85rem">$24.1K</div><div class="kpi-delta">↑ proj</div></div>
+          </div>
+          <div class="slide-logo">
+            <svg class="ih-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              <rect x="30" y="20" width="60" height="80" fill="#e8a020" filter="url(#glow)" rx="6"/>
+              <polygon points="45,40 60,55 75,40" fill="#080d1a"/>
+              <polygon points="45,65 60,80 75,65" fill="#080d1a"/>
+            </svg>
+            <p>Insight Hunter</p>
+          </div>
+          <div class="chat-mockup">
+            <div class="chat-header">💬 AI Finance Advisor</div>
+            <div class="chat-messages">
+              <div class="chat-bubble bubble-user">What's my 90-day cash forecast?</div>
+              <div class="chat-bubble bubble-ai">Based on historical patterns and pending invoices, you'll have \$145K in 90 days. Your burn rate suggests a 14-month runway.</div>
+              <div class="chat-bubble bubble-user">Should I hire now?</div>
+              <div class="chat-bubble bubble-ai">Recommended: Wait 60 days for Q2 revenue confirmation. Current margins are 32%; hiring now reduces that to 18%.</div>
             </div>
-            <div style="background:rgba(232,160,32,0.1);border:1px solid rgba(232,160,32,0.2);border-radius:8px;padding:0.65rem;font-size:0.65rem;color:rgba(255,255,255,0.8)">
-              🧠 <strong style="color:#f5c44a">AI Insight:</strong> Based on seasonality, June is projected to be your strongest month. Consider pre-paying annual subscriptions before July.
+            <input type="text" class="chat-input" placeholder="Type a question...">
+          </div>
+        </div>
+
+        <!-- SLIDE 3: FORECAST -->
+        <div class="carousel-slide">
+          <div class="slide-text">
+            <h1>See Cash Flow Before It Happens</h1>
+            <p>Predictive models powered by 100k+ business datasets. Know your runway. Plan with confidence.</p>
+            <div class="slide-ctas">
+              <button class="btn btn-primary">Get Started Free</button>
+              <button class="btn btn-outline">View Demo</button>
+            </div>
+          </div>
+          <div class="slide-logo">
+            <svg class="ih-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              <rect x="30" y="20" width="60" height="80" fill="#e8a020" filter="url(#glow)" rx="6"/>
+              <polygon points="45,40 60,55 75,40" fill="#080d1a"/>
+              <polygon points="45,65 60,80 75,65" fill="#080d1a"/>
+            </svg>
+            <p>Insight Hunter</p>
+          </div>
+          <div class="forecast-mockup">
+            <div class="forecast-header">📈 12-Month Cash Forecast</div>
+            <div class="forecast-chart">
+              <div class="forecast-bar" style="height: 72%;"></div>
+              <div class="forecast-bar" style="height: 78%;"></div>
+              <div class="forecast-bar" style="height: 85%;"></div>
+              <div class="forecast-bar" style="height: 82%;"></div>
+              <div class="forecast-bar" style="height: 88%;"></div>
+              <div class="forecast-bar" style="height: 92%;"></div>
+            </div>
+            <div class="forecast-insight">
+              <div class="insight-label">💡 Insight</div>
+              <div>Q3 shows 18% growth. Optimal hiring window: July–August. Budget reserve: \$50K.</div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="apps-strip">
-      <div class="apps-label">Included Apps</div>
-      <div class="apps-row">
-        <a href="/features/bizforma.html"         class="app-icon-wrap"><div class="app-icon">🏢</div><span class="app-name">BizForma</span></a>
-        <a href="/features/bookkeeping.html"       class="app-icon-wrap"><div class="app-icon">📒</div><span class="app-name">Bookkeeping</span></a>
-        <a href="/features/insight-lite.html"      class="app-icon-wrap"><div class="app-icon">💡</div><span class="app-name">Insight Lite</span></a>
-        <a href="/features/insight-standard.html"  class="app-icon-wrap"><div class="app-icon">📈</div><span class="app-name">Insight Standard</span></a>
-        <a href="/features/insight-pro.html"       class="app-icon-wrap"><div class="app-icon">🧠</div><span class="app-name">Insight Pro</span></a>
-        <a href="/features/scout.html"             class="app-icon-wrap"><div class="app-icon">🔍</div><span class="app-name">Scout</span></a>
-        <a href="/features/pbx.html"               class="app-icon-wrap"><div class="app-icon">📞</div><span class="app-name">PBX</span></a>
-        <a href="/features/payroll.html"           class="app-icon-wrap"><div class="app-icon">💼</div><span class="app-name">Payroll</span></a>
-        <a href="/features/website-services.html"  class="app-icon-wrap"><div class="app-icon">🌐</div><span class="app-name">Website Services</span></a>
+
+      <!-- ARROWS -->
+      <div class="carousel-arrows">
+        <button class="carousel-arrow" id="prev-slide">‹</button>
+        <button class="carousel-arrow" id="next-slide">›</button>
       </div>
-    </div>
-  </div><!-- /slide-2 -->
 
-  <!-- Dots -->
-  <div class="carousel-dots">
-    <button class="dot active" data-slide="0" aria-label="Slide 1"></button>
-    <button class="dot" data-slide="1" aria-label="Slide 2"></button>
-    <button class="dot" data-slide="2" aria-label="Slide 3"></button>
-  </div>
-</div><!-- /hero-carousel -->
-
-<!-- ════════════════════════════════════════════════════
-     BELOW FOLD
-════════════════════════════════════════════════════ -->
-<div class="below-fold">
-
-  <!-- Features -->
-  <div class="features-dark">
-    <div class="section-eyebrow">Everything included</div>
-    <div class="section-heading-dark">Nine Tools. One Dashboard. One Price.</div>
-    <div class="section-sub-dark">Stop stitching together six different apps. Insight Hunter replaces them all.</div>
-    <div class="features-grid-dark">
-      <a href="/features/bookkeeping.html"      style="text-decoration:none"><div class="feature-card-dark"><div class="icon">📒</div><h3>Bookkeeping</h3><p>Double-entry accounting, real-time P&L, and bank reconciliation — your books always current.</p></div></a>
-      <a href="/features/insight-pro.html"      style="text-decoration:none"><div class="feature-card-dark"><div class="icon">🧠</div><h3>AI CFO Chat</h3><p>Ask anything, get real answers from your real data in seconds. Powered by Llama 3.3.</p></div></a>
-      <a href="/features/forecast.html"         style="text-decoration:none"><div class="feature-card-dark"><div class="icon">🔮</div><h3>Cash Flow Forecast</h3><p>AI projections 1–12 months ahead. Know before surprises happen.</p></div></a>
-      <a href="/features/payroll.html"          style="text-decoration:none"><div class="feature-card-dark"><div class="icon">💼</div><h3>Payroll</h3><p>W-2 and 1099 payroll in minutes. Tax withholding, direct deposit, year-end reports.</p></div></a>
-      <a href="/features/bizforma.html"         style="text-decoration:none"><div class="feature-card-dark"><div class="icon">🏢</div><h3>BizForma</h3><p>Form your LLC or Corp. EIN, state registration, compliance calendar — all guided.</p></div></a>
-      <a href="/features/pbx.html"              style="text-decoration:none"><div class="feature-card-dark"><div class="icon">📞</div><h3>Business PBX</h3><p>Virtual phone system with numbers, routing, voicemail transcription, and SMS.</p></div></a>
-      <a href="/features/scout.html"            style="text-decoration:none"><div class="feature-card-dark"><div class="icon">🔍</div><h3>Scout</h3><p>Find any contract, invoice, or document instantly with plain-English search.</p></div></a>
-      <a href="/features/reports.html"          style="text-decoration:none"><div class="feature-card-dark"><div class="icon">📊</div><h3>Reports</h3><p>P&L, Balance Sheet, Cash Flow Statement, trends. Export to PDF or CSV.</p></div></a>
-      <a href="/features/website-services.html" style="text-decoration:none"><div class="feature-card-dark"><div class="icon">🌐</div><h3>Website Services</h3><p>Business landing pages hosted on Cloudflare's global edge. Included on Pro.</p></div></a>
-    </div>
-  </div>
-
-  <!-- Pricing -->
-  <div class="pricing-dark">
-    <div class="pricing-dark-inner">
-      <div class="section-eyebrow" style="text-align:center">Simple, transparent pricing</div>
-      <div class="section-heading-dark" style="text-align:center">Plans for Every Stage</div>
-      <div class="section-sub-dark" style="text-align:center;margin:0 auto 3rem">Start free. Upgrade when your business grows. Cancel any time.</div>
-      <div class="pricing-grid-dark">
-        <div class="pricing-card-dark">
-          <div class="plan-name">Free</div>
-          <div class="plan-price">$<span style="font-size:1.1rem">0</span></div>
-          <div class="plan-period">Forever free</div>
-          <hr>
-          <div class="plan-feat"><span class="ck">✓</span>100 transactions/mo</div>
-          <div class="plan-feat"><span class="ck">✓</span>Bookkeeping + reports</div>
-          <div class="plan-feat"><span class="dd">—</span>AI CFO chat</div>
-          <div class="plan-feat"><span class="dd">—</span>Forecasting</div>
-          <a href="/auth/register.html" class="btn-dark-outline" style="width:100%;margin-top:1rem;justify-content:center">Get Started</a>
-        </div>
-        <div class="pricing-card-dark">
-          <div class="plan-name">Starter</div>
-          <div class="plan-price">$<span style="font-size:1.1rem">29</span><sup style="font-size:0.8rem">/mo</sup></div>
-          <div class="plan-period">For growing solopreneurs</div>
-          <hr>
-          <div class="plan-feat"><span class="ck">✓</span>1,000 transactions/mo</div>
-          <div class="plan-feat"><span class="ck">✓</span>500 AI questions/mo</div>
-          <div class="plan-feat"><span class="ck">✓</span>Cash flow forecast</div>
-          <div class="plan-feat"><span class="dd">—</span>PBX + Payroll</div>
-          <a href="/auth/register.html" class="btn-dark-outline" style="width:100%;margin-top:1rem;justify-content:center">Start Free Trial</a>
-        </div>
-        <div class="pricing-card-dark featured">
-          <div class="plan-name">Pro ⭐</div>
-          <div class="plan-price">$<span style="font-size:1.1rem">79</span><sup style="font-size:0.8rem">/mo</sup></div>
-          <div class="plan-period">Most popular</div>
-          <hr>
-          <div class="plan-feat"><span class="ck">✓</span>Unlimited transactions</div>
-          <div class="plan-feat"><span class="ck">✓</span>Unlimited AI chat</div>
-          <div class="plan-feat"><span class="ck">✓</span>PBX + Payroll + Scout</div>
-          <div class="plan-feat"><span class="ck">✓</span>Website Services</div>
-          <a href="/auth/register.html" class="btn-gold" style="width:100%;margin-top:1rem;justify-content:center">Start Free Trial</a>
-        </div>
-        <div class="pricing-card-dark">
-          <div class="plan-name">Enterprise</div>
-          <div class="plan-price">$<span style="font-size:1.1rem">199</span><sup style="font-size:0.8rem">/mo</sup></div>
-          <div class="plan-period">For firms + fractional CFOs</div>
-          <hr>
-          <div class="plan-feat"><span class="ck">✓</span>Everything on Pro</div>
-          <div class="plan-feat"><span class="ck">✓</span>Multi-entity support</div>
-          <div class="plan-feat"><span class="ck">✓</span>White-label API</div>
-          <div class="plan-feat"><span class="ck">✓</span>Priority support</div>
-          <a href="/contact.html" class="btn-dark-outline" style="width:100%;margin-top:1rem;justify-content:center">Talk to Sales</a>
-        </div>
+      <!-- DOTS -->
+      <div class="carousel-controls">
+        <div class="carousel-dot active" data-slide="0"></div>
+        <div class="carousel-dot" data-slide="1"></div>
+        <div class="carousel-dot" data-slide="2"></div>
       </div>
     </div>
   </div>
 
-  <!-- CTA -->
-  <div class="cta-dark">
-    <h2>Ready to stop flying blind?</h2>
-    <p>Your business deserves a CFO. Start with our free plan — no credit card required.</p>
-    <a href="/auth/register.html" class="btn-gold" style="font-size:1.05rem;padding:0.85rem 2.25rem">Create Free Account →</a>
+  <!-- APPS STRIP -->
+  <div class="apps-strip">
+    <p class="apps-label">Included Apps</p>
+    <div class="apps-grid">
+      <div class="app-icon">📋<span class="app-label">BizForma</span></div>
+      <div class="app-icon">📚<span class="app-label">Bookkeeping</span></div>
+      <div class="app-icon">📊<span class="app-label">Insight Lite</span></div>
+      <div class="app-icon">IH<span class="app-label">Insight Standard</span></div>
+      <div class="app-icon">👑<span class="app-label">Insight Pro</span></div>
+      <div class="app-icon">🔍<span class="app-label">Scout</span></div>
+      <div class="app-icon">📞<span class="app-label">PBX</span></div>
+      <div class="app-icon">💼<span class="app-label">Payroll</span></div>
+      <div class="app-icon">🌐<span class="app-label">Website Services</span></div>
+    </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="footer-dark">
-    <div class="footer-dark-grid">
-      <div>
-        <span style="font-size:1.15rem;font-weight:800;color:#fff">Insight<span style="color:#e8a020">Hunter</span></span>
-        <p class="brand-desc">The Auto-CFO for freelancers, small firms, and fractional CFOs. Built on Cloudflare's global edge.</p>
-      </div>
-      <div>
-        <h4>Product</h4>
-        <ul>
-          <li><a href="/features/bookkeeping.html">Bookkeeping</a></li>
-          <li><a href="/features/payroll.html">Payroll</a></li>
-          <li><a href="/features/bizforma.html">BizForma</a></li>
-          <li><a href="/features/pbx.html">PBX</a></li>
-          <li><a href="/pricing.html">Pricing</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Resources</h4>
-        <ul>
-          <li><a href="/blog/">Blog</a></li>
-          <li><a href="/features/">Features</a></li>
-          <li><a href="/contact.html">Contact</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Legal</h4>
-        <ul>
-          <li><a href="/legal/privacy/index.html">Privacy</a></li>
-          <li><a href="/legal/terms/index.html">Terms</a></li>
-          <li><a href="/legal/sms-optin/index.html">SMS Opt-In</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-dark-bottom">
-      <span>© 2026 Insight Hunter. All rights reserved.</span>
-      <span>Built on <a href="https://workers.cloudflare.com" target="_blank" style="color:#e8a020">Cloudflare Workers</a></span>
-    </div>
-  </footer>
-</div>
+  <script>
+    // ━━━ PARTICLE SYSTEM ━━━
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-<!-- ════════════════════════════════════════════════════
-     SCRIPTS
-════════════════════════════════════════════════════ -->
-<script>
-/* ── Particle background ──────────────────────────────── */
-(function () {
-  const canvas = document.getElementById('particles');
-  const ctx = canvas.getContext('2d');
-  let W, H, particles = [];
+    const particles = [];
+    const particleCount = 180;
 
-  function resize() {
-    W = canvas.width  = canvas.offsetWidth;
-    H = canvas.height = document.getElementById('carousel').offsetHeight;
-  }
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 1) * 0.8;
+        this.radius = Math.random() * 1.5 + 0.5;
+        this.opacity = Math.random() * 0.5 + 0.3;
+        this.color = Math.random() > 0.5 ? '#e8a020' : '#f1f5f9';
+      }
 
-  function rand(min, max) { return Math.random() * (max - min) + min; }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy -= 0.02;
+        if (this.y > canvas.height) {
+          this.y = -10;
+          this.x = Math.random() * canvas.width;
+        }
+      }
 
-  function make() {
-    return {
-      x: rand(0, W), y: rand(0, H),
-      r: rand(0.5, 2.5),
-      vx: rand(-0.3, 0.3), vy: rand(-0.4, -0.1),
-      alpha: rand(0.2, 0.8),
-      gold: Math.random() > 0.6,
-    };
-  }
+      draw() {
+        ctx.globalAlpha = this.opacity;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
 
-  function init() {
-    resize();
-    particles = Array.from({ length: 180 }, make);
-  }
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
 
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    particles.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = p.gold
-        ? `rgba(232,160,32,${p.alpha})`
-        : `rgba(255,255,255,${p.alpha * 0.5})`;
-      ctx.fill();
-      p.x += p.vx; p.y += p.vy;
-      p.alpha -= 0.001;
-      if (p.y < -5 || p.alpha <= 0) Object.assign(p, make(), { y: H + 5 });
+    function animateParticles() {
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = '#080d1a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     });
-    requestAnimationFrame(draw);
-  }
 
-  window.addEventListener('resize', resize);
-  init(); draw();
-})();
+    // ━━━ CAROUSEL ━━━
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.carousel-dot');
 
-/* ── Carousel ─────────────────────────────────────────── */
-(function () {
-  const slides = document.querySelectorAll('.carousel-slide');
-  const dots   = document.querySelectorAll('.dot');
-  let cur = 0, timer;
-  const total = slides.length;
+    function showSlide(n) {
+      slides.forEach(s => s.classList.remove('active'));
+      dots.forEach(d => d.classList.remove('active'));
+      slides[n].classList.add('active');
+      dots[n].classList.add('active');
+    }
 
-  const show = (n) => {
-    slides[cur].classList.remove('active');
-    dots[cur].classList.remove('active');
-    cur = (n + total) % total;
-    slides[cur].classList.add('active');
-    dots[cur].classList.add('active');
-  };
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }
 
-  const reset = () => { clearInterval(timer); timer = setInterval(() => show(cur + 1), 9000); };
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+      showSlide(currentSlide);
+    }
 
-  dots.forEach((d, i) => d.addEventListener('click', () => { show(i); reset(); }));
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight') { show(cur + 1); reset(); }
-    if (e.key === 'ArrowLeft')  { show(cur - 1); reset(); }
-  });
-  reset();
-})();
-</script>
+    document.getElementById('next-slide').addEventListener('click', nextSlide);
+    document.getElementById('prev-slide').addEventListener('click', prevSlide);
+    dots.forEach((dot, idx) => {
+      dot.addEventListener('click', () => {
+        currentSlide = idx;
+        showSlide(currentSlide);
+      });
+    });
 
+    // Auto-rotate every 9 seconds
+    setInterval(nextSlide, 9000);
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+    });
+  </script>
 </body>
 </html>
+
