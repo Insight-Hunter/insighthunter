@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Formation Started — Insight Hunter</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0D1117;--card:#161B22;--border:#1E2A3A;--gold:#C9972B;--gold-l:#D4A843;--green:#10B981;--g2:#94A3B8;--g3:#64748B;--white:#FFF}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;
+  background:radial-gradient(ellipse 60% 40% at 50% 10%,rgba(16,185,129,.06),transparent 60%),var(--navy)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:3rem 2.5rem;max-width:500px;width:100%;text-align:center}
+.icon{width:64px;height:64px;border-radius:50%;background:rgba(16,185,129,.1);border:2px solid rgba(16,185,129,.3);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.75rem}
+h1{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.6rem}
+.sub{font-size:.875rem;color:var(--g2);line-height:1.7;margin-bottom:2rem}
+.upgrade-badge{background:rgba(201,151,43,.08);border:1px solid rgba(201,151,43,.25);border-radius:12px;
+  padding:1rem 1.25rem;margin-bottom:1.75rem;text-align:left}
+.upgrade-badge .label{font-size:.65rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem}
+.upgrade-badge .value{font-size:1rem;font-weight:700;color:var(--white)}
+.upgrade-badge .note{font-size:.72rem;color:var(--g3);margin-top:.2rem}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn{display:block;width:100%;padding:.75rem;border-radius:10px;background:var(--gold);color:var(--navy);
+  font-size:.95rem;font-weight:700;cursor:pointer;border:none;transition:.2s}
+.btn:hover{background:var(--gold-l)}
+.btn-ghost{display:block;width:100%;padding:.65rem;border-radius:10px;background:none;border:1px solid var(--border);
+  color:var(--g2);font-size:.875rem;margin-top:.75rem;cursor:pointer;transition:.2s}
+.btn-ghost:hover{border-color:var(--gold-d);color:var(--white)}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon" id="icon"><div class="spinner" id="spinner"></div></div>
+  <h1 id="title">Confirming payment...</h1>
+  <p class="sub" id="sub">We're verifying your payment and setting up your account. This takes just a moment.</p>
+
+  <div class="upgrade-badge" id="upgrade-badge" style="display:none">
+    <div class="label">🎉 Plan Upgraded</div>
+    <div class="value">Insight Standard — 6 Months Free</div>
+    <div class="note">Expires <span id="expiry-date">—</span> · Then $79/mo or downgrade to Free</div>
+  </div>
+
+  <div id="actions" style="display:none">
+    <button class="btn" onclick="window.location='/dashboard/bizforma.html'">Go to BizForma Dashboard →</button>
+    <button class="btn-ghost" onclick="window.location='/dashboard/index.html'">Back to Dashboard</button>
+  </div>
+</div>
+
+<script>
+const API = '/api'
+async function pollStatus() {
+  for (let i = 0; i < 12; i++) {  // Poll up to 60s (5s × 12)
+    await new Promise(r => setTimeout(r, 5000))
+    try {
+      const res  = await fetch(API + '/bizforma/order-status', { credentials: 'include' })
+      const data = await res.json()
+      if (data.order?.status === 'paid') {
+        // Success!
+        document.getElementById('icon').textContent = '🎉'
+        document.getElementById('title').textContent = 'Formation Started!'
+        document.getElementById('sub').textContent = "Your LLC formation is underway. We've upgraded your account to Insight Standard — free for 6 months."
+        document.getElementById('upgrade-badge').style.display = 'block'
+        if (data.order.plan_expires) {
+          document.getElementById('expiry-date').textContent =
+            new Date(data.order.plan_expires).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        }
+        document.getElementById('actions').style.display = 'block'
+        document.getElementById('spinner') && document.getElementById('icon').querySelector('.spinner')?.remove()
+        return
+      }
+    } catch (e) { console.error(e) }
+  }
+  // Timeout fallback
+  document.getElementById('icon').textContent = '✓'
+  document.getElementById('title').textContent = 'Payment Received'
+  document.getElementById('sub').textContent = "Your payment was received. Your formation is being processed — check your dashboard in a few minutes."
+  document.getElementById('actions').style.display = 'block'
+}
+pollStatus()
+</script>
+</body>
+</html>

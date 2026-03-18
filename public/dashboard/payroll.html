@@ -98,6 +98,9 @@ label.field-label{display:block;font-size:.68rem;font-weight:600;color:var(--g2)
 .step-label{font-size:.65rem;font-weight:600;color:var(--g3);text-align:center}
 .step.active .step-label{color:var(--gold-l)}
 </style>
+<!-- Add to EVERY dashboard/*.html and auth/*.html <head> -->
+  <script src="/js/api.js"></script> <!-- shared API client --> 
+  <script src="/auth/guard.js"></script> <!-- session check -->
 </head>
 <body>
 <aside class="sidebar">
