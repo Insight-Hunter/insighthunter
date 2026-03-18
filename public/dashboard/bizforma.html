@@ -74,6 +74,29 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 @media(max-width:1024px){.kpi-row{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){.sidebar{display:none}.dash-main{margin-left:0}.grid-2{grid-template-columns:1fr}}
 </style>
+<!-- 1. Shared API client (relative URLs — no domain needed) -->
+<script src="/js/api.js"></script>
+
+<!-- 2. Auth guard — redirects to login if session expired -->
+<script src="/auth/guard.js"></script>
+
+<!-- 3. Page-specific script — uses window.api.* -->
+<script>
+  // Example: dashboard/bookkeeping.html
+  document.addEventListener('DOMContentLoaded', async () => {
+    const from = '2026-01-01';
+    const to   = '2026-03-18';
+
+    try {
+      const summary = await api.summary(from, to);
+      document.getElementById('revenue').textContent  = '$' + summary.revenue.toLocaleString();
+      document.getElementById('expenses').textContent = '$' + summary.expenses.toLocaleString();
+      document.getElementById('net').textContent      = '$' + summary.netIncome.toLocaleString();
+    } catch (err) {
+      console.error('Failed to load summary:', err.message);
+    }
+  });
+</script>
 </head>
 <body>
 <nav>
@@ -91,9 +114,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
   <div class="sidebar-label">Menu</div><a href="/dashboard/index.html"><svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a><a href="/dashboard/bizforma.html" class="active"><svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2zM17 21v-8H7v8M7 3v5h8"/></svg>BizForma</a><a href="/dashboard/bookkeeping.html"><svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2zM8 7h8M8 11h5"/></svg>Bookkeeping</a><a href="/dashboard/reports.html"><svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Reports</a><a href="/dashboard/forecast.html"><svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>Forecast</a><a href="/dashboard/insights.html"><svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>Insights</a>
   <div class="sidebar-label">Account</div><a href="/dashboard/settings.html"><svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a><a href="/dashboard/upgrade.html"><svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>Upgrade</a>
   <div style="margin-top:auto;padding-top:1rem;border-top:1px solid var(--navy-border)">
-    <button onclick="IH.logout()" style="width:100%;display:flex;align-items:center;gap:.5rem;padding:.5rem .65rem;background:none;border:none;cursor:pointer;font-size:.75rem;color:var(--g3);border-radius:6px;transition:.15s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--g3)'">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign Out
-    </button>
+    <!-- LOGOUT button anywhere on page -->
+<script src="/auth/logout.js"></script>
+<button onclick="logout()">Log Out</button>
   </div>
 </aside>
   <main class="dash-main">
@@ -114,8 +137,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="/auth/guard.js"></script>
-<script src="/auth/logout.js"></script>
+
+
 <script>
 const API = '/api'
 function toast(msg, type='success') {
@@ -129,4 +152,3 @@ function fmtDate(d) { return new Date(d).toLocaleDateString('en-US',{month:'shor
 
 </body>
 </html>
-
