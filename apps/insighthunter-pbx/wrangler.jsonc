@@ -1,0 +1,51 @@
+
+{
+  "name": "insighthunter-pbx",
+  "main": "src/backend/index.ts",
+  "compatibility_date": "2024-03-18",
+  "vars": {
+    "JWT_SECRET": "your-jwt-secret"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "SESSIONS",
+      "id": "your-kv-namespace-id",
+      "preview_id": "your-kv-namespace-preview-id"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "VOICEMAILS",
+      "bucket_name": "insighthunter-voicemails",
+      "preview_bucket_name": "insighthunter-voicemails-preview"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter-pbx-main",
+      "database_id": "your-d1-database-id",
+      "preview_database_id": "your-d1-preview-database-id",
+      "migrations_dir": "db/migrations"
+    }
+  ],
+  "queues": {
+    "producers": [
+      {
+        "queue": "notifications",
+        "binding": "NOTIFICATIONS_QUEUE"
+      }
+    ]
+  },
+  "ai": [
+    {
+      "binding": "AI"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "PBX_ROOM", "class_name": "PBXRoom" },
+      { "name": "CALL_SESSION", "class_name": "CallSession" }
+    ]
+  }
+}

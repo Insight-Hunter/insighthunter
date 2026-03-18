@@ -1,132 +1,57 @@
-# packages/agents/wrangler.toml
-
-name                = "insighthunter-agents"
-main                = "./src/index.ts"
-compatibility_date  = "2025-04-01"
+name = "insighthunter-ai"
+main = "src/index.ts"
+compatibility_date = "2025-11-01"
 compatibility_flags = ["nodejs_compat"]
 
-workers_dev = false
+[observability]
+enabled = true
+head_sampling_rate = 1
 
-# ─── Routes ──────────────────────────────────────────────────────────────────
-routes = [
-  { pattern = "agents.insighthunter.app", custom_domain = true }
-]
-
-# ─── CFO Agent Durable Object ─────────────────────────────────────────────────
-[durable_objects]
-bindings = [
-  { name = "CFO_AGENT", class_name = "CfoAgent" }
-]
-
-[[migrations]]
-tag                = "v1"
-new_sqlite_classes = ["CfoAgent"]
-
-# ─── Service Bindings ─────────────────────────────────────────────────────────
-[[services]]
-binding = "AUTH_WORKER"
-service = "insighthunter-auth"
-
-# ─── Workers AI ──────────────────────────────────────────────────────────────
 [ai]
 binding = "AI"
 
-# ─── Vectorize ───────────────────────────────────────────────────────────────
 [[vectorize]]
-binding    = "VECTORIZE"
-index_name = "insighthunter-embeddings"
+binding = "VECTORS"
+index_name = "insighthunter-insights"
 
-# ─── KV (session validation + plan cache) ────────────────────────────────────
 [[kv_namespaces]]
-binding    = "CACHE"
-id         = "af7391791e95423b82c1cd877c0992e3"
-preview_id = "af7391791e95423b82c1cd877c0992e3"
+binding = "SESSIONS"
+id = "REPLACE_WITH_SESSIONS_KV_ID"
+preview_id = "REPLACE_WITH_SESSIONS_KV_PREVIEW_ID"
 
-# ─── Analytics Engine ────────────────────────────────────────────────────────
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-main"
+database_id = "REPLACE_WITH_D1_ID"
+migrations_dir = "../../apps/insighthunter-api/migrations"
+
+[durable_objects]
+bindings = [
+  { name = "AI_SESSION", class_name = "AISession", script_name = "insighthunter-ai" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["AISession"]
+
 [[analytics_engine_datasets]]
-binding = "EVENTS"
+binding = "ANALYTICS"
 dataset = "insighthunter_events"
 
-# ─── Observability ───────────────────────────────────────────────────────────
-[observability]
-enabled            = true
-head_sampling_rate = 1
-
-# ─── Vars ─────────────────────────────────────────────────────────────────────
 [vars]
 ENVIRONMENT = "production"
-SITE_URL    = "https://insighthunter.app"
-AI_MODEL    = "@cf/meta/llama-3.1-8b-instruct"
-AI_MODEL_PRO = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+ALLOWED_ORIGINS = "https://insighthunter.com,https://app.insighthunter.com"
+CHAT_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+EMBED_MODEL = "@cf/baai/bge-large-en-v1.5"
+SUMMARY_MODEL = "@cf/meta/llama-3.1-8b-instruct"
+MAX_TOKENS = "1024"
+HISTORY_LIMIT = "20"
+FREE_CHAT_LIMIT = "10"
+PRO_CHAT_LIMIT = "500"
 
-# Secrets → npx wrangler secret put <NAME>
-#   OPENAI_API_KEY          (fallback if Workers AI insufficient)
-#   AI_GATEWAY_URL          (optional — Cloudflare AI Gateway)
+[env.preview]
+name = "insighthunter-ai-preview"
 
-# ─── Staging ──────────────────────────────────────────────────────────────────
-[env.staging]
-name               = "insighthunter-agents-staging"
-compatibility_date = "2025-04-01"
-workers_dev        = true
-
-[env.staging.durable_objects]
-bindings = [{ name = "CFO_AGENT", class_name = "CfoAgent" }]
-
-[[env.staging.migrations]]
-tag                = "v1"
-new_sqlite_classes = ["CfoAgent"]
-
-[[env.staging.services]]
-binding = "AUTH_WORKER"
-service = "insighthunter-auth"
-
-[[env.staging.vectorize]]
-binding    = "VECTORIZE"
-index_name = "insighthunter-embeddings-staging"
-
-[[env.staging.kv_namespaces]]
-binding    = "CACHE"
-id         = "af7391791e95423b82c1cd877c0992e3"
-preview_id = "af7391791e95423b82c1cd877c0992e3"
-
-[[env.staging.analytics_engine_datasets]]
-binding = "EVENTS"
-dataset = "insighthunter_events_staging"
-
-[env.staging.vars]
-ENVIRONMENT  = "staging"
-SITE_URL     = "https://staging.insighthunter.app"
-AI_MODEL     = "@cf/meta/llama-3.1-8b-instruct"
-AI_MODEL_PRO = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
-
-# ─── Dev ──────────────────────────────────────────────────────────────────────
-[env.dev]
-name               = "insighthunter-agents-dev"
-compatibility_date = "2025-04-01"
-workers_dev        = true
-
-[env.dev.durable_objects]
-bindings = [{ name = "CFO_AGENT", class_name = "CfoAgent" }]
-
-[[env.dev.migrations]]
-tag                = "v1"
-new_sqlite_classes = ["CfoAgent"]
-
-[[env.dev.services]]
-binding = "AUTH_WORKER"
-service = "insighthunter-auth"
-
-[[env.dev.kv_namespaces]]
-binding    = "CACHE"
-id         = "af7391791e95423b82c1cd877c0992e3"
-preview_id = "af7391791e95423b82c1cd877c0992e3"
-
-[[env.dev.analytics_engine_datasets]]
-binding = "EVENTS"
-dataset = "insighthunter_events_dev"
-
-[env.dev.vars]
-ENVIRONMENT  = "dev"
-SITE_URL     = "http://localhost:8787"
-AI_MODEL     = "@cf/meta/llama-3.1-8b-instruct"
-AI_MODEL_PRO = "@cf/meta/llama-3.1-8b-instruct"
+[env.preview.vars]
+ENVIRONMENT = "preview"
+ALLOWED_ORIGINS = "https://preview.insighthunter.com"
