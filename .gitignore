@@ -33,3 +33,15 @@ Thumbs.db
 .env
 .env.production
 secrets.json
+
+.dev.vars
+.env
+.env.local
+.env.production
+.wrangler/
+node_modules/
+dist/
+.astro/
+.cache/
+*.log
+.DS_Store

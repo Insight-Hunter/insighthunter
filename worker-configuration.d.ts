@@ -10,7 +10,7 @@ declare namespace Cloudflare {
 		DB: D1Database;
 		ASSETS: Fetcher;
 		ENVIRONMENT: "preview";
-		APP_URL: "https://preview.insighthunter.com";
+		APP_URL: "https://preview.insighthunter.app";
 		TWILIO_ACCOUNT_SID: string;
 		TWILIO_AUTH_TOKEN: string;
 		TWILIO_PHONE_NUMBER: string;
@@ -73,7 +73,7 @@ declare namespace Cloudflare {
 		DB?: D1Database;
 		ASSETS: Fetcher;
 		ENVIRONMENT: "preview" | "development" | "production";
-		APP_URL: "https://preview.insighthunter.com" | "http://localhost:8787" | "https://app.insighthunter.com";
+		APP_URL: "https://preview.insighthunter.app" | "http://localhost:8787" | "https://app.insighthunter.app";
 		TWILIO_ACCOUNT_SID: string;
 		TWILIO_AUTH_TOKEN: string;
 		TWILIO_PHONE_NUMBER: string;
@@ -116,7 +116,7 @@ declare namespace Cloudflare {
 		EXPORT_QUEUE?: Queue;
 		AI?: Ai;
 		APP_NAME?: "Insight Hunter";
-		ALLOWED_ORIGINS?: "https://insighthunter.com,https://app.insighthunter.com";
+		ALLOWED_ORIGINS?: "https://insighthunter.app,https://app.insighthunter.app";
 		SESSION_TTL_SECONDS?: "86400";
 		MAX_UPLOAD_MB?: "25";
 		PLAN_FREE_TX_LIMIT?: "100";

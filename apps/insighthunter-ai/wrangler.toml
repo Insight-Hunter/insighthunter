@@ -40,7 +40,7 @@ dataset = "insighthunter_events"
 
 [vars]
 ENVIRONMENT = "production"
-ALLOWED_ORIGINS = "https://insighthunter.com,https://app.insighthunter.com"
+ALLOWED_ORIGINS = "https://insighthunter.app,https://app.insighthunter.app"
 CHAT_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 EMBED_MODEL = "@cf/baai/bge-large-en-v1.5"
 SUMMARY_MODEL = "@cf/meta/llama-3.1-8b-instruct"
@@ -54,4 +54,4 @@ name = "insighthunter-ai-preview"
 
 [env.preview.vars]
 ENVIRONMENT = "preview"
-ALLOWED_ORIGINS = "https://preview.insighthunter.com"
+ALLOWED_ORIGINS = "https://preview.insighthunter.app"

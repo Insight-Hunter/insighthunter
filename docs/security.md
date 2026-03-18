@@ -20,7 +20,7 @@ Key properties:
 
 Access Policy:
 Allow emails from:
-*@insighthunter.com
+*@insighthunter.app
 
 ------------------------------------------------------------
 2. Data Storage

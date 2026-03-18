@@ -3,7 +3,7 @@ import type { User, AccessTokenPayload } from "../../src/types";
 export const mockUser: User = {
   id:             "user-test-001",
   org_id:         "org-test-001",
-  email:          "test@insighthunter.com",
+  email:          "test@insighthunter.app",
   name:           "Test User",
   password_hash:  "pbkdf2:100000:abc123salt:abc123hash",
   role:           "owner",

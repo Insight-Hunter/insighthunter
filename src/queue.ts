@@ -20,7 +20,7 @@ async function handleEmail(body: any, env: Env) {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      from:    'Insight Hunter <noreply@insighthunter.com>',
+      from:    'Insight Hunter <noreply@insighthunter.app>',
       to:      [body.email],
       subject: body.type === 'weekly_summary' ? 'Your Weekly Financial Summary' :
                body.type === 'monthly_report' ? 'Your Monthly P&L Report is Ready' :
@@ -48,6 +48,6 @@ function buildEmailHTML(body: any): string {
     <p>${body.type === 'weekly_summary' ? 'Your weekly financial summary is ready. Log in to view your full report.' :
         body.type === 'monthly_report'  ? 'Your monthly P&L report has been generated.' :
         `Your compliance item "<strong>${body.item}</strong>" is due on ${body.due}.`}</p>
-    <a href="https://app.insighthunter.com" style="display:inline-block;background:#C9972B;color:#0D1117;padding:.65rem 1.25rem;border-radius:8px;font-weight:700;text-decoration:none;margin-top:1rem">Open Dashboard →</a>
+    <a href="https://app.insighthunter.app" style="display:inline-block;background:#C9972B;color:#0D1117;padding:.65rem 1.25rem;border-radius:8px;font-weight:700;text-decoration:none;margin-top:1rem">Open Dashboard →</a>
   </div>`
 }
