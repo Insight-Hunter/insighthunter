@@ -76,6 +76,29 @@ tr.tx-row:hover{background:rgba(255,255,255,.015)}
   transform:translateY(80px);opacity:0;pointer-events:none}
 #toast.show{transform:translateY(0);opacity:1}
 </style>
+<!-- 1. Shared API client (relative URLs — no domain needed) -->
+<script src="/js/api.js"></script>
+
+<!-- 2. Auth guard — redirects to login if session expired -->
+<script src="/auth/guard.js"></script>
+
+<!-- 3. Page-specific script — uses window.api.* -->
+<script>
+  // Example: dashboard/bookkeeping.html
+  document.addEventListener('DOMContentLoaded', async () => {
+    const from = '2026-01-01';
+    const to   = '2026-03-18';
+
+    try {
+      const summary = await api.summary(from, to);
+      document.getElementById('revenue').textContent  = '$' + summary.revenue.toLocaleString();
+      document.getElementById('expenses').textContent = '$' + summary.expenses.toLocaleString();
+      document.getElementById('net').textContent      = '$' + summary.netIncome.toLocaleString();
+    } catch (err) {
+      console.error('Failed to load summary:', err.message);
+    }
+  });
+</script>
 </head>
 <body>
 <aside class="sidebar">
@@ -708,5 +731,8 @@ async function deleteTx(id) {
 
 document.addEventListener('DOMContentLoaded', initPage)
 </script>
+<!-- LOGOUT button anywhere on page -->
+<script src="/auth/logout.js"></script>
+<button onclick="logout()">Log Out</button>
 </body>
 </html>
