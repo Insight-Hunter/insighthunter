@@ -1,21 +1,28 @@
-
 name = "insighthunter-pbx"
-main = "src/backend/index.ts"
-compatibility_date = "2023-01-26"
+main = "src/index.ts"
+compatibility_date = "2025-11-01"
+compatibility_flags = ["nodejs_compat"]
 
-[[r2_buckets]]
-binding = "PBX_ASSETS"
-bucket_name = "insighthunter-pbx-assets"
+[durable_objects]
+bindings = [
+  { name = "PBX_ROOM", class_name = "PBXRoom", script_name = "insighthunter-pbx" }
+]
 
-[[durable_objects.bindings]]
-name = "PBX_ROOM"
-class_name = "PBXRoom"
+[[migrations]]
+tag = "v1"
+new_classes = ["PBXRoom"]
 
-[[durable_objects.bindings]]
-name = "CALL_SESSION"
-class_name = "CallSession"
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-pbx"
+database_id = "REPLACE_WITH_D1_ID"
+migrations_dir = "migrations"
 
 [vars]
-TWILIO_ACCOUNT_SID = "your_account_sid"
-TWILIO_AUTH_TOKEN = "your_auth_token"
-TWILIO_PHONE_NUMBER = "your_twilio_phone_number"
+ENVIRONMENT = "production"
+
+[env.preview]
+name = "insighthunter-pbx-preview"
+
+[env.preview.vars]
+ENVIRONMENT = "preview"

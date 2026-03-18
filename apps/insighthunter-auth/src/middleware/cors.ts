@@ -6,7 +6,7 @@ export const corsMiddleware: MiddlewareHandler<{ Bindings: Env }> = async (c, ne
   const reqOrigin = c.req.header("Origin") ?? "";
   const isAllowed = allowed === "*"
     || reqOrigin === allowed
-    || reqOrigin.endsWith(".insighthunter.com");
+    || reqOrigin.endsWith(".insighthunter.app");
 
   if (c.req.method === "OPTIONS") {
     return new Response(null, {

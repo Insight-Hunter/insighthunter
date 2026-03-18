@@ -1,7 +1,7 @@
 import type { Env } from "@/types";
 import { logger } from "@/lib/logger";
 
-const FROM    = "Insight Hunter <noreply@insighthunter.com>";
+const FROM    = "Insight Hunter <noreply@insighthunter.app>";
 const SUBJECT = {
   verify: "Verify your Insight Hunter email",
   reset:  "Reset your Insight Hunter password",
@@ -23,7 +23,7 @@ async function sendEmail(
     },
     body: JSON.stringify({
       personalizations: [{ to: [{ email: to }] }],
-      from: { email: "noreply@insighthunter.com", name: "Insight Hunter" },
+      from: { email: "noreply@insighthunter.app", name: "Insight Hunter" },
       subject,
       content: [
         { type: "text/plain", value: text },
