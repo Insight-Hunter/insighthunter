@@ -1,14 +1,10 @@
-import { Hono } from 'hono'
-import { cors } from 'hono/cors'
+import { CfoAgent } from './agents/CfoAgent';
 
-interface Env {
-  // Add bindings here
-}
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    // Implement your fetch logic here
+    return new Response('Hello from InsightHunter Agents!');
+  },
+};
 
-const app = new Hono<{ Bindings: Env }>()
-app.use('*', cors())
-
-// TODO: implement /api/ai routes
-app.get('/', (c) => c.json({ service: '/api/ai', status: 'ok' }))
-
-export default app
+export { CfoAgent };
