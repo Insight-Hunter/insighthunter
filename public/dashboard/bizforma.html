@@ -74,6 +74,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 @media(max-width:1024px){.kpi-row{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){.sidebar{display:none}.dash-main{margin-left:0}.grid-2{grid-template-columns:1fr}}
 </style>
+<!-- Add to EVERY dashboard/*.html and auth/*.html <head> -->
+<script src="/js/api.js"></script>    <!-- shared API client -->
+<script src="/auth/guard.js"></script> <!-- session check -->
+
 <!-- 1. Shared API client (relative URLs — no domain needed) -->
 <script src="/js/api.js"></script>
 

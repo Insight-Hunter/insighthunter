@@ -89,6 +89,9 @@ label.fl{display:block;font-size:.68rem;font-weight:600;color:var(--g3);margin-b
 .tbl td{padding:.65rem 1rem;font-size:.8rem;border-bottom:1px solid rgba(30,42,58,.5);vertical-align:middle}
 .tbl tr:last-child td{border:none}
 </style>
+<!-- Add to EVERY dashboard/*.html and auth/*.html <head> -->
+  <script src="/js/api.js"></script> <!-- shared API client --> 
+  <script src="/auth/guard.js"></script> <!-- session check -->
 </head>
 <body>
 <aside class="sidebar">

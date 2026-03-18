@@ -80,6 +80,9 @@ select option{background:var(--navy-card)}
 .bar-fill{height:100%;border-radius:4px;transition:.5s}
 @media print{.sidebar,.top-bar,.no-print{display:none!important}.main{display:block}.content{padding:.5rem}}
 </style>
+<!-- Add to EVERY dashboard/*.html and auth/*.html <head> -->
+  <script src="/js/api.js"></script> <!-- shared API client --> 
+  <script src="/auth/guard.js"></script> <!-- session check -->
 </head>
 <body>
 <aside class="sidebar">

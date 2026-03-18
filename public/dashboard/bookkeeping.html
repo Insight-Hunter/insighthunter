@@ -76,11 +76,9 @@ tr.tx-row:hover{background:rgba(255,255,255,.015)}
   transform:translateY(80px);opacity:0;pointer-events:none}
 #toast.show{transform:translateY(0);opacity:1}
 </style>
-<!-- 1. Shared API client (relative URLs — no domain needed) -->
-<script src="/js/api.js"></script>
-
-<!-- 2. Auth guard — redirects to login if session expired -->
-<script src="/auth/guard.js"></script>
+<!-- Add to EVERY dashboard/*.html and auth/*.html <head> -->
+<script src="/js/api.js"></script>    <!-- shared API client -->
+<script src="/auth/guard.js"></script> <!-- session check -->
 
 <!-- 3. Page-specific script — uses window.api.* -->
 <script>

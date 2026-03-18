@@ -64,6 +64,9 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);ma
   font-size:.82rem;font-weight:600;transition:.3s;transform:translateY(100px);opacity:0;pointer-events:none}
 #toast.show{transform:translateY(0);opacity:1}
 </style>
+<!-- Add to EVERY dashboard/*.html and auth/*.html <head> -->
+  <script src="/js/api.js"></script> <!-- shared API client --> 
+  <script src="/auth/guard.js"></script> <!-- session check -->
 </head>
 <body>
 

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Features — Insight Hunter</title>
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#080d1a; color:#f1f5f9; overflow-x:hidden; }
+    a { text-decoration:none; color:inherit; }
+
+    /* PARTICLES */
+    #particles { position:fixed; inset:0; pointer-events:none; z-index:0; }
+
+    /* NAV */
+    .site-nav { position:sticky; top:0; z-index:100; background:rgba(8,13,26,.94); backdrop-filter:blur(12px); border-bottom:1px solid rgba(232,160,32,.15); height:60px; }
+    .nav-inner { max-width:1400px; margin:0 auto; height:100%; padding:0 32px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-logo { font-size:1.2rem; font-weight:700; }
+    .nav-logo span { color:#e8a020; }
+    .nav-links { display:flex; gap:2rem; list-style:none; }
+    .nav-links a { font-size:.9rem; color:#cbd5e1; transition:color .2s; }
+    .nav-links a:hover,.nav-links a.active { color:#e8a020; }
+    .nav-actions { display:flex; gap:.75rem; }
+    .btn-ghost { padding:7px 16px; border-radius:6px; font-size:.85rem; font-weight:600; color:#f1f5f9; border:1px solid rgba(241,245,249,.3); background:transparent; cursor:pointer; transition:all .2s; }
+    .btn-ghost:hover { border-color:#e8a020; color:#e8a020; }
+    .btn-nav-cta { padding:7px 16px; border-radius:6px; font-size:.85rem; font-weight:600; background:#e8a020; color:#000; border:none; cursor:pointer; transition:all .2s; }
+    .btn-nav-cta:hover { background:#f0b03f; }
+    .hamburger { display:none; flex-direction:column; gap:4px; cursor:pointer; padding:4px; }
+    .hamburger span { width:22px; height:2px; background:#f1f5f9; border-radius:2px; transition:all .3s; }
+    .mobile-menu { display:none; position:fixed; inset:60px 0 0 0; background:rgba(8,13,26,.98); z-index:99; flex-direction:column; padding:2rem; gap:1.5rem; }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a { font-size:1.1rem; color:#cbd5e1; border-bottom:1px solid rgba(232,160,32,.1); padding-bottom:1rem; }
+    .mobile-menu a:hover { color:#e8a020; }
+
+    /* HERO BANNER */
+    .features-hero {
+      position:relative; z-index:10;
+      padding:5rem 32px 4rem;
+      text-align:center;
+      background:linear-gradient(180deg, rgba(232,160,32,.04) 0%, transparent 100%);
+      border-bottom:1px solid rgba(232,160,32,.1);
+    }
+    .hero-eyebrow { font-size:.8rem; color:#e8a020; text-transform:uppercase; letter-spacing:2.5px; margin-bottom:1rem; }
+    .hero-title { font-size:clamp(2rem,4.5vw,3.2rem); font-weight:800; line-height:1.15; margin-bottom:1.25rem; }
+    .hero-title span { color:#e8a020; }
+    .hero-sub { font-size:clamp(.9rem,1.4vw,1.05rem); color:#94a3b8; max-width:640px; margin:0 auto 2.5rem; line-height:1.7; }
+    .hero-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+    .btn-primary { padding:12px 28px; border-radius:9px; font-size:.95rem; font-weight:600; background:#e8a020; color:#000; border:none; cursor:pointer; transition:all .25s; }
+    .btn-primary:hover { background:#f0b03f; transform:translateY(-2px); box-shadow:0 8px 20px rgba(232,160,32,.3); }
+    .btn-secondary { padding:12px 28px; border-radius:9px; font-size:.95rem; font-weight:600; background:transparent; color:#f1f5f9; border:2px solid rgba(241,245,249,.3); cursor:pointer; transition:all .25s; }
+    .btn-secondary:hover { border-color:#e8a020; color:#e8a020; }
+
+    /* STATS BAR */
+    .stats-bar { position:relative; z-index:10; background:rgba(15,23,42,.7); border-bottom:1px solid rgba(232,160,32,.1); padding:1.5rem 32px; }
+    .stats-inner { max-width:1000px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+    .stat-item { text-align:center; }
+    .stat-num { font-size:1.8rem; font-weight:800; color:#e8a020; }
+    .stat-lbl { font-size:.75rem; color:#94a3b8; margin-top:.2rem; }
+
+    /* SHARED SECTION */
+    .page-section { position:relative; z-index:10; padding:5rem 32px; max-width:1400px; margin:0 auto; }
+    .section-eyebrow { font-size:.78rem; color:#e8a020; text-transform:uppercase; letter-spacing:2px; margin-bottom:.6rem; }
+    .section-title { font-size:clamp(1.5rem,2.8vw,2.2rem); font-weight:700; line-height:1.25; margin-bottom:.75rem; }
+    .section-sub { font-size:.9rem; color:#94a3b8; line-height:1.65; max-width:580px; margin-bottom:3rem; }
+    .divider { border:none; border-top:1px solid rgba(232,160,32,.1); margin:0; }
+
+    /* FEATURE SPOTLIGHT — alternating layout */
+    .spotlight { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; padding:5rem 32px; max-width:1400px; margin:0 auto; }
+    .spotlight.reverse { direction:rtl; }
+    .spotlight.reverse > * { direction:ltr; }
+    .spotlight-text .tag { display:inline-block; background:rgba(232,160,32,.12); color:#e8a020; font-size:.75rem; font-weight:600; padding:4px 12px; border-radius:20px; margin-bottom:1rem; border:1px solid rgba(232,160,32,.25); }
+    .spotlight-text h2 { font-size:clamp(1.4rem,2.5vw,2rem); font-weight:700; line-height:1.25; margin-bottom:.85rem; }
+    .spotlight-text p { font-size:.9rem; color:#94a3b8; line-height:1.7; margin-bottom:1.5rem; }
+    .feature-bullets { list-style:none; display:flex; flex-direction:column; gap:.65rem; }
+    .feature-bullets li { font-size:.88rem; color:#cbd5e1; display:flex; gap:.65rem; align-items:flex-start; }
+    .feature-bullets li::before { content:"✦"; color:#e8a020; font-size:.7rem; margin-top:.2rem; flex-shrink:0; }
+
+    /* MOCKUP PANELS */
+    .panel {
+      background:rgba(15,23,42,.8); border:1.5px solid rgba(232,160,32,.3);
+      border-radius:16px; padding:1.5rem;
+      box-shadow:0 0 40px rgba(232,160,32,.08);
+      position:relative; overflow:hidden;
+    }
+    .panel::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(232,160,32,.03) 0%,transparent 60%); pointer-events:none; }
+    .panel-title { font-size:.8rem; font-weight:600; color:#e8a020; margin-bottom:1rem; display:flex; align-items:center; gap:.4rem; }
+    .panel-dot { width:8px; height:8px; border-radius:50%; background:#e8a020; }
+
+    /* ledger rows */
+    .ledger-row { display:flex; justify-content:space-between; align-items:center; padding:.55rem 0; border-bottom:1px solid rgba(232,160,32,.07); font-size:.82rem; }
+    .ledger-row:last-child { border-bottom:none; }
+    .ledger-cat { color:#cbd5e1; }
+    .ledger-amt { font-weight:600; }
+    .ledger-pos { color:#10b981; }
+    .ledger-neg { color:#f87171; }
+    .ledger-neu { color:#e8a020; }
+    .ledger-badge { font-size:.68rem; padding:2px 8px; border-radius:4px; }
+    .badge-green { background:rgba(16,185,129,.15); color:#10b981; }
+    .badge-gold  { background:rgba(232,160,32,.12); color:#e8a020; }
+    .badge-red   { background:rgba(248,113,113,.12); color:#f87171; }
+
+    /* mini area chart */
+    .area-chart { margin:1rem 0; height:80px; position:relative; }
+    .area-chart svg { width:100%; height:100%; }
+
+    /* gauge */
+    .gauge-row { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin-top:.75rem; }
+    .gauge-item { background:rgba(8,13,26,.6); border-radius:8px; padding:.65rem; }
+    .gauge-label { font-size:.7rem; color:#94a3b8; margin-bottom:.4rem; }
+    .gauge-bar { height:6px; background:rgba(232,160,32,.15); border-radius:3px; overflow:hidden; }
+    .gauge-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#e8a020,#f0b03f); }
+    .gauge-val { font-size:.8rem; font-weight:700; color:#e8a020; margin-top:.3rem; }
+
+    /* tax calendar */
+    .tax-cal { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-top:.5rem; }
+    .tax-event { background:rgba(8,13,26,.7); border:1px solid rgba(232,160,32,.15); border-radius:8px; padding:.6rem; }
+    .tax-date { font-size:.68rem; color:#e8a020; font-weight:600; margin-bottom:.2rem; }
+    .tax-name { font-size:.75rem; color:#cbd5e1; }
+    .tax-status { font-size:.65rem; margin-top:.3rem; }
+
+    /* chat panel */
+    .chat-stream { display:flex; flex-direction:column; gap:.6rem; }
+    .msg { font-size:.78rem; line-height:1.45; padding:.5rem .75rem; border-radius:8px; max-width:90%; }
+    .msg-u { background:#e8a020; color:#000; font-weight:500; align-self:flex-end; }
+    .msg-a { background:rgba(232,160,32,.1); color:#cbd5e1; border-left:2px solid #e8a020; }
+    .chat-input-fake { margin-top:.75rem; background:rgba(8,13,26,.8); border:1px solid rgba(232,160,32,.2); border-radius:6px; padding:.5rem .75rem; font-size:.75rem; color:#475569; }
+
+    /* kpi dashboard */
+    .kpi-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.6rem; margin-bottom:.75rem; }
+    .kpi-tile { background:rgba(8,13,26,.7); border:1px solid rgba(232,160,32,.12); border-radius:8px; padding:.6rem; }
+    .kpi-tile-label { font-size:.65rem; color:#64748b; text-transform:uppercase; margin-bottom:.25rem; }
+    .kpi-tile-val   { font-size:1rem; font-weight:700; color:#e8a020; }
+    .kpi-tile-delta { font-size:.65rem; margin-top:.15rem; }
+    .delta-pos { color:#10b981; }
+    .delta-neg { color:#f87171; }
+    .kpi-bar-chart { display:flex; align-items:flex-end; gap:.3rem; height:60px; }
+    .kbar { flex:1; border-radius:3px 3px 0 0; background:linear-gradient(to top,#e8a020,#f0b03f); }
+
+    /* APPS GRID */
+    .apps-full-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1.25rem; }
+    .app-card {
+      background:rgba(15,23,42,.75); border:1px solid rgba(232,160,32,.15);
+      border-radius:14px; padding:1.5rem;
+      transition:all .3s; cursor:pointer;
+    }
+    .app-card:hover { border-color:#e8a020; transform:translateY(-4px); box-shadow:0 12px 28px rgba(232,160,32,.12); }
+    .app-icon { font-size:2rem; margin-bottom:.75rem; }
+    .app-name { font-size:1rem; font-weight:600; margin-bottom:.4rem; }
+    .app-desc { font-size:.82rem; color:#64748b; line-height:1.55; margin-bottom:1rem; }
+    .app-tag { display:inline-block; font-size:.68rem; padding:3px 9px; border-radius:12px; font-weight:600; }
+    .tag-free { background:rgba(16,185,129,.1); color:#10b981; border:1px solid rgba(16,185,129,.2); }
+    .tag-std  { background:rgba(232,160,32,.1); color:#e8a020; border:1px solid rgba(232,160,32,.2); }
+    .tag-pro  { background:rgba(168,85,247,.1); color:#a855f7; border:1px solid rgba(168,85,247,.2); }
+
+    /* INTEGRATIONS */
+    .integrations-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:1rem; }
+    .int-card { background:rgba(15,23,42,.6); border:1px solid rgba(232,160,32,.1); border-radius:10px; padding:1rem; text-align:center; transition:all .25s; cursor:pointer; }
+    .int-card:hover { border-color:rgba(232,160,32,.4); background:rgba(232,160,32,.05); }
+    .int-icon { font-size:1.6rem; margin-bottom:.4rem; }
+    .int-name { font-size:.75rem; color:#94a3b8; }
+
+    /* COMPARE TABLE */
+    .compare-wrap { overflow-x:auto; }
+    .compare-table { width:100%; border-collapse:collapse; font-size:.85rem; }
+    .compare-table th { padding:.85rem 1rem; text-align:left; font-weight:600; border-bottom:1px solid rgba(232,160,32,.2); color:#e8a020; }
+    .compare-table th:first-child { color:#94a3b8; }
+    .compare-table td { padding:.75rem 1rem; border-bottom:1px solid rgba(232,160,32,.07); color:#cbd5e1; }
+    .compare-table tr:hover td { background:rgba(232,160,32,.03); }
+    .check { color:#10b981; font-size:1rem; }
+    .cross { color:#f87171; font-size:.9rem; }
+    .partial { color:#e8a020; font-size:.8rem; }
+    .compare-table .plan-col { font-weight:600; color:#f1f5f9; }
+
+    /* CTA */
+    .cta-section { position:relative; z-index:10; padding:6rem 32px; text-align:center; background:linear-gradient(180deg, transparent 0%, rgba(232,160,32,.04) 100%); }
+    .cta-title { font-size:clamp(1.6rem,3vw,2.4rem); font-weight:700; margin-bottom:1rem; }
+    .cta-sub { font-size:.95rem; color:#94a3b8; margin:0 auto 2.5rem; max-width:540px; line-height:1.65; }
+    .cta-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+    .btn-big { padding:14px 34px; border-radius:10px; font-size:1rem; font-weight:600; cursor:pointer; transition:all .25s; border:none; }
+    .btn-big-gold { background:#e8a020; color:#000; }
+    .btn-big-gold:hover { background:#f0b03f; transform:translateY(-2px); box-shadow:0 10px 28px rgba(232,160,32,.35); }
+    .btn-big-outline { background:transparent; color:#f1f5f9; border:2px solid rgba(241,245,249,.3); }
+    .btn-big-outline:hover { border-color:#e8a020; color:#e8a020; }
+
+    /* FOOTER */
+    .site-footer { position:relative; z-index:10; background:rgba(5,9,18,.97); border-top:1px solid rgba(232,160,32,.1); padding:3.5rem 32px 2rem; }
+    .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:3rem; max-width:1200px; margin:0 auto 2rem; }
+    .footer-brand p { font-size:.82rem; color:#475569; line-height:1.65; margin-top:.6rem; max-width:260px; }
+    .footer-col h4 { font-size:.85rem; font-weight:600; color:#f1f5f9; margin-bottom:1rem; }
+    .footer-col ul { list-style:none; display:flex; flex-direction:column; gap:.5rem; }
+    .footer-col a { font-size:.82rem; color:#475569; transition:color .2s; }
+    .footer-col a:hover { color:#e8a020; }
+    .footer-bottom { max-width:1200px; margin:0 auto; padding-top:1.5rem; border-top:1px solid rgba(232,160,32,.08); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+    .footer-bottom p { font-size:.78rem; color:#334155; }
+
+    /* RESPONSIVE */
+    @media(max-width:1024px){ .spotlight { grid-template-columns:1fr; gap:2.5rem; } .spotlight.reverse { direction:ltr; } .stats-inner { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:768px){ .page-section,.spotlight { padding:3rem 20px; } .features-hero { padding:3.5rem 20px 3rem; } .footer-grid { grid-template-columns:1fr 1fr; gap:2rem; } .kpi-grid { grid-template-columns:1fr 1fr; } .nav-links { display:none; } .hamburger { display:flex; } }
+    @media(max-width:520px){ .stats-inner { grid-template-columns:repeat(2,1fr); } .footer-grid { grid-template-columns:1fr; } .stats-bar { padding:1.25rem 20px; } }
+  </style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<!-- NAV -->
+<nav class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Insight<span>Hunter</span></a>
+    <ul class="nav-links">
+      <li><a href="/features/" class="active">Features</a></li>
+      <li><a href="/pricing.html">Pricing</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn-ghost">Log In</button>
+      <button class="btn-nav-cta">Start Free</button>
+    </div>
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="/features/">Features</a>
+  <a href="/pricing.html">Pricing</a>
+  <a href="/blog/">Blog</a>
+  <a href="/contact.html">Contact</a>
+  <button class="btn-nav-cta" style="width:fit-content">Start Free</button>
+</div>
+
+<!-- HERO -->
+<section class="features-hero">
+  <p class="hero-eyebrow">Full Feature Set</p>
+  <h1 class="hero-title">Enterprise-grade finance.<br><span>Small business price.</span></h1>
+  <p class="hero-sub">From day-one formation to month-end close, Insight Hunter replaces a bookkeeper, CFO, and compliance team — all in one platform.</p>
+  <div class="hero-btns">
+    <button class="btn-primary">Get Started Free</button>
+    <button class="btn-secondary">View Pricing</button>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="stat-num">9</div><div class="stat-lbl">Integrated Apps</div></div>
+    <div class="stat-item"><div class="stat-num">100K+</div><div class="stat-lbl">Businesses Analyzed</div></div>
+    <div class="stat-item"><div class="stat-num">&lt;2s</div><div class="stat-lbl">AI Response Time</div></div>
+    <div class="stat-item"><div class="stat-num">SOC 2</div><div class="stat-lbl">Compliant</div></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ━━━ SPOTLIGHT 1: BOOKKEEPING ━━━ -->
+<div class="spotlight">
+  <div class="spotlight-text">
+    <span class="tag">📚 AI Bookkeeping</span>
+    <h2>Your books, always up to date. Zero manual entry.</h2>
+    <p>Connect your bank accounts, credit cards, and payment processors. Insight Hunter auto-categorizes every transaction, reconciles accounts monthly, and generates GAAP-ready P&L and balance sheets in real time.</p>
+    <ul class="feature-bullets">
+      <li>Live bank sync via Plaid — transactions posted in under 60 seconds</li>
+      <li>AI categorization with 98.4% accuracy, trained on 100K+ business datasets</li>
+      <li>Automated month-end close with variance analysis</li>
+      <li>Multi-entity consolidated reporting</li>
+      <li>Accountant export: QuickBooks, Xero, and CSV</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><div class="panel-dot"></div>Live Ledger — March 2026</div>
+    <div class="ledger-row"><span class="ledger-cat">🏦 Stripe Revenue</span><span class="ledger-amt ledger-pos">+$14,200</span><span class="ledger-badge badge-green">Auto</span></div>
+    <div class="ledger-row"><span class="ledger-cat">💳 AWS Compute</span><span class="ledger-amt ledger-neg">-$1,840</span><span class="ledger-badge badge-gold">Cloud</span></div>
+    <div class="ledger-row"><span class="ledger-cat">📦 Shopify Sales</span><span class="ledger-amt ledger-pos">+$6,320</span><span class="ledger-badge badge-green">Auto</span></div>
+    <div class="ledger-row"><span class="ledger-cat">🏢 Office Lease</span><span class="ledger-amt ledger-neg">-$3,200</span><span class="ledger-badge badge-red">Fixed</span></div>
+    <div class="ledger-row"><span class="ledger-cat">👥 Contractor Pay</span><span class="ledger-amt ledger-neg">-$4,500</span><span class="ledger-badge badge-red">Payroll</span></div>
+    <div class="ledger-row" style="border-top:1px solid rgba(232,160,32,.3);margin-top:.4rem;padding-top:.6rem"><span class="ledger-cat" style="font-weight:600;color:#f1f5f9">Net Income</span><span class="ledger-amt ledger-pos" style="font-size:.95rem">+$10,980</span><span class="ledger-badge badge-green">✓ Reconciled</span></div>
+    <div class="gauge-row">
+      <div class="gauge-item"><div class="gauge-label">Gross Margin</div><div class="gauge-bar"><div class="gauge-fill" style="width:72%"></div></div><div class="gauge-val">72%</div></div>
+      <div class="gauge-item"><div class="gauge-label">Op Margin</div><div class="gauge-bar"><div class="gauge-fill" style="width:38%"></div></div><div class="gauge-val">38%</div></div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ━━━ SPOTLIGHT 2: FORECASTING ━━━ -->
+<div class="spotlight reverse">
+  <div class="spotlight-text">
+    <span class="tag">📈 Cash Flow Forecasting</span>
+    <h2>See what's coming before it arrives.</h2>
+    <p>Insight Hunter builds rolling 12-month cash flow models using your actual transaction history, open invoices, recurring costs, and seasonal patterns. Stress-test scenarios before you commit.</p>
+    <ul class="feature-bullets">
+      <li>Rolling 12-month cash flow with weekly granularity</li>
+      <li>Scenario modeling — best case, base case, downside</li>
+      <li>Runway calculator with burn rate tracking</li>
+      <li>Hiring and spend impact analysis</li>
+      <li>Automated alerts when projected balance drops below threshold</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><div class="panel-dot"></div>12-Month Cash Forecast</div>
+    <div style="display:flex;align-items:flex-end;gap:.3rem;height:100px;margin-bottom:.75rem">
+      <div style="flex:1;height:55%;background:linear-gradient(to top,#e8a020,#f0b03f);border-radius:3px 3px 0 0"></div>
+      <div style="flex:1;height:62%;background:linear-gradient(to top,#e8a020,#f0b03f);border-radius:3px 3px 0 0"></div>
+      <div style="flex:1;height:70%;background:linear-gradient(to top,#e8a020,#f0b03f);border-radius:3px 3px 0 0"></div>
+      <div style="flex:1;height:68%;background:linear-gradient(to top,#e8a020,#f0b03f);border-radius:3px 3px 0 0"></div>
+      <div style="flex:1;height:78%;background:linear-gradient(to top,#e8a020,#f0b03f);border-radius:3px 3px 0 0"></div>
+      <div style="flex:1;height:82%;background:linear-gradient(to top,#e8a020,#f0b03f);border-radius:3px 3px 0 0"></div>
+      <div style="flex:1;height:86%;background:linear-gradient(to top,rgba(232,160,32,.4),rgba(240,176,63,.4));border-radius:3px 3px 0 0;border:1px dashed rgba(232,160,32,.5)"></div>
+      <div style="flex:1;height:90%;background:linear-gradient(to top,rgba(232,160,32,.4),rgba(240,176,63,.4));border-radius:3px 3px 0 0;border:1px dashed rgba(232,160,32,.5)"></div>
+      <div style="flex:1;height:92%;background:linear-gradient(to top,rgba(232,160,32,.4),rgba(240,176,63,.4));border-radius:3px 3px 0 0;border:1px dashed rgba(232,160,32,.5)"></div>
+      <div style="flex:1;height:95%;background:linear-gradient(to top,rgba(232,160,32,.4),rgba(240,176,63,.4));border-radius:3px 3px 0 0;border:1px dashed rgba(232,160,32,.5)"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:.65rem;color:#475569;margin-bottom:.75rem">
+      <span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span style="color:#e8a020">Sep ›</span><span style="color:#e8a020">Oct ›</span><span style="color:#e8a020">Nov ›</span><span style="color:#e8a020">Dec ›</span>
+    </div>
+    <div style="background:rgba(16,185,129,.08);border-left:3px solid #10b981;border-radius:6px;padding:.6rem;font-size:.78rem;color:#cbd5e1;margin-bottom:.5rem">
+      <span style="color:#10b981;font-weight:600">✓ Runway: 18 months</span> at current burn rate of $22K/mo
+    </div>
+    <div style="background:rgba(232,160,32,.08);border-left:3px solid #e8a020;border-radius:6px;padding:.6rem;font-size:.78rem;color:#cbd5e1">
+      <span style="color:#e8a020;font-weight:600">💡 Insight:</span> Q4 projected +18% — optimal window for hiring or expansion
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ━━━ SPOTLIGHT 3: TAX & COMPLIANCE ━━━ -->
+<div class="spotlight">
+  <div class="spotlight-text">
+    <span class="tag">🧾 Tax & Compliance</span>
+    <h2>Never miss a filing. Never get caught off guard.</h2>
+    <p>Insight Hunter tracks your tax obligations across federal, state, and local jurisdictions automatically. Quarterly estimates, sales tax nexus alerts, payroll deposits, and annual filing prep — all handled.</p>
+    <ul class="feature-bullets">
+      <li>Automated quarterly estimated tax calculations (1040-ES, 1120-W)</li>
+      <li>Multi-state sales tax tracking and nexus detection</li>
+      <li>Payroll tax deposits with deadline alerts</li>
+      <li>W-2, 1099-NEC, and 1099-K generation</li>
+      <li>Audit trail with document vault for every filing</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><div class="panel-dot"></div>Tax Calendar — 2026</div>
+    <div class="tax-cal">
+      <div class="tax-event"><div class="tax-date">Mar 15</div><div class="tax-name">S-Corp Q1 Estimate</div><div class="tax-status"><span class="ledger-badge badge-green">Filed ✓</span></div></div>
+      <div class="tax-event"><div class="tax-date">Apr 15</div><div class="tax-name">1040 Federal Return</div><div class="tax-status"><span class="ledger-badge badge-gold">In Progress</span></div></div>
+      <div class="tax-event"><div class="tax-date">Apr 30</div><div class="tax-name">Payroll 941 Deposit</div><div class="tax-status"><span class="ledger-badge badge-gold">Scheduled</span></div></div>
+      <div class="tax-event"><div class="tax-date">Jun 15</div><div class="tax-name">Q2 Estimated Tax</div><div class="tax-status"><span class="ledger-badge" style="background:rgba(99,102,241,.1);color:#818cf8">Upcoming</span></div></div>
+    </div>
+    <div style="margin-top:.75rem;background:rgba(248,113,113,.06);border-left:3px solid #f87171;border-radius:6px;padding:.6rem;font-size:.75rem;color:#cbd5e1">
+      <span style="color:#f87171;font-weight:600">⚠ Nexus Alert:</span> Sales in CA and TX exceed thresholds — register for sales tax in both states
+    </div>
+    <div style="margin-top:.5rem;display:flex;justify-content:space-between;font-size:.75rem;color:#94a3b8;background:rgba(8,13,26,.5);border-radius:6px;padding:.6rem">
+      <span>2026 Tax Estimate</span>
+      <span style="color:#e8a020;font-weight:600">$18,400</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ━━━ SPOTLIGHT 4: AI ADVISOR ━━━ -->
+<div class="spotlight reverse">
+  <div class="spotlight-text">
+    <span class="tag">💬 AI Finance Advisor</span>
+    <h2>Ask anything. Get answers backed by your real data.</h2>
+    <p>Unlike generic AI tools, Insight Hunter's advisor reads your actual books, forecasts, and filings before it answers. Ask about hiring decisions, pricing strategy, cash runway, or tax optimization — all in plain English.</p>
+    <ul class="feature-bullets">
+      <li>Contextual answers grounded in your live financial data</li>
+      <li>Scenario analysis — "What happens if I hire 2 engineers?"</li>
+      <li>Proactive alerts and weekly digest pushed to email or Slack</li>
+      <li>Fractional CFO report generator (PDF, branded)</li>
+      <li>Audit-ready memo templates for investor or lender review</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><div class="panel-dot"></div>AI Finance Advisor</div>
+    <div class="chat-stream">
+      <div class="msg msg-u">Can I afford to hire two engineers in Q3?</div>
+      <div class="msg msg-a">Based on your Q2 projections ($82K revenue, 38% margin), adding 2 engineers at $95K each would reduce your runway from 18 months to 11 months. I recommend waiting until July when Q2 closes — if revenue hits target, the hire is safe.</div>
+      <div class="msg msg-u">What's my biggest tax risk right now?</div>
+      <div class="msg msg-a">California nexus. You've made $48K in CA sales this year, crossing the $500K threshold is 6 months away at current growth. Register now to avoid retroactive liability.</div>
+    </div>
+    <div class="chat-input-fake">Ask about your finances…</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ━━━ SPOTLIGHT 5: KPI DASHBOARDS ━━━ -->
+<div class="spotlight">
+  <div class="spotlight-text">
+    <span class="tag">📊 KPI Dashboards</span>
+    <h2>Every metric that matters, live and in context.</h2>
+    <p>Custom dashboards for your industry — SaaS, retail, services, or construction. Track the numbers your business actually needs: MRR, churn, LTV, COGS, margin by product, and client-level profitability.</p>
+    <ul class="feature-bullets">
+      <li>50+ pre-built KPI templates by industry vertical</li>
+      <li>Custom metric builder — define your own formulas</li>
+      <li>Shareable dashboards for investors and boards</li>
+      <li>Trend alerts — flag when metrics move beyond set thresholds</li>
+      <li>White-label PDF reports (Pro plan)</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><div class="panel-dot"></div>KPI Dashboard — SaaS</div>
+    <div class="kpi-grid">
+      <div class="kpi-tile"><div class="kpi-tile-label">MRR</div><div class="kpi-tile-val">$14.2K</div><div class="kpi-tile-delta delta-pos">↑ 12%</div></div>
+      <div class="kpi-tile"><div class="kpi-tile-label">Churn</div><div class="kpi-tile-val">1.8%</div><div class="kpi-tile-delta delta-pos">↓ 0.3%</div></div>
+      <div class="kpi-tile"><div class="kpi-tile-label">LTV</div><div class="kpi-tile-val">$4,800</div><div class="kpi-tile-delta delta-pos">↑ 8%</div></div>
+      <div class="kpi-tile"><div class="kpi-tile-label">CAC</div><div class="kpi-tile-val">$320</div><div class="kpi-tile-delta delta-neg">↑ 5%</div></div>
+      <div class="kpi-tile"><div class="kpi-tile-label">Margin</div><div class="kpi-tile-val">68%</div><div class="kpi-tile-delta delta-pos">↑ 2%</div></div>
+      <div class="kpi-tile"><div class="kpi-tile-label">Runway</div><div class="kpi-tile-val">18mo</div><div class="kpi-tile-delta delta-pos">Healthy</div></div>
+    </div>
+    <div class="kpi-bar-chart">
+      <div class="kbar" style="height:55%"></div>
+      <div class="kbar" style="height:62%"></div>
+      <div class="kbar" style="height:70%"></div>
+      <div class="kbar" style="height:68%"></div>
+      <div class="kbar" style="height:78%"></div>
+      <div class="kbar" style="height:85%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:.65rem;color:#475569;margin-top:.3rem"><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ━━━ ALL APPS ━━━ -->
+<div class="page-section">
+  <p class="section-eyebrow">Included Apps</p>
+  <h2 class="section-title">One platform. Nine powerful tools.</h2>
+  <p class="section-sub">Every app is included in your plan — no bolt-ons, no per-feature charges.</p>
+  <div class="apps-full-grid">
+    <div class="app-card"><div class="app-icon">📋</div><div class="app-name">BizForma</div><div class="app-desc">LLC, S-Corp, and C-Corp formation. EIN, operating agreements, state registration, and BOI filings.</div><span class="app-tag tag-free">Free Tier</span></div>
+    <div class="app-card"><div class="app-icon">📚</div><div class="app-name">Bookkeeping</div><div class="app-desc">AI-powered bank sync, transaction categorization, P&L, and balance sheet — always reconciled.</div><span class="app-tag tag-std">Standard+</span></div>
+    <div class="app-card"><div class="app-icon">📊</div><div class="app-name">Insight Lite</div><div class="app-desc">Essential KPI dashboard with monthly cash flow snapshot and AI advisor (10 questions/mo).</div><span class="app-tag tag-free">Free Tier</span></div>
+    <div class="app-card"><div class="app-icon" style="font-size:1.4rem;font-weight:800;color:#e8a020;line-height:2rem">IH</div><div class="app-name">Insight Standard</div><div class="app-desc">Full forecasting, unlimited bookkeeping, tax compliance, and unlimited AI advisor access.</div><span class="app-tag tag-std">Standard</span></div>
+    <div class="app-card"><div class="app-icon">👑</div><div class="app-name">Insight Pro</div><div class="app-desc">White-label reporting, multi-entity management, custom KPI builder, and fractional CFO report generation.</div><span class="app-tag tag-pro">Pro Only</span></div>
+    <div class="app-card"><div class="app-icon">🔍</div><div class="app-name">Scout</div><div class="app-desc">AI-powered client and prospect financial profiling. Assess creditworthiness and revenue potential.</div><span class="app-tag tag-pro">Pro Only</span></div>
+    <div class="app-card"><div class="app-icon">📞</div><div class="app-name">PBX</div><div class="app-desc">Business phone system with auto-attendant, call routing, voicemail-to-email, and call recording.</div><span class="app-tag tag-pro">Pro Only</span></div>
+    <div class="app-card"><div class="app-icon">💼</div><div class="app-name">Payroll</div><div class="app-desc">Full-service payroll — W-2 employees and 1099 contractors. Tax deposits, direct deposit, and year-end filings.</div><span class="app-tag tag-std">Standard+</span></div>
+    <div class="app-card"><div class="app-icon">🌐</div><div class="app-name">Website Services</div><div class="app-desc">Business website builder with integrated payment pages, client portal, and domain management.</div><span class="app-tag tag-std">Standard+</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ━━━ INTEGRATIONS ━━━ -->
+<div class="page-section" style="padding-top:3rem">
+  <p class="section-eyebrow">Integrations</p>
+  <h2 class="section-title">Connects with your stack</h2>
+  <p class="section-sub" style="margin-bottom:2rem">Plug in your existing tools. No migration required.</p>
+  <div class="integrations-grid">
+    <div class="int-card"><div class="int-icon">🏦</div><div class="int-name">Plaid (Bank Sync)</div></div>
+    <div class="int-card"><div class="int-icon">💳</div><div class="int-name">Stripe</div></div>
+    <div class="int-card"><div class="int-icon">🛒</div><div class="int-name">Shopify</div></div>
+    <div class="int-card"><div class="int-icon">📦</div><div class="int-name">QuickBooks</div></div>
+    <div class="int-card"><div class="int-icon">🔵</div><div class="int-name">Xero</div></div>
+    <div class="int-card"><div class="int-icon">💬</div><div class="int-name">Slack</div></div>
+    <div class="int-card"><div class="int-icon">📧</div><div class="int-name">Gmail / Outlook</div></div>
+    <div class="int-card"><div class="int-icon">📊</div><div class="int-name">Google Sheets</div></div>
+    <div class="int-card"><div class="int-icon">🔗</div><div class="int-name">Zapier / Make</div></div>
+    <div class="int-card"><div class="int-icon">💰</div><div class="int-name">PayPal / Square</div></div>
+    <div class="int-card"><div class="int-icon">🧾</div><div class="int-name">Gusto Payroll</div></div>
+    <div class="int-card"><div class="int-icon">☁️</div><div class="int-name">AWS / GCP</div></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ━━━ PLAN COMPARISON ━━━ -->
+<div class="page-section" style="padding-top:3rem">
+  <p class="section-eyebrow">Compare Plans</p>
+  <h2 class="section-title">What's included in each tier</h2>
+  <p class="section-sub" style="margin-bottom:2rem">All plans include the core platform. Upgrade for more power.</p>
+  <div class="compare-wrap">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Lite — $0</th>
+          <th>Standard — $49</th>
+          <th>Pro — $149</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Business Entities</td><td class="plan-col">1</td><td class="plan-col">3</td><td class="plan-col">Unlimited</td></tr>
+        <tr><td>Bookkeeping Transactions/mo</td><td>50</td><td>Unlimited</td><td>Unlimited</td></tr>
+        <tr><td>Bank Account Sync</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Cash Flow Forecast</td><td>Annual snapshot</td><td>12-month rolling</td><td>12-month + scenarios</td></tr>
+        <tr><td>AI Finance Advisor</td><td>10 questions/mo</td><td>Unlimited</td><td>Unlimited + proactive</td></tr>
+        <tr><td>KPI Dashboards</td><td>3 standard</td><td>All templates</td><td>Custom builder</td></tr>
+        <tr><td>Tax Compliance</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Payroll</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>White-label Reports</td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>PBX Phone System</td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Scout (Client Profiling)</td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Priority Support</td><td><span class="cross">✗</span></td><td>Email</td><td>Phone + Chat</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ━━━ CTA ━━━ -->
+<div class="cta-section">
+  <h2 class="cta-title">Ready to see it in action?</h2>
+  <p class="cta-sub">Start free — no credit card required. Your first entity, bookkeeping, and AI advisor are on us.</p>
+  <div class="cta-btns">
+    <button class="btn-big btn-big-gold">Get Started Free</button>
+    <button class="btn-big btn-big-outline">Schedule a Demo</button>
+  </div>
+</div>
+
+<!-- ━━━ FOOTER ━━━ -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="nav-logo" style="font-size:1.15rem">Insight<span style="color:#e8a020">Hunter</span></a>
+      <p>Financial intelligence for freelancers, small firms, and fractional CFOs. Built on Cloudflare's global edge network.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="#">Bookkeeping</a></li>
+        <li><a href="#">Forecasting</a></li>
+        <li><a href="#">Compliance</a></li>
+        <li><a href="#">Payroll</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Security</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Insight Hunter. All rights reserved.</p>
+    <p>Built on Cloudflare Workers &amp; D1</p>
+  </div>
+</footer>
+
+<script>
+  // PARTICLES
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  function resize(){ canvas.width=innerWidth; canvas.height=innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  const pts = Array.from({length:130}, () => ({
+    x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+    vx:(Math.random()-.5)*.4, vy:-(Math.random()*.5+.15),
+    r:Math.random()*1.2+.3, o:Math.random()*.4+.15,
+    c:Math.random()>.5?'#e8a020':'#f1f5f9'
+  }));
+  (function animate(){
+    ctx.globalAlpha=1; ctx.fillStyle='#080d1a';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.y<-10){ p.y=canvas.height+10; p.x=Math.random()*canvas.width; }
+      ctx.globalAlpha=p.o; ctx.fillStyle=p.c;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+    });
+    requestAnimationFrame(animate);
+  })();
+
+  // HAMBURGER
+  const ham = document.getElementById('hamburger');
+  const mob = document.getElementById('mobileMenu');
+  ham.addEventListener('click', () => mob.classList.toggle('open'));
+</script>
+</body>
+</html>
