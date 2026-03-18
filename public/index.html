@@ -5,849 +5,669 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Insight Hunter — Financial Intelligence Platform</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#080d1a; color:#f1f5f9; overflow-x:hidden; }
+    a { text-decoration:none; color:inherit; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #080d1a;
-      color: #f1f5f9;
-      overflow-x: hidden;
-    }
+    /* ── PARTICLES ── */
+    #particles { position:fixed; inset:0; z-index:0; pointer-events:none; }
 
-    /* ━━━ PARTICLES ━━━ */
-    #particles {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
+    /* ── NAV ── */
+    .site-nav {
+      position:sticky; top:0; z-index:200;
+      height:62px;
+      background:rgba(8,13,26,.94);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(232,160,32,.15);
     }
-
-    /* ━━━ HERO CAROUSEL WRAPPER ━━━ */
-    .hero-carousel-container {
-      position: relative;
-      z-index: 10;
-      margin: 0 auto;
-      padding: 40px 32px;
-      max-width: 1400px;
-      width: 100%;
+    .nav-inner {
+      max-width:1380px; margin:0 auto;
+      height:100%; padding:0 28px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:1.5rem;
     }
+    .nav-logo { font-size:1.18rem; font-weight:800; white-space:nowrap; }
+    .nav-logo span { color:#e8a020; }
+    .nav-links { display:flex; gap:1.75rem; list-style:none; }
+    .nav-links a { font-size:.875rem; color:#94a3b8; transition:color .2s; }
+    .nav-links a:hover,.nav-links a.active { color:#e8a020; }
+    .nav-actions { display:flex; gap:.6rem; flex-shrink:0; }
+    .nav-ghost { padding:6px 15px; border-radius:6px; font-size:.84rem; font-weight:600; color:#f1f5f9; border:1px solid rgba(255,255,255,.2); background:transparent; cursor:pointer; transition:all .2s; }
+    .nav-ghost:hover { border-color:#e8a020; color:#e8a020; }
+    .nav-cta { padding:6px 15px; border-radius:6px; font-size:.84rem; font-weight:600; background:#e8a020; color:#000; border:none; cursor:pointer; transition:background .2s; }
+    .nav-cta:hover { background:#f0b03f; }
+    .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; }
+    .hamburger span { display:block; width:22px; height:2px; background:#f1f5f9; border-radius:2px; }
+    .mob-menu { display:none; position:fixed; top:62px; inset-inline:0; background:rgba(8,13,26,.98); z-index:190; flex-direction:column; padding:1.5rem 24px; gap:1.25rem; border-bottom:1px solid rgba(232,160,32,.15); }
+    .mob-menu.open { display:flex; }
+    .mob-menu a { font-size:1rem; color:#cbd5e1; padding-bottom:1rem; border-bottom:1px solid rgba(232,160,32,.08); }
+    .mob-menu a:hover { color:#e8a020; }
 
-    .hero-carousel {
-      position: relative;
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(232, 160, 32, 0.15);
-      border-radius: 20px;
-      overflow: hidden;
-      min-height: 500px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .carousel-slides {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .carousel-slide {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      display: grid;
-      grid-template-columns: 1fr 0.4fr 1.2fr;
-      gap: 2rem;
-      padding: 4rem 3rem;
-      align-items: center;
-      opacity: 0;
-      transition: opacity 0.8s ease-in-out;
-      pointer-events: none;
-    }
-
-    .carousel-slide.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .slide-text h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: 1rem;
-      color: #f1f5f9;
-    }
-
-    .slide-text p {
-      font-size: 0.95rem;
-      color: #cbd5e1;
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
-
-    .slide-ctas {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btn-primary {
-      background: #e8a020;
-      color: #000;
-    }
-
-    .btn-primary:hover {
-      background: #f0b03f;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(232, 160, 32, 0.3);
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: #f1f5f9;
-      border: 2px solid #f1f5f9;
-    }
-
-    .btn-outline:hover {
-      background: rgba(241, 245, 249, 0.1);
-      border-color: #e8a020;
-      color: #e8a020;
-    }
-
-    .slide-logo {
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-    }
-
-    .ih-logo {
-      width: 100px;
-      height: 100px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      filter: drop-shadow(0 0 20px rgba(232, 160, 32, 0.5));
-    }
-
-    .slide-logo p {
-      font-size: 0.9rem;
-      color: #cbd5e1;
-      margin: 0;
-    }
-
-    /* ━━━ DASHBOARD MOCKUP ━━━ */
-    .dashboard-mockup {
-      background: rgba(30, 41, 59, 0.6);
-      border: 2px solid #e8a020;
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 0 40px rgba(232, 160, 32, 0.15);
-      height: 380px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      font-size: 0.85rem;
-      color: #cbd5e1;
-    }
-
-    .dashboard-kpis {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .kpi-chip {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(232, 160, 32, 0.2);
-      border-radius: 8px;
-      padding: 0.8rem;
-    }
-
-    .kpi-label {
-      font-size: 0.7rem;
-      color: #94a3b8;
-      text-transform: uppercase;
-      margin-bottom: 0.3rem;
-    }
-
-    .kpi-value {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #e8a020;
-    }
-
-    .kpi-trend {
-      font-size: 0.7rem;
-      color: #10b981;
-      margin-top: 0.2rem;
-    }
-
-    .dashboard-chart {
-      height: 120px;
-      background: rgba(232, 160, 32, 0.05);
-      border-radius: 6px;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-around;
-      padding: 0.5rem;
-      gap: 0.3rem;
-    }
-
-    .chart-bar {
-      flex: 1;
-      background: linear-gradient(to top, #e8a020, #f0b03f);
-      border-radius: 3px;
-      min-height: 20%;
-    }
-
-    .dashboard-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.8rem;
-      color: #cbd5e1;
-      padding: 0.5rem 0;
-      border-top: 1px solid rgba(232, 160, 32, 0.1);
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-
-    .status-active {
-      background: rgba(16, 185, 129, 0.15);
-      color: #10b981;
-    }
-
-    /* ━━━ CHAT MOCKUP ━━━ */
-    .chat-mockup {
-      background: rgba(30, 41, 59, 0.6);
-      border: 2px solid #e8a020;
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 0 40px rgba(232, 160, 32, 0.15);
-      height: 380px;
+    /* ── HERO WRAPPER — exactly one viewport tall (minus nav) ── */
+    .hero-wrap {
+      position:relative; z-index:10;
+      height: calc(100dvh - 62px);
+      min-height: 520px;
+      padding: 20px 28px;
       display: flex;
       flex-direction: column;
     }
 
-    .chat-header {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #e8a020;
-      margin-bottom: 1rem;
-      border-bottom: 1px solid rgba(232, 160, 32, 0.2);
-      padding-bottom: 0.8rem;
+    /* ── CAROUSEL CARD ── */
+    .carousel-card {
+      flex:1;
+      min-height:0;                /* critical: prevents flex child overflow */
+      position:relative;
+      background:rgba(12,20,38,.82);
+      backdrop-filter:blur(10px);
+      border:1px solid rgba(232,160,32,.22);
+      border-radius:20px;
+      overflow:hidden;
     }
 
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+    /* ── SLIDES ── */
+    .slide {
+      position:absolute; inset:0;
+      display:grid;
+      grid-template-columns: 1fr 100px 1fr;
+      align-items:center;
+      gap:0;
+      padding:2.5rem 3rem;
+      opacity:0;
+      transition:opacity .75s ease;
+      pointer-events:none;
+    }
+    .slide.active { opacity:1; pointer-events:auto; }
+
+    /* LEFT — text */
+    .slide-left { padding-right:2rem; }
+    .slide-eyebrow {
+      display:inline-block;
+      font-size:.7rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:2px;
+      color:#e8a020;
+      background:rgba(232,160,32,.1);
+      border:1px solid rgba(232,160,32,.25);
+      padding:4px 12px; border-radius:20px;
+      margin-bottom:1rem;
+    }
+    .slide-left h1 {
+      font-size:clamp(1.5rem, 2.6vw, 2.2rem);
+      font-weight:800; line-height:1.2;
+      margin-bottom:.85rem;
+    }
+    .slide-left p {
+      font-size:clamp(.8rem, 1.1vw, .95rem);
+      color:#94a3b8; line-height:1.65;
+      margin-bottom:1.5rem;
+    }
+    .slide-btns { display:flex; gap:.75rem; flex-wrap:wrap; }
+    .btn-gold { padding:10px 22px; border-radius:8px; font-size:.9rem; font-weight:700; background:#e8a020; color:#000; border:none; cursor:pointer; transition:all .25s; }
+    .btn-gold:hover { background:#f0b03f; transform:translateY(-2px); box-shadow:0 6px 18px rgba(232,160,32,.35); }
+    .btn-wire { padding:10px 22px; border-radius:8px; font-size:.9rem; font-weight:600; background:transparent; color:#f1f5f9; border:1.5px solid rgba(255,255,255,.35); cursor:pointer; transition:all .25s; }
+    .btn-wire:hover { border-color:#e8a020; color:#e8a020; }
+
+    /* CENTER — logo */
+    .slide-center {
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:.5rem; text-align:center;
+    }
+    .logo-glow {
+      width:76px; height:76px;
+      filter:drop-shadow(0 0 18px rgba(232,160,32,.6));
+    }
+    .logo-name { font-size:.78rem; font-weight:700; color:#f1f5f9; white-space:nowrap; }
+    .logo-sub  { font-size:.68rem; color:#e8a020; white-space:nowrap; }
+
+    /* RIGHT — mockup */
+    .slide-right { padding-left:2rem; height:100%; display:flex; align-items:center; }
+    .mockup-box {
+      width:100%;
+      height:min(340px, calc(100% - 20px));
+      background:rgba(18,28,50,.75);
+      border:1.5px solid rgba(232,160,32,.45);
+      border-radius:14px;
+      padding:1rem 1.1rem;
+      box-shadow:0 0 36px rgba(232,160,32,.1), inset 0 1px 0 rgba(232,160,32,.08);
+      display:flex; flex-direction:column;
+      overflow:hidden;
+    }
+    .mbox-title {
+      font-size:.75rem; font-weight:700; color:#e8a020;
+      padding-bottom:.5rem; margin-bottom:.5rem;
+      border-bottom:1px solid rgba(232,160,32,.18);
+      flex-shrink:0;
     }
 
-    .chat-bubble {
-      padding: 0.8rem 1rem;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      line-height: 1.5;
-    }
+    /* kpi chips */
+    .kpi-row { display:grid; grid-template-columns:1fr 1fr; gap:.45rem; margin-bottom:.5rem; flex-shrink:0; }
+    .kchip { background:rgba(8,13,26,.8); border:1px solid rgba(232,160,32,.12); border-radius:7px; padding:.45rem .55rem; }
+    .kchip-lbl { font-size:.62rem; color:#64748b; text-transform:uppercase; margin-bottom:.2rem; }
+    .kchip-val { font-size:.95rem; font-weight:800; color:#e8a020; }
+    .kchip-trnd { font-size:.62rem; color:#10b981; margin-top:.12rem; }
 
-    .bubble-user {
-      background: #e8a020;
-      color: #000;
-      align-self: flex-end;
-      max-width: 80%;
-      font-weight: 500;
+    /* bar chart */
+    .mchart {
+      flex:1; min-height:0;
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap:.25rem; padding:.3rem 0 0;
+      margin-bottom:.45rem;
     }
+    .mcbar { flex:1; border-radius:3px 3px 0 0; background:linear-gradient(to top,#c07010,#e8a020); }
 
-    .bubble-ai {
-      background: rgba(232, 160, 32, 0.15);
-      color: #cbd5e1;
-      align-self: flex-start;
-      max-width: 90%;
-      border-left: 2px solid #e8a020;
+    /* rows */
+    .mrow {
+      display:flex; justify-content:space-between; align-items:center;
+      font-size:.7rem; color:#94a3b8;
+      padding:.28rem 0; border-top:1px solid rgba(232,160,32,.08);
+      flex-shrink:0;
     }
+    .mbadge { padding:2px 7px; border-radius:4px; font-size:.62rem; font-weight:700; }
+    .mbadge-g { background:rgba(16,185,129,.12); color:#10b981; }
+    .mbadge-y { background:rgba(232,160,32,.12); color:#e8a020; }
 
-    .chat-input {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(232, 160, 32, 0.2);
-      background: rgba(15, 23, 42, 0.8);
-      padding: 0.8rem;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      color: #94a3b8;
-      border: 1px solid rgba(232, 160, 32, 0.2);
+    /* chat */
+    .mchat { flex:1; min-height:0; display:flex; flex-direction:column; gap:.45rem; overflow:hidden; margin-bottom:.4rem; }
+    .mbubble { padding:.42rem .65rem; border-radius:7px; font-size:.74rem; line-height:1.4; }
+    .mbubble-u { background:#e8a020; color:#000; font-weight:600; align-self:flex-end; max-width:85%; }
+    .mbubble-a { background:rgba(232,160,32,.1); color:#cbd5e1; border-left:2px solid #e8a020; align-self:flex-start; max-width:90%; }
+    .mchat-inp { background:rgba(8,13,26,.8); border:1px solid rgba(232,160,32,.18); border-radius:6px; padding:.4rem .65rem; font-size:.7rem; color:#475569; flex-shrink:0; }
+
+    /* forecast */
+    .mforecast { flex:1; min-height:0; display:flex; align-items:flex-end; justify-content:space-between; gap:.25rem; margin-bottom:.45rem; }
+    .mfbar { flex:1; border-radius:3px 3px 0 0; }
+    .mfbar-solid { background:linear-gradient(to top,#c07010,#e8a020); }
+    .mfbar-dash  { background:rgba(232,160,32,.3); border:1px dashed rgba(232,160,32,.5); }
+    .minsight { background:rgba(232,160,32,.07); border-left:3px solid #e8a020; border-radius:6px; padding:.45rem .65rem; font-size:.72rem; color:#cbd5e1; flex-shrink:0; }
+    .minsight strong { color:#e8a020; }
+
+    /* ── CAROUSEL CONTROLS ── */
+    .c-arrows {
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 .85rem; pointer-events:none; z-index:20;
     }
-
-    /* ━━━ FORECAST MOCKUP ━━━ */
-    .forecast-mockup {
-      background: rgba(30, 41, 59, 0.6);
-      border: 2px solid #e8a020;
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 0 40px rgba(232, 160, 32, 0.15);
-      height: 380px;
-      display: flex;
-      flex-direction: column;
+    .c-arr {
+      width:32px; height:32px; border-radius:50%;
+      background:rgba(232,160,32,.15); border:1px solid rgba(232,160,32,.4);
+      color:#e8a020; font-size:1.1rem;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; pointer-events:auto;
+      transition:all .2s; flex-shrink:0;
     }
-
-    .forecast-header {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #e8a020;
-      margin-bottom: 1rem;
-      border-bottom: 1px solid rgba(232, 160, 32, 0.2);
-      padding-bottom: 0.8rem;
+    .c-arr:hover { background:#e8a020; color:#000; transform:scale(1.1); }
+    .c-dots {
+      position:absolute; bottom:.9rem; left:50%; transform:translateX(-50%);
+      display:flex; gap:.55rem; z-index:20;
     }
+    .cdot { width:7px; height:7px; border-radius:50%; background:rgba(232,160,32,.25); border:1px solid rgba(232,160,32,.4); cursor:pointer; transition:all .25s; }
+    .cdot.active { background:#e8a020; transform:scale(1.35); }
 
-    .forecast-chart {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-      gap: 0.4rem;
-    }
-
-    .forecast-bar {
-      flex: 1;
-      background: linear-gradient(to top, #e8a020, #f0b03f);
-      border-radius: 4px;
-      min-height: 15%;
-      position: relative;
-    }
-
-    .forecast-insight {
-      background: rgba(232, 160, 32, 0.1);
-      border-left: 3px solid #e8a020;
-      padding: 0.8rem;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      color: #cbd5e1;
-    }
-
-    .insight-label {
-      color: #e8a020;
-      font-weight: 600;
-      margin-bottom: 0.3rem;
-    }
-
-    /* ━━━ CAROUSEL CONTROLS ━━━ */
-    .carousel-controls {
-      position: absolute;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 1rem;
-      z-index: 20;
-    }
-
-    .carousel-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: rgba(232, 160, 32, 0.3);
-      border: 1px solid rgba(232, 160, 32, 0.5);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .carousel-dot.active {
-      background: #e8a020;
-      transform: scale(1.3);
-    }
-
-    .carousel-dot:hover {
-      background: rgba(232, 160, 32, 0.6);
-    }
-
-    .carousel-arrows {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      padding: 0 1rem;
-      pointer-events: none;
-      z-index: 15;
-    }
-
-    .carousel-arrow {
-      background: rgba(232, 160, 32, 0.2);
-      border: 1px solid rgba(232, 160, 32, 0.5);
-      color: #e8a020;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      pointer-events: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      font-size: 1.2rem;
-    }
-
-    .carousel-arrow:hover {
-      background: #e8a020;
-      color: #000;
-      transform: scale(1.1);
-    }
-
-    /* ━━━ APPS STRIP ━━━ */
+    /* ── APPS STRIP ── */
     .apps-strip {
-      position: relative;
-      z-index: 10;
-      padding: 3rem 32px;
-      text-align: center;
+      position:relative; z-index:10;
+      padding:2.5rem 28px;
+      border-top:1px solid rgba(232,160,32,.1);
+      background:rgba(10,16,30,.55);
     }
-
-    .apps-label {
-      font-size: 0.9rem;
-      color: #cbd5e1;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 2rem;
+    .apps-eyebrow { text-align:center; font-size:.72rem; color:#64748b; text-transform:uppercase; letter-spacing:2.5px; margin-bottom:1.5rem; }
+    .apps-row { display:flex; justify-content:center; flex-wrap:wrap; gap:1.5rem 2rem; max-width:1100px; margin:0 auto; }
+    .app-item { display:flex; flex-direction:column; align-items:center; gap:.45rem; cursor:pointer; }
+    .app-box {
+      width:60px; height:60px;
+      background:rgba(20,30,52,.85); border:1px solid rgba(232,160,32,.18);
+      border-radius:13px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.5rem; transition:all .28s;
     }
+    .app-item:hover .app-box { border-color:#e8a020; background:rgba(232,160,32,.1); transform:translateY(-3px); box-shadow:0 6px 18px rgba(232,160,32,.18); }
+    .app-lbl { font-size:.7rem; color:#64748b; text-align:center; white-space:nowrap; transition:color .2s; }
+    .app-item:hover .app-lbl { color:#e8a020; }
 
-    .apps-grid {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      max-width: 1200px;
-      margin: 0 auto;
+    /* ── SHARED SECTION ── */
+    .section { position:relative; z-index:10; padding:5rem 28px; max-width:1380px; margin:0 auto; }
+    .sec-eye { font-size:.72rem; color:#e8a020; text-transform:uppercase; letter-spacing:2px; margin-bottom:.55rem; }
+    .sec-title { font-size:clamp(1.5rem,2.8vw,2.2rem); font-weight:800; line-height:1.2; margin-bottom:.7rem; }
+    .sec-sub { font-size:.9rem; color:#64748b; line-height:1.65; max-width:560px; margin-bottom:3rem; }
+    .divider { border:none; border-top:1px solid rgba(232,160,32,.08); }
+
+    /* ── FEATURES ── */
+    .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1.25rem; }
+    .feat-card {
+      background:rgba(12,20,38,.75); border:1px solid rgba(232,160,32,.12);
+      border-radius:14px; padding:1.5rem;
+      transition:all .3s;
     }
+    .feat-card:hover { border-color:rgba(232,160,32,.45); transform:translateY(-4px); box-shadow:0 10px 26px rgba(232,160,32,.1); }
+    .feat-icon { font-size:1.8rem; margin-bottom:.8rem; }
+    .feat-title { font-size:.95rem; font-weight:700; margin-bottom:.4rem; }
+    .feat-desc { font-size:.82rem; color:#64748b; line-height:1.6; }
 
-    .app-icon {
-      width: 80px;
-      height: 80px;
-      background: rgba(30, 41, 59, 0.8);
-      border: 1px solid rgba(232, 160, 32, 0.2);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
+    /* ── PRICING ── */
+    .pricing-band { position:relative; z-index:10; padding:5rem 28px; background:rgba(8,13,26,.7); border-top:1px solid rgba(232,160,32,.08); border-bottom:1px solid rgba(232,160,32,.08); }
+    .pricing-inner { max-width:1100px; margin:0 auto; }
+    .pricing-header { text-align:center; margin-bottom:3rem; }
+    .pricing-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.25rem; }
+    .plan {
+      background:rgba(12,20,38,.85); border:1px solid rgba(232,160,32,.14);
+      border-radius:16px; padding:2rem;
+      display:flex; flex-direction:column; transition:all .28s;
     }
+    .plan:hover { transform:translateY(-4px); }
+    .plan.hot { border-color:#e8a020; box-shadow:0 0 28px rgba(232,160,32,.12); }
+    .plan-badge { background:#e8a020; color:#000; font-size:.67rem; font-weight:800; padding:3px 10px; border-radius:20px; width:fit-content; margin-bottom:.7rem; }
+    .plan-name { font-size:1.05rem; font-weight:700; margin-bottom:.2rem; }
+    .plan-price { font-size:2.1rem; font-weight:800; color:#e8a020; }
+    .plan-price em { font-size:.85rem; color:#64748b; font-style:normal; font-weight:400; }
+    .plan-desc { font-size:.8rem; color:#64748b; margin:.35rem 0 1.1rem; }
+    .plan-feats { list-style:none; flex:1; display:flex; flex-direction:column; gap:.5rem; margin-bottom:1.5rem; }
+    .plan-feats li { font-size:.82rem; color:#cbd5e1; display:flex; gap:.5rem; }
+    .plan-feats li::before { content:"✓"; color:#e8a020; font-weight:700; flex-shrink:0; }
+    .plan-btn { padding:10px; border-radius:8px; font-size:.88rem; font-weight:700; cursor:pointer; border:none; text-align:center; transition:all .25s; }
+    .plan-btn-gold { background:#e8a020; color:#000; }
+    .plan-btn-gold:hover { background:#f0b03f; }
+    .plan-btn-out { background:transparent; color:#f1f5f9; border:1.5px solid rgba(255,255,255,.25); }
+    .plan-btn-out:hover { border-color:#e8a020; color:#e8a020; }
 
-    .app-icon:hover {
-      background: rgba(232, 160, 32, 0.15);
-      border-color: #e8a020;
-      transform: translateY(-4px);
-      box-shadow: 0 10px 30px rgba(232, 160, 32, 0.2);
+    /* ── CTA ── */
+    .cta-band { position:relative; z-index:10; padding:6rem 28px; text-align:center; }
+    .cta-title { font-size:clamp(1.6rem,3vw,2.4rem); font-weight:800; margin-bottom:.9rem; }
+    .cta-sub { font-size:.93rem; color:#64748b; max-width:520px; margin:0 auto 2.25rem; line-height:1.65; }
+    .cta-btns { display:flex; gap:.85rem; justify-content:center; flex-wrap:wrap; }
+    .btn-big { padding:13px 32px; border-radius:10px; font-size:.97rem; font-weight:700; cursor:pointer; transition:all .25s; border:none; }
+    .btn-big-gold { background:#e8a020; color:#000; }
+    .btn-big-gold:hover { background:#f0b03f; transform:translateY(-2px); box-shadow:0 10px 28px rgba(232,160,32,.35); }
+    .btn-big-out { background:transparent; color:#f1f5f9; border:2px solid rgba(255,255,255,.28); }
+    .btn-big-out:hover { border-color:#e8a020; color:#e8a020; }
+
+    /* ── FOOTER ── */
+    .site-footer { position:relative; z-index:10; background:rgba(4,7,16,.98); border-top:1px solid rgba(232,160,32,.1); padding:3.5rem 28px 2rem; }
+    .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:3rem; max-width:1200px; margin:0 auto 2rem; }
+    .footer-brand p { font-size:.8rem; color:#334155; line-height:1.65; margin-top:.6rem; max-width:260px; }
+    .footer-col h4 { font-size:.83rem; font-weight:700; color:#f1f5f9; margin-bottom:.9rem; }
+    .footer-col ul { list-style:none; display:flex; flex-direction:column; gap:.48rem; }
+    .footer-col a { font-size:.8rem; color:#334155; transition:color .2s; }
+    .footer-col a:hover { color:#e8a020; }
+    .footer-bottom { max-width:1200px; margin:0 auto; padding-top:1.4rem; border-top:1px solid rgba(232,160,32,.07); display:flex; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+    .footer-bottom p { font-size:.76rem; color:#1e293b; }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:960px){
+      .slide { grid-template-columns:1fr; padding:1.5rem 1.4rem 2.5rem; overflow-y:auto; gap:.75rem; }
+      .slide-center { flex-direction:row; justify-content:flex-start; }
+      .slide-right { padding-left:0; height:auto; }
+      .mockup-box { height:260px; }
+      .hero-wrap { height:auto; min-height:calc(100dvh - 62px); }
+      .carousel-card { min-height:65vh; }
+      .nav-links { display:none; }
+      .hamburger { display:flex; }
+      .footer-grid { grid-template-columns:1fr 1fr; gap:2rem; }
     }
-
-    .app-label {
-      position: absolute;
-      bottom: -24px;
-      font-size: 0.8rem;
-      color: #cbd5e1;
-      white-space: nowrap;
-    }
-
-    /* ━━━ RESPONSIVE ━━━ */
-    @media (max-width: 1024px) {
-      .carousel-slide {
-        grid-template-columns: 1fr;
-        padding: 2rem;
-        min-height: 600px;
-      }
-
-      .slide-text h1 {
-        font-size: 1.8rem;
-      }
-
-      .dashboard-mockup,
-      .chat-mockup,
-      .forecast-mockup {
-        height: 300px;
-      }
-
-      .apps-grid {
-        gap: 1rem;
-      }
-
-      .app-icon {
-        width: 70px;
-        height: 70px;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .hero-carousel-container {
-        padding: 20px 16px;
-      }
-
-      .carousel-slide {
-        padding: 1.5rem 1rem;
-        min-height: 700px;
-      }
-
-      .slide-text h1 {
-        font-size: 1.5rem;
-      }
-
-      .slide-text p {
-        font-size: 0.9rem;
-      }
-
-      .btn {
-        padding: 10px 18px;
-        font-size: 0.85rem;
-      }
-
-      .dashboard-mockup,
-      .chat-mockup,
-      .forecast-mockup {
-        height: 250px;
-      }
-
-      .apps-grid {
-        gap: 0.8rem;
-      }
-
-      .app-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 1.5rem;
-      }
+    @media(max-width:600px){
+      .hero-wrap { padding:12px 14px; }
+      .section { padding:3rem 16px; }
+      .pricing-band,.cta-band { padding:3.5rem 16px; }
+      .footer-grid { grid-template-columns:1fr; }
+      .apps-strip { padding:2rem 16px; }
+      .apps-row { gap:1rem 1.4rem; }
+      .mockup-box { height:220px; }
     }
   </style>
 </head>
 <body>
-  <canvas id="particles"></canvas>
+<canvas id="particles"></canvas>
 
-  <div class="hero-carousel-container">
-    <div class="hero-carousel">
-      <div class="carousel-slides">
-        <!-- SLIDE 1: DASHBOARD -->
-        <div class="carousel-slide active">
-          <div class="slide-text">
-            <h1>Financial Intelligence Platform</h1>
-            <p>Formation · Bookkeeping · Forecasting · Compliance — all in one platform.</p>
-            <div class="slide-ctas">
-              <button class="btn btn-primary">Get Started Free</button>
-              <button class="btn btn-outline">View Demo</button>
-            </div>
-          </div>
-          <div class="slide-logo">
-            <svg class="ih-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <filter id="glow">
-                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                  <feMerge>
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-              </defs>
-              <rect x="30" y="20" width="60" height="80" fill="#e8a020" filter="url(#glow)" rx="6"/>
-              <polygon points="45,40 60,55 75,40" fill="#080d1a"/>
-              <polygon points="45,65 60,80 75,65" fill="#080d1a"/>
-            </svg>
-            <p>Insight Hunter</p>
-          </div>
-          <div class="dashboard-mockup">
-            <div class="dashboard-header">
-              <span>📊 Financial Dashboard</span>
-              <span>Status: Active ✓</span>
-            </div>
-            <div class="dashboard-kpis">
-              <div class="kpi-chip">
-                <div class="kpi-label">Revenue</div>
-                <div class="kpi-value">\$1.3B</div>
-                <div class="kpi-trend">↑ 12.5%</div>
-              </div>
-              <div class="kpi-chip">
-                <div class="kpi-label">Cash Flow</div>
-                <div class="kpi-value">\$118K</div>
-                <div class="kpi-trend">↑ 8.2%</div>
-              </div>
-            </div>
-            <div class="dashboard-chart">
-              <div class="chart-bar" style="height: 65%;"></div>
-              <div class="chart-bar" style="height: 80%;"></div>
-              <div class="chart-bar" style="height: 55%;"></div>
-              <div class="chart-bar" style="height: 90%;"></div>
-              <div class="chart-bar" style="height: 70%;"></div>
-            </div>
-            <div class="dashboard-row">
-              <span>Accounts</span>
-              <span class="status-badge status-active">Synced</span>
-            </div>
-            <div class="dashboard-row">
-              <span>Next Filing</span>
-              <span>Mar 25</span>
-            </div>
-          </div>
-        </div>
+<!-- NAV -->
+<nav class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Insight<span>Hunter</span></a>
+    <ul class="nav-links">
+      <li><a href="/features/">Features</a></li>
+      <li><a href="/pricing.html">Pricing</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-ghost">Log In</button>
+      <button class="nav-cta">Start Free</button>
+    </div>
+    <div class="hamburger" id="ham"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+<div class="mob-menu" id="mobMenu">
+  <a href="/features/">Features</a>
+  <a href="/pricing.html">Pricing</a>
+  <a href="/blog/">Blog</a>
+  <a href="/contact.html">Contact</a>
+  <button class="nav-cta" style="width:fit-content;margin-top:.5rem">Start Free</button>
+</div>
 
-        <!-- SLIDE 2: ASK AI -->
-        <div class="carousel-slide">
-          <div class="slide-text">
-            <h1>Ask Your AI Finance Advisor</h1>
-            <p>Real-time answers about cash flow, forecasts, tax strategy, and compliance. Natural language. Instant insights.</p>
-            <div class="slide-ctas">
-              <button class="btn btn-primary">Get Started Free</button>
-              <button class="btn btn-outline">View Demo</button>
-            </div>
-          </div>
-          <div class="slide-logo">
-            <svg class="ih-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <filter id="glow">
-                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                  <feMerge>
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-              </defs>
-              <rect x="30" y="20" width="60" height="80" fill="#e8a020" filter="url(#glow)" rx="6"/>
-              <polygon points="45,40 60,55 75,40" fill="#080d1a"/>
-              <polygon points="45,65 60,80 75,65" fill="#080d1a"/>
-            </svg>
-            <p>Insight Hunter</p>
-          </div>
-          <div class="chat-mockup">
-            <div class="chat-header">💬 AI Finance Advisor</div>
-            <div class="chat-messages">
-              <div class="chat-bubble bubble-user">What's my 90-day cash forecast?</div>
-              <div class="chat-bubble bubble-ai">Based on historical patterns and pending invoices, you'll have \$145K in 90 days. Your burn rate suggests a 14-month runway.</div>
-              <div class="chat-bubble bubble-user">Should I hire now?</div>
-              <div class="chat-bubble bubble-ai">Recommended: Wait 60 days for Q2 revenue confirmation. Current margins are 32%; hiring now reduces that to 18%.</div>
-            </div>
-            <input type="text" class="chat-input" placeholder="Type a question...">
-          </div>
-        </div>
+<!-- ══════════════════════════════════ HERO ══════════════════════════════════ -->
+<div class="hero-wrap">
+  <div class="carousel-card">
 
-        <!-- SLIDE 3: FORECAST -->
-        <div class="carousel-slide">
-          <div class="slide-text">
-            <h1>See Cash Flow Before It Happens</h1>
-            <p>Predictive models powered by 100k+ business datasets. Know your runway. Plan with confidence.</p>
-            <div class="slide-ctas">
-              <button class="btn btn-primary">Get Started Free</button>
-              <button class="btn btn-outline">View Demo</button>
-            </div>
-          </div>
-          <div class="slide-logo">
-            <svg class="ih-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <filter id="glow">
-                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                  <feMerge>
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-              </defs>
-              <rect x="30" y="20" width="60" height="80" fill="#e8a020" filter="url(#glow)" rx="6"/>
-              <polygon points="45,40 60,55 75,40" fill="#080d1a"/>
-              <polygon points="45,65 60,80 75,65" fill="#080d1a"/>
-            </svg>
-            <p>Insight Hunter</p>
-          </div>
-          <div class="forecast-mockup">
-            <div class="forecast-header">📈 12-Month Cash Forecast</div>
-            <div class="forecast-chart">
-              <div class="forecast-bar" style="height: 72%;"></div>
-              <div class="forecast-bar" style="height: 78%;"></div>
-              <div class="forecast-bar" style="height: 85%;"></div>
-              <div class="forecast-bar" style="height: 82%;"></div>
-              <div class="forecast-bar" style="height: 88%;"></div>
-              <div class="forecast-bar" style="height: 92%;"></div>
-            </div>
-            <div class="forecast-insight">
-              <div class="insight-label">💡 Insight</div>
-              <div>Q3 shows 18% growth. Optimal hiring window: July–August. Budget reserve: \$50K.</div>
-            </div>
-          </div>
+    <!-- SLIDE 1 — Dashboard -->
+    <div class="slide active">
+      <div class="slide-left">
+        <span class="slide-eyebrow">Financial Intelligence</span>
+        <h1>The Platform Built for Your Business Finances</h1>
+        <p>Formation · Bookkeeping · Forecasting · Compliance — all in one place, powered by AI.</p>
+        <div class="slide-btns">
+          <button class="btn-gold">Get Started Free</button>
+          <button class="btn-wire">View Demo</button>
         </div>
       </div>
-
-      <!-- ARROWS -->
-      <div class="carousel-arrows">
-        <button class="carousel-arrow" id="prev-slide">‹</button>
-        <button class="carousel-arrow" id="next-slide">›</button>
+      <div class="slide-center">
+        <svg class="logo-glow" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs><filter id="g0"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+          <rect x="28" y="14" width="44" height="72" rx="6" fill="#e8a020" filter="url(#g0)"/>
+          <polygon points="36,30 50,46 64,30" fill="#080d1a"/>
+          <polygon points="36,56 50,72 64,56" fill="#080d1a"/>
+        </svg>
+        <div class="logo-name">Insight Hunter</div>
+        <div class="logo-sub">Platform</div>
       </div>
+      <div class="slide-right">
+        <div class="mockup-box">
+          <div class="mbox-title">📊 Dashboard</div>
+          <div class="kpi-row">
+            <div class="kchip"><div class="kchip-lbl">Revenue</div><div class="kchip-val">$118K</div><div class="kchip-trnd">↑ 12.5%</div></div>
+            <div class="kchip"><div class="kchip-lbl">Cash Flow</div><div class="kchip-val">$44K</div><div class="kchip-trnd">↑ 8.2%</div></div>
+          </div>
+          <div class="mchart">
+            <div class="mcbar" style="height:58%"></div>
+            <div class="mcbar" style="height:72%"></div>
+            <div class="mcbar" style="height:50%"></div>
+            <div class="mcbar" style="height:88%"></div>
+            <div class="mcbar" style="height:66%"></div>
+            <div class="mcbar" style="height:80%"></div>
+          </div>
+          <div class="mrow"><span>Bank Sync</span><span class="mbadge mbadge-g">Live</span></div>
+          <div class="mrow"><span>Next Filing</span><span style="color:#e8a020">Mar 25</span></div>
+          <div class="mrow"><span>Runway</span><span class="mbadge mbadge-y">18 mo</span></div>
+        </div>
+      </div>
+    </div>
 
-      <!-- DOTS -->
-      <div class="carousel-controls">
-        <div class="carousel-dot active" data-slide="0"></div>
-        <div class="carousel-dot" data-slide="1"></div>
-        <div class="carousel-dot" data-slide="2"></div>
+    <!-- SLIDE 2 — AI Advisor -->
+    <div class="slide">
+      <div class="slide-left">
+        <span class="slide-eyebrow">AI Finance Advisor</span>
+        <h1>Ask Anything. Get Answers from Your Real Books.</h1>
+        <p>Instant, data-backed answers on cash flow, hiring decisions, tax risk, and pricing strategy — in plain English.</p>
+        <div class="slide-btns">
+          <button class="btn-gold">Get Started Free</button>
+          <button class="btn-wire">View Demo</button>
+        </div>
+      </div>
+      <div class="slide-center">
+        <svg class="logo-glow" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs><filter id="g1"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+          <rect x="28" y="14" width="44" height="72" rx="6" fill="#e8a020" filter="url(#g1)"/>
+          <polygon points="36,30 50,46 64,30" fill="#080d1a"/>
+          <polygon points="36,56 50,72 64,56" fill="#080d1a"/>
+        </svg>
+        <div class="logo-name">Insight Hunter</div>
+        <div class="logo-sub">AI Advisor</div>
+      </div>
+      <div class="slide-right">
+        <div class="mockup-box">
+          <div class="mbox-title">💬 AI Finance Advisor</div>
+          <div class="mchat">
+            <div class="mbubble mbubble-u">What's my 90-day cash forecast?</div>
+            <div class="mbubble mbubble-a">You'll have ~$145K in 90 days. Burn rate suggests a 14-month runway at current spend.</div>
+            <div class="mbubble mbubble-u">Can I hire now?</div>
+            <div class="mbubble mbubble-a">Wait 60 days. Hiring now drops margins from 32% → 18%. Q2 close will confirm if it's safe.</div>
+          </div>
+          <div class="mchat-inp">Ask about your finances…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3 — Forecasting -->
+    <div class="slide">
+      <div class="slide-left">
+        <span class="slide-eyebrow">Cash Flow Forecasting</span>
+        <h1>See Your Cash Flow Before It Happens.</h1>
+        <p>12-month rolling forecasts, scenario modeling, and runway alerts — powered by your real transaction history.</p>
+        <div class="slide-btns">
+          <button class="btn-gold">Get Started Free</button>
+          <button class="btn-wire">View Demo</button>
+        </div>
+      </div>
+      <div class="slide-center">
+        <svg class="logo-glow" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs><filter id="g2"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+          <rect x="28" y="14" width="44" height="72" rx="6" fill="#e8a020" filter="url(#g2)"/>
+          <polygon points="36,30 50,46 64,30" fill="#080d1a"/>
+          <polygon points="36,56 50,72 64,56" fill="#080d1a"/>
+        </svg>
+        <div class="logo-name">Insight Hunter</div>
+        <div class="logo-sub">Forecasting</div>
+      </div>
+      <div class="slide-right">
+        <div class="mockup-box">
+          <div class="mbox-title">📈 12-Month Forecast</div>
+          <div class="mforecast">
+            <div class="mfbar mfbar-solid" style="height:58%"></div>
+            <div class="mfbar mfbar-solid" style="height:66%"></div>
+            <div class="mfbar mfbar-solid" style="height:74%"></div>
+            <div class="mfbar mfbar-solid" style="height:70%"></div>
+            <div class="mfbar mfbar-solid" style="height:80%"></div>
+            <div class="mfbar mfbar-dash" style="height:85%"></div>
+            <div class="mfbar mfbar-dash" style="height:88%"></div>
+            <div class="mfbar mfbar-dash" style="height:92%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.6rem;color:#334155;margin-bottom:.45rem"><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span style="color:#e8a020">Aug›</span><span style="color:#e8a020">Sep›</span><span style="color:#e8a020">Oct›</span></div>
+          <div class="minsight"><strong>💡 Insight:</strong> Q3 +18% growth — optimal hiring window July–August</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARROWS -->
+    <div class="c-arrows">
+      <button class="c-arr" id="prev">&#8249;</button>
+      <button class="c-arr" id="next">&#8250;</button>
+    </div>
+    <!-- DOTS -->
+    <div class="c-dots">
+      <div class="cdot active" data-s="0"></div>
+      <div class="cdot" data-s="1"></div>
+      <div class="cdot" data-s="2"></div>
+    </div>
+
+  </div><!-- /.carousel-card -->
+</div><!-- /.hero-wrap -->
+
+<!-- ══════════════════════════════════ APPS ══════════════════════════════════ -->
+<div class="apps-strip">
+  <p class="apps-eyebrow">Included Apps</p>
+  <div class="apps-row">
+    <div class="app-item"><div class="app-box">📋</div><span class="app-lbl">BizForma</span></div>
+    <div class="app-item"><div class="app-box">📚</div><span class="app-lbl">Bookkeeping</span></div>
+    <div class="app-item"><div class="app-box">📊</div><span class="app-lbl">Insight Lite</span></div>
+    <div class="app-item"><div class="app-box" style="font-size:.85rem;font-weight:800;color:#e8a020">IH</div><span class="app-lbl">Insight Standard</span></div>
+    <div class="app-item"><div class="app-box">👑</div><span class="app-lbl">Insight Pro</span></div>
+    <div class="app-item"><div class="app-box">🔍</div><span class="app-lbl">Scout</span></div>
+    <div class="app-item"><div class="app-box">📞</div><span class="app-lbl">PBX</span></div>
+    <div class="app-item"><div class="app-box">💼</div><span class="app-lbl">Payroll</span></div>
+    <div class="app-item"><div class="app-box">🌐</div><span class="app-lbl">Website Services</span></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ══════════════════════════════════ FEATURES ══════════════════════════════════ -->
+<div class="section">
+  <p class="sec-eye">What's Inside</p>
+  <h2 class="sec-title">Everything your business needs</h2>
+  <p class="sec-sub">From formation to month-end close, Insight Hunter covers the full financial lifecycle.</p>
+  <div class="features-grid">
+    <div class="feat-card"><div class="feat-icon">🏢</div><div class="feat-title">Business Formation</div><div class="feat-desc">LLC, S-Corp, C-Corp filing, EIN, operating agreements, and state compliance — done in minutes.</div></div>
+    <div class="feat-card"><div class="feat-icon">📚</div><div class="feat-title">AI Bookkeeping</div><div class="feat-desc">Auto transaction categorization, bank sync, P&L and balance sheet — always reconciled, zero manual entry.</div></div>
+    <div class="feat-card"><div class="feat-icon">📈</div><div class="feat-title">Cash Flow Forecasting</div><div class="feat-desc">12-month rolling forecasts with scenario modeling. Know your runway before it becomes a problem.</div></div>
+    <div class="feat-card"><div class="feat-icon">🧾</div><div class="feat-title">Tax Compliance</div><div class="feat-desc">Quarterly estimates, multi-state sales tax, payroll deposits, W-2/1099 generation and filing reminders.</div></div>
+    <div class="feat-card"><div class="feat-icon">💬</div><div class="feat-title">AI Finance Advisor</div><div class="feat-desc">Ask about pricing, hiring, runway, or tax risk. Get instant answers grounded in your actual books.</div></div>
+    <div class="feat-card"><div class="feat-icon">📊</div><div class="feat-title">KPI Dashboards</div><div class="feat-desc">50+ pre-built templates. Real-time MRR, churn, LTV, margin, and burn rate — customizable per industry.</div></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ══════════════════════════════════ PRICING ══════════════════════════════════ -->
+<div class="pricing-band">
+  <div class="pricing-inner">
+    <div class="pricing-header">
+      <p class="sec-eye" style="text-align:center">Pricing</p>
+      <h2 class="sec-title" style="text-align:center">Simple, transparent pricing</h2>
+      <p class="sec-sub" style="margin:0 auto;text-align:center">No surprise fees. Cancel anytime.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="plan">
+        <div class="plan-name">Lite</div>
+        <div class="plan-price">$0<em>/mo</em></div>
+        <div class="plan-desc">For freelancers just getting started.</div>
+        <ul class="plan-feats">
+          <li>1 business entity</li>
+          <li>Basic bookkeeping (50 tx/mo)</li>
+          <li>AI advisor (10 questions/mo)</li>
+          <li>Annual cash flow snapshot</li>
+          <li>Insight Lite dashboard</li>
+        </ul>
+        <button class="plan-btn plan-btn-out">Get Started Free</button>
+      </div>
+      <div class="plan hot">
+        <div class="plan-badge">Most Popular</div>
+        <div class="plan-name">Standard</div>
+        <div class="plan-price">$49<em>/mo</em></div>
+        <div class="plan-desc">For growing small businesses.</div>
+        <ul class="plan-feats">
+          <li>Up to 3 entities</li>
+          <li>Unlimited bookkeeping + bank sync</li>
+          <li>12-month rolling forecast</li>
+          <li>Unlimited AI advisor</li>
+          <li>Tax compliance + reminders</li>
+          <li>KPI dashboards + Payroll</li>
+        </ul>
+        <button class="plan-btn plan-btn-gold">Start Free Trial</button>
+      </div>
+      <div class="plan">
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$149<em>/mo</em></div>
+        <div class="plan-desc">For fractional CFOs and multi-entity firms.</div>
+        <ul class="plan-feats">
+          <li>Unlimited entities + clients</li>
+          <li>White-label reports (PDF)</li>
+          <li>PBX phone system</li>
+          <li>Scout client profiling</li>
+          <li>Custom KPI builder</li>
+          <li>Priority support + onboarding</li>
+        </ul>
+        <button class="plan-btn plan-btn-out">Contact Sales</button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- APPS STRIP -->
-  <div class="apps-strip">
-    <p class="apps-label">Included Apps</p>
-    <div class="apps-grid">
-      <div class="app-icon">📋<span class="app-label">BizForma</span></div>
-      <div class="app-icon">📚<span class="app-label">Bookkeeping</span></div>
-      <div class="app-icon">📊<span class="app-label">Insight Lite</span></div>
-      <div class="app-icon">IH<span class="app-label">Insight Standard</span></div>
-      <div class="app-icon">👑<span class="app-label">Insight Pro</span></div>
-      <div class="app-icon">🔍<span class="app-label">Scout</span></div>
-      <div class="app-icon">📞<span class="app-label">PBX</span></div>
-      <div class="app-icon">💼<span class="app-label">Payroll</span></div>
-      <div class="app-icon">🌐<span class="app-label">Website Services</span></div>
+<!-- ══════════════════════════════════ CTA ══════════════════════════════════ -->
+<div class="cta-band">
+  <h2 class="cta-title">Ready to take control of your finances?</h2>
+  <p class="cta-sub">Join thousands of small businesses that get enterprise-grade financial intelligence — without the enterprise price tag.</p>
+  <div class="cta-btns">
+    <button class="btn-big btn-big-gold">Get Started Free</button>
+    <button class="btn-big btn-big-out">Schedule a Demo</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ FOOTER ══════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="nav-logo" style="font-size:1.12rem">Insight<span>Hunter</span></a>
+      <p>Financial intelligence for freelancers, small firms, and fractional CFOs. Built on Cloudflare's global edge network.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="/features/">Features</a></li>
+        <li><a href="/pricing.html">Pricing</a></li>
+        <li><a href="#">Bookkeeping</a></li>
+        <li><a href="#">Forecasting</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Security</a></li>
+      </ul>
     </div>
   </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Insight Hunter. All rights reserved.</p>
+    <p>Built on Cloudflare Workers &amp; D1</p>
+  </div>
+</footer>
 
-  <script>
-    // ━━━ PARTICLE SYSTEM ━━━
-    const canvas = document.getElementById('particles');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const particles = [];
-    const particleCount = 180;
-
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.5;
-        this.vy = (Math.random() - 1) * 0.8;
-        this.radius = Math.random() * 1.5 + 0.5;
-        this.opacity = Math.random() * 0.5 + 0.3;
-        this.color = Math.random() > 0.5 ? '#e8a020' : '#f1f5f9';
-      }
-
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vy -= 0.02;
-        if (this.y > canvas.height) {
-          this.y = -10;
-          this.x = Math.random() * canvas.width;
-        }
-      }
-
-      draw() {
-        ctx.globalAlpha = this.opacity;
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle());
-    }
-
-    function animateParticles() {
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = '#080d1a';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.update();
-        p.draw();
-      });
-      requestAnimationFrame(animateParticles);
-    }
-    animateParticles();
-
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+<script>
+  // PARTICLES
+  const cv = document.getElementById('particles');
+  const cx = cv.getContext('2d');
+  function rsz(){ cv.width=innerWidth; cv.height=innerHeight; }
+  rsz(); window.addEventListener('resize', rsz);
+  const pts = Array.from({length:150},()=>({
+    x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+    vx:(Math.random()-.5)*.38, vy:-(Math.random()*.55+.12),
+    r:Math.random()*1.2+.35, o:Math.random()*.4+.15,
+    c:Math.random()>.5?'#e8a020':'#c8d5e8'
+  }));
+  (function anim(){
+    cx.globalAlpha=1; cx.fillStyle='#080d1a';
+    cx.fillRect(0,0,cv.width,cv.height);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.y<-8){ p.y=cv.height+8; p.x=Math.random()*cv.width; }
+      cx.globalAlpha=p.o; cx.fillStyle=p.c;
+      cx.beginPath(); cx.arc(p.x,p.y,p.r,0,Math.PI*2); cx.fill();
     });
+    requestAnimationFrame(anim);
+  })();
 
-    // ━━━ CAROUSEL ━━━
-    let currentSlide = 0;
-    const slides = document.querySelectorAll('.carousel-slide');
-    const dots = document.querySelectorAll('.carousel-dot');
+  // CAROUSEL
+  let cur=0;
+  const slides=document.querySelectorAll('.slide');
+  const dots=document.querySelectorAll('.cdot');
+  function show(n){
+    slides.forEach(s=>s.classList.remove('active'));
+    dots.forEach(d=>d.classList.remove('active'));
+    slides[n].classList.add('active');
+    dots[n].classList.add('active');
+  }
+  document.getElementById('next').onclick=()=>{ cur=(cur+1)%slides.length; show(cur); };
+  document.getElementById('prev').onclick=()=>{ cur=(cur-1+slides.length)%slides.length; show(cur); };
+  dots.forEach((d,i)=>d.addEventListener('click',()=>{ cur=i; show(cur); }));
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'){ cur=(cur+1)%slides.length; show(cur); }
+    if(e.key==='ArrowLeft'){ cur=(cur-1+slides.length)%slides.length; show(cur); }
+  });
+  let timer=setInterval(()=>{ cur=(cur+1)%slides.length; show(cur); },8000);
+  document.querySelector('.carousel-card').addEventListener('mouseenter',()=>clearInterval(timer));
+  document.querySelector('.carousel-card').addEventListener('mouseleave',()=>{ timer=setInterval(()=>{ cur=(cur+1)%slides.length; show(cur); },8000); });
 
-    function showSlide(n) {
-      slides.forEach(s => s.classList.remove('active'));
-      dots.forEach(d => d.classList.remove('active'));
-      slides[n].classList.add('active');
-      dots[n].classList.add('active');
-    }
-
-    function nextSlide() {
-      currentSlide = (currentSlide + 1) % slides.length;
-      showSlide(currentSlide);
-    }
-
-    function prevSlide() {
-      currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-      showSlide(currentSlide);
-    }
-
-    document.getElementById('next-slide').addEventListener('click', nextSlide);
-    document.getElementById('prev-slide').addEventListener('click', prevSlide);
-    dots.forEach((dot, idx) => {
-      dot.addEventListener('click', () => {
-        currentSlide = idx;
-        showSlide(currentSlide);
-      });
-    });
-
-    // Auto-rotate every 9 seconds
-    setInterval(nextSlide, 9000);
-
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') nextSlide();
-      if (e.key === 'ArrowLeft') prevSlide();
-    });
-  </script>
+  // HAMBURGER
+  document.getElementById('ham').onclick=()=>document.getElementById('mobMenu').classList.toggle('open');
+</script>
 </body>
 </html>
-
