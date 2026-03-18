@@ -1,0 +1,7 @@
+__turbopack_load_page_chunks__("/components/FileUpload", [
+  "static/chunks/a9adc3f8433df95e.js",
+  "static/chunks/21bacc4485f02580.js",
+  "static/chunks/2b4d9e8cf3c40db8.js",
+  "static/chunks/b5a35a57e43d90de.js",
+  "static/chunks/turbopack-bf402e162a5cc90b.js"
+])
