@@ -1,614 +1,786 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<meta name="description" content="Insight Hunter — the financial OS for small business. Dashboard, bookkeeping, AI forecasting, business formation, payroll, PBX and more. Start free."/>
-<title>Insight Hunter — The Financial OS for Small Business</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#0D1117;--navy-2:#0F1929;--navy-3:#141E30;--card:#161B22;--border:#1E2A3A;
-  --gold:#C9972B;--gold-l:#D4A843;--gold-d:#8A6820;
-  --g1:#E2E8F0;--g2:#94A3B8;--g3:#64748B;--g4:#334155;--white:#FFF;
-  --green:#10B981;--blue:#3B82F6;--pink:#EC4899;--amber:#F59E0B;--red:#EF4444}
-html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);overflow-x:hidden}
-a{text-decoration:none;color:inherit}
-img{display:block;max-width:100%}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insight Hunter — The Auto-CFO for Your Business</title>
+  <meta name="description" content="Formation · Bookkeeping · Forecasting · Compliance — all in one AI-powered platform for small business." />
+  <link rel="canonical" href="https://insighthunter.com/" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/main.css" />
 
-/* ── Nav ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 clamp(1.25rem,4vw,3rem);
-  background:rgba(13,17,23,.92);backdrop-filter:blur(16px);
-  border-bottom:1px solid rgba(30,42,58,.8);transition:background .3s}
-.nav-logo{display:flex;align-items:center;gap:9px;font-size:.98rem;font-weight:800;letter-spacing:-.01em}
-.nav-links{display:flex;gap:2rem;list-style:none}
-.nav-links a{font-size:.875rem;font-weight:500;color:var(--g2);transition:color .15s}
-.nav-links a:hover{color:var(--white)}
-.nav-right{display:flex;align-items:center;gap:.65rem}
-.btn-ghost{padding:.42rem 1.05rem;border-radius:8px;border:1px solid var(--border);
-  font-size:.82rem;font-weight:500;color:var(--g1);transition:.18s}
-.btn-ghost:hover{border-color:rgba(201,151,43,.4);color:var(--white)}
-.btn-gold{padding:.45rem 1.2rem;border-radius:8px;background:var(--gold);
-  color:var(--navy);font-size:.82rem;font-weight:700;transition:.18s}
-.btn-gold:hover{background:var(--gold-l)}
-@media(max-width:768px){.nav-links{display:none}}
+  <style>
+    /* ══════════════════════════════════════════
+       DARK THEME OVERRIDES
+    ══════════════════════════════════════════ */
+    :root {
+      --dark-bg:      #080d1a;
+      --dark-surface: #0e1424;
+      --dark-card:    rgba(255,255,255,0.05);
+      --dark-border:  rgba(255,255,255,0.10);
+      --gold:         #e8a020;
+      --gold-light:   #f5c44a;
+      --gold-dim:     rgba(232,160,32,0.18);
+      --white:        #ffffff;
+      --white-70:     rgba(255,255,255,0.70);
+      --white-45:     rgba(255,255,255,0.45);
+    }
 
-/* ── Hero ── */
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;
-  text-align:center;padding:6rem clamp(1.25rem,4vw,3rem) 4rem;position:relative;overflow:hidden}
-.hero-bg{position:absolute;inset:0;z-index:0;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,151,43,.12) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 40% at 80% 60%, rgba(59,130,246,.05) 0%, transparent 50%),
-    var(--navy);
-}
-.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(30,42,58,.35) 1px,transparent 1px),linear-gradient(90deg,rgba(30,42,58,.35) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,black 30%,transparent 100%)}
-.hero-content{position:relative;z-index:1;max-width:820px;margin:0 auto}
-.hero-pill{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem 1rem;
-  border-radius:100px;background:rgba(201,151,43,.08);border:1px solid rgba(201,151,43,.2);
-  font-size:.72rem;font-weight:600;color:var(--gold-l);margin-bottom:1.75rem;letter-spacing:.02em}
-.hero-pill span{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
-h1{font-size:clamp(2.6rem,6vw,4.25rem);font-weight:900;letter-spacing:-.05em;line-height:1.05;
-  margin-bottom:1.25rem}
-h1 .accent{background:linear-gradient(135deg,var(--gold) 0%,var(--gold-l) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-sub{font-size:clamp(.95rem,2vw,1.15rem);color:var(--g2);line-height:1.75;
-  max-width:600px;margin:0 auto 2.5rem}
-.hero-ctas{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap;margin-bottom:3rem}
-.cta-primary{display:inline-flex;align-items:center;gap:8px;padding:.85rem 2rem;
-  border-radius:12px;background:var(--gold);color:var(--navy);font-size:1rem;
-  font-weight:700;box-shadow:0 4px 32px rgba(201,151,43,.3);transition:.2s}
-.cta-primary:hover{background:var(--gold-l);transform:translateY(-2px);box-shadow:0 8px 40px rgba(201,151,43,.35)}
-.cta-secondary{display:inline-flex;align-items:center;gap:8px;padding:.85rem 2rem;
-  border-radius:12px;border:1px solid var(--border);color:var(--g1);font-size:1rem;
-  font-weight:600;transition:.2s}
-.cta-secondary:hover{border-color:rgba(201,151,43,.3);color:var(--white)}
-.hero-note{font-size:.78rem;color:var(--g3)}
-.hero-note span{color:var(--gold-l);font-weight:600}
+    /* ══════════════════════════════════════════
+       CAROUSEL WRAPPER
+    ══════════════════════════════════════════ */
+    .hero-carousel {
+      position: relative; width: 100%; overflow: hidden;
+      background: var(--dark-bg);
+    }
 
-/* ── Stats ── */
-.stats{display:flex;justify-content:center;gap:0;border-top:1px solid var(--border);
-  border-bottom:1px solid var(--border);background:rgba(22,27,34,.6)}
-.stat{flex:1;max-width:220px;padding:1.75rem 1.5rem;text-align:center;
-  border-right:1px solid var(--border)}
-.stat:last-child{border:none}
-.stat-n{font-size:1.75rem;font-weight:900;letter-spacing:-.04em;color:var(--gold)}
-.stat-l{font-size:.72rem;color:var(--g3);margin-top:.2rem}
+    /* Particle canvas sits behind content */
+    #particles { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
 
-/* ── Section shared ── */
-section{padding:5rem clamp(1.25rem,4vw,3rem)}
-.section-inner{max-width:1200px;margin:0 auto}
-.eyebrow{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;
-  color:var(--gold);margin-bottom:.65rem}
-h2{font-size:clamp(1.75rem,3.5vw,2.75rem);font-weight:900;letter-spacing:-.04em;
-  line-height:1.15;margin-bottom:.85rem}
-.section-sub{font-size:.95rem;color:var(--g2);line-height:1.75;max-width:520px}
+    /* ── Slides ── */
+    .carousel-slide {
+      position: absolute; inset: 0; opacity: 0; z-index: 1;
+      transition: opacity 0.8s ease;
+      display: flex; flex-direction: column; min-height: 100vh;
+    }
+    .carousel-slide.active { opacity: 1; z-index: 2; position: relative; }
 
-/* ── Product Grid ── */
-.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:3rem}
-.product-card{background:var(--card);border:1px solid var(--border);border-radius:16px;
-  padding:1.75rem;transition:border-color .2s,transform .2s;position:relative;overflow:hidden}
-.product-card:hover{border-color:rgba(201,151,43,.25);transform:translateY(-3px)}
-.product-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:.3s}
-.product-card:hover::before{opacity:1}
-.pc-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;
-  justify-content:center;font-size:1.2rem;margin-bottom:1rem}
-.pc-tag{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
-  padding:2px 7px;border-radius:100px;margin-bottom:.6rem;display:inline-block}
-.pc-title{font-size:1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.5rem}
-.pc-desc{font-size:.8rem;color:var(--g2);line-height:1.65;margin-bottom:1rem}
-.pc-features{list-style:none;display:flex;flex-direction:column;gap:.3rem}
-.pc-features li{font-size:.75rem;color:var(--g3);display:flex;gap:6px;align-items:center}
-.pc-features li::before{content:'✓';color:var(--gold);font-size:.65rem}
+    /* ── Hero Body (3-col grid) ── */
+    .hero-body {
+      flex: 1; display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center; gap: 2rem;
+      padding: 7rem 5vw 3rem;
+      max-width: 1400px; margin: 0 auto; width: 100%;
+    }
 
-/* ── BizForma Feature Section ── */
-.bizforma-section{background:linear-gradient(135deg,rgba(201,151,43,.06) 0%,rgba(201,151,43,.02) 100%);
-  border-top:1px solid rgba(201,151,43,.12);border-bottom:1px solid rgba(201,151,43,.12)}
-.biz-split{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-.biz-badge{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem 1rem;
-  border-radius:100px;background:rgba(201,151,43,.1);border:1px solid rgba(201,151,43,.2);
-  font-size:.7rem;font-weight:700;color:var(--gold-l);margin-bottom:1.25rem}
-.biz-steps{list-style:none;display:flex;flex-direction:column;gap:.85rem;margin:1.5rem 0 2rem}
-.biz-steps li{display:flex;gap:.85rem;align-items:flex-start}
-.step-num{width:26px;height:26px;border-radius:50%;background:rgba(201,151,43,.1);
-  border:1px solid rgba(201,151,43,.25);display:flex;align-items:center;justify-content:center;
-  font-size:.65rem;font-weight:700;color:var(--gold-l);flex-shrink:0;margin-top:1px}
-.step-text{font-size:.82rem;color:var(--g2);line-height:1.6}
-.step-text strong{color:var(--white);font-weight:600}
-.promo-card{background:var(--card);border:1px solid rgba(201,151,43,.25);border-radius:18px;padding:2rem}
-.promo-price{font-size:2.5rem;font-weight:900;letter-spacing:-.04em;margin-bottom:.2rem}
-.promo-price sub{font-size:.9rem;font-weight:400;color:var(--g3)}
-.promo-value{display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;
-  color:var(--green);font-weight:600;background:rgba(16,185,129,.08);
-  border:1px solid rgba(16,185,129,.2);padding:.3rem .8rem;border-radius:100px;margin-bottom:1.25rem}
-.promo-list{list-style:none;display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem}
-.promo-list li{font-size:.8rem;color:var(--g2);display:flex;gap:7px;align-items:center}
-.promo-list li::before{content:'✓';color:var(--green);font-weight:700}
-.promo-list li.star::before{content:'★';color:var(--gold)}
+    /* Left column — headline + CTAs */
+    .hero-left { display: flex; flex-direction: column; gap: 1.5rem; }
 
-/* ── Pricing teaser ── */
-.pricing-teaser{display:grid;grid-template-columns:repeat(5,1fr);gap:.9rem}
-.pt-card{background:var(--card);border:1px solid var(--border);border-radius:14px;
-  padding:1.4rem 1.1rem;transition:.2s;position:relative}
-.pt-card:hover{border-color:rgba(201,151,43,.2)}
-.pt-card.hl{border-color:var(--gold);box-shadow:0 0 30px rgba(201,151,43,.1)}
-.pt-pop{position:absolute;top:-11px;left:50%;transform:translateX(-50%);
-  background:var(--gold);color:var(--navy);font-size:.58rem;font-weight:800;
-  padding:2px 10px;border-radius:100px;white-space:nowrap;text-transform:uppercase}
-.pt-tier{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem}
-.pt-price{font-size:1.8rem;font-weight:900;letter-spacing:-.04em;margin-bottom:.3rem}
-.pt-price sup{font-size:.75rem;font-weight:500;vertical-align:top;margin-top:.3rem}
-.pt-price sub{font-size:.68rem;font-weight:400;color:var(--g3)}
-.pt-desc{font-size:.72rem;color:var(--g3);line-height:1.5;margin-bottom:.85rem;min-height:2.2rem}
-.pt-cta{display:block;width:100%;padding:.55rem;border-radius:8px;text-align:center;
-  font-size:.78rem;font-weight:700;cursor:pointer;border:none;transition:.15s}
+    .hero-headline {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 900; line-height: 1.1; color: var(--white);
+    }
+    .hero-headline em { font-style: normal; color: var(--gold); }
 
-/* ── Services ── */
-.services-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2.5rem}
-.svc{background:var(--card);border:1px solid var(--border);border-radius:12px;
-  padding:1.25rem;display:flex;gap:.9rem;align-items:flex-start;transition:.2s}
-.svc:hover{border-color:rgba(201,151,43,.2)}
-.svc-ic{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;
-  justify-content:center;font-size:1.1rem;flex-shrink:0}
+    .hero-sub {
+      font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+      color: var(--white-70); line-height: 1.65; max-width: 420px;
+    }
 
-/* ── Social Proof ── */
-.proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:2.5rem}
-.proof-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem}
-.stars{color:var(--gold);font-size:.85rem;margin-bottom:.75rem}
-.quote{font-size:.82rem;color:var(--g2);line-height:1.7;margin-bottom:1rem}
-.reviewer{display:flex;align-items:center;gap:.65rem}
-.reviewer-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0}
-.reviewer-name{font-size:.78rem;font-weight:700}
-.reviewer-role{font-size:.68rem;color:var(--g3)}
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
 
-/* ── Final CTA ── */
-.final-cta{text-align:center;padding:5rem clamp(1.25rem,4vw,3rem);
-  background:linear-gradient(180deg,rgba(201,151,43,.04) 0%,transparent 100%);
-  border-top:1px solid var(--border)}
+    .btn-gold {
+      background: var(--gold); color: #000;
+      font-weight: 700; padding: 0.75rem 1.75rem;
+      border-radius: 8px; font-size: 0.97rem;
+      transition: background 0.2s, transform 0.15s;
+      border: none; cursor: pointer; display: inline-flex; align-items: center;
+    }
+    .btn-gold:hover { background: var(--gold-light); transform: translateY(-2px); }
 
-/* ── Footer ── */
-footer{background:var(--card);border-top:1px solid var(--border);padding:3rem clamp(1.25rem,4vw,3rem) 2rem}
-.footer-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem}
-.footer-brand p{font-size:.78rem;color:var(--g3);line-height:1.7;margin-top:.65rem;max-width:240px}
-.footer-col h4{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3);margin-bottom:.85rem}
-.footer-col a{display:block;font-size:.8rem;color:var(--g2);margin-bottom:.45rem;transition:color .15s}
-.footer-col a:hover{color:var(--white)}
-.footer-bottom{max-width:1200px;margin:0 auto;border-top:1px solid var(--border);padding-top:1.5rem;
-  display:flex;justify-content:space-between;align-items:center;font-size:.72rem;color:var(--g4);flex-wrap:wrap;gap:.5rem}
+    .btn-dark-outline {
+      background: transparent; color: var(--white);
+      font-weight: 600; padding: 0.75rem 1.75rem;
+      border-radius: 8px; font-size: 0.97rem;
+      border: 1.5px solid rgba(255,255,255,0.35);
+      transition: border-color 0.2s, transform 0.15s; cursor: pointer;
+      display: inline-flex; align-items: center;
+    }
+    .btn-dark-outline:hover { border-color: #fff; transform: translateY(-2px); }
 
-@media(max-width:1100px){.product-grid{grid-template-columns:1fr 1fr}.pricing-teaser{grid-template-columns:1fr 1fr 1fr}}
-@media(max-width:900px){.biz-split{grid-template-columns:1fr}.services-row{grid-template-columns:1fr 1fr}.proof-grid{grid-template-columns:1fr}}
-@media(max-width:640px){.product-grid{grid-template-columns:1fr}.stats{flex-wrap:wrap}.stat{min-width:50%;border-bottom:1px solid var(--border)}.pricing-teaser{grid-template-columns:1fr 1fr}.services-row{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}}
-</style>
+    /* Center column — Logo */
+    .hero-center { display: flex; flex-direction: column; align-items: center; gap: 1rem; z-index: 1; }
+
+    .ih-logo-mark {
+      width: 110px; height: 110px;
+      filter: drop-shadow(0 0 28px rgba(232,160,32,0.65));
+    }
+    .ih-logo-name { font-size: 1.6rem; font-weight: 800; color: var(--white); text-align: center; }
+    .ih-logo-tag  { font-size: 0.85rem; font-weight: 500; color: var(--gold); letter-spacing: 0.04em; }
+
+    /* Right column — Dashboard mockup */
+    .hero-right { display: flex; justify-content: flex-end; align-items: center; }
+
+    .dash-mockup {
+      width: min(460px, 42vw);
+      background: #0e1628;
+      border: 1.5px solid rgba(232,160,32,0.35);
+      border-radius: 14px;
+      box-shadow: 0 0 60px rgba(232,160,32,0.18), 0 0 120px rgba(232,160,32,0.08);
+      overflow: hidden;
+    }
+
+    .dash-topbar {
+      background: #111928; padding: 0.7rem 1.1rem;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .dash-title { font-size: 0.82rem; font-weight: 700; color: var(--white); }
+    .dash-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--gold); }
+
+    .dash-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+
+    /* KPI row */
+    .kpi-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.5rem; }
+    .kpi-box {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px; padding: 0.65rem 0.75rem;
+    }
+    .kpi-label { font-size: 0.6rem; color: var(--white-45); margin-bottom: 0.25rem; }
+    .kpi-value { font-size: 1rem; font-weight: 800; color: var(--white); }
+    .kpi-delta { font-size: 0.6rem; color: #4ade80; margin-top: 0.15rem; }
+
+    /* Mini chart */
+    .mini-chart-area {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px; padding: 0.75rem; height: 80px;
+      display: flex; align-items: flex-end; gap: 4px;
+    }
+    .chart-bar {
+      flex: 1; border-radius: 3px 3px 0 0;
+      background: linear-gradient(to top, var(--gold), rgba(232,160,32,0.35));
+      transition: height 0.4s ease;
+    }
+
+    /* Status rows */
+    .status-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.04); border-radius: 6px; padding: 0.5rem 0.7rem;
+    }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; margin-right: 0.5rem; flex-shrink:0; }
+    .status-dot.green  { background: #4ade80; }
+    .status-dot.gold   { background: var(--gold); }
+    .status-dot.blue   { background: #60a5fa; }
+    .status-label { font-size: 0.65rem; color: var(--white-70); flex:1; display:flex; align-items:center; }
+    .status-val   { font-size: 0.65rem; font-weight: 700; color: var(--white); }
+
+    /* ── Apps Strip ── */
+    .apps-strip {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 1.75rem 5vw;
+      display: flex; flex-direction: column; align-items: center; gap: 1.25rem;
+    }
+    .apps-label { font-size: 0.75rem; font-weight: 700; color: var(--gold); letter-spacing: 0.14em; text-transform: uppercase; }
+    .apps-row { display: flex; gap: 1.25rem; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+    .app-icon-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; cursor: pointer; }
+    .app-icon {
+      width: 52px; height: 52px; border-radius: 13px;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+    .app-icon:hover { background: var(--gold-dim); border-color: var(--gold); transform: translateY(-3px); }
+    .app-name { font-size: 0.65rem; color: var(--white-70); text-align: center; font-weight: 500; }
+
+    /* ── Slide Dots ── */
+    .carousel-dots {
+      position: absolute; bottom: 1.25rem; left: 50%;
+      transform: translateX(-50%); z-index: 20;
+      display: flex; gap: 0.6rem; align-items: center;
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(232,160,32,0.35); cursor: pointer;
+      transition: all 0.3s; border: none;
+    }
+    .dot.active { background: var(--gold); width: 26px; border-radius: 4px; }
+
+    /* ══════════════════════════════════════════
+       DARK NAV OVERRIDE
+    ══════════════════════════════════════════ */
+    .site-nav-dark {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 100;
+      height: 60px; background: transparent;
+    }
+    .nav-inner-dark {
+      max-width: 1400px; margin: 0 auto; padding: 0 5vw;
+      height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+    }
+    .nav-logo-dark { font-size: 1.1rem; font-weight: 800; color: var(--white); }
+    .nav-logo-dark span { color: var(--gold); }
+    .nav-links-dark { display: flex; gap: 1.75rem; font-size: 0.88rem; font-weight: 500; }
+    .nav-links-dark a { color: var(--white-70); transition: color 0.2s; }
+    .nav-links-dark a:hover { color: var(--white); }
+    .nav-links-dark a.active { color: var(--gold); }
+    @media (max-width:768px) { .nav-links-dark { display:none; } }
+
+    /* ══════════════════════════════════════════
+       BELOW FOLD — LIGHT SECTION
+    ══════════════════════════════════════════ */
+    .below-fold { background: var(--dark-surface); }
+
+    .features-dark {
+      padding: 5rem 5vw;
+      max-width: 1400px; margin: 0 auto;
+    }
+    .section-eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+    .section-heading-dark { font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 800; color: var(--white); margin-bottom: 0.75rem; }
+    .section-sub-dark { color: var(--white-70); font-size: 1rem; max-width: 540px; margin-bottom: 3rem; }
+
+    .features-grid-dark {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem;
+    }
+    .feature-card-dark {
+      background: var(--dark-card); border: 1px solid var(--dark-border);
+      border-radius: 12px; padding: 1.5rem;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+    .feature-card-dark:hover { border-color: rgba(232,160,32,0.35); background: rgba(232,160,32,0.05); transform: translateY(-3px); }
+    .feature-card-dark .icon { font-size: 1.75rem; margin-bottom: 0.75rem; }
+    .feature-card-dark h3 { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 0.4rem; }
+    .feature-card-dark p  { font-size: 0.85rem; color: var(--white-70); line-height: 1.6; }
+
+    /* Pricing dark */
+    .pricing-dark { padding: 5rem 5vw; border-top: 1px solid rgba(255,255,255,0.07); }
+    .pricing-dark-inner { max-width: 1000px; margin: 0 auto; }
+    .pricing-grid-dark { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 1.25rem; margin-top: 3rem; }
+    .pricing-card-dark {
+      background: var(--dark-card); border: 1px solid var(--dark-border);
+      border-radius: 12px; padding: 1.75rem;
+    }
+    .pricing-card-dark.featured { border-color: var(--gold); background: rgba(232,160,32,0.07); }
+    .pricing-card-dark .plan-name  { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.75rem; }
+    .pricing-card-dark .plan-price { font-size: 2.5rem; font-weight: 800; color: var(--white); line-height: 1; }
+    .pricing-card-dark .plan-price sup { font-size: 1rem; vertical-align: top; margin-top: 0.4rem; }
+    .pricing-card-dark .plan-period { font-size: 0.8rem; color: var(--white-45); margin-bottom: 1.25rem; }
+    .pricing-card-dark hr { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 1rem 0; }
+    .plan-feat { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.85rem; color: var(--white-70); margin-bottom: 0.5rem; }
+    .plan-feat .ck { color: #4ade80; flex-shrink: 0; }
+    .plan-feat .dd { color: var(--white-45); flex-shrink: 0; }
+
+    /* CTA dark */
+    .cta-dark {
+      padding: 5rem 5vw; text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .cta-dark h2 { font-size: clamp(1.75rem,4vw,2.5rem); font-weight: 800; color: var(--white); margin-bottom: 1rem; }
+    .cta-dark p  { color: var(--white-70); max-width: 480px; margin: 0 auto 2.5rem; font-size: 1.05rem; }
+
+    /* Footer dark */
+    .footer-dark {
+      padding: 3rem 5vw 2rem;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .footer-dark-grid { display: grid; grid-template-columns: 2fr repeat(3,1fr); gap: 3rem; margin-bottom: 3rem; }
+    @media(max-width:768px){ .footer-dark-grid{grid-template-columns:1fr 1fr;} }
+    @media(max-width:480px){ .footer-dark-grid{grid-template-columns:1fr;} }
+    .footer-dark .brand-desc { font-size: 0.85rem; color: var(--white-45); margin-top: 0.75rem; max-width: 220px; line-height: 1.6; }
+    .footer-dark h4 { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+    .footer-dark ul { display: flex; flex-direction: column; gap: 0.6rem; }
+    .footer-dark a { font-size: 0.85rem; color: var(--white-45); transition: color 0.2s; }
+    .footer-dark a:hover { color: var(--white); }
+    .footer-dark-bottom {
+      border-top: 1px solid rgba(255,255,255,0.07); padding-top: 1.25rem;
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
+      font-size: 0.8rem; color: var(--white-45);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero-body { grid-template-columns: 1fr; text-align: center; padding: 6rem 1.5rem 2rem; }
+      .hero-left { align-items: center; }
+      .hero-sub { max-width: 100%; }
+      .hero-center { order: -1; }
+      .hero-right { display: none; }
+      .dash-mockup { display: none; }
+    }
+    @media (max-width: 480px) {
+      .apps-row { gap: 0.75rem; }
+      .app-icon { width: 44px; height: 44px; font-size: 1.1rem; }
+      .app-name { font-size: 0.58rem; }
+    }
+  </style>
 </head>
-<body>
+<body style="background: var(--dark-bg, #080d1a); margin:0">
 
-<!-- NAV -->
-<nav id="nav">
-  <a href="/" class="nav-logo">
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#141E30"/><path d="M16 4v5M13 6h6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M10 9v15h12V9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 24h18" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M13 14l2.5 3L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Insight Hunter
-  </a>
-  <ul class="nav-links">
-    <li><a href="#features">Features</a></li>
-    <li><a href="#bizforma">BizForma</a></li>
-    <li><a href="/pricing.html">Pricing</a></li>
-    <li><a href="#services">Services</a></li>
-    <li><a href="/about.html">About</a></li>
-  </ul>
-  <div class="nav-right">
-    <a href="/auth/login.html" class="btn-ghost">Sign In</a>
-    <a href="/auth/register.html" class="btn-gold">Start Free →</a>
+<!-- ════════════════════════════════════════════════════
+     DARK NAV (absolute, overlays carousel)
+════════════════════════════════════════════════════ -->
+<nav class="site-nav-dark">
+  <div class="nav-inner-dark">
+    <a href="/" class="nav-logo-dark">Insight<span>Hunter</span></a>
+    <ul class="nav-links-dark">
+      <li><a href="/features/">Features</a></li>
+      <li><a href="/pricing.html">Pricing</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/contact.html">Contact</a></li>
+    </ul>
+    <div style="display:flex;gap:0.75rem;align-items:center">
+      <a href="/auth/login.html"    style="font-size:0.88rem;font-weight:600;color:rgba(255,255,255,0.7);padding:0.5rem 1rem">Log In</a>
+      <a href="/auth/register.html" class="btn-gold" style="padding:0.5rem 1.25rem;font-size:0.88rem">Get Started Free</a>
+    </div>
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-content">
-    <div class="hero-pill"><span></span> Now in early access — start free, no card required</div>
-    <h1>The <span class="accent">Financial OS</span><br>for Small Business</h1>
-    <p class="hero-sub">Dashboard analytics, AI forecasting, bookkeeping, business formation, payroll, PBX, and a full services marketplace — in one platform built for the way you actually run your business.</p>
-    <div class="hero-ctas">
-      <a href="/auth/register.html" class="cta-primary">
-        Start Free — No Card
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
-      <a href="/pricing.html" class="cta-secondary">View Pricing</a>
-    </div>
-    <div class="hero-note">Free forever · <span>Form your LLC → get 6 months Standard free</span> · Cancel anytime</div>
-  </div>
-</section>
+<!-- ════════════════════════════════════════════════════
+     HERO CAROUSEL
+════════════════════════════════════════════════════ -->
+<div class="hero-carousel" id="carousel">
+  <canvas id="particles"></canvas>
 
-<!-- STATS -->
-<div class="stats">
-  <div class="stat"><div class="stat-n">$0</div><div class="stat-l">To start — always free tier</div></div>
-  <div class="stat"><div class="stat-n">50</div><div class="stat-l">States for business formation</div></div>
-  <div class="stat"><div class="stat-n">5</div><div class="stat-l">Plan tiers — pay only for what you need</div></div>
-  <div class="stat"><div class="stat-n">9+</div><div class="stat-l">Business services in one place</div></div>
-  <div class="stat" style="border:none"><div class="stat-n">1</div><div class="stat-l">Platform for your entire business stack</div></div>
+  <!-- ── SLIDE 1: Main Hero ───────────────────────────────── -->
+  <div class="carousel-slide active" id="slide-0">
+    <div class="hero-body">
+
+      <!-- Left -->
+      <div class="hero-left">
+        <h1 class="hero-headline">The Auto-CFO for<br><em>Your Business</em></h1>
+        <p class="hero-sub">Formation · Bookkeeping · Forecasting · Compliance — all in one AI-powered platform built for small business.</p>
+        <div class="hero-btns">
+          <a href="/auth/register.html" class="btn-gold">Get Started Free</a>
+          <a href="#demo" class="btn-dark-outline">View Demo</a>
+        </div>
+      </div>
+
+      <!-- Center Logo -->
+      <div class="hero-center">
+        <svg class="ih-logo-mark" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <!-- Torch body -->
+          <rect x="48" y="52" width="14" height="36" rx="4" fill="#e8a020" opacity="0.9"/>
+          <!-- Torch head -->
+          <path d="M35 52 Q55 15 75 52 Z" fill="#e8a020"/>
+          <!-- Flame inner -->
+          <path d="M45 50 Q55 28 65 50 Q60 40 55 45 Q50 40 45 50Z" fill="#f5c44a" filter="url(#glow)"/>
+          <!-- IH letters on torch -->
+          <text x="41" y="72" font-family="Arial" font-weight="900" font-size="13" fill="#000" opacity="0.7">IH</text>
+          <!-- Vertical lines below torch -->
+          <rect x="44" y="88" width="5" height="10" rx="2" fill="#e8a020" opacity="0.6"/>
+          <rect x="52" y="86" width="5" height="12" rx="2" fill="#e8a020" opacity="0.9"/>
+          <rect x="60" y="88" width="5" height="10" rx="2" fill="#e8a020" opacity="0.6"/>
+        </svg>
+        <div class="ih-logo-name">Insight Hunter</div>
+        <div class="ih-logo-tag">Auto-CFO Platform</div>
+      </div>
+
+      <!-- Right — Dashboard Mockup -->
+      <div class="hero-right">
+        <div class="dash-mockup">
+          <div class="dash-topbar">
+            <span class="dash-title">Dashboard</span>
+            <div style="display:flex;align-items:center;gap:0.5rem">
+              <span style="font-size:0.6rem;color:rgba(255,255,255,0.5)">John's Biz</span>
+              <div class="dash-avatar"></div>
+            </div>
+          </div>
+          <div class="dash-body">
+            <!-- KPI row -->
+            <div class="kpi-row">
+              <div class="kpi-box">
+                <div class="kpi-label">Revenue</div>
+                <div class="kpi-value">$13.1K</div>
+                <div class="kpi-delta">↑ 12.4%</div>
+              </div>
+              <div class="kpi-box">
+                <div class="kpi-label">Net Income</div>
+                <div class="kpi-value">$11.9K</div>
+                <div class="kpi-delta">↑ 8.2%</div>
+              </div>
+              <div class="kpi-box">
+                <div class="kpi-label">Margin</div>
+                <div class="kpi-value">1.9%</div>
+                <div class="kpi-delta" style="color:#facc15">→ Flat</div>
+              </div>
+            </div>
+            <!-- Chart label -->
+            <div style="font-size:0.6rem;color:rgba(255,255,255,0.4);margin-bottom:-0.4rem">Cash Flow Forecast</div>
+            <!-- Mini bar chart -->
+            <div class="mini-chart-area">
+              <div class="chart-bar" style="height:45%"></div>
+              <div class="chart-bar" style="height:60%"></div>
+              <div class="chart-bar" style="height:40%"></div>
+              <div class="chart-bar" style="height:75%"></div>
+              <div class="chart-bar" style="height:55%"></div>
+              <div class="chart-bar" style="height:85%"></div>
+              <div class="chart-bar" style="height:65%"></div>
+              <div class="chart-bar" style="height:90%;background:linear-gradient(to top,#f5c44a,rgba(245,196,74,0.5))"></div>
+              <div class="chart-bar" style="height:70%;opacity:0.5"></div>
+              <div class="chart-bar" style="height:80%;opacity:0.4"></div>
+            </div>
+            <!-- Status rows -->
+            <div class="status-row">
+              <div class="status-dot green"></div>
+              <div class="status-label">Payroll processed</div>
+              <div class="status-val">✓ On time</div>
+            </div>
+            <div class="status-row">
+              <div class="status-dot gold"></div>
+              <div class="status-label">Q1 tax filing</div>
+              <div class="status-val">Due in 12d</div>
+            </div>
+            <div class="status-row">
+              <div class="status-dot blue"></div>
+              <div class="status-label">AI CFO insight</div>
+              <div class="status-val">New →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Apps Strip -->
+    <div class="apps-strip">
+      <div class="apps-label">Included Apps</div>
+      <div class="apps-row">
+        <a href="/features/bizforma.html"         class="app-icon-wrap"><div class="app-icon">🏢</div><span class="app-name">BizForma</span></a>
+        <a href="/features/bookkeeping.html"       class="app-icon-wrap"><div class="app-icon">📒</div><span class="app-name">Bookkeeping</span></a>
+        <a href="/features/insight-lite.html"      class="app-icon-wrap"><div class="app-icon">💡</div><span class="app-name">Insight Lite</span></a>
+        <a href="/features/insight-standard.html"  class="app-icon-wrap"><div class="app-icon">📈</div><span class="app-name">Insight Standard</span></a>
+        <a href="/features/insight-pro.html"       class="app-icon-wrap"><div class="app-icon">🧠</div><span class="app-name">Insight Pro</span></a>
+        <a href="/features/scout.html"             class="app-icon-wrap"><div class="app-icon">🔍</div><span class="app-name">Scout</span></a>
+        <a href="/features/pbx.html"               class="app-icon-wrap"><div class="app-icon">📞</div><span class="app-name">PBX</span></a>
+        <a href="/features/payroll.html"           class="app-icon-wrap"><div class="app-icon">💼</div><span class="app-name">Payroll</span></a>
+        <a href="/features/website-services.html"  class="app-icon-wrap"><div class="app-icon">🌐</div><span class="app-name">Website Services</span></a>
+      </div>
+    </div>
+  </div><!-- /slide-0 -->
+
+  <!-- ── SLIDE 2: AI CFO Chat ──────────────────────────────── -->
+  <div class="carousel-slide" id="slide-1">
+    <div class="hero-body">
+      <div class="hero-left">
+        <h1 class="hero-headline">Your<br><em>AI CFO.</em><br>Ask Anything.</h1>
+        <p class="hero-sub">Real answers from real data. <em style="color:rgba(255,255,255,0.85)">"Am I on track to hit $200k?" "Which client is most profitable?" "Can I afford to hire?"</em> — instant answers, every time.</p>
+        <div class="hero-btns">
+          <a href="/auth/register.html" class="btn-gold">Try AI Chat Free</a>
+          <a href="/features/insight-pro.html" class="btn-dark-outline">Learn More</a>
+        </div>
+      </div>
+      <div class="hero-center">
+        <svg class="ih-logo-mark" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="55" cy="55" r="40" fill="rgba(232,160,32,0.1)" stroke="#e8a020" stroke-width="1.5"/>
+          <text x="38" y="65" font-family="Arial" font-weight="900" font-size="28" fill="#e8a020">AI</text>
+          <circle cx="55" cy="55" r="48" fill="none" stroke="rgba(232,160,32,0.2)" stroke-width="1"/>
+        </svg>
+        <div class="ih-logo-name">AI CFO Chat</div>
+        <div class="ih-logo-tag">Powered by Llama 3.3</div>
+      </div>
+      <div class="hero-right">
+        <div class="dash-mockup" style="padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem">
+          <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);padding-bottom:0.5rem;border-bottom:1px solid rgba(255,255,255,0.07)">AI CFO Chat</div>
+          <!-- Chat bubbles -->
+          <div style="background:rgba(255,255,255,0.06);border-radius:10px 10px 10px 2px;padding:0.65rem 0.85rem;font-size:0.72rem;color:rgba(255,255,255,0.8);max-width:90%">
+            Am I on track to hit $200k revenue this year?
+          </div>
+          <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.2);border-radius:10px 10px 2px 10px;padding:0.65rem 0.85rem;font-size:0.72rem;color:rgba(255,255,255,0.85);align-self:flex-end;max-width:95%">
+            📊 Based on your last 6 months, you're trending at <strong style="color:#f5c44a">$187k</strong>. You need <strong style="color:#f5c44a">$2,750/mo</strong> more to hit $200k. March is your best month historically — you're on track. ✅
+          </div>
+          <div style="background:rgba(255,255,255,0.06);border-radius:10px 10px 10px 2px;padding:0.65rem 0.85rem;font-size:0.72rem;color:rgba(255,255,255,0.8);max-width:90%">
+            Which expense category grew the most this quarter?
+          </div>
+          <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.2);border-radius:10px 10px 2px 10px;padding:0.65rem 0.85rem;font-size:0.72rem;color:rgba(255,255,255,0.85);align-self:flex-end;max-width:95%">
+            💡 <strong style="color:#f5c44a">Software subscriptions</strong> grew 34% QoQ, now $1,240/mo. Consider auditing unused tools.
+          </div>
+          <!-- Input bar -->
+          <div style="display:flex;gap:0.5rem;margin-top:0.25rem">
+            <div style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.65rem;color:rgba(255,255,255,0.3)">Ask your CFO...</div>
+            <div style="background:var(--gold);border-radius:6px;width:28px;display:flex;align-items:center;justify-content:center;font-size:0.75rem">→</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="apps-strip">
+      <div class="apps-label">Included Apps</div>
+      <div class="apps-row">
+        <a href="/features/bizforma.html"         class="app-icon-wrap"><div class="app-icon">🏢</div><span class="app-name">BizForma</span></a>
+        <a href="/features/bookkeeping.html"       class="app-icon-wrap"><div class="app-icon">📒</div><span class="app-name">Bookkeeping</span></a>
+        <a href="/features/insight-lite.html"      class="app-icon-wrap"><div class="app-icon">💡</div><span class="app-name">Insight Lite</span></a>
+        <a href="/features/insight-standard.html"  class="app-icon-wrap"><div class="app-icon">📈</div><span class="app-name">Insight Standard</span></a>
+        <a href="/features/insight-pro.html"       class="app-icon-wrap"><div class="app-icon">🧠</div><span class="app-name">Insight Pro</span></a>
+        <a href="/features/scout.html"             class="app-icon-wrap"><div class="app-icon">🔍</div><span class="app-name">Scout</span></a>
+        <a href="/features/pbx.html"               class="app-icon-wrap"><div class="app-icon">📞</div><span class="app-name">PBX</span></a>
+        <a href="/features/payroll.html"           class="app-icon-wrap"><div class="app-icon">💼</div><span class="app-name">Payroll</span></a>
+        <a href="/features/website-services.html"  class="app-icon-wrap"><div class="app-icon">🌐</div><span class="app-name">Website Services</span></a>
+      </div>
+    </div>
+  </div><!-- /slide-1 -->
+
+  <!-- ── SLIDE 3: Forecasting ──────────────────────────────── -->
+  <div class="carousel-slide" id="slide-2">
+    <div class="hero-body">
+      <div class="hero-left">
+        <h1 class="hero-headline">See Your<br><em>Cash Flow</em><br>Before It Happens.</h1>
+        <p class="hero-sub">AI-generated forecasts built on your actual transaction history. Know your cash position 1–12 months ahead — with plain-English explanations.</p>
+        <div class="hero-btns">
+          <a href="/auth/register.html" class="btn-gold">Start Forecasting Free</a>
+          <a href="/features/forecast.html" class="btn-dark-outline">See How It Works</a>
+        </div>
+      </div>
+      <div class="hero-center">
+        <svg class="ih-logo-mark" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="70" width="8" height="25" rx="2" fill="#e8a020" opacity="0.5"/>
+          <rect x="24" y="58" width="8" height="37" rx="2" fill="#e8a020" opacity="0.7"/>
+          <rect x="38" y="48" width="8" height="47" rx="2" fill="#e8a020" opacity="0.85"/>
+          <rect x="52" y="35" width="8" height="60" rx="2" fill="#e8a020"/>
+          <rect x="66" y="42" width="8" height="53" rx="2" fill="#e8a020" opacity="0.6" stroke-dasharray="3"/>
+          <rect x="80" y="30" width="8" height="65" rx="2" fill="#e8a020" opacity="0.4"/>
+          <rect x="94" y="22" width="8" height="73" rx="2" fill="#e8a020" opacity="0.25"/>
+          <polyline points="14,70 28,58 42,48 56,35 70,42 84,30 98,22" stroke="#f5c44a" stroke-width="2" fill="none" stroke-dasharray="4 2" opacity="0.8"/>
+        </svg>
+        <div class="ih-logo-name">Cash Flow Forecast</div>
+        <div class="ih-logo-tag">1–12 Month Projections</div>
+      </div>
+      <div class="hero-right">
+        <div class="dash-mockup">
+          <div class="dash-topbar">
+            <span class="dash-title">6-Month Forecast</span>
+            <span style="font-size:0.6rem;color:#4ade80">● Live</span>
+          </div>
+          <div class="dash-body">
+            <div style="font-size:0.62rem;color:rgba(255,255,255,0.4);margin-bottom:-0.25rem">Projected Cash Position</div>
+            <div class="mini-chart-area" style="height:100px">
+              <div class="chart-bar" style="height:55%"></div>
+              <div class="chart-bar" style="height:70%"></div>
+              <div class="chart-bar" style="height:65%"></div>
+              <div class="chart-bar" style="height:80%"></div>
+              <div class="chart-bar" style="height:75%"></div>
+              <div class="chart-bar" style="height:90%"></div>
+              <div class="chart-bar" style="height:85%;opacity:0.5;border:1px dashed rgba(232,160,32,0.4)"></div>
+              <div class="chart-bar" style="height:95%;opacity:0.4"></div>
+            </div>
+            <div class="kpi-row">
+              <div class="kpi-box"><div class="kpi-label">Apr</div><div class="kpi-value" style="font-size:0.85rem">$18.2K</div><div class="kpi-delta">↑ proj</div></div>
+              <div class="kpi-box"><div class="kpi-label">May</div><div class="kpi-value" style="font-size:0.85rem">$21.5K</div><div class="kpi-delta">↑ proj</div></div>
+              <div class="kpi-box"><div class="kpi-label">Jun</div><div class="kpi-value" style="font-size:0.85rem">$24.1K</div><div class="kpi-delta">↑ proj</div></div>
+            </div>
+            <div style="background:rgba(232,160,32,0.1);border:1px solid rgba(232,160,32,0.2);border-radius:8px;padding:0.65rem;font-size:0.65rem;color:rgba(255,255,255,0.8)">
+              🧠 <strong style="color:#f5c44a">AI Insight:</strong> Based on seasonality, June is projected to be your strongest month. Consider pre-paying annual subscriptions before July.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="apps-strip">
+      <div class="apps-label">Included Apps</div>
+      <div class="apps-row">
+        <a href="/features/bizforma.html"         class="app-icon-wrap"><div class="app-icon">🏢</div><span class="app-name">BizForma</span></a>
+        <a href="/features/bookkeeping.html"       class="app-icon-wrap"><div class="app-icon">📒</div><span class="app-name">Bookkeeping</span></a>
+        <a href="/features/insight-lite.html"      class="app-icon-wrap"><div class="app-icon">💡</div><span class="app-name">Insight Lite</span></a>
+        <a href="/features/insight-standard.html"  class="app-icon-wrap"><div class="app-icon">📈</div><span class="app-name">Insight Standard</span></a>
+        <a href="/features/insight-pro.html"       class="app-icon-wrap"><div class="app-icon">🧠</div><span class="app-name">Insight Pro</span></a>
+        <a href="/features/scout.html"             class="app-icon-wrap"><div class="app-icon">🔍</div><span class="app-name">Scout</span></a>
+        <a href="/features/pbx.html"               class="app-icon-wrap"><div class="app-icon">📞</div><span class="app-name">PBX</span></a>
+        <a href="/features/payroll.html"           class="app-icon-wrap"><div class="app-icon">💼</div><span class="app-name">Payroll</span></a>
+        <a href="/features/website-services.html"  class="app-icon-wrap"><div class="app-icon">🌐</div><span class="app-name">Website Services</span></a>
+      </div>
+    </div>
+  </div><!-- /slide-2 -->
+
+  <!-- Dots -->
+  <div class="carousel-dots">
+    <button class="dot active" data-slide="0" aria-label="Slide 1"></button>
+    <button class="dot" data-slide="1" aria-label="Slide 2"></button>
+    <button class="dot" data-slide="2" aria-label="Slide 3"></button>
+  </div>
+</div><!-- /hero-carousel -->
+
+<!-- ════════════════════════════════════════════════════
+     BELOW FOLD
+════════════════════════════════════════════════════ -->
+<div class="below-fold">
+
+  <!-- Features -->
+  <div class="features-dark">
+    <div class="section-eyebrow">Everything included</div>
+    <div class="section-heading-dark">Nine Tools. One Dashboard. One Price.</div>
+    <div class="section-sub-dark">Stop stitching together six different apps. Insight Hunter replaces them all.</div>
+    <div class="features-grid-dark">
+      <a href="/features/bookkeeping.html"      style="text-decoration:none"><div class="feature-card-dark"><div class="icon">📒</div><h3>Bookkeeping</h3><p>Double-entry accounting, real-time P&L, and bank reconciliation — your books always current.</p></div></a>
+      <a href="/features/insight-pro.html"      style="text-decoration:none"><div class="feature-card-dark"><div class="icon">🧠</div><h3>AI CFO Chat</h3><p>Ask anything, get real answers from your real data in seconds. Powered by Llama 3.3.</p></div></a>
+      <a href="/features/forecast.html"         style="text-decoration:none"><div class="feature-card-dark"><div class="icon">🔮</div><h3>Cash Flow Forecast</h3><p>AI projections 1–12 months ahead. Know before surprises happen.</p></div></a>
+      <a href="/features/payroll.html"          style="text-decoration:none"><div class="feature-card-dark"><div class="icon">💼</div><h3>Payroll</h3><p>W-2 and 1099 payroll in minutes. Tax withholding, direct deposit, year-end reports.</p></div></a>
+      <a href="/features/bizforma.html"         style="text-decoration:none"><div class="feature-card-dark"><div class="icon">🏢</div><h3>BizForma</h3><p>Form your LLC or Corp. EIN, state registration, compliance calendar — all guided.</p></div></a>
+      <a href="/features/pbx.html"              style="text-decoration:none"><div class="feature-card-dark"><div class="icon">📞</div><h3>Business PBX</h3><p>Virtual phone system with numbers, routing, voicemail transcription, and SMS.</p></div></a>
+      <a href="/features/scout.html"            style="text-decoration:none"><div class="feature-card-dark"><div class="icon">🔍</div><h3>Scout</h3><p>Find any contract, invoice, or document instantly with plain-English search.</p></div></a>
+      <a href="/features/reports.html"          style="text-decoration:none"><div class="feature-card-dark"><div class="icon">📊</div><h3>Reports</h3><p>P&L, Balance Sheet, Cash Flow Statement, trends. Export to PDF or CSV.</p></div></a>
+      <a href="/features/website-services.html" style="text-decoration:none"><div class="feature-card-dark"><div class="icon">🌐</div><h3>Website Services</h3><p>Business landing pages hosted on Cloudflare's global edge. Included on Pro.</p></div></a>
+    </div>
+  </div>
+
+  <!-- Pricing -->
+  <div class="pricing-dark">
+    <div class="pricing-dark-inner">
+      <div class="section-eyebrow" style="text-align:center">Simple, transparent pricing</div>
+      <div class="section-heading-dark" style="text-align:center">Plans for Every Stage</div>
+      <div class="section-sub-dark" style="text-align:center;margin:0 auto 3rem">Start free. Upgrade when your business grows. Cancel any time.</div>
+      <div class="pricing-grid-dark">
+        <div class="pricing-card-dark">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">$<span style="font-size:1.1rem">0</span></div>
+          <div class="plan-period">Forever free</div>
+          <hr>
+          <div class="plan-feat"><span class="ck">✓</span>100 transactions/mo</div>
+          <div class="plan-feat"><span class="ck">✓</span>Bookkeeping + reports</div>
+          <div class="plan-feat"><span class="dd">—</span>AI CFO chat</div>
+          <div class="plan-feat"><span class="dd">—</span>Forecasting</div>
+          <a href="/auth/register.html" class="btn-dark-outline" style="width:100%;margin-top:1rem;justify-content:center">Get Started</a>
+        </div>
+        <div class="pricing-card-dark">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">$<span style="font-size:1.1rem">29</span><sup style="font-size:0.8rem">/mo</sup></div>
+          <div class="plan-period">For growing solopreneurs</div>
+          <hr>
+          <div class="plan-feat"><span class="ck">✓</span>1,000 transactions/mo</div>
+          <div class="plan-feat"><span class="ck">✓</span>500 AI questions/mo</div>
+          <div class="plan-feat"><span class="ck">✓</span>Cash flow forecast</div>
+          <div class="plan-feat"><span class="dd">—</span>PBX + Payroll</div>
+          <a href="/auth/register.html" class="btn-dark-outline" style="width:100%;margin-top:1rem;justify-content:center">Start Free Trial</a>
+        </div>
+        <div class="pricing-card-dark featured">
+          <div class="plan-name">Pro ⭐</div>
+          <div class="plan-price">$<span style="font-size:1.1rem">79</span><sup style="font-size:0.8rem">/mo</sup></div>
+          <div class="plan-period">Most popular</div>
+          <hr>
+          <div class="plan-feat"><span class="ck">✓</span>Unlimited transactions</div>
+          <div class="plan-feat"><span class="ck">✓</span>Unlimited AI chat</div>
+          <div class="plan-feat"><span class="ck">✓</span>PBX + Payroll + Scout</div>
+          <div class="plan-feat"><span class="ck">✓</span>Website Services</div>
+          <a href="/auth/register.html" class="btn-gold" style="width:100%;margin-top:1rem;justify-content:center">Start Free Trial</a>
+        </div>
+        <div class="pricing-card-dark">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">$<span style="font-size:1.1rem">199</span><sup style="font-size:0.8rem">/mo</sup></div>
+          <div class="plan-period">For firms + fractional CFOs</div>
+          <hr>
+          <div class="plan-feat"><span class="ck">✓</span>Everything on Pro</div>
+          <div class="plan-feat"><span class="ck">✓</span>Multi-entity support</div>
+          <div class="plan-feat"><span class="ck">✓</span>White-label API</div>
+          <div class="plan-feat"><span class="ck">✓</span>Priority support</div>
+          <a href="/contact.html" class="btn-dark-outline" style="width:100%;margin-top:1rem;justify-content:center">Talk to Sales</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-dark">
+    <h2>Ready to stop flying blind?</h2>
+    <p>Your business deserves a CFO. Start with our free plan — no credit card required.</p>
+    <a href="/auth/register.html" class="btn-gold" style="font-size:1.05rem;padding:0.85rem 2.25rem">Create Free Account →</a>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer-dark">
+    <div class="footer-dark-grid">
+      <div>
+        <span style="font-size:1.15rem;font-weight:800;color:#fff">Insight<span style="color:#e8a020">Hunter</span></span>
+        <p class="brand-desc">The Auto-CFO for freelancers, small firms, and fractional CFOs. Built on Cloudflare's global edge.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="/features/bookkeeping.html">Bookkeeping</a></li>
+          <li><a href="/features/payroll.html">Payroll</a></li>
+          <li><a href="/features/bizforma.html">BizForma</a></li>
+          <li><a href="/features/pbx.html">PBX</a></li>
+          <li><a href="/pricing.html">Pricing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/features/">Features</a></li>
+          <li><a href="/contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="/legal/privacy/index.html">Privacy</a></li>
+          <li><a href="/legal/terms/index.html">Terms</a></li>
+          <li><a href="/legal/sms-optin/index.html">SMS Opt-In</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-dark-bottom">
+      <span>© 2026 Insight Hunter. All rights reserved.</span>
+      <span>Built on <a href="https://workers.cloudflare.com" target="_blank" style="color:#e8a020">Cloudflare Workers</a></span>
+    </div>
+  </footer>
 </div>
 
-<!-- FEATURES -->
-<section id="features">
-  <div class="section-inner">
-    <div class="eyebrow">Platform</div>
-    <h2>Everything your business needs<br>— finally in one place</h2>
-    <p class="section-sub">Six core products that work together so you're never switching between five different tools.</p>
-
-    <div class="product-grid">
-
-      <div class="product-card">
-        <div class="pc-icon" style="background:rgba(201,151,43,.1);border:1px solid rgba(201,151,43,.2)">📊</div>
-        <div class="pc-tag" style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:var(--green)">All Plans</div>
-        <div class="pc-title">Financial Dashboard</div>
-        <div class="pc-desc">Real-time P&L, cash flow charts, KPI cards and a live snapshot of your business financial health. Always visible, always current.</div>
-        <ul class="pc-features">
-          <li>Revenue, burn rate &amp; runway KPIs</li>
-          <li>Cash flow chart</li>
-          <li>Uncategorized transaction alerts</li>
-          <li>Customizable widget layout</li>
-        </ul>
-      </div>
-
-      <div class="product-card">
-        <div class="pc-icon" style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2)">📒</div>
-        <div class="pc-tag" style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:var(--blue)">3 Tiers · Add-on</div>
-        <div class="pc-title">Bookkeeping</div>
-        <div class="pc-desc">From simple CSV import to full bank sync and automated reconciliation. Three tiers — Basic bundled with Standard, Standard with Pro, Advanced with Enterprise.</div>
-        <ul class="pc-features">
-          <li>CSV import + auto-categorization</li>
-          <li>Bank sync (Standard+)</li>
-          <li>Automated reconciliation (Advanced)</li>
-          <li>Accountant access portal (Advanced)</li>
-        </ul>
-      </div>
-
-      <div class="product-card">
-        <div class="pc-icon" style="background:rgba(201,151,43,.1);border:1px solid rgba(201,151,43,.2)">🔮</div>
-        <div class="pc-tag" style="background:rgba(201,151,43,.1);border:1px solid rgba(201,151,43,.2);color:var(--gold-l)">Standard+ · Add-on</div>
-        <div class="pc-title">AI Forecasting</div>
-        <div class="pc-desc">AI-powered 12-month cash flow projections built from your actual transaction data. Know your runway before it becomes a problem.</div>
-        <ul class="pc-features">
-          <li>3-month basic forecast (Lite)</li>
-          <li>12-month AI projection (Standard+)</li>
-          <li>Monthly scenario breakdown</li>
-          <li>Burn rate trend analysis</li>
-        </ul>
-      </div>
-
-      <div class="product-card">
-        <div class="pc-icon" style="background:rgba(201,151,43,.1);border:1px solid rgba(201,151,43,.2)">🏛️</div>
-        <div class="pc-tag" style="background:rgba(201,151,43,.1);border:1px solid rgba(201,151,43,.2);color:var(--gold)">One-time · All Plans</div>
-        <div class="pc-title">BizForma</div>
-        <div class="pc-desc">Form your LLC, S-Corp or C-Corp in all 50 states. Includes EIN, Operating Agreement, registered agent, and compliance calendar. Pay the fee — get 6 months Standard free.</div>
-        <ul class="pc-features">
-          <li>Entity recommendation engine</li>
-          <li>All 50 states · EIN + RA included</li>
-          <li>Compliance calendar &amp; reminders</li>
-          <li class="star" style="color:var(--gold-l);font-size:.75rem">★ 6 months Standard free ($474 value)</li>
-        </ul>
-      </div>
-
-      <div class="product-card">
-        <div class="pc-icon" style="background:rgba(236,72,153,.1);border:1px solid rgba(236,72,153,.2)">💰</div>
-        <div class="pc-tag" style="background:rgba(236,72,153,.1);border:1px solid rgba(236,72,153,.2);color:var(--pink)">Pro · Add-on</div>
-        <div class="pc-title">Payroll</div>
-        <div class="pc-desc">Run payroll for W-2 employees and 1099 contractors. Automatic tax calculations, direct deposit, and year-end forms. Included with Pro plans or $39/mo add-on.</div>
-        <ul class="pc-features">
-          <li>W-2 employees + 1099 contractors</li>
-          <li>Auto tax withholding &amp; filing</li>
-          <li>Direct deposit</li>
-          <li>$39/mo + $6/employee standalone</li>
-        </ul>
-      </div>
-
-      <div class="product-card">
-        <div class="pc-icon" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2)">📞</div>
-        <div class="pc-tag" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);color:#A78BFA">Pro · Add-on</div>
-        <div class="pc-title">PBX Communications</div>
-        <div class="pc-desc">A full business phone system with IVR menus, call routing, voicemail, SMS, and call logs — all managed from your dashboard. No hardware needed.</div>
-        <ul class="pc-features">
-          <li>Local or toll-free business number</li>
-          <li>IVR menus + call routing</li>
-          <li>Voicemail + transcription</li>
-          <li>$29/mo + usage standalone</li>
-        </ul>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- BIZFORMA SPOTLIGHT -->
-<section class="bizforma-section" id="bizforma">
-  <div class="section-inner">
-    <div class="biz-split">
-      <div>
-        <div class="biz-badge">🏛️ BizForma — Business Formation</div>
-        <h2>Form your LLC.<br>Get 6 months free.</h2>
-        <p style="font-size:.9rem;color:var(--g2);line-height:1.75;margin-bottom:.5rem">The smartest way to start a business in America. We handle the paperwork — you keep running.</p>
-        <ul class="biz-steps">
-          <li><div class="step-num">1</div><div class="step-text"><strong>Tell us about your business</strong> — industry, state, structure. Our engine recommends the right entity type.</div></li>
-          <li><div class="step-num">2</div><div class="step-text"><strong>We file everything</strong> — Articles of Organization, EIN application, Registered Agent enrollment, Operating Agreement.</div></li>
-          <li><div class="step-num">3</div><div class="step-text"><strong>Your LLC is active</strong> — and your Insight Hunter account automatically upgrades to Standard for 6 months free.</div></li>
-          <li><div class="step-num">4</div><div class="step-text"><strong>Stay compliant forever</strong> — annual report reminders, registered agent renewals, tax deadline alerts, all in your dashboard.</div></li>
-        </ul>
-        <a href="/features/bizforma.html" style="display:inline-flex;align-items:center;gap:7px;padding:.75rem 1.75rem;border-radius:10px;background:var(--gold);color:var(--navy);font-size:.92rem;font-weight:700">
-          Start Formation →
-        </a>
-      </div>
-      <div class="promo-card">
-        <div class="eyebrow" style="margin-bottom:.5rem">Formation Fee</div>
-        <div class="promo-price"><sup>$</sup>149 <sub>+ state filing fee</sub></div>
-        <div class="promo-value">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1l2.163 4.279L15 6.08l-3.5 3.313.826 4.607L8 11.75l-4.326 2.25.826-4.607L1 6.08l4.837-.801L8 1z" fill="currentColor"/></svg>
-          Includes 6 months Standard — $474 value
-        </div>
-        <ul class="promo-list">
-          <li>Entity type recommendation</li>
-          <li>Articles of Organization filing</li>
-          <li>EIN application</li>
-          <li>Operating Agreement template</li>
-          <li>1 year Registered Agent included</li>
-          <li>Compliance calendar setup</li>
-          <li class="star">6 months Insight Standard FREE</li>
-          <li class="star">Instant dashboard upgrade on payment</li>
-        </ul>
-        <a href="/auth/register.html" style="display:block;text-align:center;padding:.75rem;border-radius:10px;background:var(--gold);color:var(--navy);font-size:.9rem;font-weight:700">Start Now — $149 + state fee</a>
-        <div style="text-align:center;font-size:.7rem;color:var(--g3);margin-top:.65rem">State fees vary $35–$500 · passed through at cost</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PRICING TEASER -->
-<section>
-  <div class="section-inner">
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:2rem">
-      <div>
-        <div class="eyebrow">Pricing</div>
-        <h2 style="margin-bottom:0">Pay only for what you need</h2>
-      </div>
-      <a href="/pricing.html" style="font-size:.82rem;color:var(--gold-l);font-weight:600">Full pricing + add-ons →</a>
-    </div>
-    <div class="pricing-teaser">
-      <div class="pt-card">
-        <div class="pt-tier" style="color:var(--g3)">Free</div>
-        <div class="pt-price"><sup>$</sup>0</div>
-        <div class="pt-desc">Dashboard + 10 transactions. Forever free.</div>
-        <a href="/auth/register.html" class="pt-cta" style="background:transparent;border:1px solid var(--border);color:var(--g1)">Get Started</a>
-      </div>
-      <div class="pt-card">
-        <div class="pt-tier" style="color:var(--blue)">Insight Lite</div>
-        <div class="pt-price"><sup>$</sup>29<sub>/mo</sub></div>
-        <div class="pt-desc">CSV import + 3-month forecast.</div>
-        <a href="/auth/register.html" class="pt-cta" style="background:transparent;border:1px solid var(--border);color:var(--g1)">14-Day Trial</a>
-      </div>
-      <div class="pt-card hl">
-        <div class="pt-pop">Most Popular</div>
-        <div class="pt-tier" style="color:var(--gold)">Insight Standard</div>
-        <div class="pt-price"><sup>$</sup>79<sub>/mo</sub></div>
-        <div class="pt-desc">AI forecast + BizForma + Bookkeeping Basic.</div>
-        <a href="/auth/register.html" class="pt-cta" style="background:var(--gold);color:var(--navy)">Free Trial</a>
-      </div>
-      <div class="pt-card">
-        <div class="pt-tier" style="color:var(--pink)">Pro Single</div>
-        <div class="pt-price"><sup>$</sup>199<sub>/mo</sub></div>
-        <div class="pt-desc">Payroll + PBX + Bookkeeping Standard.</div>
-        <a href="/auth/register.html" class="pt-cta" style="background:transparent;border:1px solid rgba(236,72,153,.3);color:var(--pink)">14-Day Trial</a>
-      </div>
-      <div class="pt-card">
-        <div class="pt-tier" style="color:var(--pink)">Pro Enterprise</div>
-        <div class="pt-price" style="font-size:1.5rem">Custom</div>
-        <div class="pt-desc">Unlimited entities · White-label · Agency portal.</div>
-        <a href="/contact.html" class="pt-cta" style="background:var(--navy-3);border:1px solid var(--border);color:var(--g1)">Contact Sales</a>
-      </div>
-    </div>
-    <div style="text-align:center;margin-top:1.25rem;font-size:.78rem;color:var(--g3)">
-      All plans include a 14-day free trial · Cancel anytime · <a href="/pricing.html" style="color:var(--gold-l)">View all add-ons →</a>
-    </div>
-  </div>
-</section>
-
-<!-- SERVICES -->
-<section id="services" style="background:rgba(22,27,34,.4);border-top:1px solid var(--border)">
-  <div class="section-inner">
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:.5rem">
-      <div>
-        <div class="eyebrow">Services Marketplace</div>
-        <h2>Every service your business needs</h2>
-      </div>
-      <a href="/dashboard/services.html" style="font-size:.82rem;color:var(--gold-l);font-weight:600">View marketplace →</a>
-    </div>
-    <p class="section-sub" style="margin-bottom:0">Available now and coming soon — all accessible from your dashboard.</p>
-    <div class="services-row">
-      <div class="svc">
-        <div class="svc-ic" style="background:rgba(201,151,43,.1)">🏛️</div>
-        <div>
-          <div style="font-size:.85rem;font-weight:700;margin-bottom:.2rem">Business Formation</div>
-          <div style="font-size:.74rem;color:var(--g3);line-height:1.55;margin-bottom:.4rem">LLC/Corp filing in all 50 states · EIN · RA · 6 mo Standard free</div>
-          <span style="font-size:.62rem;font-weight:700;padding:1px 7px;border-radius:100px;background:rgba(16,185,129,.12);color:var(--green)">Available Now</span>
-        </div>
-      </div>
-      <div class="svc">
-        <div class="svc-ic" style="background:rgba(201,151,43,.1)">📞</div>
-        <div>
-          <div style="font-size:.85rem;font-weight:700;margin-bottom:.2rem">Registered Agent</div>
-          <div style="font-size:.74rem;color:var(--g3);line-height:1.55;margin-bottom:.4rem">Annual $49/yr renewal · 1st year included with BizForma</div>
-          <span style="font-size:.62rem;font-weight:700;padding:1px 7px;border-radius:100px;background:rgba(16,185,129,.12);color:var(--green)">Available Now</span>
-        </div>
-      </div>
-      <div class="svc">
-        <div class="svc-ic" style="background:rgba(245,158,11,.08)">⚖️</div>
-        <div>
-          <div style="font-size:.85rem;font-weight:700;margin-bottom:.2rem">Notary Services</div>
-          <div style="font-size:.74rem;color:var(--g3);line-height:1.55;margin-bottom:.4rem">Remote online notarization for business documents</div>
-          <span style="font-size:.62rem;font-weight:700;padding:1px 7px;border-radius:100px;background:rgba(245,158,11,.1);color:var(--amber)">Coming Soon</span>
-        </div>
-      </div>
-      <div class="svc">
-        <div class="svc-ic" style="background:rgba(245,158,11,.08)">™️</div>
-        <div>
-          <div style="font-size:.85rem;font-weight:700;margin-bottom:.2rem">Trademark Registration</div>
-          <div style="font-size:.74rem;color:var(--g3);line-height:1.55;margin-bottom:.4rem">USPTO search, filing and management</div>
-          <span style="font-size:.62rem;font-weight:700;padding:1px 7px;border-radius:100px;background:rgba(245,158,11,.1);color:var(--amber)">Coming Soon</span>
-        </div>
-      </div>
-      <div class="svc">
-        <div class="svc-ic" style="background:rgba(245,158,11,.08)">🌐</div>
-        <div>
-          <div style="font-size:.85rem;font-weight:700;margin-bottom:.2rem">Domain Registration</div>
-          <div style="font-size:.74rem;color:var(--g3);line-height:1.55;margin-bottom:.4rem">Register domains at near cost — .com, .io, .app and more</div>
-          <span style="font-size:.62rem;font-weight:700;padding:1px 7px;border-radius:100px;background:rgba(245,158,11,.1);color:var(--amber)">Coming Soon</span>
-        </div>
-      </div>
-      <div class="svc">
-        <div class="svc-ic" style="background:rgba(245,158,11,.08)">🖥️</div>
-        <div>
-          <div style="font-size:.85rem;font-weight:700;margin-bottom:.2rem">Website Creation</div>
-          <div style="font-size:.74rem;color:var(--g3);line-height:1.55;margin-bottom:.4rem">Professional business website built and deployed in days</div>
-          <span style="font-size:.62rem;font-weight:700;padding:1px 7px;border-radius:100px;background:rgba(245,158,11,.1);color:var(--amber)">Coming Soon</span>
-        </div>
-      </div>
-      <div class="svc">
-        <div class="svc-ic" style="background:rgba(245,158,11,.08)">⭐</div>
-        <div>
-          <div style="font-size:.85rem;font-weight:700;margin-bottom:.2rem">Online Reputation Mgmt</div>
-          <div style="font-size:.74rem;color:var(--g3);line-height:1.55;margin-bottom:.4rem">Monitor and manage Google, Yelp and social reviews</div>
-          <span style="font-size:.62rem;font-weight:700;padding:1px 7px;border-radius:100px;background:rgba(245,158,11,.1);color:var(--amber)">Coming Soon</span>
-        </div>
-      </div>
-      <div class="svc">
-        <div class="svc-ic" style="background:rgba(245,158,11,.08)">🎨</div>
-        <div>
-          <div style="font-size:.85rem;font-weight:700;margin-bottom:.2rem">Graphic Design</div>
-          <div style="font-size:.74rem;color:var(--g3);line-height:1.55;margin-bottom:.4rem">Logos, brand kits and social graphics — white-labeled</div>
-          <span style="font-size:.62rem;font-weight:700;padding:1px 7px;border-radius:100px;background:rgba(245,158,11,.1);color:var(--amber)">Coming Soon</span>
-        </div>
-      </div>
-      <div class="svc">
-        <div class="svc-ic" style="background:rgba(245,158,11,.08)">📱</div>
-        <div>
-          <div style="font-size:.85rem;font-weight:700;margin-bottom:.2rem">Digital Marketing</div>
-          <div style="font-size:.74rem;color:var(--g3);line-height:1.55;margin-bottom:.4rem">SEO, social media and Google Ads for small businesses</div>
-          <span style="font-size:.62rem;font-weight:700;padding:1px 7px;border-radius:100px;background:rgba(245,158,11,.1);color:var(--amber)">Coming Soon</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SOCIAL PROOF -->
-<section>
-  <div class="section-inner">
-    <div class="eyebrow" style="text-align:center">Reviews</div>
-    <h2 style="text-align:center;margin-bottom:0">Built for founders like you</h2>
-    <div class="proof-grid">
-      <div class="proof-card">
-        <div class="stars">★★★★★</div>
-        <div class="quote">"Formed my LLC and had full bookkeeping running the same day. The 6 months Standard free basically paid for the formation fee on its own."</div>
-        <div class="reviewer">
-          <div class="reviewer-av" style="background:rgba(201,151,43,.1);color:var(--gold-l)">MJ</div>
-          <div><div class="reviewer-name">Marcus J.</div><div class="reviewer-role">E-commerce founder · Atlanta, GA</div></div>
-        </div>
-      </div>
-      <div class="proof-card">
-        <div class="stars">★★★★★</div>
-        <div class="quote">"I was using 4 different tools. Insight Hunter replaced all of them. The AI forecast alone has changed how I make spending decisions every month."</div>
-        <div class="reviewer">
-          <div class="reviewer-av" style="background:rgba(59,130,246,.1);color:var(--blue)">SR</div>
-          <div><div class="reviewer-name">Sofia R.</div><div class="reviewer-role">Marketing consultant · Miami, FL</div></div>
-        </div>
-      </div>
-      <div class="proof-card">
-        <div class="stars">★★★★★</div>
-        <div class="quote">"As a fractional CFO I use Pro Enterprise for all my clients. The white-label portal makes me look like I built a custom platform. Game-changer."</div>
-        <div class="reviewer">
-          <div class="reviewer-av" style="background:rgba(236,72,153,.1);color:var(--pink)">DT</div>
-          <div><div class="reviewer-name">David T.</div><div class="reviewer-role">Fractional CFO · Chicago, IL</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FINAL CTA -->
-<div class="final-cta">
-  <div style="max-width:600px;margin:0 auto">
-    <div class="eyebrow">Get Started</div>
-    <h2 style="font-size:clamp(1.75rem,4vw,2.75rem);font-weight:900;letter-spacing:-.04em;margin-bottom:.85rem">Your business deserves<br>better tools.</h2>
-    <p style="color:var(--g2);font-size:.95rem;line-height:1.75;margin-bottom:2rem">Start free. Add what you need. Grow without switching platforms.</p>
-    <div style="display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap">
-      <a href="/auth/register.html" class="cta-primary">
-        Create Free Account
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
-      <a href="/features/bizforma.html" class="cta-secondary">Start LLC Formation →</a>
-    </div>
-    <div style="margin-top:1.25rem;font-size:.76rem;color:var(--g3)">No credit card · Free forever plan · 14-day trials on paid plans</div>
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-grid">
-    <div class="footer-brand">
-      <a href="/" style="display:flex;align-items:center;gap:8px;font-size:.95rem;font-weight:700;margin-bottom:.5rem">
-        <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#141E30"/><path d="M16 4v5M13 6h6" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M10 9v15h12V9" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 24h18" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round"/><path d="M13 14l2.5 3L20 12" stroke="#C9972B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Insight Hunter
-      </a>
-      <p>The financial operating system for modern small businesses. Start free, scale as you grow.</p>
-    </div>
-    <div class="footer-col"><h4>Product</h4>
-      <a href="#features">Dashboard</a><a href="#features">Bookkeeping</a>
-      <a href="#features">Forecasting</a><a href="#bizforma">BizForma</a>
-      <a href="#features">Payroll</a><a href="#features">PBX</a>
-    </div>
-    <div class="footer-col"><h4>Services</h4>
-      <a href="/features/bizforma.html">LLC Formation</a>
-      <a href="/dashboard/services.html">Registered Agent</a>
-      <a href="/dashboard/services.html">Notary</a>
-      <a href="/dashboard/services.html">Trademark</a>
-      <a href="/dashboard/services.html">Web Services</a>
-    </div>
-    <div class="footer-col"><h4>Plans</h4>
-      <a href="/pricing.html">Free</a><a href="/pricing.html">Lite — $29</a>
-      <a href="/pricing.html">Standard — $79</a><a href="/pricing.html">Pro Single — $199</a>
-      <a href="/pricing.html">Enterprise</a>
-    </div>
-    <div class="footer-col"><h4>Company</h4>
-      <a href="/about.html">About</a><a href="/contact.html">Contact</a>
-      <a href="/auth/login.html">Sign In</a><a href="/auth/register.html">Sign Up</a>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <span>&copy; 2026 Insight Hunter. All rights reserved.</span>
-    <div style="display:flex;gap:1.5rem"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Security</a></div>
-  </div>
-</footer>
-
+<!-- ════════════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════════ -->
 <script>
-// Nav scroll effect
-window.addEventListener('scroll',()=>{
-  document.getElementById('nav').style.background=
-    window.scrollY>60?'rgba(13,17,23,.98)':'rgba(13,17,23,.92)'
-})
-// Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(a=>{
-  a.addEventListener('click',e=>{
-    const t=document.querySelector(a.getAttribute('href'))
-    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}
-  })
-})
+/* ── Particle background ──────────────────────────────── */
+(function () {
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width  = canvas.offsetWidth;
+    H = canvas.height = document.getElementById('carousel').offsetHeight;
+  }
+
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+
+  function make() {
+    return {
+      x: rand(0, W), y: rand(0, H),
+      r: rand(0.5, 2.5),
+      vx: rand(-0.3, 0.3), vy: rand(-0.4, -0.1),
+      alpha: rand(0.2, 0.8),
+      gold: Math.random() > 0.6,
+    };
+  }
+
+  function init() {
+    resize();
+    particles = Array.from({ length: 180 }, make);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.gold
+        ? `rgba(232,160,32,${p.alpha})`
+        : `rgba(255,255,255,${p.alpha * 0.5})`;
+      ctx.fill();
+      p.x += p.vx; p.y += p.vy;
+      p.alpha -= 0.001;
+      if (p.y < -5 || p.alpha <= 0) Object.assign(p, make(), { y: H + 5 });
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  init(); draw();
+})();
+
+/* ── Carousel ─────────────────────────────────────────── */
+(function () {
+  const slides = document.querySelectorAll('.carousel-slide');
+  const dots   = document.querySelectorAll('.dot');
+  let cur = 0, timer;
+  const total = slides.length;
+
+  const show = (n) => {
+    slides[cur].classList.remove('active');
+    dots[cur].classList.remove('active');
+    cur = (n + total) % total;
+    slides[cur].classList.add('active');
+    dots[cur].classList.add('active');
+  };
+
+  const reset = () => { clearInterval(timer); timer = setInterval(() => show(cur + 1), 9000); };
+
+  dots.forEach((d, i) => d.addEventListener('click', () => { show(i); reset(); }));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { show(cur + 1); reset(); }
+    if (e.key === 'ArrowLeft')  { show(cur - 1); reset(); }
+  });
+  reset();
+})();
 </script>
+
 </body>
 </html>
