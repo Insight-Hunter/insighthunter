@@ -120,4 +120,3 @@ bookkeepingRoutes.delete('/transactions/:id', async c => {
   ).bind(new Date().toISOString(), id, userId).run()
   return c.json({ ok: true })
 })
--

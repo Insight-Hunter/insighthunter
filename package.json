@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev":     "wrangler dev --local --persist",
+    "dev":     "wrangler dev --local --persist-to .wrangler/state",
     "deploy":  "wrangler deploy",
     "deploy:preview": "wrangler deploy --env preview",
     "db:migrate":     "wrangler d1 migrations apply insighthunter-main",

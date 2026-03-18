@@ -3,21 +3,22 @@ import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { secureHeaders } from 'hono/secure-headers'
 import { timing } from 'hono/timing'
+import { verify } from 'hono/jwt'
 
 // Route modules
-import { authRoutes }        from './routes/auth'
-import { bookkeepingRoutes } from './routes/bookkeeping'
-import { payrollRoutes }     from './routes/payroll'
-import { pbxRoutes }         from './routes/pbx'
-import { bizformaRoutes }    from './routes/bizforma'
-import { reportsRoutes }     from './routes/reports'
-import { aiRoutes }          from './routes/ai'
-import { cronHandler }       from './cron'
-import { queueHandler }      from './queue'
+import { authRoutes }        from '../routes/auth'
+import { bookkeepingRoutes } from '../routes/bookkeeping'
+import { payrollRoutes }     from '../routes/payroll'
+import { pbxRoutes }         from '../routes/pbx'
+import { bizformaRoutes }    from '../routes/bizforma'
+import { reportsRoutes }     from '../routes/reports'
+import { aiRoutes }          from '../routes/ai'
+import { cronHandler }       from '../cron'
+import { queueHandler }      from '../queue'
 
 // Durable Object exports (required at module top-level)
-export { PBXRoom }   from './durable/PBXRoom'
-export { AISession } from './durable/AISession'
+export { PBXRoom }   from '../durable/PBXRoom'
+export { AISession } from '../durable/AISession'
 
 export type Env = {
   // D1
@@ -64,6 +65,23 @@ export type Env = {
 }
 
 const app = new Hono<{ Bindings: Env }>()
+
+async function verifySession(c: any, next: any) {
+    const authHeader = c.req.header('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return c.json({ message: 'Unauthorized' }, 401)
+    }
+    const token = authHeader.substring(7)
+    try {
+        const decoded = await verify(token, c.env.JWT_SECRET)
+        c.set('user', decoded)
+        await next()
+    } catch (e) {
+        return c.json({ message: 'Invalid token' }, 401)
+    }
+}
+
+export const requireAuth = verifySession;
 
 // ── Global middleware ────────────────────────────────────────
 app.use('*', timing())

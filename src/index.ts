@@ -89,13 +89,13 @@ app.get('/health', c => c.json({
 }))
 
 // ── API routes ───────────────────────────────────────────────
-app.route('/api/auth',        authRoutes)
-app.route('/api/bookkeeping', bookkeepingRoutes)
-app.route('/api/payroll',     payrollRoutes)
-app.route('/api/pbx',         pbxRoutes)
-app.route('/api/bizforma',    bizformaRoutes)
-app.route('/api/reports',     reportsRoutes)
-app.route('/api/ai',          aiRoutes)
+// app.route('/api/auth',        authRoutes)
+// app.route('/api/bookkeeping', bookkeepingRoutes)
+// app.route('/api/payroll',     payrollRoutes)
+// app.route('/api/pbx',         pbxRoutes)
+// app.route('/api/bizforma',    bizformaRoutes)
+// app.route('/api/reports',     reportsRoutes)
+// app.route('/api/ai',          aiRoutes)
 
 // ── Stripe webhook (raw body required) ───────────────────────
 app.post('/api/webhooks/stripe', async c => {
