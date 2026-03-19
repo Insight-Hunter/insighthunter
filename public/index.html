@@ -92,7 +92,7 @@ h2{font-size:clamp(1.75rem,3.5vw,2.75rem);font-weight:900;letter-spacing:-.04em;
 /* ── Product Grid ── */
 .product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:3rem}
 .product-card{background:var(--card);border:1px solid var(--border);border-radius:16px;
-  padding:1.75rem;transition:border-color .2s,transform .2s;position:relative;overflow:hidden}
+  padding:1.75rem;transition:border-color .2s,transform .2s;position:relative;overflow:hidden;cursor:pointer;}
 .product-card:hover{border-color:rgba(201,151,43,.25);transform:translateY(-3px)}
 .product-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
   background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:.3s}
@@ -356,7 +356,7 @@ footer{background:var(--card);border-top:1px solid var(--border);padding:3rem cl
 
     <div class="product-grid">
 
-      <div class="product-card">
+      <div class="product-card" onclick="window.location.href='features/insight-lite.html'">
         <div class="pc-icon" style="background:rgba(201,151,43,.1);border:1px solid rgba(201,151,43,.2)">📊</div>
         <div class="pc-tag" style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:var(--green)">All Plans</div>
         <div class="pc-title">Financial Dashboard</div>
@@ -369,7 +369,7 @@ footer{background:var(--card);border-top:1px solid var(--border);padding:3rem cl
         </ul>
       </div>
 
-      <div class="product-card">
+      <div class="product-card" onclick="window.location.href='features/bookkeeping.html'">
         <div class="pc-icon" style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2)">📒</div>
         <div class="pc-tag" style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:var(--blue)">3 Tiers · Add-on</div>
         <div class="pc-title">Bookkeeping</div>
@@ -382,7 +382,7 @@ footer{background:var(--card);border-top:1px solid var(--border);padding:3rem cl
         </ul>
       </div>
 
-      <div class="product-card">
+      <div class="product-card" onclick="window.location.href='features/index.html'">
         <div class="pc-icon" style="background:rgba(201,151,43,.1);border:1px solid rgba(201,151,43,.2)">🔮</div>
         <div class="pc-tag" style="background:rgba(201,151,43,.1);border:1px solid rgba(201,151,43,.2);color:var(--gold-l)">Standard+ · Add-on</div>
         <div class="pc-title">AI Forecasting</div>
@@ -395,7 +395,7 @@ footer{background:var(--card);border-top:1px solid var(--border);padding:3rem cl
         </ul>
       </div>
 
-      <div class="product-card">
+      <div class="product-card" onclick="window.location.href='features/bizforma.html'">
         <div class="pc-icon" style="background:rgba(201,151,43,.1);border:1px solid rgba(201,151,43,.2)">🏛️</div>
         <div class="pc-tag" style="background:rgba(201,151,43,.1);border:1px solid rgba(201,151,43,.2);color:var(--gold)">One-time · All Plans</div>
         <div class="pc-title">BizForma</div>
@@ -408,7 +408,7 @@ footer{background:var(--card);border-top:1px solid var(--border);padding:3rem cl
         </ul>
       </div>
 
-      <div class="product-card">
+      <div class="product-card" onclick="window.location.href='features/payroll.html'">
         <div class="pc-icon" style="background:rgba(236,72,153,.1);border:1px solid rgba(236,72,153,.2)">💰</div>
         <div class="pc-tag" style="background:rgba(236,72,153,.1);border:1px solid rgba(236,72,153,.2);color:var(--pink)">Pro · Add-on</div>
         <div class="pc-title">Payroll</div>
@@ -421,7 +421,7 @@ footer{background:var(--card);border-top:1px solid var(--border);padding:3rem cl
         </ul>
       </div>
 
-      <div class="product-card">
+      <div class="product-card" onclick="window.location.href='features/pbx.html'">
         <div class="pc-icon" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2)">📞</div>
         <div class="pc-tag" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);color:#A78BFA">Pro · Add-on</div>
         <div class="pc-title">PBX Communications</div>
