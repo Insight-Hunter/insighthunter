@@ -3,19 +3,20 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
-      "dev":            "wrangler dev --local --persist",
-      "deploy":         "wrangler deploy",
-      "deploy:preview": "wrangler deploy --env preview",
-      "tail":           "wrangler tail insighthunter-ai",
-      "types":          "wrangler types"
+        "dev": "wrangler dev --local --persist",
+        "deploy": "wrangler deploy",
+        "deploy:preview": "wrangler deploy --env preview",
+        "tail": "wrangler tail insighthunter-ai",
+        "types": "wrangler types",
+        "build": "wrangler types"
     },
     "dependencies": {
-      "hono": "^4.6.0"
+        "hono": "^4.6.0"
     },
     "devDependencies": {
-      "@cloudflare/workers-types": "^4.20250310.0",
-      "typescript": "^5.7.0",
-      "wrangler": "^4.0.0"
+        "@cloudflare/workers-types": "^4.20250310.0",
+        "@types/node": "^25.5.0",
+        "typescript": "^5.7.0",
+        "wrangler": "^4.0.0"
     }
-  }
-  
+}
