@@ -1,0 +1,49 @@
+{
+  "name": "insight-platform-dispatch",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+
+  // Routes all user API traffic
+  "routes": [
+    { "pattern": "api.insighthunter.com/api/*", "zone_name": "insighthunter.com" }
+  ],
+
+  // Dispatch namespace — holds all per-user workers
+  "dispatch_namespaces": [
+    {
+      "binding": "DISPATCHER",
+      "namespace": "insight-users"
+      // For local dev, add: "remote": true
+    }
+  ],
+
+  // Platform-level D1 — stores user → worker_name mappings
+  "d1_databases": [
+    {
+      "binding": "PLATFORM_DB",
+      "database_name": "insight-platform-db",
+      "database_id": "<PLATFORM_DB_ID>"
+    }
+  ],
+
+  // Routing cache — fast userId → worker_name lookup
+  "kv_namespaces": [
+    {
+      "binding": "ROUTING_CACHE",
+      "id": "<ROUTING_CACHE_KV_ID>"
+    }
+  ],
+
+  // Metering/billing events
+  "analytics_engine_datasets": [
+    {
+      "binding": "EVENTS",
+      "dataset": "insight_api_events"
+    }
+  ],
+
+  "vars": {},
+  "secrets": ["JWT_SECRET"]
+}
