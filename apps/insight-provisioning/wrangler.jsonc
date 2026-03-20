@@ -1,0 +1,45 @@
+{
+  "name": "insight-provisioning",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+
+  "d1_databases": [
+    {
+      "binding": "PLATFORM_DB",
+      "database_name": "insight-platform-db",
+      "database_id": "<PLATFORM_DB_ID>"
+    }
+  ],
+
+  "kv_namespaces": [
+    { "binding": "ROUTING_CACHE", "id": "<ROUTING_CACHE_KV_ID>" }
+  ],
+
+  "queues": {
+    "producers": [
+      { "binding": "PROVISION_QUEUE", "queue": "insight-provision-queue" }
+    ],
+    "consumers": [
+      {
+        "queue": "insight-provision-queue",
+        "dead_letter_queue": "insight-provision-dlq",
+        "retry_delay": 60,
+        "max_retries": 3
+      }
+    ]
+  },
+
+  "analytics_engine_datasets": [
+    { "binding": "EVENTS", "dataset": "insight_provision_events" }
+  ],
+
+  "vars": {
+    "CF_ACCOUNT_ID": "<YOUR_ACCOUNT_ID>",
+    "DISPATCH_NAMESPACE": "insight-users",
+    "USER_WORKER_SCRIPT_URL": "https://assets.insighthunter.com/user-worker/latest.js"
+  },
+
+  "secrets": ["CF_API_TOKEN", "INTERNAL_TOKEN"]
+}
