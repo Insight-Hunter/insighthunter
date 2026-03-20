@@ -17,3 +17,14 @@ export interface Env {
       body:    ['GET','HEAD'].includes(request.method) ? undefined : request.body,
     }))
   }
+// After user successfully authenticates, fire provisioning
+async function triggerProvision(userId: string, email: string, plan: string, internalToken: string) {
+  await fetch('https://insight-provisioning.workers.dev/provision', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Internal-Token': internalToken,
+    },
+    body: JSON.stringify({ userId, email, plan }),
+  });
+}
