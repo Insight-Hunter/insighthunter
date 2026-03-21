@@ -1,0 +1,64 @@
+// src/types/index.ts
+
+export type Tier = 'free' | 'lite' | 'standard' | 'pro' | 'enterprise';
+
+export type FeatureFlag =
+  | 'bookkeeping'
+  | 'bizforma'
+  | 'pbx'
+  | 'payroll'
+  | 'scout'
+  | 'website_services'
+  | 'ai_insights'
+  | 'cash_flow_forecast'
+  | 'white_label'
+  | 'api_access';
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  avatar_url?: string;
+  org_id: string;
+}
+
+export interface OrgContext {
+  id: string;
+  name: string;
+  tier: Tier;
+  features: FeatureFlag[];
+  phone_number?: string;
+}
+
+export interface Session {
+  user: AuthUser;
+  org_id: string;
+  tier: Tier;
+  features: FeatureFlag[];
+  expires_at: string;
+}
+
+export interface AppDefinition {
+  slug: string;
+  name: string;
+  description: string;
+  tier: Tier;           // minimum tier required
+  route: string;        // dashboard route
+  icon: string;
+  badge?: string;       // e.g. 'New', 'Beta'
+}
+
+export interface APIResponse<T = unknown> {
+  data?: T;
+  error?: string;
+  message?: string;
+}
+
+export interface NavItem {
+  label: string;
+  href: string;
+  icon: string;
+  tier: Tier;
+  badge?: string;
+  children?: NavItem[];
+}
