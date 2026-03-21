@@ -8,7 +8,7 @@
   "d1_databases": [
     {
       "binding": "PLATFORM_DB",
-      "database_name": "insight-platform-db",
+      "database_name": "insighthunter_main",
       "database_id": "<PLATFORM_DB_ID>"
     }
   ],

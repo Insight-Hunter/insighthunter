@@ -67,7 +67,7 @@ const app = new Hono<{ Bindings: Env }>();
 app.use(
   '*',
   cors({
-    origin: ['https://app.insighthunter.com', 'https://insighthunter.com'],
+    origin: ['https://auth.insighthunter.app', 'https://insighthunter.app'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowHeaders: ['Authorization', 'Content-Type', 'X-Request-ID'],
   }),
