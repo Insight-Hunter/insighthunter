@@ -1,0 +1,64 @@
+---
+// src/layouts/DashboardLayout.astro
+import Sidebar from '../components/dashboard/Sidebar.svelte';
+import TopBar from '../components/dashboard/TopBar.svelte';
+import Toast from '../components/shared/Toast.svelte';
+
+interface Props {
+  title: string;
+  activeNav?: string;
+}
+
+const { title, activeNav } = Astro.props;
+
+// Populated by middleware — no client-side check needed
+const user = Astro.locals.user;
+const tier = Astro.locals.tier;
+
+// Belt-and-suspenders: if middleware didn't catch it
+if (!user) {
+  return Astro.redirect(`/auth/login?redirect=${encodeURIComponent(Astro.url.pathname)}`, 302);
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} · Insight Hunter</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#b5a48a" />
+    <!-- Preload critical fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+  </head>
+  <body class="dashboard-body">
+    <div class="dashboard-shell">
+      <Sidebar
+        client:load
+        activeNav={activeNav}
+        tier={tier}
+        user={user}
+      />
+      <div class="dashboard-main">
+        <TopBar
+          client:load
+          user={user}
+          tier={tier}
+        />
+        <main class="dashboard-content">
+          <slot />
+        </main>
+      </div>
+    </div>
+    <Toast client:load />
+
+    <script>
+      // Register service worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      }
+    </script>
+  </body>
+</html>
