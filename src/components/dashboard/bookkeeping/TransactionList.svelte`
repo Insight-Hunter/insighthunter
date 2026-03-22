@@ -1,0 +1,226 @@
+<script lang="ts">
+  import { onMount, createEventDispatcher } from 'svelte';
+  import type { Account } from './BookkeepingApp.svelte';
+
+  export let token: string;
+  export let accounts: Account[];
+
+  const dispatch = createEventDispatcher();
+  const API = '/api/bookkeeping';
+
+  let transactions: TxnRow[] = [];
+  let loading = true;
+  let error = '';
+  let page = 1;
+  let total = 0;
+  const limit = 50;
+
+  // Filters
+  let filterStatus = '';
+  let filterFrom = '';
+  let filterTo = '';
+  let filterSearch = '';
+  let filterAccount = '';
+
+  interface TxnRow {
+    id: string; date: string; description: string; reference: string | null;
+    status: 'DRAFT' | 'POSTED' | 'VOID';
+    line_count: number; total_debit: number; total_credit: number;
+    created_at: string;
+  }
+
+  async function load() {
+    loading = true; error = '';
+    try {
+      const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+      if (filterStatus)  params.set('status', filterStatus);
+      if (filterFrom)    params.set('from', filterFrom);
+      if (filterTo)      params.set('to', filterTo);
+      if (filterSearch)  params.set('search', filterSearch);
+      if (filterAccount) params.set('account', filterAccount);
+
+      const res = await fetch(`${API}/transactions?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      transactions = data.transactions;
+      total = data.pagination.total;
+    } catch (e) {
+      error = 'Failed to load transactions.';
+    } finally {
+      loading = false;
+    }
+  }
+
+  async function postTxn(id: string) {
+    if (!confirm('Post this transaction? It cannot be edited once posted.')) return;
+    await fetch(`${API}/transactions/${id}/post`, {
+      method: 'POST', headers: { Authorization: `Bearer ${token}` },
+    });
+    load();
+  }
+
+  async function voidTxn(id: string) {
+    if (!confirm('Void this transaction?')) return;
+    await fetch(`${API}/transactions/${id}/void`, {
+      method: 'POST', headers: { Authorization: `Bearer ${token}` },
+    });
+    load();
+  }
+
+  function fmt(n: number) {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
+  }
+
+  onMount(load);
+
+  function applyFilters() { page = 1; load(); }
+  function prevPage() { if (page > 1) { page--; load(); } }
+  function nextPage() { if (page * limit < total) { page++; load(); } }
+
+  const statusColors: Record<string, string> = {
+    DRAFT: 'badge-gray', POSTED: 'badge-green', VOID: 'badge-red',
+  };
+</script>
+
+<div class="txn-list">
+  <!-- Filters -->
+  <div class="filters">
+    <input class="filter-input" placeholder="Search…" bind:value={filterSearch} on:change={applyFilters} />
+    <select class="filter-select" bind:value={filterStatus} on:change={applyFilters}>
+      <option value="">All status</option>
+      <option value="DRAFT">Draft</option>
+      <option value="POSTED">Posted</option>
+      <option value="VOID">Void</option>
+    </select>
+    <select class="filter-select" bind:value={filterAccount} on:change={applyFilters}>
+      <option value="">All accounts</option>
+      {#each accounts as acct}
+        <option value={acct.id}>{acct.code ? `${acct.code} · ` : ''}{acct.name}</option>
+      {/each}
+    </select>
+    <input class="filter-input date" type="date" bind:value={filterFrom} on:change={applyFilters} />
+    <span class="date-sep">→</span>
+    <input class="filter-input date" type="date" bind:value={filterTo} on:change={applyFilters} />
+  </div>
+
+  {#if loading}
+    <div class="state-msg">Loading…</div>
+  {:else if error}
+    <div class="state-msg error">{error}</div>
+  {:else if transactions.length === 0}
+    <div class="state-msg">No transactions found. Create your first journal entry.</div>
+  {:else}
+    <table class="txn-table">
+      <thead>
+        <tr>
+          <th>Date</th><th>Description</th><th>Reference</th>
+          <th class="num">Debit</th><th class="num">Credit</th>
+          <th>Lines</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each transactions as txn}
+          <tr class:void={txn.status === 'VOID'}>
+            <td class="date">{txn.date}</td>
+            <td class="desc">{txn.description}</td>
+            <td class="ref">{txn.reference ?? '—'}</td>
+            <td class="num">{fmt(txn.total_debit)}</td>
+            <td class="num">{fmt(txn.total_credit)}</td>
+            <td class="center">{txn.line_count}</td>
+            <td>
+              <span class="badge {statusColors[txn.status]}">{txn.status}</span>
+            </td>
+            <td class="actions">
+              {#if txn.status === 'DRAFT'}
+                <button class="act-btn" on:click={() => dispatch('edit', txn)}>Edit</button>
+                <button class="act-btn green" on:click={() => postTxn(txn.id)}>Post</button>
+              {/if}
+              {#if txn.status === 'POSTED'}
+                <button class="act-btn red" on:click={() => voidTxn(txn.id)}>Void</button>
+              {/if}
+            </td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <span>{total} total</span>
+      <div class="page-btns">
+        <button on:click={prevPage} disabled={page === 1}>← Prev</button>
+        <span>Page {page} of {Math.ceil(total / limit)}</span>
+        <button on:click={nextPage} disabled={page * limit >= total}>Next →</button>
+      </div>
+    </div>
+  {/if}
+</div>
+
+<style>
+  .txn-list { display: flex; flex-direction: column; gap: var(--space-4); }
+
+  .filters {
+    display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center;
+  }
+  .filter-input, .filter-select {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-taupe-200); border-radius: var(--radius-md);
+    font-size: var(--text-sm); background: white;
+  }
+  .filter-input { min-width: 180px; }
+  .filter-input.date { width: 140px; }
+  .date-sep { color: var(--color-taupe-400); }
+
+  .txn-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+  .txn-table thead th {
+    text-align: left; padding: var(--space-2) var(--space-3);
+    border-bottom: 2px solid var(--color-taupe-200);
+    color: var(--color-taupe-500); font-weight: 600;
+    white-space: nowrap;
+  }
+  .txn-table tbody td {
+    padding: var(--space-3); border-bottom: 1px solid var(--color-taupe-100);
+  }
+  .txn-table tbody tr:hover td { background: var(--color-taupe-50); }
+  tr.void td { opacity: 0.45; }
+
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .center { text-align: center; }
+  .date { white-space: nowrap; font-family: monospace; }
+  .desc { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ref { color: var(--color-taupe-400); font-size: var(--text-xs); }
+
+  .badge {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 999px; font-size: 11px; font-weight: 600;
+  }
+  .badge-gray  { background: var(--color-taupe-100); color: var(--color-taupe-600); }
+  .badge-green { background: #d1fae5; color: #065f46; }
+  .badge-red   { background: #fee2e2; color: #991b1b; }
+
+  .actions { display: flex; gap: var(--space-1); white-space: nowrap; }
+  .act-btn {
+    padding: 2px 8px; border-radius: var(--radius-sm);
+    border: 1px solid var(--color-taupe-200); background: white;
+    font-size: var(--text-xs); cursor: pointer; color: var(--color-taupe-700);
+  }
+  .act-btn:hover { background: var(--color-taupe-50); }
+  .act-btn.green { border-color: #6ee7b7; color: #065f46; }
+  .act-btn.red   { border-color: #fca5a5; color: #991b1b; }
+
+  .pagination {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: var(--text-sm); color: var(--color-taupe-500);
+  }
+  .page-btns { display: flex; gap: var(--space-3); align-items: center; }
+  .page-btns button {
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-taupe-200); border-radius: var(--radius-sm);
+    background: white; cursor: pointer; font-size: var(--text-sm);
+  }
+  .page-btns button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .state-msg { padding: var(--space-12); text-align: center; color: var(--color-taupe-400); }
+  .state-msg.error { color: #b91c1c; }
+</style>
