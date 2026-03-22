@@ -31,11 +31,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 h2{font-size:1.15rem;font-weight:800;letter-spacing:-.02em;margin:2.5rem 0 .75rem;
   padding-bottom:.5rem;border-bottom:1px solid var(--border);color:var(--white)}
 p{font-size:.875rem;color:var(--g2);margin-bottom:.85rem;line-height:1.8}
-ul{margin:.5rem 0 1rem 1.25rem;display:flex;flex-direction:column;gap:.35rem}
+ul,ol{margin:.5rem 0 1rem 1.25rem;display:flex;flex-direction:column;gap:.35rem}
 li{font-size:.875rem;color:var(--g2);line-height:1.7}
+li strong{color:var(--g1)}
+.highlight-box{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:1.1rem 1.4rem;margin:1rem 0 1.5rem}
+.highlight-box p{margin:0;font-size:.82rem}
 footer{border-top:1px solid var(--border);padding:2rem clamp(1.25rem,4vw,3rem);
   display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;
-  font-size:.72rem;color:var(--g4);max-width:100%}
+  font-size:.72rem;color:var(--g3);max-width:100%}
 </style>
 </head>
 <body>
@@ -54,37 +58,64 @@ footer{border-top:1px solid var(--border);padding:2rem clamp(1.25rem,4vw,3rem);
 <div class="page">
   <div class="doc-header">
     <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:.4rem">Legal</p>
-    <h1>End-User License Agreement</h1>
+    <h1>End-User License Agreement (EULA)</h1>
     <div class="meta">
-      <strong>Last updated: October 26, 2023</strong>
+      <strong>Effective Date: March 16, 2026</strong> &nbsp;·&nbsp;
+      Last updated: March 16, 2026
     </div>
   </div>
 
-  <p>Please read this End-User License Agreement carefully before clicking the "I Agree" button, downloading or using InsightHunter.</p>
+  <p>This End-User License Agreement ("EULA") constitutes a binding legal agreement between you (either an individual or a single legal entity, hereinafter "You" or "Your") and Insight Hunter LLC ("Company," "we," "us," or "our"). This EULA governs your use of the Insight Hunter software-as-a-service platform, including all associated features, functionalities, and documentation (collectively, the "Software").</p>
+  <p>By accessing, using, or subscribing to the Software, you are accepting this EULA and agreeing to be bound by its terms. If you do not agree to the terms of this EULA, do not access or use the Software. This EULA is incorporated into our main <a href="/legal/terms/">Terms of Service</a>, and by agreeing to this EULA, you also agree to those terms.</p>
 
-  <h2>Interpretation and Definitions</h2>
-  <p>This End-User License Agreement (the "Agreement") is a legal agreement between you ("You" or "Your") and InsightHunter ("Company," "we," "us," or "our") for the use of our software application (the "Software").</p>
-  <p>By downloading, installing, or using the Software, you agree to be bound by the terms of this Agreement. If you do not agree to the terms of this Agreement, do not download, install, or use the Software.</p>
+  <h2 id="s1">1. License Grant</h2>
+  <p>Subject to your compliance with the terms of this EULA and our Terms of Service, we grant you a limited, non-exclusive, non-transferable, non-sublicensable, and revocable license to access and use the Software for your internal business purposes during the term of your subscription.</p>
 
-  <h2>License Grant</h2>
-  <p>The Company grants you a revocable, non-exclusive, non-transferable, limited license to download, install, and use the Software solely for your personal, non-commercial purposes strictly in accordance with the terms of this Agreement.</p>
-
-  <h2>Restrictions</h2>
-  <p>You agree not to, and you will not permit others to:</p>
+  <h2 id="s2">2. License Restrictions</h2>
+  <p>You agree that you will not, and will not permit any third party to:</p>
   <ul>
-    <li>License, sell, rent, lease, assign, distribute, transmit, host, outsource, disclose, or otherwise commercially exploit the Software or make the Software available to any third party.</li>
-    <li>Modify, make derivative works of, disassemble, decrypt, reverse compile, or reverse engineer any part of the Software.</li>
-    <li>Remove, alter, or obscure any proprietary notice (including any notice of copyright or trademark) of the Company or its affiliates, partners, suppliers, or the licensors of the Software.</li>
+    <li>License, sell, rent, lease, assign, distribute, transmit, host, outsource, disclose, or otherwise commercially exploit the Software or make it available to any third party.</li>
+    <li>Use the Software for any purpose other than your own internal business operations.</li>
+    <li>Reverse engineer, decompile, disassemble, or otherwise attempt to discover the source code, object code, or underlying structure, ideas, or algorithms of the Software.</li>
+    <li>Modify, translate, or create derivative works based on the Software.</li>
+    <li>Remove, alter, or obscure any proprietary notices (including copyright and trademark notices) on the Software.</li>
+    <li>Use the Software to build a competitive product or service.</li>
+    <li>Use the Software for any illegal or unauthorized purpose, or in violation of any applicable laws (including but not limited to data privacy laws, telecommunications laws, and export control laws).</li>
   </ul>
+
+  <h2 id="s3">3. Intellectual Property Rights</h2>
+  <p>The Software is licensed, not sold. You acknowledge that the Software and its structure, organization, source code, and all related documentation, including all intellectual property rights therein (including copyrights, patents, trade secrets, and trademarks) are the exclusive property of Insight Hunter LLC and its licensors. We reserve all rights in and to the Software not expressly granted to you in this EULA.</p>
+
+  <h2 id="s4">4. Your Content</h2>
+  <p>You retain all ownership rights to the financial data, business information, and other content you upload or input into the Software ("Your Content"). You grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, modify, and process Your Content solely for the purpose of providing, maintaining, and improving the Software and its features for you.</p>
+
+  <h2 id="s5">5. Term and Termination</h2>
+  <p>This EULA is effective from the moment you first access the Software and remains in effect until your subscription is terminated. Upon termination, the license granted herein will also terminate, and you must cease all access to and use of the Software. The sections on Intellectual Property, Your Content, Disclaimers, Limitation of Liability, and Governing Law will survive any termination of this EULA.</p>
+  
+  <h2 id="s6">6. Disclaimer of Warranties</h2>
+  <p>THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITH ALL FAULTS AND WITHOUT WARRANTY OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, INSIGHT HUNTER LLC EXPRESSLY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.</p>
+
+  <h2 id="s7">7. Limitation of Liability</h2>
+  <p>IN NO EVENT SHALL INSIGHT HUNTER LLC BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING DAMAGES FOR LOST PROFITS, LOSS OF DATA, OR BUSINESS INTERRUPTION, ARISING OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. OUR TOTAL CUMULATIVE LIABILITY IN CONNECTION WITH THIS EULA AND THE SOFTWARE, WHETHER IN CONTRACT, TORT, OR OTHERWISE, WILL NOT EXCEED THE AMOUNT OF FEES YOU PAID TO US FOR THE USE OF THE SOFTWARE IN THE 12 MONTHS PRECEDING THE CLAIM.</p>
+
+  <h2 id="s8">8. Governing Law</h2>
+  <p>This EULA shall be governed by and construed in accordance with the laws of the State of Georgia, United States, without regard to its conflict of law principles. Any legal action or proceeding arising under this EULA will be brought exclusively in the federal or state courts located in Georgia, and the parties hereby irrevocably consent to the personal jurisdiction and venue therein.</p>
+  
+  <h2 id="s9">9. Contact Information</h2>
+  <p>For any questions about this EULA, please contact us at <a href="mailto:legal@insighthunter.app">legal@insighthunter.app</a>.</p>
+  
+  <div class="highlight-box">
+    <p>By using the Insight Hunter Software, you acknowledge that you have read, understood, and agree to be bound by this EULA and the accompanying <a href="/legal/terms/">Terms of Service</a> and <a href="/legal/privacy/">Privacy Policy</a>.</p>
+  </div>
 </div>
 
 <footer>
   <span>&copy; 2026 Insight Hunter LLC. All rights reserved.</span>
   <div style="display:flex;gap:1.5rem">
-    <a href="/legal/privacy/" style="color:var(--g4)">Privacy</a>
-    <a href="/legal/terms/" style="color:var(--g4)">Terms</a>
-    <a href="/legal/eula/" style="color:var(--g4)">EULA</a>
-    <a href="/legal/security/" style="color:var(--g4)">Security</a>
+    <a href="/legal/privacy/" style="color:var(--g3)">Privacy</a>
+    <a href="/legal/terms/" style="color:var(--g3)">Terms</a>
+    <a href="/legal/eula/" style="color:var(--g3)">EULA</a>
+    <a href="/legal/sms-optin/" style="color:var(--g3)">SMS Policy</a>
   </div>
 </footer>
 

@@ -223,3 +223,74 @@ app.post('/auth/reset-password', async (c) => {
 })
 
 export default app
+// src/index.ts
+import { Hono } from "hono";
+import OAuthProvider from "@cloudflare/workers-oauth-provider";
+
+// Your protected API routes
+const api = new Hono<{ Bindings: Env }>();
+
+api.get("/me", (c) => {
+  // Access authenticated user props injected by the OAuth layer
+  const { userId, email, scopes } = c.env.USER_PROPS as any;
+  return c.json({ userId, email, scopes });
+});
+
+api.get("/dashboard", (c) => {
+  // Your Insight Hunter dashboard data
+  return c.json({ message: "Protected data here" });
+});
+
+// Auth handler — renders login UI and verifies credentials
+async function handleLogin(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url);
+
+  if (request.method === "GET") {
+    // Return your login page HTML
+    return new Response(`
+      <form method="POST" action="/authorize">
+        <input name="email" type="email" placeholder="Email" required />
+        <input name="password" type="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+      </form>
+    `, { headers: { "Content-Type": "text/html" } });
+  }
+
+  if (request.method === "POST") {
+    const body = await request.formData();
+    const email = body.get("email") as string;
+    const password = body.get("password") as string;
+
+    // Validate against your D1 users table
+    // const user = await env.DB.prepare("SELECT * FROM users WHERE email = ?")
+    //   .bind(email).first();
+
+    const isValid = email && password; // Replace with real D1 check
+
+    if (!isValid) {
+      return new Response("Invalid credentials", { status: 401 });
+    }
+
+    // Return user identity — library binds this to the issued token
+    return new Response(JSON.stringify({
+      login: true,
+      userId: "user-123",       // from D1
+      email,
+      scopes: ["read", "write"] // what this user can do
+    }), { headers: { "Content-Type": "application/json" } });
+  }
+
+  return new Response("Method not allowed", { status: 405 });
+}
+
+// Export the OAuthProvider as your Worker entrypoint
+export default new OAuthProvider({
+  apiRoute: "/api",             // All /api/* routes go to your Hono app
+  apiHandler: api.fetch,        // Your Hono handler
+  authorizeEndpoint: "/authorize",
+  tokenEndpoint: "/token",
+  clientRegistrationEndpoint: "/register",  // Optional: dynamic client registration
+  defaultScopes: ["read"],
+  kvNamespace: "OAUTH_KV",      // KV binding name from wrangler.toml
+  loginHandler: handleLogin,    // Your auth logic above
+});

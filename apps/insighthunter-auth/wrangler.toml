@@ -7,15 +7,20 @@ compatibility_flags = ["nodejs_compat"]
 enabled = true
 head_sampling_rate = 1
 
-# These bindings are illustrative. Actual values might differ.
-kv_namespaces = [
-  { binding = "AUTH_KV", id = "..." }
-]
+[[kv_namespaces]]
+binding = "AUTH_KV" 
+id = "..." 
 
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-auth"
 database_id = "..."
 
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "your-kv-namespace-id"
+
+[vars]
+JWT_SECRET = "your-secret-here"
 [vars]
 SITE_URL = "https://insighthunter.app"
