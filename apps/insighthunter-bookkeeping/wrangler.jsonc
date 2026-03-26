@@ -1,0 +1,21 @@
+{
+  "name": "insighthunter-bookkeeping",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "insighthunter-bookkeeping", "database_id": "REPLACE_AFTER_PROVISION" }
+  ],
+  "r2_buckets": [
+    { "binding": "RECEIPTS", "bucket_name": "ih-receipts" }
+  ],
+  "kv_namespaces": [
+    { "binding": "REPORT_CACHE", "id": "REPLACE_AFTER_PROVISION" }
+  ],
+  "analytics_engine_datasets": [
+    { "binding": "BOOKKEEPING_EVENTS", "dataset": "ih_bookkeeping_events" }
+  ],
+  "vars": { "ENVIRONMENT": "production" }
+  // Secrets: JWT_SECRET
+}

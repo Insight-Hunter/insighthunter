@@ -1,0 +1,10 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import TierGate from '../../components/dashboard/TierGate.astro';
+import ReportsPanel from '../../components/dashboard/ReportsPanel.svelte';
+---
+<DashboardLayout title="Reports">
+  <TierGate required="lite">
+    <ReportsPanel client:load />
+  </TierGate>
+</DashboardLayout>

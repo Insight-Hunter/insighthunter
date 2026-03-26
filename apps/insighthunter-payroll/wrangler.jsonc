@@ -1,0 +1,29 @@
+{
+  "name": "insighthunter-payroll",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "insighthunter-payroll", "database_id": "REPLACE_AFTER_PROVISION" }
+  ],
+  "r2_buckets": [
+    { "binding": "PAY_STUBS", "bucket_name": "ih-pay-stubs" }
+  ],
+  "kv_namespaces": [
+    { "binding": "PAYROLL_CACHE", "id": "REPLACE_AFTER_PROVISION" }
+  ],
+  "queues": {
+    "producers": [{ "binding": "PAYROLL_QUEUE", "queue": "ih-payroll-queue" }],
+    "consumers": [{
+      "queue": "ih-payroll-queue",
+      "max_batch_size": 10,
+      "max_retries": 3,
+      "dead_letter_queue": "ih-payroll-dlq"
+    }]
+  },
+  "analytics_engine_datasets": [
+    { "binding": "PAYROLL_EVENTS", "dataset": "ih_payroll_events" }
+  ],
+  "vars": { "ENVIRONMENT": "production" }
+}
