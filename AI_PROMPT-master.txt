@@ -1,0 +1,1406 @@
+Here is the complete master prompt as plain text. Copy everything below the line and paste it directly into any AI coding session.
+
+***
+
+INSIGHTHUNTER COMPLETE PRODUCTION INSTALL PROMPT v3.0
+AI-Powered Auto-CFO SaaS — Cloudflare Edge-Native Multi-Tenant Platform
+Generated: March 2026
+
+======================================================================
+YOUR ROLE AND RULES
+======================================================================
+
+You are a principal Cloudflare platform engineer building InsightHunter from scratch. Generate every file completely — never partial diffs or placeholders. All TypeScript, all ES Modules, all wrangler.jsonc files. Never hard-code secrets. Never use wrangler.toml. Follow every instruction in the order given. Do not ask clarifying questions — generate all files.
+
+======================================================================
+PLATFORM OVERVIEW
+======================================================================
+
+InsightHunter is a multi-tenant AI CFO SaaS running entirely on Cloudflare's edge. Every tenant (org) is isolated by org_id at the database query level. Enterprise tenants additionally get their own isolated Worker runtime via Workers for Platforms. All authentication flows through a single internal worker called insighthunter-auth. Every other worker validates tokens either by calling insighthunter-auth's internal /auth/verify endpoint using an X-Internal-Secret header, or by verifying the JWT signature locally using the shared JWT_SECRET.
+
+======================================================================
+MONOREPO STRUCTURE
+======================================================================
+
+Root directory: ./insighthunter/
+
+insighthunter/
+  package.json                        npm workspaces + turbo root
+  turbo.json                          Turborepo pipeline
+  .env.example                        All secrets documented
+  scripts/
+    provision.sh                      One-time CF resource creation
+    deploy.sh                         Ordered production deploy
+    migrate.sh                        Run all D1 migrations
+    seed-tenant.sh                    Seed a new tenant after register
+  packages/
+    @ih/types/
+      package.json
+      src/index.ts                    All shared TypeScript interfaces
+    @ih/tier-config/
+      package.json
+      src/index.ts                    Tier limits, pricing, feature flags
+    @ih/auth-client/
+      package.json
+      src/index.ts                    signJWT, verifyJWT, extractBearer
+  workers-for-platforms/
+    tenant-base-worker/
+      package.json
+      wrangler.jsonc
+      src/index.ts                    Template injected per enterprise tenant
+  apps/
+    insighthunter-auth/               CENTRAL AUTH — all others depend on this
+    insighthunter-dispatch/           Workers for Platforms dispatch router
+    insighthunter-bookkeeping/        Double-entry bookkeeping API
+    insighthunter-bizforma/           Formation, EIN, compliance + handoff
+    insighthunter-pbx/                PBX call routing, voicemail, IVR
+    insighthunter-payroll/            Payroll runs, pay stubs, tax forms
+    insighthunter-ai/                 AI CFO assistant + Vectorize RAG
+    insighthunter-main/               Astro + Svelte frontend on Pages
+
+======================================================================
+SHARED TYPES  --  packages/@ih/types/src/index.ts
+======================================================================
+
+Export these exact TypeScript interfaces. Every worker imports from @ih/types.
+
+  export type Tier = 'free' | 'lite' | 'standard' | 'pro' | 'enterprise'
+
+  export interface AuthUser
+    userId: string
+    orgId: string
+    email: string
+    name: string
+    tier: Tier
+    role: 'owner' | 'admin' | 'member' | 'viewer'
+
+  export interface JWTPayload
+    sub: string         userId
+    org: string         orgId
+    email: string
+    tier: Tier
+    role: string
+    iat: number
+    exp: number
+
+  export interface Session
+    user: AuthUser
+    accessToken: string
+    refreshToken: string
+    expiresAt: number
+
+  export interface Org
+    id: string
+    name: string
+    tier: Tier
+    owner_id: string
+    worker_script: string or null    WFP enterprise worker name
+    custom_domain: string or null
+    stripe_sub_id: string or null
+    created_at: string
+    updated_at: string
+
+  export interface TierLimits
+    transactions_per_month: number or null   null means unlimited
+    api_calls_per_minute: number or null
+    ai_queries_per_day: number or null
+    payroll_employees: number or null
+    pbx_extensions: number or null
+    storage_gb: number or null
+    custom_worker: boolean
+    white_label: boolean
+    sla_hours: number or null
+
+  export interface ApiError
+    error: string
+    code: string
+    status: number
+
+  export interface Paginated<T>
+    items: T[]
+    total: number
+    page: number
+    limit: number
+    hasMore: boolean
+
+======================================================================
+TIER CONFIG  --  packages/@ih/tier-config/src/index.ts
+======================================================================
+
+Import TierLimits and Tier from @ih/types. Export these exact values.
+
+TIER_LIMITS record keyed by Tier:
+
+  free:
+    transactions_per_month: 50
+    api_calls_per_minute: 20
+    ai_queries_per_day: 0
+    payroll_employees: 0
+    pbx_extensions: 0
+    storage_gb: 0.5
+    custom_worker: false
+    white_label: false
+    sla_hours: null
+
+  lite:
+    transactions_per_month: null
+    api_calls_per_minute: 60
+    ai_queries_per_day: 10
+    payroll_employees: 0
+    pbx_extensions: 0
+    storage_gb: 5
+    custom_worker: false
+    white_label: false
+    sla_hours: null
+
+  standard:
+    transactions_per_month: null
+    api_calls_per_minute: 120
+    ai_queries_per_day: 50
+    payroll_employees: 10
+    pbx_extensions: 5
+    storage_gb: 20
+    custom_worker: false
+    white_label: false
+    sla_hours: 48
+
+  pro:
+    transactions_per_month: null
+    api_calls_per_minute: 300
+    ai_queries_per_day: 200
+    payroll_employees: 50
+    pbx_extensions: 25
+    storage_gb: 100
+    custom_worker: false
+    white_label: true
+    sla_hours: 24
+
+  enterprise:
+    transactions_per_month: null
+    api_calls_per_minute: null
+    ai_queries_per_day: null
+    payroll_employees: null
+    pbx_extensions: null
+    storage_gb: null
+    custom_worker: true
+    white_label: true
+    sla_hours: 4
+
+TIER_PRICING keyed by Tier: free=0, lite=29, standard=79, pro=199, enterprise=999
+
+Export function tierAtLeast(userTier: Tier, required: Tier): boolean
+  Returns true if userTier rank is >= required rank using array index order:
+  free, lite, standard, pro, enterprise
+
+Export function checkLimit(tier: Tier, key: keyof TierLimits): boolean
+  Returns false if the limit value is 0 or false, true otherwise
+
+======================================================================
+AUTH CLIENT  --  packages/@ih/auth-client/src/index.ts
+======================================================================
+
+Use only Web Crypto API. No external JWT libraries. Implement HMAC-SHA256.
+
+Export async function signJWT(payload without iat/exp, secret: string, ttlSeconds: number): Promise<string>
+  Encodes header as base64url JSON with alg HS256 typ JWT
+  Encodes payload as base64url JSON adding iat as now and exp as now plus ttl
+  Signs header.payload with HMAC-SHA256 using secret
+  Returns header.payload.signature all base64url encoded
+
+Export async function verifyJWT(token: string, secret: string): Promise<JWTPayload>
+  Splits on dot into three parts
+  Verifies HMAC signature
+  Throws if signature invalid or exp is in the past
+  Returns decoded JWTPayload
+
+Export function extractBearer(authHeader: string or null or undefined): string or null
+  Returns token string if header starts with Bearer, otherwise null
+
+Export function jwtToAuthUser(payload: JWTPayload): AuthUser
+
+======================================================================
+WORKER: insighthunter-auth
+======================================================================
+
+This is the single source of truth for all identity. Every other worker
+calls POST /auth/verify with an X-Internal-Secret header to validate tokens
+OR verifies locally using the shared JWT_SECRET. This worker is the only
+place passwords are checked, JWTs are issued, orgs are created, and
+refresh tokens are stored.
+
+--- wrangler.jsonc ---
+
+  name: insighthunter-auth
+  main: src/index.ts
+  compatibility_date: 2025-03-07
+  compatibility_flags: nodejs_compat
+  observability: enabled true, head_sampling_rate 1
+
+  d1_databases:
+    binding DB, database_name insighthunter-auth, database_id REPLACE_AFTER_PROVISION
+
+  kv_namespaces:
+    binding SESSIONS, id REPLACE_AFTER_PROVISION       TTL 1 hour per entry
+    binding REFRESH_TOKENS, id REPLACE_AFTER_PROVISION TTL 30 days per entry
+
+  analytics_engine_datasets:
+    binding AUTH_EVENTS, dataset ih_auth_events
+
+  vars:
+    ENVIRONMENT: production
+    ACCESS_TOKEN_TTL: 3600
+    REFRESH_TOKEN_TTL: 2592000
+
+  secrets required: JWT_SECRET
+
+--- Database Schema: src/db/schema.sql ---
+
+  CREATE TABLE IF NOT EXISTS orgs (
+    id             TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+    name           TEXT NOT NULL,
+    tier           TEXT NOT NULL DEFAULT 'free',
+    owner_id       TEXT,
+    worker_script  TEXT,
+    custom_domain  TEXT,
+    stripe_sub_id  TEXT,
+    created_at     TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at     TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS users (
+    id            TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+    email         TEXT NOT NULL UNIQUE,
+    name          TEXT NOT NULL,
+    password_hash TEXT,
+    org_id        TEXT NOT NULL REFERENCES orgs(id),
+    role          TEXT NOT NULL DEFAULT 'owner',
+    email_verified INTEGER NOT NULL DEFAULT 0,
+    last_login    TEXT,
+    created_at    TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+  CREATE INDEX IF NOT EXISTS idx_users_org   ON users(org_id);
+
+  CREATE TABLE IF NOT EXISTS password_resets (
+    id         TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+    user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    used       INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+--- API Routes: src/index.ts ---
+
+Use Hono. All CORS headers must include Authorization, Content-Type, X-Internal-Secret.
+Allowed origins: https://insighthunter.app and any subdomain.
+
+  POST /auth/register
+    Body: email, password (min 8 chars), name, org_name
+    Creates org row then user row in D1 batch
+    Password stored as HMAC-SHA256(plain + salt) colon salt
+    Returns: access_token, refresh_token, user object
+    Stores refresh token in REFRESH_TOKENS KV with TTL
+
+  POST /auth/login
+    Body: email, password
+    Joins users and orgs to get tier and worker_script
+    Verifies password hash
+    Updates last_login
+    Issues access token and refresh token
+    Returns same shape as register
+
+  POST /auth/refresh
+    Body: refresh_token
+    Reads from REFRESH_TOKENS KV
+    Issues new access token
+    Rotates refresh token (deletes old, writes new)
+    Returns: access_token, refresh_token
+
+  POST /auth/logout
+    Body: refresh_token
+    Deletes refresh token from KV
+    Returns: message logged out
+
+  GET /auth/me
+    Requires Bearer token in Authorization header
+    Verifies JWT locally using JWT_SECRET
+    Returns full user plus org details from D1
+
+  POST /auth/verify
+    INTERNAL ONLY — requires X-Internal-Secret header matching JWT_SECRET
+    Body: token string
+    Verifies JWT, returns decoded AuthUser payload
+    Used by all other workers for fast service-to-service token validation
+    Returns 200 with user object or 401
+
+  PATCH /auth/org
+    INTERNAL ONLY — requires X-Internal-Secret
+    Body: orgId, tier, worker_script
+    Updates org record
+    Returns updated org
+
+  GET /auth/org/:orgId
+    INTERNAL ONLY — requires X-Internal-Secret
+    Returns full org record including tier and worker_script
+
+  POST /auth/forgot-password
+    Body: email
+    Creates password_reset row with random token hash
+    In production send email — in MVP log token to console
+    Returns: message sent if exists
+
+  POST /auth/reset-password
+    Body: token, new_password
+    Validates token not expired and not used
+    Updates password_hash, marks token used
+    Returns: message reset successful
+
+  PATCH /auth/profile
+    Requires Bearer token
+    Body: name optional, current_password optional, new_password optional
+    Updates name or password
+    Returns updated user
+
+======================================================================
+WORKER: insighthunter-dispatch  (Workers for Platforms)
+======================================================================
+
+This is the dispatch worker that routes requests to per-tenant custom Workers
+for enterprise orgs. Non-enterprise orgs fall through to standard service bindings.
+Requires Cloudflare Workers for Platforms enabled on the account (paid add-on).
+
+--- wrangler.jsonc ---
+
+  name: insighthunter-dispatch
+  main: src/index.ts
+  compatibility_date: 2025-03-07
+  compatibility_flags: nodejs_compat
+  observability: enabled true, head_sampling_rate 1
+
+  dispatch_namespaces:
+    binding: TENANT_WORKERS
+    namespace: insighthunter-tenants
+
+  services:
+    binding AUTH_WORKER, service insighthunter-auth
+    binding BOOKKEEPING_WORKER, service insighthunter-bookkeeping
+    binding BIZFORMA_WORKER, service insighthunter-bizforma
+    binding PBX_WORKER, service insighthunter-pbx
+    binding PAYROLL_WORKER, service insighthunter-payroll
+    binding AI_WORKER, service insighthunter-ai
+
+  kv_namespaces:
+    binding TENANT_CACHE, id REPLACE_AFTER_PROVISION
+
+  vars:
+    ENVIRONMENT: production
+
+  secrets required: JWT_SECRET
+
+--- src/index.ts logic ---
+
+The dispatch worker is the single entry point for all API traffic from the
+frontend. It inspects the Bearer token, calls AUTH_WORKER internally to
+verify it, reads the org's tier and worker_script from the auth response,
+then routes to the correct downstream worker.
+
+Routing logic:
+  Extract token from Authorization header
+  Call AUTH_WORKER fetch POST /auth/verify with X-Internal-Secret and body token
+  If 401 return 401 to client
+  Parse AuthUser from response
+  Check if org has worker_script set (enterprise custom worker)
+  If enterprise and worker_script exists:
+    Get tenant worker from TENANT_WORKERS dispatch namespace using worker_script name
+    Forward entire request to tenant worker with X-IH-User header containing JSON AuthUser
+  If not enterprise or no custom worker:
+    Route by URL path prefix:
+      /api/bookkeeping/* → BOOKKEEPING_WORKER
+      /api/bizforma/*    → BIZFORMA_WORKER
+      /api/pbx/*         → PBX_WORKER
+      /api/payroll/*     → PAYROLL_WORKER
+      /api/ai/*          → AI_WORKER
+    Strip the /api/worker-name prefix before forwarding
+    Inject X-IH-User header with JSON AuthUser so downstream workers trust it
+    Inject X-Internal-Secret header so downstream workers know request came from dispatch
+
+Rate limiting per tier using KV:
+  Key: rate:orgId:minute (value = count, TTL = 60 seconds)
+  Free: 20/min, Lite: 60/min, Standard: 120/min, Pro: 300/min, Enterprise: null
+  Return 429 with Retry-After if exceeded
+
+--- Tenant Worker Provisioning API ---
+
+  POST /admin/tenants/:orgId/worker
+    INTERNAL ONLY X-Internal-Secret required
+    Body: script_name (the worker name to register in the namespace)
+    Calls Cloudflare REST API to upload the base tenant worker script
+    URL: https://api.cloudflare.com/client/v4/accounts/ACCOUNT_ID/workers/dispatch/namespaces/insighthunter-tenants/scripts/SCRIPT_NAME
+    Authorization: Bearer CF_API_TOKEN
+    After upload calls AUTH_WORKER PATCH /auth/org to set worker_script
+    Returns: deployed true, script_name
+
+  DELETE /admin/tenants/:orgId/worker
+    Deletes tenant worker from dispatch namespace
+    Clears worker_script in auth
+
+======================================================================
+WORKERS FOR PLATFORMS — TENANT BASE WORKER TEMPLATE
+======================================================================
+
+File: workers-for-platforms/tenant-base-worker/src/index.ts
+
+This script gets uploaded to the dispatch namespace as the starting point
+for each enterprise tenant. It can be customized per tenant.
+
+  interface Env
+    IH_ORG_ID: string         injected as var at upload time
+    IH_TIER: string           injected as var at upload time
+
+  export default fetch handler
+    Read X-IH-User header which contains the AuthUser injected by dispatch
+    Parse into AuthUser object
+    Verify orgId in the user matches IH_ORG_ID binding
+    Log request to console for tenant audit trail
+    Return Response.json with message custom worker active, orgId, path, method
+    Enterprise tenants replace this handler body with their custom logic
+
+The wrangler.jsonc for the tenant base worker sets:
+  name: ih-tenant-base
+  main: src/index.ts
+  compatibility_date: 2025-03-07
+
+======================================================================
+WORKER: insighthunter-bookkeeping
+======================================================================
+
+All requests arrive with X-IH-User header (JSON AuthUser) injected by dispatch.
+Parse X-IH-User at the start of every route handler — never re-verify JWT here.
+Extract orgId from parsed user. Every D1 query filters by org_id.
+
+--- wrangler.jsonc ---
+
+  name: insighthunter-bookkeeping
+  main: src/index.ts
+  compatibility_date: 2025-03-07
+  compatibility_flags: nodejs_compat
+  observability: enabled true, head_sampling_rate 1
+
+  d1_databases:
+    binding DB, database_name insighthunter-bookkeeping, database_id REPLACE
+
+  r2_buckets:
+    binding RECEIPTS, bucket_name ih-receipts
+
+  kv_namespaces:
+    binding REPORT_CACHE, id REPLACE
+
+  analytics_engine_datasets:
+    binding BOOKKEEPING_EVENTS, dataset ih_bookkeeping_events
+
+  vars:
+    ENVIRONMENT: production
+
+  secrets required: JWT_SECRET   used only for /seed internal endpoint
+
+--- Database Schema ---
+
+  bookkeeping_accounts table:
+    id TEXT PRIMARY KEY default randomblob hex
+    org_id TEXT NOT NULL
+    code TEXT nullable
+    name TEXT NOT NULL
+    type TEXT NOT NULL  CHECK ASSET LIABILITY EQUITY REVENUE EXPENSE
+    subtype TEXT
+    description TEXT
+    parent_id TEXT references self
+    is_active INTEGER DEFAULT 1
+    created_at TEXT DEFAULT datetime now
+    updated_at TEXT DEFAULT datetime now
+    UNIQUE index on org_id + code where code is not null
+
+  transactions table:
+    id TEXT PRIMARY KEY default randomblob hex
+    org_id TEXT NOT NULL
+    date TEXT NOT NULL
+    description TEXT NOT NULL
+    reference TEXT nullable
+    status TEXT DEFAULT DRAFT  CHECK DRAFT POSTED VOID
+    created_by TEXT
+    created_at TEXT
+    updated_at TEXT
+    INDEX on org_id + date
+    INDEX on org_id + status
+
+  transaction_lines table:
+    id TEXT PRIMARY KEY
+    transaction_id TEXT REFERENCES transactions ON DELETE CASCADE
+    account_id TEXT REFERENCES bookkeeping_accounts
+    debit REAL DEFAULT 0 CHECK >= 0
+    credit REAL DEFAULT 0 CHECK >= 0
+    memo TEXT
+    created_at TEXT
+    INDEX on transaction_id
+    INDEX on account_id
+
+  attachments table:
+    id TEXT PRIMARY KEY
+    org_id TEXT NOT NULL
+    transaction_id TEXT references transactions ON DELETE SET NULL
+    r2_key TEXT NOT NULL
+    filename TEXT NOT NULL
+    size INTEGER
+    created_at TEXT
+
+--- API Routes ---
+
+  GET /accounts             list CoA filtered by ?type and ?active
+  POST /accounts            create account, name and type required
+  PATCH /accounts/:id       update fields
+  DELETE /accounts/:id      soft-delete if posted txns exist else hard delete
+
+  GET /transactions         paginated list, filters: status from to account search page limit
+  GET /transactions/:id     single with lines and attachments
+  POST /transactions        create DRAFT, enforce sum(debit)==sum(credit) within 0.001
+  PATCH /transactions/:id   edit DRAFT only, replace lines atomically via D1 batch
+  POST /transactions/:id/post    DRAFT to POSTED, bust REPORT_CACHE keys for org
+  POST /transactions/:id/void    mark VOID
+
+  POST /attachments/:txnId  multipart upload to R2, insert metadata row
+  GET /attachments/:id/download  stream R2 object to client
+
+  POST /import              batch array of simple rows, each becomes two-line DRAFT transaction
+  POST /seed                INTERNAL X-Internal-Secret required, X-Org-Id header
+                            seeds 32 default Chart of Accounts accounts for org
+
+  GET /reports/trial-balance     KV cached 5 min, as_of date param
+  GET /reports/pl                KV cached 5 min, from and to date params
+  GET /reports/balance-sheet     KV cached 5 min, as_of date param
+
+--- Default Chart of Accounts (32 accounts seeded on /seed) ---
+
+  1000 Cash ASSET Current
+  1010 Checking Account ASSET Current
+  1020 Savings Account ASSET Current
+  1100 Accounts Receivable ASSET Current
+  1200 Prepaid Expenses ASSET Current
+  1500 Equipment ASSET Fixed
+  1510 Accumulated Depreciation ASSET Fixed
+  2000 Accounts Payable LIABILITY Current
+  2100 Credit Card Payable LIABILITY Current
+  2200 Sales Tax Payable LIABILITY Current
+  2300 Payroll Liabilities LIABILITY Current
+  2500 Long-Term Debt LIABILITY LongTerm
+  3000 Owners Equity EQUITY Equity
+  3100 Owners Draw EQUITY Equity
+  3200 Retained Earnings EQUITY Equity
+  4000 Revenue REVENUE Operating
+  4100 Service Revenue REVENUE Operating
+  4200 Product Revenue REVENUE Operating
+  4900 Other Income REVENUE Other
+  5000 Cost of Goods Sold EXPENSE COGS
+  6000 Rent Expense EXPENSE Operating
+  6100 Utilities EXPENSE Operating
+  6200 Payroll Expense EXPENSE Operating
+  6300 Professional Services EXPENSE Operating
+  6400 Marketing and Advertising EXPENSE Operating
+  6500 Software and Subscriptions EXPENSE Operating
+  6600 Office Supplies EXPENSE Operating
+  6700 Travel and Meals EXPENSE Operating
+  6800 Bank Fees EXPENSE Operating
+  6900 Depreciation Expense EXPENSE Operating
+  7000 Interest Expense EXPENSE Other
+  7100 Income Tax Expense EXPENSE Other
+
+======================================================================
+WORKER: insighthunter-bizforma
+======================================================================
+
+Same auth pattern as bookkeeping — trust X-IH-User header from dispatch.
+On formation case status reaching COMPLETE, call insighthunter-bookkeeping
+POST /seed endpoint with X-Internal-Secret and X-Org-Id header to initialize
+the org's Chart of Accounts. This is the BizForma to Bookkeeping handoff.
+
+--- wrangler.jsonc ---
+
+  name: insighthunter-bizforma
+  main: src/index.ts
+  compatibility_date: 2025-03-07
+  compatibility_flags: nodejs_compat
+  observability: enabled true, head_sampling_rate 1
+
+  d1_databases:
+    binding DB, database_name insighthunter-bizforma, database_id REPLACE
+
+  r2_buckets:
+    binding DOCUMENTS, bucket_name ih-bizforma-docs
+
+  kv_namespaces:
+    binding CACHE, id REPLACE
+
+  analytics_engine_datasets:
+    binding BIZ_EVENTS, dataset ih_bizforma_events
+
+  durable_objects:
+    bindings:
+      name FORMATION_AGENT, class_name FormationAgent
+      name COMPLIANCE_AGENT, class_name ComplianceAgent
+  migrations:
+    tag v1, new_classes FormationAgent ComplianceAgent
+
+  vars:
+    ENVIRONMENT: production
+    BOOKKEEPING_WORKER_URL: https://insighthunter-bookkeeping.ACCOUNT.workers.dev
+
+  secrets required: JWT_SECRET
+
+--- Database Schema ---
+
+  formation_cases:
+    id TEXT PRIMARY KEY
+    org_id TEXT NOT NULL
+    user_id TEXT NOT NULL
+    status TEXT DEFAULT QUESTIONNAIRE
+      allowed: QUESTIONNAIRE ENTITY_SELECTED EIN_PENDING EIN_COMPLETE
+               STATE_PENDING STATE_COMPLETE TAX_SETUP COMPLETE
+    entity_type TEXT  allowed: SOLE_PROP LLC S_CORP C_CORP PARTNERSHIP NONPROFIT
+    business_name TEXT
+    state TEXT
+    created_at TEXT
+    updated_at TEXT
+
+  questionnaire_answers:
+    id TEXT PRIMARY KEY
+    case_id TEXT REFERENCES formation_cases ON DELETE CASCADE
+    question TEXT NOT NULL
+    answer TEXT NOT NULL
+    created_at TEXT
+
+  ein_applications:
+    id TEXT PRIMARY KEY
+    case_id TEXT REFERENCES formation_cases
+    status TEXT DEFAULT PENDING  allowed: PENDING SUBMITTED APPROVED REJECTED
+    ein TEXT nullable
+    submitted_at TEXT
+    approved_at TEXT
+    created_at TEXT
+
+  state_registrations:
+    id TEXT PRIMARY KEY
+    case_id TEXT REFERENCES formation_cases
+    state TEXT NOT NULL
+    status TEXT DEFAULT PENDING  allowed: PENDING FILED APPROVED REJECTED
+    filing_fee REAL
+    filed_at TEXT
+    approved_at TEXT
+    created_at TEXT
+
+  compliance_events:
+    id TEXT PRIMARY KEY
+    org_id TEXT NOT NULL
+    case_id TEXT nullable
+    type TEXT NOT NULL
+    title TEXT NOT NULL
+    due_date TEXT NOT NULL
+    status TEXT DEFAULT PENDING  allowed: PENDING COMPLETE WAIVED OVERDUE
+    notes TEXT
+    created_at TEXT
+    INDEX on org_id + due_date
+
+--- API Routes ---
+
+  GET    /cases                  list all formation cases for org
+  POST   /cases                  create case, init FormationAgent DO
+  GET    /cases/:id              detail with answers, EIN apps, state regs
+  PATCH  /cases/:id              update status/entity/state
+                                 when status === COMPLETE call bookkeeping /seed
+  POST   /cases/:id/answers      submit questionnaire answers, return entity scores
+  POST   /cases/:id/ein          create EIN application, advance to EIN_PENDING
+  PATCH  /cases/:id/ein/:einId   update EIN status and number
+  POST   /cases/:id/state-reg    file state registration, return state rule + fee
+  GET    /state-rules/:state     return filing fee and timeline for a state
+
+  GET    /compliance             list events filtered by from to status
+  POST   /compliance             create event and schedule ComplianceAgent alarm
+  PATCH  /compliance/:id         update event status and notes
+
+  POST   /documents/upload       multipart upload to R2
+  GET    /documents/:key+        download document, enforce org ownership check
+
+--- Entity Scoring Matrix (entityMatrix.ts) ---
+
+  revenue_expect:
+    under_50k   -> SOLE_PROP +3, LLC +2
+    50k_250k    -> LLC +3, S_CORP +2
+    over_250k   -> S_CORP +3, C_CORP +2
+
+  team_size:
+    just_me     -> SOLE_PROP +3, LLC +2
+    small_team  -> LLC +3, S_CORP +2
+    growing_fast -> C_CORP +3, S_CORP +2
+
+  liability_concern:
+    high        -> LLC +3, S_CORP +3, C_CORP +3
+    medium      -> LLC +2, S_CORP +2
+    low         -> SOLE_PROP +2
+
+  investor_funding:
+    yes_vc      -> C_CORP +5
+    yes_angels  -> C_CORP +3, S_CORP +2
+    no          -> LLC +2
+
+--- Durable Objects ---
+
+  FormationAgent extends DurableObject
+    Tracks case status machine per case ID
+    Exposes GET /state, POST /init, POST /advance
+
+  ComplianceAgent extends DurableObject
+    On POST /schedule sets a D.O. alarm for the due date
+    Alarm handler logs the reminder and could call a queue or email service
+
+======================================================================
+WORKER: insighthunter-pbx
+======================================================================
+
+Provides PBX functionality: extensions, call routing, voicemail, IVR menus.
+Tier enforcement: standard=5 extensions, pro=25, enterprise=unlimited.
+
+--- wrangler.jsonc ---
+
+  name: insighthunter-pbx
+  main: src/index.ts
+  compatibility_date: 2025-03-07
+  compatibility_flags: nodejs_compat
+  observability: enabled true, head_sampling_rate 1
+
+  d1_databases:
+    binding DB, database_name insighthunter-pbx, database_id REPLACE
+
+  r2_buckets:
+    binding VOICEMAIL, bucket_name ih-voicemail
+
+  kv_namespaces:
+    binding CALL_STATE, id REPLACE
+
+  durable_objects:
+    bindings:
+      name CALL_SESSION, class_name CallSession
+  migrations:
+    tag v1, new_classes CallSession
+
+  analytics_engine_datasets:
+    binding PBX_EVENTS, dataset ih_pbx_events
+
+  vars:
+    ENVIRONMENT: production
+    TWILIO_ACCOUNT_SID: REPLACE_WITH_VAR
+
+  secrets required: TWILIO_AUTH_TOKEN
+
+--- Database Schema ---
+
+  extensions:
+    id TEXT PRIMARY KEY
+    org_id TEXT NOT NULL
+    number TEXT NOT NULL
+    name TEXT NOT NULL
+    user_id TEXT nullable          assigned user
+    voicemail_enabled INTEGER DEFAULT 1
+    is_active INTEGER DEFAULT 1
+    created_at TEXT
+    UNIQUE on org_id + number
+
+  call_logs:
+    id TEXT PRIMARY KEY
+    org_id TEXT NOT NULL
+    from_number TEXT
+    to_number TEXT
+    direction TEXT   CHECK inbound outbound
+    status TEXT      CHECK ringing answered missed voicemail
+    duration_seconds INTEGER DEFAULT 0
+    recording_r2_key TEXT nullable
+    created_at TEXT
+    INDEX on org_id + created_at
+
+  ivr_menus:
+    id TEXT PRIMARY KEY
+    org_id TEXT NOT NULL
+    name TEXT NOT NULL
+    greeting_text TEXT
+    routing_config TEXT    JSON: array of key-press to extension mappings
+    created_at TEXT
+
+  voicemails:
+    id TEXT PRIMARY KEY
+    org_id TEXT NOT NULL
+    extension_id TEXT REFERENCES extensions
+    caller_number TEXT
+    r2_key TEXT NOT NULL
+    transcription TEXT nullable
+    listened INTEGER DEFAULT 0
+    created_at TEXT
+
+--- API Routes ---
+
+  GET    /extensions             list all extensions for org
+  POST   /extensions             create extension, enforce tier limit
+  PATCH  /extensions/:id         update extension
+  DELETE /extensions/:id         delete extension
+
+  GET    /call-logs              paginated call log with filters direction status from to
+  GET    /call-logs/:id          single call detail
+
+  POST   /inbound                Twilio webhook: handle inbound call, route to IVR or extension
+  POST   /status-callback        Twilio status callback: update call_log row
+  POST   /voicemail-callback     Twilio recording callback: save to R2, insert voicemail row
+
+  GET    /voicemails             list voicemails for org or extension
+  GET    /voicemails/:id/audio   stream voicemail audio from R2
+  PATCH  /voicemails/:id         mark listened
+
+  GET    /ivr-menus              list IVR menus
+  POST   /ivr-menus              create IVR menu
+  PATCH  /ivr-menus/:id          update menu
+  DELETE /ivr-menus/:id          delete menu
+
+--- CallSession Durable Object ---
+
+  Manages live call state per call SID
+  Stores: callSid, orgId, extensionId, status, startTime
+  Exposes fetch handler for updating call status
+  Uses D.O. alarm to clean up stale sessions after 1 hour
+
+======================================================================
+WORKER: insighthunter-payroll
+======================================================================
+
+Processes payroll runs, generates pay stubs, tracks tax withholding.
+Tier enforcement: standard=10 employees, pro=50, enterprise=unlimited.
+Free and Lite tiers: 403 on all payroll routes.
+
+--- wrangler.jsonc ---
+
+  name: insighthunter-payroll
+  main: src/index.ts
+  compatibility_date: 2025-03-07
+  compatibility_flags: nodejs_compat
+  observability: enabled true, head_sampling_rate 1
+
+  d1_databases:
+    binding DB, database_name insighthunter-payroll, database_id REPLACE
+
+  r2_buckets:
+    binding PAY_STUBS, bucket_name ih-pay-stubs
+
+  kv_namespaces:
+    binding PAYROLL_CACHE, id REPLACE
+
+  queues:
+    producers:
+      binding PAYROLL_QUEUE, queue_name ih-payroll-queue
+    consumers:
+      queue_name: ih-payroll-queue
+      max_batch_size: 10
+      max_retries: 3
+      dead_letter_queue: ih-payroll-dlq
+
+  analytics_engine_datasets:
+    binding PAYROLL_EVENTS, dataset ih_payroll_events
+
+  vars:
+    ENVIRONMENT: production
+
+--- Database Schema ---
+
+  employees:
+    id TEXT PRIMARY KEY
+    org_id TEXT NOT NULL
+    first_name TEXT NOT NULL
+    last_name TEXT NOT NULL
+    email TEXT NOT NULL
+    ssn_last4 TEXT
+    employment_type TEXT  CHECK fulltime parttime contractor
+    pay_type TEXT         CHECK hourly salary
+    pay_rate REAL NOT NULL
+    hours_per_week REAL DEFAULT 40
+    filing_status TEXT    CHECK single married
+    federal_allowances INTEGER DEFAULT 1
+    state TEXT
+    is_active INTEGER DEFAULT 1
+    start_date TEXT
+    created_at TEXT
+    INDEX on org_id
+
+  payroll_runs:
+    id TEXT PRIMARY KEY
+    org_id TEXT NOT NULL
+    period_start TEXT NOT NULL
+    period_end TEXT NOT NULL
+    pay_date TEXT NOT NULL
+    status TEXT DEFAULT DRAFT  CHECK DRAFT PROCESSING COMPLETE FAILED
+    total_gross REAL DEFAULT 0
+    total_taxes REAL DEFAULT 0
+    total_net REAL DEFAULT 0
+    created_by TEXT
+    created_at TEXT
+    updated_at TEXT
+    INDEX on org_id + status
+
+  payroll_line_items:
+    id TEXT PRIMARY KEY
+    run_id TEXT REFERENCES payroll_runs ON DELETE CASCADE
+    employee_id TEXT REFERENCES employees
+    gross_pay REAL NOT NULL
+    federal_income_tax REAL DEFAULT 0
+    state_income_tax REAL DEFAULT 0
+    social_security REAL DEFAULT 0
+    medicare REAL DEFAULT 0
+    other_deductions REAL DEFAULT 0
+    net_pay REAL NOT NULL
+    hours_worked REAL nullable
+    pay_stub_r2_key TEXT nullable
+    created_at TEXT
+    INDEX on run_id
+    INDEX on employee_id
+
+--- API Routes ---
+
+  GET    /employees              list active employees for org
+  POST   /employees              create employee, enforce tier limit
+  PATCH  /employees/:id          update employee
+  DELETE /employees/:id          deactivate
+
+  GET    /runs                   list payroll runs paginated
+  GET    /runs/:id               run detail with all line items
+  POST   /runs                   create DRAFT run for period
+  POST   /runs/:id/calculate     compute gross tax net for all employees in run
+                                 stores results in payroll_line_items
+                                 uses simple federal tax table: 10% on first 11000,
+                                 12% on 11001-44725, 22% on 44726-95375 annualized
+                                 social security: 6.2% up to 160200 annual
+                                 medicare: 1.45% no limit
+  POST   /runs/:id/submit        enqueue run to PAYROLL_QUEUE for processing
+  GET    /runs/:id/paystubs/:empId   stream pay stub PDF from R2
+
+  Queue consumer handler:
+    For each message in batch:
+      Generate basic pay stub as text or HTML
+      Upload to R2 at pay-stubs/orgId/runId/employeeId.html
+      Update pay_stub_r2_key in payroll_line_items
+      Update run status to COMPLETE when all items processed
+
+  GET    /summary                total payroll cost by month for org
+                                 Used by bookkeeping for journal entry suggestions
+
+======================================================================
+WORKER: insighthunter-ai
+======================================================================
+
+AI CFO assistant using Workers AI for inference and Vectorize for RAG.
+Stores conversation history per org in D1. Streams responses.
+Tier limits: free=0 queries/day, lite=10, standard=50, pro=200, enterprise=unlimited.
+
+--- wrangler.jsonc ---
+
+  name: insighthunter-ai
+  main: src/index.ts
+  compatibility_date: 2025-03-07
+  compatibility_flags: nodejs_compat
+  observability: enabled true, head_sampling_rate 1
+
+  d1_databases:
+    binding DB, database_name insighthunter-ai, database_id REPLACE
+
+  kv_namespaces:
+    binding USAGE, id REPLACE    tracks daily query counts per org
+
+  ai:
+    binding AI
+
+  vectorize:
+    binding VECTORIZE, index_name ih-financial-docs
+
+  analytics_engine_datasets:
+    binding AI_EVENTS, dataset ih_ai_events
+
+  vars:
+    ENVIRONMENT: production
+    EMBED_MODEL: @cf/baai/bge-small-en-v1.5
+    CHAT_MODEL: @cf/meta/llama-3.1-8b-instruct
+
+--- Database Schema ---
+
+  conversations:
+    id TEXT PRIMARY KEY
+    org_id TEXT NOT NULL
+    user_id TEXT NOT NULL
+    title TEXT
+    created_at TEXT
+    updated_at TEXT
+    INDEX on org_id
+
+  messages:
+    id TEXT PRIMARY KEY
+    conversation_id TEXT REFERENCES conversations ON DELETE CASCADE
+    role TEXT CHECK user assistant system
+    content TEXT NOT NULL
+    tokens_used INTEGER DEFAULT 0
+    created_at TEXT
+    INDEX on conversation_id
+
+  financial_docs:
+    id TEXT PRIMARY KEY
+    org_id TEXT NOT NULL
+    type TEXT   CHECK pl balance_sheet trial_balance report
+    period TEXT
+    content TEXT NOT NULL
+    vector_id TEXT     Vectorize document ID
+    created_at TEXT
+
+--- API Routes ---
+
+  GET    /conversations          list conversations for org
+  POST   /conversations          create new conversation
+  GET    /conversations/:id      conversation with all messages
+  DELETE /conversations/:id      delete conversation and messages
+
+  POST   /conversations/:id/chat
+    Body: message string
+    Check daily usage in USAGE KV  key: usage:orgId:YYYY-MM-DD  increment atomic
+    Return 429 if over tier limit
+    Load last 10 messages from D1 for context
+    Perform vector similarity search in Vectorize using embedded query
+    Include top 3 matching financial doc chunks as context
+    Build system prompt:
+      You are InsightHunter, an AI CFO assistant. You help small business owners
+      understand their financials. You have access to this org's financial data.
+      Keep answers concise, actionable, and in plain business language.
+      Format numbers as currency. Today is DATE.
+    Call AI binding with chat model using streaming
+    Save user message and assistant response to D1
+    Return streaming response with content-type text/event-stream
+
+  POST   /documents/embed
+    INTERNAL X-Internal-Secret required
+    Body: orgId, type, period, content string
+    Generate embedding via AI binding embed model
+    Upsert into Vectorize with metadata orgId type period
+    Insert row into financial_docs D1 table
+    Returns: vector_id
+
+  GET    /usage
+    Returns today's query count for org vs tier limit
+
+======================================================================
+FRONTEND: insighthunter-main
+======================================================================
+
+Astro with Cloudflare adapter and Svelte integration. Deployed on Cloudflare Pages.
+Theme: Sandtaupe (sand + taupe color palette). All styles use CSS custom properties.
+No Tailwind. Use SCSS only.
+
+--- wrangler.jsonc ---
+
+  name: insighthunter-main
+  pages_build_output_dir: dist
+  compatibility_date: 2025-03-07
+  compatibility_flags: nodejs_compat
+  observability: enabled true
+
+  services:
+    binding DISPATCH_WORKER, service insighthunter-dispatch
+    binding AUTH_WORKER, service insighthunter-auth
+
+  kv_namespaces:
+    binding SESSIONS, id REPLACE
+
+  analytics_engine_datasets:
+    binding PAGE_EVENTS, dataset ih_page_views
+
+  vars:
+    PUBLIC_APP_URL: https://insighthunter.app
+
+  secrets required: JWT_SECRET
+
+--- Middleware: src/middleware/index.ts ---
+
+  Runs on all /dashboard/* routes
+  Reads ih_session cookie or Authorization header for JWT
+  Calls AUTH_WORKER service binding POST /auth/verify
+  On 401 redirect to /auth/login?next=encodedPath
+  On success set Astro.locals.user from response body
+
+--- Pages Overview ---
+
+Marketing pages use MarketingLayout.astro with Nav and Footer.
+Auth pages use AuthLayout.astro centered card design.
+Dashboard pages use DashboardLayout.astro with Sidebar and TopBar.
+
+Marketing pages:
+  index.astro         Hero: Stop Flying Blind. PricingTable. FeatureGrid. Testimonials. CTABanner.
+  pricing.astro       Full pricing table with tier comparison
+  about.astro         Team and mission
+  404.astro
+
+Auth pages:
+  auth/login.astro          LoginForm.svelte client:load
+  auth/register.astro       RegisterForm.svelte client:load
+  auth/forgot-password.astro ForgotPasswordForm.svelte client:load
+  auth/callback.astro       OAuth callback handler
+
+Dashboard pages (all require session via middleware):
+  dashboard/index.astro         KPI cards: Revenue MTD, Expenses MTD, Net Income, Cash
+                                RevenueChart, CashFlowChart, InsightCard list, ActivityFeed
+  dashboard/bookkeeping.astro   BookkeepingApp.svelte client:load
+                                Tabs: Transactions, Chart of Accounts, Reports
+                                Tier gate: requires lite or above
+  dashboard/bizforma.astro      BizFormaApp.svelte client:load
+                                Formation wizard, compliance calendar
+                                Tier gate: requires standard or above
+  dashboard/pbx.astro           PBXApp.svelte client:load
+                                Extensions, call log, voicemail, IVR builder
+                                Tier gate: requires standard or above
+  dashboard/payroll.astro       PayrollApp.svelte client:load
+                                Employee list, run payroll wizard, pay stubs
+                                Tier gate: requires standard or above
+  dashboard/ai.astro            AIAssistant.svelte client:load
+                                Chat interface with streaming responses
+                                Shows usage counter vs daily limit
+                                Tier gate: requires lite or above
+  dashboard/reports.astro       ReportsPanel.svelte client:load
+                                P&L, Balance Sheet, Trial Balance with date controls
+  dashboard/forecast.astro      ForecastView.svelte client:load
+                                6-month cash flow projection chart
+  dashboard/insights.astro      InsightsFeed.svelte client:load
+                                AI-generated anomaly alerts and trend summaries
+  dashboard/settings.astro      Settings form: org name, billing, API keys, notifications
+  dashboard/upgrade.astro       Tier upsell with full feature comparison table
+
+--- Tier Gate Component ---
+
+  Create TierGate.astro that accepts required: Tier prop
+  Reads Astro.locals.user.tier
+  If tier is insufficient renders an UpgradePrompt showing current tier,
+  required tier, price difference, and a button linking to /dashboard/upgrade
+  Otherwise renders slot children
+
+--- Pages Functions (API Proxies) ---
+
+  functions/api/[[path]].ts
+    Forwards all /api/* requests to DISPATCH_WORKER service binding
+    Passes through Authorization header and all request headers unchanged
+    This is the only outbound API route from the Pages app
+
+--- Svelte Component Specs ---
+
+All Svelte components use:
+  fetch wrapper from lib/api.ts that prepends /api and injects Authorization Bearer
+  Toast.svelte for success and error notifications
+  Spinner.svelte for loading states
+  EmptyState.astro for empty lists
+
+AIAssistant.svelte:
+  Left panel: conversation list, new chat button
+  Right panel: message thread with user and assistant bubbles
+  Input: textarea with submit on Enter or button click
+  Streams SSE response from /api/ai/conversations/:id/chat
+  Shows typing indicator during stream
+  Usage bar showing queries used today vs limit
+
+PBXApp.svelte:
+  Tab 1: Extensions table with edit and delete, add button with number input
+  Tab 2: Call log table with direction icon, status badge, duration, caller number
+  Tab 3: Voicemail list with play button and transcription expandable
+  Tab 4: IVR menu builder with key-press to extension mapping
+
+PayrollApp.svelte:
+  Tab 1: Employee table with status badge, pay rate, pay type
+  Tab 2: Payroll runs list with status and totals
+  Tab 3: Active run detail showing each employee gross tax net with calculate button
+  Submit run button shows confirmation modal before enqueuing
+
+======================================================================
+PROVISION SCRIPT  --  scripts/provision.sh
+======================================================================
+
+#!/bin/bash
+set -e
+
+echo "InsightHunter — One-Time Resource Provisioning"
+
+echo "Creating D1 databases..."
+npx wrangler d1 create insighthunter-auth
+npx wrangler d1 create insighthunter-bookkeeping
+npx wrangler d1 create insighthunter-bizforma
+npx wrangler d1 create insighthunter-pbx
+npx wrangler d1 create insighthunter-payroll
+npx wrangler d1 create insighthunter-ai
+
+echo "Creating KV namespaces..."
+npx wrangler kv namespace create SESSIONS
+npx wrangler kv namespace create REFRESH_TOKENS
+npx wrangler kv namespace create REPORT_CACHE
+npx wrangler kv namespace create BIZ_CACHE
+npx wrangler kv namespace create CALL_STATE
+npx wrangler kv namespace create PAYROLL_CACHE
+npx wrangler kv namespace create USAGE
+npx wrangler kv namespace create TENANT_CACHE
+
+echo "Creating R2 buckets..."
+npx wrangler r2 bucket create ih-receipts
+npx wrangler r2 bucket create ih-bizforma-docs
+npx wrangler r2 bucket create ih-voicemail
+npx wrangler r2 bucket create ih-pay-stubs
+
+echo "Creating dispatch namespace for Workers for Platforms..."
+npx wrangler dispatch-namespace create insighthunter-tenants
+
+echo "Creating Vectorize index..."
+npx wrangler vectorize create ih-financial-docs --dimensions=384 --metric=cosine
+
+echo "Provisioning complete. Copy all IDs above into wrangler.jsonc files then run deploy.sh"
+
+======================================================================
+DEPLOY SCRIPT  --  scripts/deploy.sh
+======================================================================
+
+#!/bin/bash
+set -e
+
+echo "InsightHunter — Production Deploy"
+
+echo "Installing dependencies..."
+npm install
+
+echo "Running D1 migrations..."
+bash scripts/migrate.sh
+
+echo "Deploying workers in dependency order..."
+
+echo "1 of 7: insighthunter-auth"
+cd apps/insighthunter-auth && npx wrangler deploy && cd ../..
+
+echo "2 of 7: insighthunter-bookkeeping"
+cd apps/insighthunter-bookkeeping && npx wrangler deploy && cd ../..
+
+echo "3 of 7: insighthunter-bizforma"
+cd apps/insighthunter-bizforma && npx wrangler deploy && cd ../..
+
+echo "4 of 7: insighthunter-pbx"
+cd apps/insighthunter-pbx && npx wrangler deploy && cd ../..
+
+echo "5 of 7: insighthunter-payroll"
+cd apps/insighthunter-payroll && npx wrangler deploy && cd ../..
+
+echo "6 of 7: insighthunter-ai"
+cd apps/insighthunter-ai && npx wrangler deploy && cd ../..
+
+echo "7 of 7: insighthunter-dispatch (must come after all others)"
+cd apps/insighthunter-dispatch && npx wrangler deploy && cd ../..
+
+echo "Building and deploying insighthunter-main..."
+cd apps/insighthunter-main
+npm run build
+npx wrangler pages deploy dist --project-name=insighthunter-main
+cd ../..
+
+echo "Deploy complete."
+
+======================================================================
+SECRETS SETUP
+======================================================================
+
+Generate one JWT_SECRET and use it across ALL workers. This shared secret
+allows inter-service communication via X-Internal-Secret header and local
+JWT verification in each worker.
+
+  JWT_SECRET=$(openssl rand -base64 48)
+
+  Set on each worker:
+    cd apps/insighthunter-auth        && echo "$JWT_SECRET" | npx wrangler secret put JWT_SECRET
+    cd apps/insighthunter-dispatch    && echo "$JWT_SECRET" | npx wrangler secret put JWT_SECRET
+    cd apps/insighthunter-bookkeeping && echo "$JWT_SECRET" | npx wrangler secret put JWT_SECRET
+    cd apps/insighthunter-bizforma    && echo "$JWT_SECRET" | npx wrangler secret put JWT_SECRET
+    cd apps/insighthunter-pbx         && echo "$JWT_SECRET" | npx wrangler secret put JWT_SECRET
+    cd apps/insighthunter-payroll     && echo "$JWT_SECRET" | npx wrangler secret put JWT_SECRET
+    cd apps/insighthunter-ai          && echo "$JWT_SECRET" | npx wrangler secret put JWT_SECRET
+
+  Set Pages secrets via dashboard or:
+    cd apps/insighthunter-main && npx wrangler pages secret put JWT_SECRET
+
+  Additional secrets by worker:
+    insighthunter-pbx: TWILIO_AUTH_TOKEN
+    insighthunter-dispatch: CF_API_TOKEN (for WFP tenant worker upload REST calls)
+
+======================================================================
+.env.example
+======================================================================
+
+JWT_SECRET=                        shared across all 8 workers, generate with openssl rand -base64 48
+CF_API_TOKEN=                      Cloudflare API token with Workers Scripts Edit permission
+CF_ACCOUNT_ID=                     your Cloudflare account ID
+TWILIO_ACCOUNT_SID=                Twilio account SID for PBX
+TWILIO_AUTH_TOKEN=                 Twilio auth token for PBX
+PUBLIC_APP_URL=https://insighthunter.app
+BOOKKEEPING_WORKER_URL=https://insighthunter-bookkeeping.ACCOUNT.workers.dev
+
+======================================================================
+CODING STANDARDS — ENFORCE THROUGHOUT
+======================================================================
+
+1. TypeScript everywhere. No any except when unavoidable, use unknown.
+2. ES Modules exclusively. No CommonJS require.
+3. Hono for all Worker routing. Never use raw addEventListener fetch handler style.
+4. D1 batch() for all multi-statement writes. Never loop with sequential awaits.
+5. Org isolation: every single D1 query must include WHERE org_id = orgId.
+6. Auth in sub-workers: read X-IH-User header injected by dispatch, parse JSON, trust it.
+   Never re-verify JWT in sub-workers — dispatch already did it.
+7. Internal calls between workers use X-Internal-Secret header matching JWT_SECRET.
+8. CORS: allow credentials, explicit origin whitelist, allow Authorization and Content-Type.
+9. Error responses always return JSON with error string key and appropriate HTTP status.
+10. Rate limiting enforced in dispatch worker only. Sub-workers trust dispatch did it.
+11. Analytics Engine writeDataPoint is never awaited. It is fire-and-forget.
+12. Tier gates in sub-workers: read tier from X-IH-User header, check against TIER_LIMITS.
+    Return 403 with error message that includes required tier.
+13. Svelte components use createEventDispatcher for parent communication.
+14. Astro pages do all session checks via middleware. Never check auth client-side.
+15. All CSS uses CSS custom properties from theme.scss. No hardcoded hex values.
+16. Sandtaupe theme: sand 50-900 scale and taupe 50-900 scale.
+    Primary action color is sand-600. Text color is taupe-800.
+
+======================================================================
+BEGIN INSTRUCTIONS
+======================================================================
+
+Start by generating setup.mjs at the monorepo root. It must create every
+directory and write every file listed in this prompt with complete contents.
+No placeholders. No TODO comments. Every file must be immediately deployable.
+
+Generate files in this order:
+  1. Root package.json and turbo.json
+  2. packages/@ih/types/src/index.ts
+  3. packages/@ih/tier-config/src/index.ts
+  4. packages/@ih/auth-client/src/index.ts
+  5. apps/insighthunter-auth — wrangler.jsonc, schema.sql, src/index.ts
+  6. apps/insighthunter-dispatch — wrangler.jsonc, src/index.ts
+  7. workers-for-platforms/tenant-base-worker — wrangler.jsonc, src/index.ts
+  8. apps/insighthunter-bookkeeping — wrangler.jsonc, schema.sql, src/index.ts
+  9. apps/insighthunter-bizforma — wrangler.jsonc, schema.sql, src/index.ts and all agents
+  10. apps/insighthunter-pbx — wrangler.jsonc, schema.sql, src/index.ts
+  11. apps/insighthunter-payroll — wrangler.jsonc, schema.sql, src/index.ts
+  12. apps/insighthunter-ai — wrangler.jsonc, schema.sql, src/index.ts
+  13. apps/insighthunter-main — all layouts, pages, components, lib, styles
+  14. scripts/provision.sh, scripts/deploy.sh, scripts/migrate.sh
+  15. .env.example and README.md
+
+After generating all files print a summary showing total file count per app
+and the deploy order. Then stop.[1][2][3]
+
+Sources
+[1] pasted-text.txt https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_082e6609-3337-4cdb-ace4-b4e95e9db0ba/d5175f1f-bb7e-4ddd-a67f-33252b493e45/pasted-text.txt
+[2] pasted-text.txt https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_082e6609-3337-4cdb-ace4-b4e95e9db0ba/16c95ba3-4072-4d93-98aa-0a8fcc2d5559/pasted-text.txt
+[3] Cloudflare-workers-prompt.txt https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_082e6609-3337-4cdb-ace4-b4e95e9db0ba/399fba10-cfed-4660-b922-34ef23c2db1b/Cloudflare-workers-prompt.txt
+[4] insight_hunter_pitch.pptx https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_082e6609-3337-4cdb-ace4-b4e95e9db0ba/9fffdcbb-4934-4db5-8b78-baa36e9bbaa1/insight_hunter_pitch.pptx
+[5] Insight-Hunter.pdf https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_082e6609-3337-4cdb-ace4-b4e95e9db0ba/eaa79db4-a521-4af5-8e1f-9d16bd40c7b9/Insight-Hunter.pdf
