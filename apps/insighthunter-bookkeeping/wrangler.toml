@@ -1,6 +1,6 @@
 {
   "name": "insighthunter-bookkeeping",
-  "main": "src/index.ts",
+  "main": "src/backend/index.ts",
   "compatibility_date": "2025-03-07",
   "compatibility_flags": ["nodejs_compat"],
   "observability": {
@@ -8,247 +8,93 @@
     "head_sampling_rate": 1
   },
 
+  // Static SPA assets (React build output)
+  "assets": {
+    "directory": "./dist/frontend",
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
+  },
+
+  // Custom domain
+  "routes": [
+    { "pattern": "bookkeeping.insighthunter.app/*", "zone_name": "insighthunter.app" }
+  ],
+
+  // D1 — relational bookkeeping data
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "insighthunter-bookkeeping",
-      "database_id": "<YOUR_D1_DATABASE_ID>"
+      "database_id": "REPLACE_WITH_D1_ID",
+      "migrations_dir": "src/backend/db/migrations"
     }
   ],
 
-  "r2_buckets": [
-    {
-      "binding": "RECEIPTS",
-      "bucket_name": "ih-receipts"
-    }
-  ],
-
+  // KV — tier usage counters, session cache, QB token store
   "kv_namespaces": [
+    { "binding": "TIER_USAGE",    "id": "REPLACE_KV_TIER_USAGE_ID" },
+    { "binding": "SESSION_CACHE", "id": "REPLACE_KV_SESSION_CACHE_ID" },
+    { "binding": "QB_TOKENS",     "id": "REPLACE_KV_QB_TOKENS_ID" }
+  ],
+
+  // R2 — bank statements, receipts, document uploads
+  "r2_buckets": [
+    { "binding": "DOCUMENTS", "bucket_name": "ih-bookkeeping-documents" }
+  ],
+
+  // Durable Objects
+  "durable_objects": {
+    "bindings": [
+      { "name": "BOOKKEEPING_AGENT",    "class_name": "BookkeepingAgent"    },
+      { "name": "RECONCILIATION_AGENT", "class_name": "ReconciliationAgent" }
+    ]
+  },
+  "migrations": [
     {
-      "binding": "REPORT_CACHE",
-      "id": "<YOUR_KV_NAMESPACE_ID>"
+      "tag": "v1",
+      "new_sqlite_classes": ["BookkeepingAgent", "ReconciliationAgent"]
     }
   ],
 
-  "analytics_engine_datasets": [
-    {
-      "binding": "BOOKKEEPING_EVENTS",
-      "dataset": "ih_bookkeeping_events"
-    }
-  ],
-
-  "vars": {
-    "ENVIRONMENT": "production"
+  // Queues
+  "queues": {
+    "producers": [
+      { "binding": "CLASSIFICATION_QUEUE", "queue": "bk-classification-queue" },
+      { "binding": "QB_SYNC_QUEUE",        "queue": "bk-qb-sync-queue"        }
+    ],
+    "consumers": [
+      {
+        "queue": "bk-classification-queue",
+        "dead_letter_queue": "bk-classification-dlq",
+        "retry_delay": 30
+      },
+      {
+        "queue": "bk-qb-sync-queue",
+        "dead_letter_queue": "bk-qb-sync-dlq",
+        "retry_delay": 60
+      }
+    ]
   },
 
-  "secrets": ["JWT_SECRET"]
+  // Workers AI
+  "ai": {
+    "binding": "AI"
+  },
+
+  // Analytics Engine
+  "analytics_engine_datasets": [
+    { "binding": "ANALYTICS", "dataset": "bookkeeping_events" }
+  ],
+
+  // Environment variables (non-secret)
+  "vars": {
+    "ENVIRONMENT": "production",
+    "AUTH_WORKER_URL":    "https://auth.insighthunter.app",
+    "REPORTS_WORKER_URL": "https://reports.insighthunter.app",
+    "PAYROLL_WORKER_URL": "https://payroll.insighthunter.app",
+    "QB_REDIRECT_URI":   "https://bookkeeping.insighthunter.app/api/quickbooks/callback"
+  }
+
+  // Secrets (set via: wrangler secret put SECRET_NAME)
+  // QB_CLIENT_ID, QB_CLIENT_SECRET, ENCRYPTION_KEY
 }
-name = "insighthunter-bookkeeping"
-main = "src/index.ts"
-compatibility_date = "2026-02-26"
-compatibility_flags = ["nodejs_compat"]
-
-[observability]
-enabled = true
-
-# ── D1 Database ───────────────────────────────────────────────────────────────
-[[d1_databases]]
-binding       = "DB"
-database_name = "insighthunter-bookkeeping"
-database_id   = "c1b333a5-e87a-426d-92a0-49658231c6a6"
-
-[[d1_databases]]
-binding       = "insighthunter_bookkeeping_db"
-database_name = "insighthunter-bookkeeping-db"
-database_id   = "66f80a2f-de09-4686-8e09-b71b83aaa8ba"
-
-# ── KV Namespace (binding name matches Env interface: KV) ─────────────────────
-# Previously named CACHE in prior config — renamed to align with service code.
-# Update env.ts if you prefer to restore the CACHE name.
-[[kv_namespaces]]
-binding    = "KV"
-id         = "a6b8254f3a734a1288c4b910b82f7d5d"
-preview_id = "a6b8254f3a734a1288c4b910b82f7d5d"
-
-# ── R2 Bucket ─────────────────────────────────────────────────────────────────
-[[r2_buckets]]
-binding     = "R2"
-bucket_name = "insighthunter-imports"
-
-# ── Queue Producers ───────────────────────────────────────────────────────────
-[[queues.producers]]
-binding = "IMPORT_QUEUE"
-queue   = "bookkeeping-import"
-
-[[queues.producers]]
-binding = "RECONCILIATION_QUEUE"
-queue   = "bookkeeping-reconciliation"
-
-[[queues.producers]]
-binding = "TODO_QUEUE"
-queue   = "bookkeeping-todos"
-
-# ── Queue Consumers ───────────────────────────────────────────────────────────
-[[queues.consumers]]
-queue             = "bookkeeping-import"
-max_batch_size    = 10
-max_batch_timeout = 30
-max_retries       = 3
-dead_letter_queue = "bookkeeping-import-dlq"
-
-[[queues.consumers]]
-queue             = "bookkeeping-reconciliation"
-max_batch_size    = 5
-max_batch_timeout = 60
-max_retries       = 3
-dead_letter_queue = "bookkeeping-reconciliation-dlq"
-
-[[queues.consumers]]
-queue            = "bookkeeping-todos"
-max_batch_size   = 10
-max_wait_time_ms = 5000
-
-# ── Durable Objects ───────────────────────────────────────────────────────────
-[[durable_objects.bindings]]
-name       = "CATEGORIZATION_AGENT"
-class_name = "CategorizationAgent"
-
-[[durable_objects.bindings]]
-name       = "LEDGER"
-class_name = "BookkeepingLedger"
-
-[[durable_objects.bindings]]
-name       = "INVOICES"
-class_name = "InvoiceManager"
-
-[[durable_objects.bindings]]
-name       = "BANK_CONNECTION"
-class_name = "BankConnectionManager"
-
-[[durable_objects.bindings]]
-name       = "SUBSCRIPTIONS"
-class_name = "SubscriptionManager"
-
-# ── DO Migrations ─────────────────────────────────────────────────────────────
-[[migrations]]
-tag         = "v1"
-new_classes = ["CategorizationAgent"]
-
-[[migrations]]
-tag         = "v2"
-new_classes = [
-  "BookkeepingLedger",
-  "InvoiceManager",
-  "BankConnectionManager",
-  "SubscriptionManager"
-]
-
-# ── Workflows ─────────────────────────────────────────────────────────────────
-[[workflows]]
-name       = "IMPORT_WORKFLOW"
-binding    = "IMPORT_WORKFLOW"
-class_name = "ImportWorkflow"
-
-[[workflows]]
-name       = "RECONCILIATION_WORKFLOW"
-binding    = "RECONCILIATION_WORKFLOW"
-class_name = "ReconciliationWorkflow"
-
-# ── Workers AI ────────────────────────────────────────────────────────────────
-[ai]
-binding = "AI"
-
-# ── Analytics Engine ──────────────────────────────────────────────────────────
-[[analytics_engine_datasets]]
-binding = "ANALYTICS"
-dataset = "insighthunter_bookkeeping_events"
-
-# ── Service Bindings ──────────────────────────────────────────────────────────
-[[services]]
-binding = "AUTH_WORKER"
-service = "insighthunter-auth"
-
-[[services]]
-binding = "AGENTS_WORKER"
-service = "insighthunter-agents"
-
-# ── Vars (non-secret) ─────────────────────────────────────────────────────────
-[vars]
-ENVIRONMENT     = "development"
-CORS_ORIGINS    = "http://localhost:3000,https://insighthunter.app"
-PLAID_CLIENT_ID = "your-plaid-client-id"   # override via secret in prod
-PLAID_SECRET    = "your-plaid-secret"       # override via secret in prod
-
-# Secrets — set via CLI, never committed:
-# wrangler secret put JWT_SECRET
-# wrangler secret put AUTH_SERVICE_URL
-# wrangler secret put PLAID_CLIENT_ID
-# wrangler secret put PLAID_SECRET
-
-# ── Dev Environment ───────────────────────────────────────────────────────────
-[env.dev]
-
-[env.dev.vars]
-ENVIRONMENT     = "development"
-CORS_ORIGINS    = "http://localhost:3000"
-PLAID_ENV       = "sandbox"
-PLAID_CLIENT_ID = "your-plaid-client-id"
-PLAID_SECRET    = "your-plaid-secret"
-
-[[env.dev.d1_databases]]
-binding       = "DB"
-database_name = "insighthunter-bookkeeping"
-database_id   = "c1b333a5-e87a-426d-92a0-49658231c6a6"
-
-[[env.dev.kv_namespaces]]
-binding    = "KV"
-id         = "a6b8254f3a734a1288c4b910b82f7d5d"
-preview_id = "a6b8254f3a734a1288c4b910b82f7d5d"
-
-[[env.dev.r2_buckets]]
-binding     = "R2"
-bucket_name = "insighthunter-imports-dev"
-
-# ── Staging Environment ───────────────────────────────────────────────────────
-[env.staging]
-
-[env.staging.vars]
-ENVIRONMENT  = "staging"
-CORS_ORIGINS = "https://staging.insighthunter.app"
-PLAID_ENV    = "sandbox"
-
-[[env.staging.d1_databases]]
-binding       = "DB"
-database_name = "insighthunter-bookkeeping"
-database_id   = "<YOUR_STAGING_D1_DATABASE_ID>"
-
-[[env.staging.kv_namespaces]]
-binding    = "KV"
-id         = "<YOUR_STAGING_KV_NAMESPACE_ID>"
-preview_id = "<YOUR_STAGING_KV_NAMESPACE_ID>"
-
-[[env.staging.r2_buckets]]
-binding     = "R2"
-bucket_name = "insighthunter-imports-staging"
-
-# ── Production Environment ────────────────────────────────────────────────────
-[env.production]
-
-[env.production.vars]
-ENVIRONMENT  = "production"
-CORS_ORIGINS = "https://insighthunter.app"
-PLAID_ENV    = "production"
-
-[[env.production.d1_databases]]
-binding       = "DB"
-database_name = "insighthunter-bookkeeping"
-database_id   = "<YOUR_PROD_D1_DATABASE_ID>"
-
-[[env.production.kv_namespaces]]
-binding    = "KV"
-id         = "<YOUR_PROD_KV_NAMESPACE_ID>"
-preview_id = "<YOUR_PROD_KV_NAMESPACE_ID>"
-
-[[env.production.r2_buckets]]
-binding     = "R2"
-bucket_name = "insighthunter-imports-prod"
