@@ -1,0 +1,10 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import TierGate from '../../components/dashboard/TierGate.astro';
+import PayrollApp from '../../components/dashboard/PayrollApp.svelte';
+---
+<DashboardLayout title="Payroll">
+  <TierGate required="standard">
+    <PayrollApp client:load />
+  </TierGate>
+</DashboardLayout>
