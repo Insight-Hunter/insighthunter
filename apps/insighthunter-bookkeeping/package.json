@@ -1,32 +1,31 @@
-
 {
   "name": "insighthunter-bookkeeping",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "wrangler dev --port 8788",
-    "deploy": "wrangler deploy",
-    "lint": "tsc --noEmit",
-    "deploy:staging": "wrangler deploy --env staging",
-    "deploy:prod": "wrangler deploy --env production",
+    "dev":     "wrangler dev --port 8789",
+    "build":   "vite build && tsc",
+    "deploy":  "npm run build && wrangler deploy",
     "db:migrate": "wrangler d1 migrations apply insighthunter-bookkeeping",
-    "db:migrate:remote": "wrangler d1 migrations apply insighthunter-bookkeeping --remote",
-    "type-check": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "db:seed":    "wrangler d1 execute insighthunter-bookkeeping --file src/backend/db/seed.sql"
   },
   "dependencies": {
-    "agents": "0.7.6",
-    "eslint-config-next": "16.1.6",
     "hono": "^4.4.0",
-    "plaid": "^20.0.0",
-    "vite": "6.4.1"
+    "agents": "^0.0.71",
+    "@cloudflare/workers-types": "^4.20250317.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1",
+    "@tanstack/react-query": "^5.45.0",
+    "date-fns": "^3.6.0",
+    "papaparse": "^5.4.1",
+    "recharts": "^2.12.7"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.13.0",
-    "@cloudflare/workers-types": "^4.20250307.0",
+    "@cloudflare/vite-plugin": "^1.0.0",
+    "@vitejs/plugin-react": "^4.3.1",
     "typescript": "^5.4.5",
-    "vitest": "^4.1.0",
-    "wrangler": "^4.35.0"
+    "vite": "^5.3.4",
+    "wrangler": "^3.62.0"
   }
 }
