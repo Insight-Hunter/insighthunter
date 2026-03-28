@@ -1,0 +1,65 @@
+// wrangler.jsonc — BizForma Cloudflare Worker Configuration
+{
+  "name": "bizforma",
+  "main": "src/worker.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // ── Observability ────────────────────────────────────────────────────────
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  // ── Static Assets (React SPA) ────────────────────────────────────────────
+  "assets": {
+    "directory": "./dist/",
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
+  },
+
+  // ── KV Namespaces ────────────────────────────────────────────────────────
+  "kv_namespaces": [
+    {
+      "binding": "BIZFORMA_KV",
+      "id": "YOUR_KV_NAMESPACE_ID",
+      "preview_id": "YOUR_KV_PREVIEW_NAMESPACE_ID"
+    }
+  ],
+
+  // ── D1 Database ──────────────────────────────────────────────────────────
+  "d1_databases": [
+    {
+      "binding": "BIZFORMA_DB",
+      "database_name": "bizforma",
+      "database_id": "YOUR_D1_DATABASE_ID"
+    }
+  ],
+
+  // ── Workers AI ───────────────────────────────────────────────────────────
+  "ai": {
+    "binding": "AI"
+  },
+
+  // ── Analytics Engine ─────────────────────────────────────────────────────
+  "analytics_engine_datasets": [
+    {
+      "binding": "ANALYTICS",
+      "dataset": "bizforma_events"
+    }
+  ],
+
+  // ── Environment Variables ─────────────────────────────────────────────────
+  "vars": {
+    "ENVIRONMENT": "production"
+  },
+
+  // ── Secrets (set via: wrangler secret put CLAUDE_API_KEY) ────────────────
+  // CLAUDE_API_KEY - if using Claude for doc generation
+
+  // ── Development Settings ─────────────────────────────────────────────────
+  "dev": {
+    "port": 8787,
+    "local_protocol": "http"
+  }
+}
