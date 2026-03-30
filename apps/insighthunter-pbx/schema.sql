@@ -1,151 +1,199 @@
-DROP TABLE IF EXISTS customers; 
-CREATE TABLE customers (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    company_name TEXT NOT NULL,
-    email TEXT NOT NULL,
-    api_key TEXT UNIQUE NOT NULL,
-    status TEXT DEFAULT 'active' CHECK(status IN ('active', 'suspended', 'cancelled')),
-    plan TEXT DEFAULT 'starter' CHECK(plan IN ('starter', 'professional', 'enterprise')),
-    company_greeting TEXT,
-    created_at DATETIME DEFAULT (datetime('now')),
-    updated_at DATETIME DEFAULT (datetime('now'))
+-- apps/insighthunter-pbx/schema.sql
+-- InsightHunter PBX — D1 Database Schema
+
+-- ─── Tenant PBX Config ────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS tenant_pbx (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL UNIQUE,
+  twilio_subaccount_sid TEXT NOT NULL,
+  twilio_subaccount_auth_token TEXT NOT NULL,
+  twilio_api_key_sid TEXT NOT NULL,
+  twilio_api_key_secret TEXT NOT NULL,
+  twilio_twiml_app_sid TEXT NOT NULL,
+  tier TEXT NOT NULL DEFAULT 'free',
+  status TEXT NOT NULL DEFAULT 'active',
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Phone numbers owned by each customer
-DROP TABLE IF EXISTS customer_numbers;
-CREATE TABLE customer_numbers (
-    id TEXT PRIMARY KEY,
-    customer_id TEXT NOT NULL REFERENCES customers(id),
-    phone_number TEXT NOT NULL,
-    twilio_sid TEXT NOT NULL,
-    number_type TEXT CHECK(number_type IN ('toll_free', 'local')),
-    friendly_name TEXT,
-    area_code TEXT,
-    active INTEGER DEFAULT 1,
-    created_at DATETIME DEFAULT (datetime('now'))
+-- ─── Phone Numbers ────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS phone_numbers (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  twilio_sid TEXT NOT NULL UNIQUE,
+  number TEXT NOT NULL,
+  friendly_name TEXT NOT NULL,
+  type TEXT NOT NULL DEFAULT 'local',
+  capabilities TEXT NOT NULL DEFAULT '["voice","sms"]',
+  assigned_to TEXT,
+  assigned_type TEXT,
+  forward_to TEXT,
+  active INTEGER NOT NULL DEFAULT 1,
+  monthly_fee REAL NOT NULL DEFAULT 1.15,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Extensions
-DROP TABLE IF EXISTS extensions;
-CREATE TABLE extensions (
-    id TEXT PRIMARY KEY,
-    customer_id TEXT NOT NULL REFERENCES customers(id),
-    name TEXT NOT NULL,
-    number TEXT,
-    ext TEXT NOT NULL,
-    forward_to TEXT,
-    email TEXT,
-    department TEXT,
-    active INTEGER DEFAULT 1,
-    created_at DATETIME DEFAULT (datetime('now')),
-    UNIQUE(customer_id, ext)
+CREATE INDEX IF NOT EXISTS idx_numbers_org ON phone_numbers(org_id);
+CREATE INDEX IF NOT EXISTS idx_numbers_number ON phone_numbers(number);
+
+-- ─── Extensions ───────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS extensions (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  user_id TEXT,
+  extension TEXT NOT NULL,
+  display_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  sip_username TEXT NOT NULL UNIQUE,
+  sip_password_hash TEXT NOT NULL,
+  sip_password_plain TEXT NOT NULL,  -- shown once at creation, then encrypted
+  voicemail_enabled INTEGER NOT NULL DEFAULT 1,
+  voicemail_pin TEXT NOT NULL DEFAULT '0000',
+  forward_to TEXT,
+  status TEXT NOT NULL DEFAULT 'offline',
+  do_not_disturb INTEGER NOT NULL DEFAULT 0,
+  twilio_identity TEXT NOT NULL UNIQUE,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(org_id, extension)
 );
 
--- Call log
-DROP TABLE IF EXISTS call_log;
-CREATE TABLE call_log (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_id TEXT REFERENCES customers(id),
-    from_number TEXT,
-    to_number TEXT,
-    direction TEXT CHECK(direction IN ('inbound', 'outbound')),
-    status TEXT,
-    duration_seconds INTEGER,
-    twilio_sid TEXT,
-    started_at DATETIME,
-    ended_at DATETIME
+CREATE INDEX IF NOT EXISTS idx_ext_org ON extensions(org_id);
+CREATE INDEX IF NOT EXISTS idx_ext_identity ON extensions(twilio_identity);
+
+-- ─── IVR Menus ────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS ivr_menus (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  greeting TEXT NOT NULL,
+  greeting_type TEXT NOT NULL DEFAULT 'tts',
+  greeting_voice TEXT NOT NULL DEFAULT 'Polly.Joanna',
+  timeout INTEGER NOT NULL DEFAULT 5,
+  num_digits INTEGER NOT NULL DEFAULT 1,
+  options TEXT NOT NULL DEFAULT '[]',
+  is_default INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Voicemail
-DROP TABLE IF EXISTS voicemails;
-CREATE TABLE voicemails (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_id TEXT REFERENCES customers(id),
-    recording_sid TEXT UNIQUE,
-    from_number TEXT,
-    extension TEXT,
-    r2_key TEXT,
-    duration_seconds INTEGER,
-    transcription TEXT,
-    listened INTEGER DEFAULT 0,
-    listened_at DATETIME,
-    created_at DATETIME
+CREATE INDEX IF NOT EXISTS idx_ivr_org ON ivr_menus(org_id);
+
+-- ─── Call Queues ──────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS call_queues (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  strategy TEXT NOT NULL DEFAULT 'round-robin',
+  hold_music TEXT,
+  hold_announcement TEXT,
+  announcement_interval INTEGER NOT NULL DEFAULT 30,
+  max_wait_time INTEGER NOT NULL DEFAULT 300,
+  max_wait_fallback TEXT NOT NULL DEFAULT '{"type":"voicemail"}',
+  members TEXT NOT NULL DEFAULT '[]',
+  twilio_queue_sid TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- SMS log
-DROP TABLE IF EXISTS sms_log;
-CREATE TABLE sms_log (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_id TEXT REFERENCES customers(id),
-    from_number TEXT,
-    to_number TEXT,
-    body TEXT,
-    direction TEXT CHECK(direction IN ('inbound', 'outbound')),
-    twilio_sid TEXT,
-    created_at DATETIME
+CREATE INDEX IF NOT EXISTS idx_queues_org ON call_queues(org_id);
+
+-- ─── Call Records ─────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS call_records (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  twilio_call_sid TEXT NOT NULL UNIQUE,
+  direction TEXT NOT NULL,
+  from_number TEXT NOT NULL,
+  to_number TEXT NOT NULL,
+  extension_id TEXT,
+  queue_id TEXT,
+  duration INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'queued',
+  recording_url TEXT,
+  recording_sid TEXT,
+  recording_duration INTEGER,
+  transcription TEXT,
+  voicemail INTEGER NOT NULL DEFAULT 0,
+  voicemail_url TEXT,
+  answered_at TEXT,
+  ended_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Campaigns
-DROP TABLE IF EXISTS campaigns;
-CREATE TABLE campaigns (
-    id TEXT PRIMARY KEY,
-    customer_id TEXT REFERENCES customers(id),
-    name TEXT,
-    message TEXT,
-    recipients TEXT,
-    from_number TEXT,
-    status TEXT CHECK(status IN ('pending', 'scheduled', 'sending', 'sent', 'failed')),
-    scheduled_at INTEGER,
-    total_recipients INTEGER DEFAULT 0,
-    sent INTEGER DEFAULT 0,
-    failed INTEGER DEFAULT 0,
-    created_at DATETIME
+CREATE INDEX IF NOT EXISTS idx_calls_org ON call_records(org_id);
+CREATE INDEX IF NOT EXISTS idx_calls_date ON call_records(org_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_calls_sid ON call_records(twilio_call_sid);
+CREATE INDEX IF NOT EXISTS idx_calls_ext ON call_records(extension_id);
+
+-- ─── Messages ─────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS messages (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  twilio_message_sid TEXT NOT NULL UNIQUE,
+  thread_id TEXT NOT NULL,
+  from_number TEXT NOT NULL,
+  to_number TEXT NOT NULL,
+  body TEXT NOT NULL DEFAULT '',
+  media_urls TEXT NOT NULL DEFAULT '[]',
+  direction TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'queued',
+  extension_id TEXT,
+  from_number_id TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- SMS opt-outs
-DROP TABLE IF EXISTS sms_optouts;
-CREATE TABLE sms_optouts (
-    customer_id TEXT NOT NULL REFERENCES customers(id),
-    phone_number TEXT NOT NULL,
-    opted_out_at DATETIME,
-    PRIMARY KEY (customer_id, phone_number)
+CREATE INDEX IF NOT EXISTS idx_msg_org ON messages(org_id);
+CREATE INDEX IF NOT EXISTS idx_msg_thread ON messages(thread_id);
+CREATE INDEX IF NOT EXISTS idx_msg_date ON messages(org_id, created_at);
+
+-- ─── Message Threads ──────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS message_threads (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  our_number TEXT NOT NULL,
+  contact_number TEXT NOT NULL,
+  contact_name TEXT,
+  last_message TEXT NOT NULL DEFAULT '',
+  last_message_at TEXT NOT NULL DEFAULT (datetime('now')),
+  unread_count INTEGER NOT NULL DEFAULT 0,
+  extension_id TEXT,
+  UNIQUE(org_id, our_number, contact_number)
 );
 
--- AI interaction log
-DROP TABLE IF EXISTS ai_interactions;
-CREATE TABLE ai_interactions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_id TEXT REFERENCES customers(id),
-    call_sid TEXT,
-    from_number TEXT,
-    speech_input TEXT,
-    routing_decision TEXT,
-    created_at DATETIME
+CREATE INDEX IF NOT EXISTS idx_threads_org ON message_threads(org_id, last_message_at);
+
+-- ─── Conferences ──────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS conferences (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  access_code TEXT NOT NULL,
+  twilio_conference_name TEXT NOT NULL UNIQUE,
+  status TEXT NOT NULL DEFAULT 'idle',
+  participants TEXT NOT NULL DEFAULT '[]',
+  max_participants INTEGER NOT NULL DEFAULT 10,
+  record_enabled INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Agent handoff requests
-DROP TABLE IF EXISTS agent_handoffs;
-CREATE TABLE agent_handoffs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_id TEXT REFERENCES customers(id),
-    from_number TEXT,
-    to_number TEXT,
-    reason TEXT,
-    resolved INTEGER DEFAULT 0,
-    created_at DATETIME
+CREATE INDEX IF NOT EXISTS idx_conf_org ON conferences(org_id);
+CREATE INDEX IF NOT EXISTS idx_conf_code ON conferences(access_code);
+
+-- ─── Voicemails ───────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS voicemails (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  extension_id TEXT NOT NULL,
+  twilio_call_sid TEXT NOT NULL,
+  from_number TEXT NOT NULL,
+  duration INTEGER NOT NULL DEFAULT 0,
+  recording_url TEXT NOT NULL,
+  recording_sid TEXT NOT NULL,
+  transcription TEXT,
+  listened INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_customers_api_key ON customers(api_key);
-CREATE INDEX IF NOT EXISTS idx_customer_numbers_cust ON customer_numbers(customer_id);
-CREATE INDEX IF NOT EXISTS idx_customer_numbers_phone ON customer_numbers(phone_number);
-CREATE INDEX IF NOT EXISTS idx_extensions_customer ON extensions(customer_id);
-CREATE INDEX IF NOT EXISTS idx_extensions_number ON extensions(number);
-CREATE INDEX IF NOT EXISTS idx_call_log_customer ON call_log(customer_id);
-CREATE INDEX IF NOT EXISTS idx_call_log_started ON call_log(started_at);
-CREATE INDEX IF NOT EXISTS idx_voicemails_customer ON voicemails(customer_id);
-CREATE INDEX IF NOT EXISTS idx_voicemails_listened ON voicemails(listened);
-CREATE INDEX IF NOT EXISTS idx_sms_log_customer ON sms_log(customer_id);
-CREATE INDEX IF NOT EXISTS idx_sms_log_created ON sms_log(created_at);
-CREATE INDEX IF NOT EXISTS idx_campaigns_customer ON campaigns(customer_id);
+CREATE INDEX IF NOT EXISTS idx_vm_org ON voicemails(org_id);
+CREATE INDEX IF NOT EXISTS idx_vm_ext ON voicemails(extension_id, listened);
