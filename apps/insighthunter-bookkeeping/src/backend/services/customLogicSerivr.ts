@@ -1,4 +1,6 @@
 // e.g., src/backend/services/customLogicService.ts
+import type { Env } from "../types.js";
+
 export async function runUserHook(
   env: Env,
   orgId: string,
