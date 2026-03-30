@@ -206,7 +206,11 @@ export async function pushJournalEntry(
   if (!conn) throw new Error("QuickBooks not connected");
   const token = await getValidToken(orgId, env);
 
-  const qbLines = je.lines?.map((line, idx) => ({
+  if (!je.lines || je.lines.length === 0) {
+    throw new Error("Journal entry must have at least one line");
+  }
+
+  const qbLines = je.lines.map((line, idx) => ({
     Id: String(idx + 1),
     Description: line.description ?? je.memo,
     Amount: line.debit > 0 ? line.debit : line.credit,
