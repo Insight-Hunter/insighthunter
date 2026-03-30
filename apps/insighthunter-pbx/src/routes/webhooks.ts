@@ -26,7 +26,11 @@ function twimlResponse(xml: string) {
 
 // ─── Helper: get orgId from query ────────────────────────────────────────────
 function getOrgId(c: any): string {
-  return c.req.query('orgId') ?? '';
+  const orgId = c.req.query('orgId');
+  if (!orgId) {
+    throw new Error('Missing required orgId parameter');
+  }
+  return orgId;
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
