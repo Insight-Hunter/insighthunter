@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 {
   "compilerOptions": {
     "target": "ES2022",
@@ -16,8 +16,7 @@
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
-}
-=======
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { cloudflare } from "@cloudflare/vite-plugin";
@@ -34,4 +33,3 @@ export default defineConfig({
     },
   },
 });
->>>>>>> b69cf5ca5da6a4b1e47bfdea2eaf479a919c1c17
