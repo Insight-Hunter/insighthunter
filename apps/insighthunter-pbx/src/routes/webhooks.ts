@@ -100,7 +100,10 @@ wh.post('/webhooks/voice/ivr', async (c) => {
 /** POST /webhooks/voice/ivr-input — handle IVR digit press */
 wh.post('/webhooks/voice/ivr-input', async (c) => {
   const orgId = getOrgId(c);
-  const menuId = c.req.query('menuId')!;
+  const menuId = c.req.query('menuId');
+  if (!menuId) {
+    return twimlResponse('<Response><Say voice="Polly.Joanna">Invalid menu. Goodbye.</Say><Hangup/></Response>');
+  }
   const body = await c.req.parseBody() as { Digits: string };
 
   const menu = await c.env.DB
