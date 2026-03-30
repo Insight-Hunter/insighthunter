@@ -158,7 +158,7 @@ api.post('/api/extensions', async (c) => {
   await c.env.DB.prepare(`
     INSERT INTO extensions (id, org_id, extension, display_name, email, sip_username, sip_password_hash, sip_password_plain, voicemail_enabled, voicemail_pin, forward_to, twilio_identity)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).bind(id, user.orgId, body.extension, body.displayName, body.email, sipUsername, sipPassword, sipPassword, body.voicemailEnabled ? 1 : 1, voicemailPin, body.forwardTo ?? null, twilioIdentity).run();
+  `).bind(id, user.orgId, body.extension, body.displayName, body.email, sipUsername, sipPassword, sipPassword, body.voicemailEnabled ? 1 : 0, voicemailPin, body.forwardTo ?? null, twilioIdentity).run();
 
   await auditLog(c.env.DB, { orgId: user.orgId, userId: user.userId, action: 'CREATE_EXTENSION', entityType: 'extension', entityId: id });
 
