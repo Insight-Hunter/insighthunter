@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-<<<<<<< HEAD
     "dev": "wrangler dev src/index.ts",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit"
@@ -17,8 +16,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250310.0",
     "typescript": "^5.7.3",
-    "wrangler": "^3.109.3"
-=======
+    "wrangler": "^3.109.3",
     "dev":     "wrangler dev --port 8789",
     "build":   "vite build && tsc",
     "deploy":  "npm run build && wrangler deploy",
@@ -43,6 +41,5 @@
     "typescript": "^5.4.5",
     "vite": "^5.3.4",
     "wrangler": "^3.62.0"
->>>>>>> b69cf5ca5da6a4b1e47bfdea2eaf479a919c1c17
   }
 }
