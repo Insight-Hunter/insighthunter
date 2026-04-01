@@ -387,11 +387,7 @@ app.get("/api/deadlines", async (c) => {
 // ─── Export Summary ───────────────────────────────────────────────────────────
 app.post("/api/export", async (c) => {
   try {
-<<<<<<< HEAD
-    const { formData } = await c.req.json<{
-=======
     const { formData, sessionId } = await c.req.json<{
->>>>>>> 80e9ff9f4c6320f821152e2c4249d40a01aafc11
       formData: Record<string, unknown>;
       sessionId: string;
     }>();
