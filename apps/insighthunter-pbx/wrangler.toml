@@ -157,4 +157,3 @@ class_name = "CallSessionDO"
 [[env.production.migrations]]
 tag         = "v1"
 new_classes = ["CallSessionDO"]
-
