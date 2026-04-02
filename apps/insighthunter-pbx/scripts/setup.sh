@@ -62,33 +62,33 @@ if [[ "$ENV" == "production" ]]; then SUFFIX=""; fi
 # dev uses local D1/KV by default, but we still create remote ones
 
 # ── 1. D1 Database ────────────────────────────────────────────────────────────
-info "Creating D1 database: pbx-db${SUFFIX}"
-D1_OUTPUT=$(wrangler d1 create "pbx-db${SUFFIX}" 2>&1) || {
-  warn "D1 create failed (may already exist). Trying to fetch existing ID..."
-  D1_OUTPUT=$(wrangler d1 list 2>&1)
-}
-D1_ID=$(echo "$D1_OUTPUT" | grep -oE 'database_id\s*=\s*"[a-f0-9-]+"' | head -1 | grep -oE '[a-f0-9-]{36}' || true)
-if [[ -z "$D1_ID" ]]; then
-  D1_ID=$(echo "$D1_OUTPUT" | grep -oE '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}' | head -1 || true)
-fi
-[[ -n "$D1_ID" ]] && success "D1 ID: $D1_ID" || warn "Could not auto-parse D1 ID — fill in wrangler.toml manually"
+##info "Creating D1 database: pbx-db${SUFFIX}"
+#//D1_OUTPUT=$(wrangler d1 create "pbx-db${SUFFIX}" 2>&1) || {
+ #// warn "D1 create failed (may already exist). Trying to fetch existing ID..."
+ #// D1_OUTPUT=$(wrangler d1 list 2>&1)
+#//}
+#//D1_ID=$(echo "$D1_OUTPUT" | grep -oE 'database_id\s*=\s*"[a-f0-9-]+"' | head -1 | grep -oE '[a-f0-9-]{36}' || true)
+#//if [[ -z "$D1_ID" ]]; then
+ #/u D1_ID=$(echo "$D1_OUTPUT" | grep -oE '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}' | head -1 || true)
+#//fi
+#//[[ -n "$D1_ID" ]] && success "D1 ID: $D1_ID" || warn "Could not auto-parse D1 ID — fill in wrangler.toml manually"
 
 # ── 2. R2 Bucket ─────────────────────────────────────────────────────────────
-info "Creating R2 bucket: pbx-audio${SUFFIX}"
-wrangler r2 bucket create "pbx-audio${SUFFIX}" 2>&1 | grep -v "^$" || warn "R2 bucket may already exist"
-success "R2 bucket: pbx-audio${SUFFIX}"
+#info "Creating R2 bucket: pbx-audio${SUFFIX}"
+#wrangler r2 bucket create "pbx-audio${SUFFIX}" 2>&1 | grep -v "^$" || warn "R2 bucket may already exist"
+#success "R2 bucket: pbx-audio${SUFFIX}"
 
 # ── 3. KV Namespace ───────────────────────────────────────────────────────────
-info "Creating KV namespace: pbx-kv${SUFFIX}"
-KV_OUTPUT=$(wrangler kv namespace create "pbx-kv${SUFFIX}" 2>&1) || {
-  warn "KV create failed (may already exist)"
-  KV_OUTPUT=""
-}
-KV_ID=$(echo "$KV_OUTPUT" | grep -oE '"id":\s*"[a-f0-9]+"' | grep -oE '[a-f0-9]{32}' | head -1 || true)
-if [[ -z "$KV_ID" ]]; then
-  KV_ID=$(echo "$KV_OUTPUT" | grep -oE 'id = "[a-f0-9]+"' | grep -oE '[a-f0-9]{32}' | head -1 || true)
-fi
-[[ -n "$KV_ID" ]] && success "KV ID: $KV_ID" || warn "Could not auto-parse KV ID — fill in wrangler.toml manually"
+#info "Creating KV namespace: pbx-kv${SUFFIX}"
+#KV_OUTPUT=$(wrangler kv namespace create "pbx-kv${SUFFIX}" 2>&1) || {
+#warn "KV create failed (may already exist)"
+ # KV_OUTPUT=""
+
+#KV_ID=$(echo "$KV_OUTPUT" | grep -oE '"id":\s*"[a-f0-9]+"' | grep -oE '[a-f0-9]{32}' | head -1 || true)
+#if [[ -z "$KV_ID" ]]; then
+  #KV_ID=$(echo "$KV_OUTPUT" | grep -oE 'id = "[a-f0-9]+"' | grep -oE '[a-f0-9]{32}' | head -1 || true)
+#fi
+#[[ -n "$KV_ID" ]] && success "KV ID: $KV_ID" || warn "Could not auto-parse KV ID — fill in wrangler.toml manually"
 
 # ── 4. Queue ──────────────────────────────────────────────────────────────────
 QUEUE_NAME="pbx-vm-transcription"
@@ -98,32 +98,7 @@ wrangler queues create "$QUEUE_NAME" 2>&1 | grep -v "^$" || warn "Queue may alre
 success "Queue: $QUEUE_NAME"
 
 # ── 5. Patch wrangler.toml ────────────────────────────────────────────────────
-echo ""
-info "Patching wrangler.toml with resource IDs..."
 
-TOML="wrangler.toml"
-
-if [[ -n "$D1_ID" ]]; then
-  if [[ "$ENV" == "staging" ]]; then
-    # Replace staging D1 placeholder
-    sed -i.bak "s/REPLACE_WITH_STAGING_D1_ID/$D1_ID/g" "$TOML"
-  else
-    # Replace top-level and production D1 placeholder
-    sed -i.bak "s/REPLACE_WITH_D1_ID/$D1_ID/g" "$TOML"
-  fi
-  success "D1 ID patched in wrangler.toml"
-fi
-
-if [[ -n "$KV_ID" ]]; then
-  if [[ "$ENV" == "staging" ]]; then
-    sed -i.bak "s/REPLACE_WITH_STAGING_KV_ID/$KV_ID/g" "$TOML"
-  else
-    sed -i.bak "s/REPLACE_WITH_KV_ID/$KV_ID/g" "$TOML"
-  fi
-  success "KV ID patched in wrangler.toml"
-fi
-
-rm -f "${TOML}.bak"
 
 # ── 6. Run DB migrations ──────────────────────────────────────────────────────
 echo ""

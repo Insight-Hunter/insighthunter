@@ -21,7 +21,7 @@ new_classes = ["CallSessionDO"]
 [[d1_databases]]
 binding       = "PBX_DB"
 database_name = "pbx-db"
-database_id   = "<your-d1-id>"          # wrangler d1 create pbx-db
+database_id   = "e78c7a6f-c529-4f2f-aba1-9ee12f998876"          # wrangler d1 create pbx-db
 
 # ── R2 Bucket ─────────────────────────────────────────────────────────────────
 [[r2_buckets]]
@@ -31,7 +31,7 @@ bucket_name = "pbx-audio"               # wrangler r2 bucket create pbx-audio
 # ── KV Namespace ──────────────────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "PBX_KV"
-id      = "<your-kv-id>"                # wrangler kv namespace create pbx-kv
+id      = "431a1ca78ac84ba8ad3cd0c08d662fe9"           # wrangler kv namespace create pbx-kv
 
 # ── Queues ────────────────────────────────────────────────────────────────────
 [[queues.producers]]
@@ -124,7 +124,8 @@ routes = [
 [[env.production.d1_databases]]
 binding       = "PBX_DB"
 database_name = "pbx-db"
-database_id   = "<your-d1-id>"
+database_id   "e78c7a6f-c529-4f2f-aba1-9ee12f998876"
+
 
 [[env.production.r2_buckets]]
 binding     = "PBX_AUDIO"
@@ -132,7 +133,7 @@ bucket_name = "pbx-audio"
 
 [[env.production.kv_namespaces]]
 binding = "PBX_KV"
-id      = "<your-kv-id>"
+id      = "431a1ca78ac84ba8ad3cd0c08d662fe9"
 
 [[env.production.queues.producers]]
 binding = "VM_QUEUE"
