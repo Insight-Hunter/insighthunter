@@ -11,7 +11,7 @@ echo "\n[1/6] Creating D1 databases..."
 wrangler d1 create insighthunter-main
 wrangler d1 create insighthunter-preview
 
-# ── KV Namespaces ─────────────────────────────────────────────
+# ── KV v  Namespaces ─────────────────────────────────────────────
 echo "\n[2/6] Creating KV namespaces..."
 wrangler kv namespace create SESSIONS
 wrangler kv namespace create SESSIONS --preview
@@ -51,3 +51,4 @@ echo "   4. Run: wrangler secret put JWT_SECRET --name insighthunter-pbx"
 echo "   5. Ru5n D1 migrations: cd apps/insighthunter-api && wrangler d1 migrations apply insighthunter-main"
 echo "   6. Add CF_API_TOKEN to GitHub Secrets"
 echo "   7. Push to main → GitHub Actions deploys everything"
+in 

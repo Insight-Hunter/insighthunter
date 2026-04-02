@@ -1,0 +1,13 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import TierGate from '../../components/dashboard/TierGate.astro';
+---
+<DashboardLayout title="Forecast">
+  <TierGate required="standard">
+    <div class="card">
+      <h3 style="font-family:var(--font-display);margin-bottom:var(--space-4);">Cash Flow Forecast</h3>
+      <p style="color:var(--color-text-muted);font-size:0.875rem;">6-month projection powered by your bookkeeping data. Ask the AI CFO for forecasting analysis.</p>
+      <a href="/dashboard/ai" class="btn btn--ghost btn--sm" style="margin-top:var(--space-4);">Ask AI for forecast →</a>
+    </div>
+  </TierGate>
+</DashboardLayout>

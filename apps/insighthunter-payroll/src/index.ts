@@ -1,389 +1,339 @@
-// apps/insighthunter-payroll/src/index.ts
-// Payroll Worker — gross-to-net calculations, pay runs, stubs
-// Tax tables: 2026 IRS Publication 15-T (Percentage Method)
-import { Hono } from 'hono'
-import { cors } from 'hono/cors'
-import { getCookie } from 'hono/cookie'
+import { Hono } from 'hono';
+import type { AuthUser } from '@ih/types';
+import { TIER_LIMITS, tierAtLeast } from '@ih/tier-config';
 
-export interface Env {
-  DB:         D1Database
-  KV:         KVNamespace
-  JWT_SECRET: string
-  STRIPE_KEY: string      // for ACH payouts (future)
+interface Env {
+  DB: D1Database;
+  PAY_STUBS: R2Bucket;
+  PAYROLL_CACHE: KVNamespace;
+  PAYROLL_QUEUE: Queue;
+  PAYROLL_EVENTS: AnalyticsEngineDataset;
 }
 
-// ─── Auth helper ─────────────────────────────────────────────
-async function requireAuth(c: any) {
-  const token = getCookie(c,'ih_token') ?? c.req.header('Authorization')?.replace('Bearer ','')
-  if (!token) return c.json({ error:'Unauthenticated' }, 401)
-  try {
-    const enc = new TextEncoder()
-    const parts = token.split('.')
-    const key = await crypto.subtle.importKey('raw', enc.encode(c.env.JWT_SECRET),
-      { name:'HMAC', hash:'SHA-256' }, false, ['verify'])
-    const sig = Uint8Array.from(atob(parts[2].replace(/-/g,'+').replace(/_/g,'/')), ch => ch.charCodeAt(0))
-    const ok  = await crypto.subtle.verify('HMAC', key, sig, enc.encode(`${parts[0]}.${parts[1]}`))
-    if (!ok) return c.json({ error:'Invalid session' }, 401)
-    const p = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')))
-    if (p.exp < Date.now()/1000) return c.json({ error:'Session expired' }, 401)
-    return p as { sub:string; email:string; plan:string }
-  } catch { return c.json({ error:'Invalid session' }, 401) }
+interface IHLocals { user: AuthUser }
+
+// ─── Tax calculation helpers ──────────────────────────────────────────────────
+
+interface TaxResult {
+  gross_pay: number;
+  federal_income_tax: number;
+  state_income_tax: number;
+  social_security: number;
+  medicare: number;
+  net_pay: number;
 }
 
-// ─── 2026 Federal Tax Tables (Percentage Method) ─────────────
-// Source: IRS Publication 15-T — projected from 2025 with ~2.6% inflation adj.
-// Per-payroll standard withholding amounts by filing status:
-const STANDARD_WITHHOLDING = {
-  single:          346.15,  // $9,000 / 26 pays (bi-weekly)
-  married_jointly: 692.31,
-  head_household:  519.23,
+function calculateTaxes(annualizedGross: number, grossPay: number): TaxResult {
+  // Federal income tax (simplified 2024 brackets)
+  let federalAnnual = 0;
+  if (annualizedGross <= 11_000)       federalAnnual = annualizedGross * 0.10;
+  else if (annualizedGross <= 44_725)  federalAnnual = 1_100 + (annualizedGross - 11_000) * 0.12;
+  else if (annualizedGross <= 95_375)  federalAnnual = 5_147 + (annualizedGross - 44_725) * 0.22;
+  else                                  federalAnnual = 16_290 + (annualizedGross - 95_375) * 0.24;
+
+  const federalRatio = annualizedGross > 0 ? federalAnnual / annualizedGross : 0;
+  const federal_income_tax = Math.round(grossPay * federalRatio * 100) / 100;
+
+  // State income tax (flat 5% estimate)
+  const state_income_tax = Math.round(grossPay * 0.05 * 100) / 100;
+
+  // FICA
+  const annualSS = Math.min(annualizedGross, 160_200);
+  const ssRatio = annualizedGross > 0 ? annualSS / annualizedGross : 0;
+  const social_security = Math.round(grossPay * ssRatio * 0.062 * 100) / 100;
+  const medicare = Math.round(grossPay * 0.0145 * 100) / 100;
+
+  const totalTax = federal_income_tax + state_income_tax + social_security + medicare;
+  const net_pay = Math.round((grossPay - totalTax) * 100) / 100;
+
+  return { gross_pay: grossPay, federal_income_tax, state_income_tax, social_security, medicare, net_pay };
 }
 
-// Percentage method brackets — Single (Table for Bi-Weekly payroll)
-// [over, not_over, flat, percent, over_amount]
-type Bracket = [number, number | null, number, number, number]
-const TAX_BRACKETS_BIWEEKLY: Record<string,Bracket[]> = {
-  single: [
-    [0,    288,    0,     0,    0],
-    [288,  1015,   0,    10,  288],
-    [1015, 3260,   72.7, 12, 1015],
-    [3260, 6260,  342.1, 22, 3260],
-    [6260, 11548, 1002.1,24, 6260],
-    [11548,23196, 2271.3,32,11548],
-    [23196,28808, 5998.9,35,23196],
-    [28808,null,  7963.1,37,28808],
-  ],
-  married_jointly: [
-    [0,    1092,   0,     0,     0],
-    [1092, 2085,   0,    10,  1092],
-    [2085, 6573,   99.3, 12,  2085],
-    [6573, 12573,  637.9,22,  6573],
-    [12573,23148, 1957.9,24, 12573],
-    [23148,46392, 4495.9,32, 23148],
-    [46392,57615,11934.9,35, 46392],
-    [57615,null, 15856.9,37, 57615],
-  ],
-}
-// Use single brackets for all other statuses as conservative estimate
-TAX_BRACKETS_BIWEEKLY['head_household'] = TAX_BRACKETS_BIWEEKLY['single']
-TAX_BRACKETS_BIWEEKLY['single_higher']  = TAX_BRACKETS_BIWEEKLY['single']
+function calculateEmployeeGross(emp: {
+  pay_type: string; pay_rate: number; hours_per_week: number;
+  period_start: string; period_end: string;
+}): { grossPay: number; hoursWorked: number; annualized: number } {
+  const days = Math.round((new Date(emp.period_end).getTime() - new Date(emp.period_start).getTime()) / 86_400_000);
+  const weeks = days / 7;
 
-// ─── Tax calculation engine ───────────────────────────────────
-function calcFederalWithholding(
-  grossBiweekly: number,
-  filingStatus: string,
-  allowances: number,    // W-4 (legacy) or 0 for new W-4
-  additionalWithholding = 0
-): number {
-  const sw = STANDARD_WITHHOLDING[filingStatus as keyof typeof STANDARD_WITHHOLDING]
-             ?? STANDARD_WITHHOLDING.single
-  const taxable = Math.max(0, grossBiweekly - sw - (allowances * 175))
-  const brackets = TAX_BRACKETS_BIWEEKLY[filingStatus] ?? TAX_BRACKETS_BIWEEKLY['single']
-  let tax = 0
-  for (const [over, notOver, flat, pct, overAmt] of brackets) {
-    if (taxable <= over) break
-    const top = notOver === null ? taxable : Math.min(taxable, notOver)
-    tax = flat + (top - overAmt) * (pct / 100)
-    if (notOver === null || taxable <= notOver) break
-  }
-  return Math.max(0, tax + additionalWithholding)
-}
-
-function calcFICA(grossBiweekly: number, ytdGross: number): {
-  ss_employee: number; ss_employer: number
-  medicare_employee: number; medicare_employer: number
-  additional_medicare: number
-} {
-  const SS_WAGE_BASE = 176700  // 2026 estimated
-  const ssWages = Math.min(Math.max(0, SS_WAGE_BASE - ytdGross), grossBiweekly)
-  return {
-    ss_employee:         ssWages * 0.062,
-    ss_employer:         ssWages * 0.062,
-    medicare_employee:   grossBiweekly * 0.0145,
-    medicare_employer:   grossBiweekly * 0.0145,
-    additional_medicare: Math.max(0, grossBiweekly - 7692.31) * 0.009, // ~$200k/yr
+  if (emp.pay_type === 'hourly') {
+    const hoursWorked = emp.hours_per_week * weeks;
+    const grossPay = Math.round(hoursWorked * emp.pay_rate * 100) / 100;
+    const annualized = emp.pay_rate * emp.hours_per_week * 52;
+    return { grossPay, hoursWorked, annualized };
+  } else {
+    // Salary: annual / 52 * weeks
+    const grossPay = Math.round((emp.pay_rate / 52) * weeks * 100) / 100;
+    return { grossPay, hoursWorked: 0, annualized: emp.pay_rate };
   }
 }
 
-// Simplified state tax flat-rate table (2026 estimates)
-const STATE_TAX_RATES: Record<string, number> = {
-  AL:0.05,AK:0,AZ:0.025,AR:0.047,CA:0.093,CO:0.044,CT:0.065,DE:0.066,
-  FL:0,GA:0.055,HI:0.08,ID:0.058,IL:0.0495,IN:0.0315,IA:0.06,KS:0.057,
-  KY:0.045,LA:0.042,ME:0.075,MD:0.0575,MA:0.05,MI:0.0425,MN:0.0985,
-  MS:0.05,MO:0.054,MT:0.069,NE:0.0664,NV:0,NH:0,NJ:0.1075,NM:0.059,
-  NY:0.109,NC:0.0475,ND:0.029,OH:0.04,OK:0.05,OR:0.099,PA:0.0307,
-  RI:0.0599,SC:0.064,SD:0,TN:0,TX:0,UT:0.0485,VT:0.0875,VA:0.0575,
-  WA:0,WV:0.065,WI:0.0765,WY:0,DC:0.1075
+// ─── Generate pay stub HTML ───────────────────────────────────────────────────
+
+function generatePayStubHTML(emp: Record<string, unknown>, run: Record<string, unknown>, line: Record<string, unknown>): string {
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Pay Stub</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; color: #333; }
+  .header { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+  td, th { padding: 8px; text-align: left; border-bottom: 1px solid #eee; }
+  th { background: #f5f5f5; font-weight: bold; }
+  .total { font-weight: bold; font-size: 1.1em; }
+  .net { color: #2a7c3f; font-size: 1.3em; font-weight: bold; }
+</style></head>
+<body>
+<div class="header">
+  <h2>InsightHunter Payroll</h2>
+  <p><strong>Employee:</strong> ${emp.first_name} ${emp.last_name} (${emp.email})</p>
+  <p><strong>Pay Period:</strong> ${run.period_start} — ${run.period_end} | <strong>Pay Date:</strong> ${run.pay_date}</p>
+</div>
+<table>
+  <tr><th>Description</th><th style="text-align:right">Amount</th></tr>
+  <tr><td>Gross Pay</td><td style="text-align:right">$${Number(line.gross_pay).toFixed(2)}</td></tr>
+  <tr><td>Federal Income Tax</td><td style="text-align:right">-$${Number(line.federal_income_tax).toFixed(2)}</td></tr>
+  <tr><td>State Income Tax</td><td style="text-align:right">-$${Number(line.state_income_tax).toFixed(2)}</td></tr>
+  <tr><td>Social Security (6.2%)</td><td style="text-align:right">-$${Number(line.social_security).toFixed(2)}</td></tr>
+  <tr><td>Medicare (1.45%)</td><td style="text-align:right">-$${Number(line.medicare).toFixed(2)}</td></tr>
+  <tr class="total"><td>Net Pay</td><td class="net" style="text-align:right">$${Number(line.net_pay).toFixed(2)}</td></tr>
+</table>
+</body></html>`;
 }
 
-function calcStateTax(grossBiweekly: number, stateCode: string): number {
-  const rate = STATE_TAX_RATES[stateCode.toUpperCase()] ?? 0.05
-  return grossBiweekly * rate
-}
+// ─── App ──────────────────────────────────────────────────────────────────────
 
-function calcDeductions(grossBiweekly: number, deductions: Deduction[]): number {
-  return deductions.reduce((sum, d) => {
-    if (d.type === 'flat')       return sum + d.amount
-    if (d.type === 'percent')    return sum + (grossBiweekly * d.amount / 100)
-    return sum
-  }, 0)
-}
+const app = new Hono<{ Bindings: Env; Variables: IHLocals }>();
 
-interface Deduction { name:string; type:'flat'|'percent'; amount:number; pre_tax:boolean }
-
-function grossToNet(params: {
-  gross_pay:    number
-  filing_status: string
-  allowances:   number
-  additional_withholding: number
-  state_code:   string
-  ytd_gross:    number
-  deductions:   Deduction[]
-}) {
-  const { gross_pay, filing_status, allowances, additional_withholding,
-    state_code, ytd_gross, deductions } = params
-
-  const preTaxDeds  = deductions.filter(d => d.pre_tax)
-  const postTaxDeds = deductions.filter(d => !d.pre_tax)
-  const preTaxAmt   = calcDeductions(gross_pay, preTaxDeds)
-  const taxableWage = gross_pay - preTaxAmt
-
-  const federalWH   = calcFederalWithholding(taxableWage, filing_status, allowances, additional_withholding)
-  const fica        = calcFICA(taxableWage, ytd_gross)
-  const stateWH     = calcStateTax(taxableWage, state_code)
-  const postTaxAmt  = calcDeductions(gross_pay, postTaxDeds)
-
-  const totalTax = federalWH + fica.ss_employee + fica.medicare_employee
-                 + fica.additional_medicare + stateWH
-  const netPay   = gross_pay - preTaxAmt - totalTax - postTaxAmt
-
-  return {
-    gross_pay,
-    pre_tax_deductions: preTaxAmt,
-    taxable_wages: taxableWage,
-    federal_income_tax: +federalWH.toFixed(2),
-    social_security:    +fica.ss_employee.toFixed(2),
-    medicare:           +(fica.medicare_employee + fica.additional_medicare).toFixed(2),
-    state_income_tax:   +stateWH.toFixed(2),
-    total_taxes:        +totalTax.toFixed(2),
-    post_tax_deductions: +postTaxAmt.toFixed(2),
-    net_pay:            +Math.max(0, netPay).toFixed(2),
-    employer_ss:        +fica.ss_employer.toFixed(2),
-    employer_medicare:  +fica.medicare_employer.toFixed(2),
-    total_employer_cost:+(gross_pay + fica.ss_employer + fica.medicare_employer).toFixed(2),
+app.use('*', async (c, next) => {
+  const raw = c.req.header('X-IH-User');
+  if (!raw) return c.json({ error: 'Missing user context', code: 'NO_USER' }, 401);
+  try { c.set('user', JSON.parse(raw) as AuthUser); } catch {
+    return c.json({ error: 'Invalid user context', code: 'BAD_USER' }, 400);
   }
-}
+  // Tier gate: payroll requires standard or above
+  const user = c.get('user');
+  if (!tierAtLeast(user.tier, 'standard')) {
+    return c.json({ error: 'Payroll requires standard plan or above', code: 'TIER_REQUIRED', required: 'standard' }, 403);
+  }
+  return next();
+});
 
-// ─── App ──────────────────────────────────────────────────────
-const app = new Hono<{ Bindings: Env }>()
-app.use('*', cors({ origin: o => o?.includes('insighthunter.app')||o?.includes('localhost') ? o : null, credentials:true }))
+// ─── Employees ────────────────────────────────────────────────────────────────
 
-// ─── Employees ───────────────────────────────────────────────
-app.get('/payroll/employees', async (c) => {
-  const user = await requireAuth(c)
-  if (user instanceof Response) return user
-  const { results } = await c.env.DB.prepare(
-    'SELECT * FROM payroll_employees WHERE user_id=? AND active=1 ORDER BY last_name')
-    .bind(user.sub).all()
-  return c.json({ employees: results })
-})
+app.get('/employees', async (c) => {
+  const user = c.get('user');
+  const { results } = await c.env.DB.prepare('SELECT * FROM employees WHERE org_id = ? AND is_active = 1 ORDER BY last_name ASC').bind(user.orgId).all();
+  return c.json(results);
+});
 
-app.post('/payroll/employees', async (c) => {
-  const user = await requireAuth(c)
-  if (user instanceof Response) return user
+app.post('/employees', async (c) => {
+  const user = c.get('user');
+  const limit = TIER_LIMITS[user.tier].payroll_employees;
+  if (limit !== null) {
+    const { cnt } = await c.env.DB.prepare('SELECT COUNT(*) as cnt FROM employees WHERE org_id = ? AND is_active = 1').bind(user.orgId).first<{ cnt: number }>() ?? { cnt: 0 };
+    if (cnt >= limit) return c.json({ error: `Employee limit (${limit}) reached for your plan`, code: 'LIMIT_REACHED' }, 403);
+  }
+
   const body = await c.req.json<{
-    first_name:string; last_name:string; email:string
-    employment_type:'w2'|'1099'; pay_type:'salary'|'hourly'
-    pay_rate:number; filing_status:string; allowances:number
-    additional_withholding:number; state_code:string
-    deductions?: Deduction[]
-  }>()
-  const id = crypto.randomUUID()
-  await c.env.DB.prepare(`
-    INSERT INTO payroll_employees
-      (id,user_id,first_name,last_name,email,employment_type,pay_type,pay_rate,
-       filing_status,allowances,additional_withholding,state_code,deductions,active,hired_at,created_at)
-    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,1,date('now'),datetime('now'))`)
-    .bind(id,user.sub,body.first_name,body.last_name,body.email,body.employment_type,
-      body.pay_type,body.pay_rate,body.filing_status??'single',body.allowances??0,
-      body.additional_withholding??0,body.state_code??'GA',
-      JSON.stringify(body.deductions??[]))
-    .run()
-  return c.json({ success:true, id })
-})
+    first_name: string; last_name: string; email: string; pay_type: string; pay_rate: number;
+    employment_type?: string; hours_per_week?: number; filing_status?: string;
+    federal_allowances?: number; state?: string; start_date?: string; ssn_last4?: string;
+  }>();
 
-app.put('/payroll/employees/:id', async (c) => {
-  const user = await requireAuth(c)
-  if (user instanceof Response) return user
-  const body = await c.req.json<Record<string,unknown>>()
-  const allowed = ['first_name','last_name','email','pay_rate','filing_status',
-    'allowances','additional_withholding','state_code','deductions','active']
-  const sets = Object.keys(body).filter(k => allowed.includes(k))
-    .map(k => `${k}=?`).join(',')
-  if (!sets) return c.json({ error:'No valid fields' }, 400)
-  const vals = Object.keys(body).filter(k => allowed.includes(k))
-    .map(k => k==='deductions' ? JSON.stringify(body[k]) : body[k])
-  await c.env.DB.prepare(`UPDATE payroll_employees SET ${sets},updated_at=datetime('now') WHERE id=? AND user_id=?`)
-    .bind(...vals, c.req.param('id'), user.sub).run()
-  return c.json({ success:true })
-})
-
-app.delete('/payroll/employees/:id', async (c) => {
-  const user = await requireAuth(c)
-  if (user instanceof Response) return user
-  await c.env.DB.prepare("UPDATE payroll_employees SET active=0 WHERE id=? AND user_id=?")
-    .bind(c.req.param('id'), user.sub).run()
-  return c.json({ success:true })
-})
-
-// ─── Pay stub calculator (preview) ───────────────────────────
-app.post('/payroll/calculate', async (c) => {
-  const user = await requireAuth(c)
-  if (user instanceof Response) return user
-  const { employee_id, gross_pay, override_gross } =
-    await c.req.json<{ employee_id:string; gross_pay?:number; override_gross?:number }>()
-
-  const emp = await c.env.DB.prepare(
-    'SELECT * FROM payroll_employees WHERE id=? AND user_id=?')
-    .bind(employee_id, user.sub)
-    .first<{pay_rate:number;pay_type:string;filing_status:string;allowances:number;
-      additional_withholding:number;state_code:string;deductions:string;employment_type:string}>()
-  if (!emp) return c.json({ error:'Employee not found' }, 404)
-
-  const ytdRow = await c.env.DB.prepare(
-    "SELECT COALESCE(SUM(gross_pay),0) as ytd FROM payroll_stubs WHERE employee_id=? AND strftime('%Y',pay_date)=strftime('%Y',date('now'))")
-    .bind(employee_id).first<{ ytd:number }>()
-
-  const grossBiweekly = override_gross ?? gross_pay ?? (emp.pay_type==='salary' ? emp.pay_rate/26 : emp.pay_rate*80)
-  const deductions: Deduction[] = JSON.parse(emp.deductions || '[]')
-  const result = grossToNet({
-    gross_pay:   grossBiweekly,
-    filing_status: emp.filing_status,
-    allowances:  emp.allowances,
-    additional_withholding: emp.additional_withholding,
-    state_code:  emp.state_code,
-    ytd_gross:   ytdRow?.ytd ?? 0,
-    deductions,
-  })
-
-  return c.json({ stub: result, employee_type: emp.employment_type })
-})
-
-// ─── Pay Runs ─────────────────────────────────────────────────
-app.get('/payroll/runs', async (c) => {
-  const user = await requireAuth(c)
-  if (user instanceof Response) return user
-  const { results } = await c.env.DB.prepare(
-    'SELECT * FROM payroll_runs WHERE user_id=? ORDER BY pay_date DESC LIMIT 20')
-    .bind(user.sub).all()
-  return c.json({ runs: results })
-})
-
-app.post('/payroll/runs', async (c) => {
-  const user = await requireAuth(c)
-  if (user instanceof Response) return user
-  const { pay_date, pay_period_start, pay_period_end, employees: empOverrides = [] } =
-    await c.req.json<{
-      pay_date:string; pay_period_start:string; pay_period_end:string
-      employees?: Array<{ id:string; gross_pay:number }>
-    }>()
-
-  const { results: emps } = await c.env.DB.prepare(
-    'SELECT * FROM payroll_employees WHERE user_id=? AND active=1')
-    .bind(user.sub).all<{id:string;first_name:string;last_name:string;pay_type:string;
-      pay_rate:number;filing_status:string;allowances:number;additional_withholding:number;
-      state_code:string;deductions:string;employment_type:string}>()
-
-  if (!emps.length) return c.json({ error:'No active employees.' }, 400)
-
-  const runId = crypto.randomUUID()
-  const stubs = []
-  let totalGross = 0, totalNet = 0, totalTax = 0
-
-  for (const emp of emps) {
-    const override = empOverrides.find(e => e.id === emp.id)
-    const ytdRow = await c.env.DB.prepare(
-      "SELECT COALESCE(SUM(gross_pay),0) as ytd FROM payroll_stubs WHERE employee_id=? AND strftime('%Y',pay_date)=?")
-      .bind(emp.id, pay_date.slice(0,4)).first<{ ytd:number }>()
-    const gross = override?.gross_pay ?? (emp.pay_type==='salary' ? emp.pay_rate/26 : emp.pay_rate*80)
-    const deductions: Deduction[] = JSON.parse(emp.deductions||'[]')
-    const calc = grossToNet({
-      gross_pay:gross, filing_status:emp.filing_status,
-      allowances:emp.allowances, additional_withholding:emp.additional_withholding,
-      state_code:emp.state_code, ytd_gross:ytdRow?.ytd??0, deductions,
-    })
-    const stubId = crypto.randomUUID()
-    stubs.push({ ...calc, employee_id:emp.id, stub_id:stubId, name:`${emp.first_name} ${emp.last_name}` })
-    totalGross += gross
-    totalNet   += calc.net_pay
-    totalTax   += calc.total_taxes
-
-    await c.env.DB.prepare(`
-      INSERT INTO payroll_stubs
-        (id,run_id,employee_id,pay_date,gross_pay,federal_tax,ss_tax,medicare_tax,
-         state_tax,total_taxes,pre_tax_deductions,post_tax_deductions,net_pay,
-         employer_ss,employer_medicare,calc_detail,created_at)
-      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,datetime('now'))`)
-      .bind(stubId,runId,emp.id,pay_date,gross,calc.federal_income_tax,calc.social_security,
-        calc.medicare,calc.state_income_tax,calc.total_taxes,calc.pre_tax_deductions,
-        calc.post_tax_deductions,calc.net_pay,calc.employer_ss,calc.employer_medicare,
-        JSON.stringify(calc))
-      .run()
+  if (!body.first_name || !body.last_name || !body.email || !body.pay_type || !body.pay_rate) {
+    return c.json({ error: 'first_name, last_name, email, pay_type, pay_rate required', code: 'MISSING_FIELDS' }, 400);
   }
 
+  const id = crypto.randomUUID().replace(/-/g, '');
   await c.env.DB.prepare(`
-    INSERT INTO payroll_runs
-      (id,user_id,pay_date,pay_period_start,pay_period_end,employee_count,
-       total_gross,total_net,total_taxes,status,created_at)
-    VALUES(?,?,?,?,?,?,?,?,?,'draft',datetime('now'))`)
-    .bind(runId,user.sub,pay_date,pay_period_start,pay_period_end,
-      emps.length,+totalGross.toFixed(2),+totalNet.toFixed(2),+totalTax.toFixed(2))
-    .run()
+    INSERT INTO employees (id, org_id, first_name, last_name, email, ssn_last4, employment_type, pay_type, pay_rate, hours_per_week, filing_status, federal_allowances, state, start_date)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).bind(id, user.orgId, body.first_name, body.last_name, body.email, body.ssn_last4 ?? null, body.employment_type ?? 'fulltime', body.pay_type, body.pay_rate, body.hours_per_week ?? 40, body.filing_status ?? 'single', body.federal_allowances ?? 1, body.state ?? null, body.start_date ?? null).run();
 
-  return c.json({ run_id:runId, stubs, summary:{ total_gross:+totalGross.toFixed(2),
-    total_net:+totalNet.toFixed(2), total_taxes:+totalTax.toFixed(2), employee_count:emps.length }})
-})
+  return c.json(await c.env.DB.prepare('SELECT * FROM employees WHERE id = ?').bind(id).first(), 201);
+});
 
-// Approve a pay run (changes status from draft → approved)
-app.post('/payroll/runs/:id/approve', async (c) => {
-  const user = await requireAuth(c)
-  if (user instanceof Response) return user
-  await c.env.DB.prepare(
-    "UPDATE payroll_runs SET status='approved',approved_at=datetime('now') WHERE id=? AND user_id=?")
-    .bind(c.req.param('id'), user.sub).run()
-  return c.json({ success:true })
-})
+app.patch('/employees/:id', async (c) => {
+  const user = c.get('user');
+  const body = await c.req.json<Record<string, unknown>>();
+  const allowed = ['first_name','last_name','email','pay_type','pay_rate','hours_per_week','filing_status','federal_allowances','state','employment_type'];
+  const updates: string[] = [];
+  const vals: unknown[] = [];
+  for (const key of allowed) {
+    if (key in body) { updates.push(`${key} = ?`); vals.push(body[key]); }
+  }
+  if (!updates.length) return c.json({ error: 'No fields', code: 'NO_CHANGES' }, 400);
+  vals.push(c.req.param('id'), user.orgId);
+  await c.env.DB.prepare(`UPDATE employees SET ${updates.join(', ')} WHERE id = ? AND org_id = ?`).bind(...vals).run();
+  return c.json(await c.env.DB.prepare('SELECT * FROM employees WHERE id = ?').bind(c.req.param('id')).first());
+});
 
-// GET stubs for a run
-app.get('/payroll/runs/:id/stubs', async (c) => {
-  const user = await requireAuth(c)
-  if (user instanceof Response) return user
-  const run = await c.env.DB.prepare('SELECT id FROM payroll_runs WHERE id=? AND user_id=?')
-    .bind(c.req.param('id'), user.sub).first()
-  if (!run) return c.json({ error:'Run not found' }, 404)
-  const { results } = await c.env.DB.prepare(
-    `SELECT s.*,e.first_name,e.last_name,e.employment_type
-     FROM payroll_stubs s
-     JOIN payroll_employees e ON e.id=s.employee_id
-     WHERE s.run_id=?`)
-    .bind(c.req.param('id')).all()
-  return c.json({ stubs: results })
-})
+app.delete('/employees/:id', async (c) => {
+  const user = c.get('user');
+  await c.env.DB.prepare('UPDATE employees SET is_active = 0 WHERE id = ? AND org_id = ?').bind(c.req.param('id'), user.orgId).run();
+  return c.json({ deactivated: true });
+});
 
-// ─── YTD Summary ──────────────────────────────────────────────
-app.get('/payroll/ytd', async (c) => {
-  const user = await requireAuth(c)
-  if (user instanceof Response) return user
-  const year = c.req.query('year') ?? new Date().getFullYear().toString()
-  const row = await c.env.DB.prepare(`
-    SELECT COALESCE(SUM(r.total_gross),0) as gross,
-           COALESCE(SUM(r.total_net),0) as net,
-           COALESCE(SUM(r.total_taxes),0) as taxes,
-           COUNT(*) as runs
-    FROM payroll_runs r
-    WHERE r.user_id=? AND strftime('%Y',r.pay_date)=? AND r.status='approved'`)
-    .bind(user.sub, year).first()
-  return c.json({ ytd: row, year })
-})
+// ─── Payroll Runs ─────────────────────────────────────────────────────────────
 
-export default app
+app.get('/runs', async (c) => {
+  const user = c.get('user');
+  const { page = '1', limit = '20' } = c.req.query();
+  const pageNum = parseInt(page, 10);
+  const limitNum = Math.min(100, parseInt(limit, 10));
+  const { results } = await c.env.DB.prepare('SELECT * FROM payroll_runs WHERE org_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?').bind(user.orgId, limitNum, (pageNum - 1) * limitNum).all();
+  return c.json(results);
+});
+
+app.get('/runs/:id', async (c) => {
+  const user = c.get('user');
+  const run = await c.env.DB.prepare('SELECT * FROM payroll_runs WHERE id = ? AND org_id = ?').bind(c.req.param('id'), user.orgId).first();
+  if (!run) return c.json({ error: 'Payroll run not found', code: 'NOT_FOUND' }, 404);
+  const { results: items } = await c.env.DB.prepare(`
+    SELECT pli.*, e.first_name, e.last_name, e.email FROM payroll_line_items pli
+    JOIN employees e ON e.id = pli.employee_id WHERE pli.run_id = ?
+  `).bind(c.req.param('id')).all();
+  return c.json({ ...run, line_items: items });
+});
+
+app.post('/runs', async (c) => {
+  const user = c.get('user');
+  const body = await c.req.json<{ period_start: string; period_end: string; pay_date: string }>();
+  if (!body.period_start || !body.period_end || !body.pay_date) {
+    return c.json({ error: 'period_start, period_end, pay_date required', code: 'MISSING_FIELDS' }, 400);
+  }
+  const id = crypto.randomUUID().replace(/-/g, '');
+  await c.env.DB.prepare('INSERT INTO payroll_runs (id, org_id, period_start, period_end, pay_date, created_by) VALUES (?, ?, ?, ?, ?, ?)')
+    .bind(id, user.orgId, body.period_start, body.period_end, body.pay_date, user.userId).run();
+  return c.json(await c.env.DB.prepare('SELECT * FROM payroll_runs WHERE id = ?').bind(id).first(), 201);
+});
+
+app.post('/runs/:id/calculate', async (c) => {
+  const user = c.get('user');
+  const runId = c.req.param('id');
+  const run = await c.env.DB.prepare('SELECT * FROM payroll_runs WHERE id = ? AND org_id = ?').bind(runId, user.orgId).first<{
+    id: string; period_start: string; period_end: string; pay_date: string; status: string;
+  }>();
+  if (!run) return c.json({ error: 'Run not found', code: 'NOT_FOUND' }, 404);
+  if (run.status !== 'DRAFT') return c.json({ error: 'Only DRAFT runs can be calculated', code: 'NOT_DRAFT' }, 400);
+
+  const { results: employees } = await c.env.DB.prepare('SELECT * FROM employees WHERE org_id = ? AND is_active = 1').bind(user.orgId).all<{
+    id: string; pay_type: string; pay_rate: number; hours_per_week: number;
+    first_name: string; last_name: string;
+  }>();
+
+  if (!employees.length) return c.json({ error: 'No active employees', code: 'NO_EMPLOYEES' }, 400);
+
+  // Delete existing line items and recalculate
+  const stmts: D1PreparedStatement[] = [
+    c.env.DB.prepare('DELETE FROM payroll_line_items WHERE run_id = ?').bind(runId),
+  ];
+
+  let totalGross = 0, totalTaxes = 0, totalNet = 0;
+
+  const lineItems: TaxResult[] = [];
+  for (const emp of employees) {
+    const { grossPay, hoursWorked, annualized } = calculateEmployeeGross({
+      pay_type: emp.pay_type,
+      pay_rate: emp.pay_rate,
+      hours_per_week: emp.hours_per_week,
+      period_start: run.period_start,
+      period_end: run.period_end,
+    });
+    const taxes = calculateTaxes(annualized, grossPay);
+    totalGross += grossPay;
+    totalTaxes += taxes.federal_income_tax + taxes.state_income_tax + taxes.social_security + taxes.medicare;
+    totalNet += taxes.net_pay;
+
+    const lineId = crypto.randomUUID().replace(/-/g, '');
+    stmts.push(c.env.DB.prepare(`
+      INSERT INTO payroll_line_items (id, run_id, employee_id, gross_pay, federal_income_tax, state_income_tax, social_security, medicare, net_pay, hours_worked)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(lineId, runId, emp.id, taxes.gross_pay, taxes.federal_income_tax, taxes.state_income_tax, taxes.social_security, taxes.medicare, taxes.net_pay, hoursWorked || null));
+    lineItems.push(taxes);
+  }
+
+  stmts.push(c.env.DB.prepare(`UPDATE payroll_runs SET total_gross = ?, total_taxes = ?, total_net = ?, updated_at = datetime('now') WHERE id = ?`)
+    .bind(Math.round(totalGross * 100) / 100, Math.round(totalTaxes * 100) / 100, Math.round(totalNet * 100) / 100, runId));
+
+  await c.env.DB.batch(stmts);
+  c.env.PAYROLL_EVENTS.writeDataPoint({ blobs: ['calculate_run', runId], indexes: [user.orgId] });
+
+  return c.json({ calculated: employees.length, total_gross: totalGross, total_taxes: totalTaxes, total_net: totalNet });
+});
+
+app.post('/runs/:id/submit', async (c) => {
+  const user = c.get('user');
+  const runId = c.req.param('id');
+  const run = await c.env.DB.prepare('SELECT * FROM payroll_runs WHERE id = ? AND org_id = ?').bind(runId, user.orgId).first<{ status: string }>();
+  if (!run) return c.json({ error: 'Run not found', code: 'NOT_FOUND' }, 404);
+  if (run.status !== 'DRAFT') return c.json({ error: 'Only DRAFT runs can be submitted', code: 'NOT_DRAFT' }, 400);
+
+  await c.env.DB.prepare("UPDATE payroll_runs SET status = 'PROCESSING', updated_at = datetime('now') WHERE id = ?").bind(runId).run();
+  await c.env.PAYROLL_QUEUE.send({ type: 'process_payroll_run', runId, orgId: user.orgId });
+  return c.json({ submitted: true, runId });
+});
+
+app.get('/runs/:id/paystubs/:empId', async (c) => {
+  const user = c.get('user');
+  const { id: runId, empId } = c.req.param();
+  const line = await c.env.DB.prepare('SELECT * FROM payroll_line_items pli JOIN payroll_runs r ON r.id = pli.run_id WHERE pli.run_id = ? AND pli.employee_id = ? AND r.org_id = ?')
+    .bind(runId, empId, user.orgId).first<{ pay_stub_r2_key: string }>();
+  if (!line?.pay_stub_r2_key) return c.json({ error: 'Pay stub not yet generated', code: 'NOT_READY' }, 404);
+  const obj = await c.env.PAY_STUBS.get(line.pay_stub_r2_key);
+  if (!obj) return c.json({ error: 'Pay stub file not found', code: 'STORAGE_ERROR' }, 404);
+  return new Response(obj.body, { headers: { 'Content-Type': 'text/html' } });
+});
+
+// ─── Summary ──────────────────────────────────────────────────────────────────
+
+app.get('/summary', async (c) => {
+  const user = c.get('user');
+  const { results } = await c.env.DB.prepare(`
+    SELECT strftime('%Y-%m', pay_date) as month, SUM(total_gross) as gross, SUM(total_net) as net, SUM(total_taxes) as taxes
+    FROM payroll_runs WHERE org_id = ? AND status = 'COMPLETE'
+    GROUP BY month ORDER BY month DESC LIMIT 12
+  `).bind(user.orgId).all();
+  return c.json(results);
+});
+
+// ─── Queue consumer: generate pay stubs ──────────────────────────────────────
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    return app.fetch(request, env);
+  },
+
+  async queue(batch: MessageBatch<{ type: string; runId: string; orgId: string }>, env: Env): Promise<void> {
+    for (const message of batch.messages) {
+      const { runId, orgId } = message.body;
+      try {
+        // Get run and all line items with employee data
+        const run = await env.DB.prepare('SELECT * FROM payroll_runs WHERE id = ?').bind(runId).first<Record<string, unknown>>();
+        if (!run) { message.ack(); continue; }
+
+        const { results: items } = await env.DB.prepare(`
+          SELECT pli.*, e.first_name, e.last_name, e.email FROM payroll_line_items pli
+          JOIN employees e ON e.id = pli.employee_id WHERE pli.run_id = ?
+        `).bind(runId).all<Record<string, unknown>>();
+
+        // Generate pay stubs for each employee
+        const stmts: D1PreparedStatement[] = [];
+        for (const item of items) {
+          const r2Key = `pay-stubs/${orgId}/${runId}/${item.employee_id}.html`;
+          const html = generatePayStubHTML(item, run, item);
+          await env.PAY_STUBS.put(r2Key, html, { httpMetadata: { contentType: 'text/html' } });
+          stmts.push(env.DB.prepare('UPDATE payroll_line_items SET pay_stub_r2_key = ? WHERE id = ?').bind(r2Key, item.id));
+        }
+
+        stmts.push(env.DB.prepare("UPDATE payroll_runs SET status = 'COMPLETE', updated_at = datetime('now') WHERE id = ?").bind(runId));
+        if (stmts.length) await env.DB.batch(stmts);
+        message.ack();
+      } catch (err) {
+        console.error('Payroll queue error:', err);
+        message.retry();
+      }
+    }
+  },
+};

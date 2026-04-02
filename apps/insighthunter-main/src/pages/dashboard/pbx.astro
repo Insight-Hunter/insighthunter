@@ -1,0 +1,10 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import TierGate from '../../components/dashboard/TierGate.astro';
+import PBXApp from '../../components/dashboard/PBXApp.svelte';
+---
+<DashboardLayout title="Phone System">
+  <TierGate required="standard">
+    <PBXApp client:load />
+  </TierGate>
+</DashboardLayout>
