@@ -1,0 +1,27 @@
+---
+import '../styles/theme.scss';
+const { title = 'InsightHunter' } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} — InsightHunter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="auth-body">
+<div class="auth-wrapper">
+  <a href="/" class="auth-logo">InsightHunter</a>
+  <div class="card auth-card"><slot /></div>
+  <p class="auth-footer"><a href="/">← Back to home</a></p>
+</div>
+</body>
+</html>
+<style>
+  .auth-body { background: var(--color-bg-subtle); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .auth-wrapper { width: 100%; max-width: 420px; padding: var(--space-6); }
+  .auth-logo { display: block; text-align: center; font-family: var(--font-display); font-size: 1.75rem; color: var(--taupe-800); font-weight: 700; margin-bottom: var(--space-6); text-decoration: none; }
+  .auth-card { padding: var(--space-8); }
+  .auth-footer { text-align: center; margin-top: var(--space-4); font-size: 0.875rem; color: var(--color-text-muted); }
+</style>

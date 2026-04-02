@@ -1,0 +1,31 @@
+// insighthunter-auth — Central authentication worker
+{
+  "name": "insighthunter-auth",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter-auth",
+      "database_id": "REPLACE_AFTER_PROVISION"
+    }
+  ],
+  "kv_namespaces": [
+    { "binding": "SESSIONS", "id": "REPLACE_AFTER_PROVISION" },
+    { "binding": "REFRESH_TOKENS", "id": "REPLACE_AFTER_PROVISION" }
+  ],
+  "analytics_engine_datasets": [
+    { "binding": "AUTH_EVENTS", "dataset": "ih_auth_events" }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production",
+    "ACCESS_TOKEN_TTL": "3600",
+    "REFRESH_TOKEN_TTL": "2592000"
+  }
+  // Secrets (set via wrangler secret put): JWT_SECRET
+}
