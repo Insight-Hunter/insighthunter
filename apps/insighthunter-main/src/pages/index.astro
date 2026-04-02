@@ -1,0 +1,88 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import { TIER_PRICING } from '@ih/tier-config';
+---
+<MarketingLayout title="InsightHunter — AI CFO for Small Business">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero__inner">
+      <span class="hero__eyebrow">AI-Powered Finance</span>
+      <h1 class="hero__headline">Stop Flying Blind.</h1>
+      <p class="hero__sub">InsightHunter is your always-on AI CFO. Bookkeeping, payroll, tax compliance, and real-time financial insight — all on the edge.</p>
+      <div class="hero__cta">
+        <a href="/auth/register" class="btn btn--primary btn--lg">Start free — no card required</a>
+        <a href="/pricing" class="btn btn--ghost btn--lg">See pricing</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature grid -->
+  <section class="features">
+    <div class="features__inner">
+      <h2 class="section-title">Everything a CFO does, automated.</h2>
+      <div class="features__grid">
+        {[
+          { icon: '📒', title: 'Double-entry Bookkeeping', desc: 'Full Chart of Accounts, transactions, P&L, balance sheet and trial balance. GAAP-ready out of the box.' },
+          { icon: '✦',  title: 'AI CFO Assistant',         desc: 'Ask questions in plain English. Get answers backed by your real financial data via RAG search.' },
+          { icon: '🏛',  title: 'Business Formation',       desc: 'Guided LLC/Corp formation, EIN application, state registration and ongoing compliance calendar.' },
+          { icon: '💳',  title: 'Payroll Engine',           desc: 'Run payroll for hourly and salaried employees. Tax withholding, pay stubs and year-end prep.' },
+          { icon: '☎',  title: 'Business PBX',              desc: 'Virtual extensions, IVR menus, call routing and voicemail with AI transcription.' },
+          { icon: '🔒',  title: 'Multi-tenant Security',    desc: 'Every tenant is fully isolated at the database layer. Enterprise orgs get dedicated Worker runtimes.' },
+        ].map(f => (
+          <div class="feature-card">
+            <div class="feature-card__icon">{f.icon}</div>
+            <h3>{f.title}</h3>
+            <p>{f.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing teaser -->
+  <section class="pricing-teaser">
+    <div class="pricing-teaser__inner">
+      <h2 class="section-title">Simple, transparent pricing.</h2>
+      <div class="pricing-teaser__grid">
+        {(['free','lite','standard','pro'] as const).map(tier => (
+          <div class={`pricing-card ${tier === 'standard' ? 'pricing-card--popular' : ''}`}>
+            {tier === 'standard' && <div class="pricing-card__badge">Most popular</div>}
+            <div class="pricing-card__tier">{tier.charAt(0).toUpperCase() + tier.slice(1)}</div>
+            <div class="pricing-card__price">${TIER_PRICING[tier]}<span>/mo</span></div>
+            <a href="/auth/register" class="btn btn--primary" style="width:100%;justify-content:center;margin-top:auto;">Get started</a>
+          </div>
+        ))}
+      </div>
+      <p style="text-align:center;margin-top:var(--space-6);color:var(--color-text-muted);font-size:0.875rem;">
+        Enterprise at $999/mo includes dedicated worker runtime, white-label and 4-hour SLA.
+        <a href="/pricing">See full comparison →</a>
+      </p>
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  .hero { background: linear-gradient(135deg, var(--sand-50) 0%, var(--sand-100) 100%); padding: var(--space-16) 0; border-bottom: 1px solid var(--color-border); }
+  .hero__inner { max-width: 700px; margin: 0 auto; padding: 0 var(--space-8); text-align: center; }
+  .hero__eyebrow { display: inline-block; background: var(--sand-200); color: var(--sand-800); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 12px; border-radius: var(--radius-full); margin-bottom: var(--space-4); }
+  .hero__headline { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 700; color: var(--taupe-900); line-height: 1.1; margin-bottom: var(--space-4); }
+  .hero__sub { font-size: 1.125rem; color: var(--color-text-muted); line-height: 1.7; margin-bottom: var(--space-8); }
+  .hero__cta { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; }
+  .section-title { font-family: var(--font-display); font-size: 2rem; text-align: center; margin-bottom: var(--space-10); color: var(--taupe-800); }
+  .features { padding: var(--space-16) 0; }
+  .features__inner { max-width: 1100px; margin: 0 auto; padding: 0 var(--space-8); }
+  .features__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6); }
+  .feature-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); }
+  .feature-card__icon { font-size: 2rem; margin-bottom: var(--space-3); }
+  .feature-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: var(--space-2); }
+  .feature-card p { font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.6; }
+  .pricing-teaser { background: var(--color-bg-subtle); padding: var(--space-16) 0; }
+  .pricing-teaser__inner { max-width: 900px; margin: 0 auto; padding: 0 var(--space-8); }
+  .pricing-teaser__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--space-4); }
+  .pricing-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-3); position: relative; }
+  .pricing-card--popular { border-color: var(--sand-400); box-shadow: var(--shadow-md); }
+  .pricing-card__badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--sand-600); color: white; font-size: 0.7rem; font-weight: 600; padding: 2px 10px; border-radius: var(--radius-full); white-space: nowrap; }
+  .pricing-card__tier { font-weight: 600; text-transform: capitalize; color: var(--color-text-muted); font-size: 0.875rem; }
+  .pricing-card__price { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--taupe-800); }
+  .pricing-card__price span { font-size: 0.875rem; font-weight: 400; color: var(--color-text-muted); }
+</style>

@@ -1,0 +1,108 @@
+{
+    "name": "insighthunter-bookkeeping",
+    "main": "src/backend/index.ts",
+    "compatibility_date": "2025-03-07",
+    "compatibility_flags": ["nodejs_compat"],
+    "observability": {
+      "enabled": true,
+      "head_sampling_rate": 1
+    },
+  
+    // Static SPA assets (React build output)
+    "assets": {
+      "directory": "./dist/frontend",
+      "not_found_handling": "single-page-application",
+      "binding": "ASSETS"
+    },
+  
+    // Custom domain
+    "routes": [
+      { "pattern": "bookkeeping.insighthunter.app/*", "zone_name": "insighthunter.app" }
+    ],
+  
+    // D1 — relational bookkeeping data
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "insighthunter-bookkeeping",
+        "database_id": "REPLACE_WITH_D1_ID",
+        "migrations_dir": "src/backend/db/migrations"
+      }
+    ],
+  
+    // KV — tier usage counters, session cache, QB token store
+    "kv_namespaces": [
+      { "binding": "TIER_USAGE",    "id": "REPLACE_KV_TIER_USAGE_ID" },
+      { "binding": "SESSION_CACHE", "id": "REPLACE_KV_SESSION_CACHE_ID" },
+      { "binding": "QB_TOKENS",     "id": "REPLACE_KV_QB_TOKENS_ID" }
+    ],
+  
+    // R2 — bank statements, receipts, document uploads
+    "r2_buckets": [
+      { "binding": "DOCUMENTS", "bucket_name": "ih-bookkeeping-documents" }
+    ],
+  
+    // Durable Objects
+    "durable_objects": {
+      "bindings": [
+        { "name": "BOOKKEEPING_AGENT",    "class_name": "BookkeepingAgent"    },
+        { "name": "RECONCILIATION_AGENT", "class_name": "ReconciliationAgent" }
+      ]
+    },
+    "migrations": [
+      {
+        "tag": "v1",
+        "new_sqlite_classes": ["BookkeepingAgent", "ReconciliationAgent"]
+      }
+    ],
+  
+    // Queues
+    "queues": {
+      "producers": [
+        { "binding": "CLASSIFICATION_QUEUE", "queue": "bk-classification-queue" },
+        { "binding": "QB_SYNC_QUEUE",        "queue": "bk-qb-sync-queue"        }
+      ],
+      "consumers": [
+        {
+          "queue": "bk-classification-queue",
+          "dead_letter_queue": "bk-classification-dlq",
+          "retry_delay": 30
+        },
+        {
+          "queue": "bk-qb-sync-queue",
+          "dead_letter_queue": "bk-qb-sync-dlq",
+          "retry_delay": 60
+        }
+      ]
+    },
+  
+    // Workers AI
+    "ai": {
+      "binding": "AI"
+    },
+  
+    // Analytics Engine
+    "analytics_engine_datasets": [
+      { "binding": "ANALYTICS", "dataset": "bookkeeping_events" }
+    ],
+  
+    // Environment variables (non-secret)
+    "vars": {
+      "ENVIRONMENT": "production",
+      "AUTH_WORKER_URL":    "https://auth.insighthunter.app",
+      "REPORTS_WORKER_URL": "https://reports.insighthunter.app",
+      "PAYROLL_WORKER_URL": "https://payroll.insighthunter.app",
+      "QB_REDIRECT_URI":   "https://bookkeeping.insighthunter.app/api/quickbooks/callback"
+    },
+  // wrangler.jsonc
+    "services": [
+     {
+      "binding": "USER_WORKERS",
+      "service": "ih-user-workers"
+  }
+   ]
+
+    // Secrets (set via: wrangler secret put SECRET_NAME)
+    // QB_CLIENT_ID, QB_CLIENT_SECRET, ENCRYPTION_KEY
+  }
+  

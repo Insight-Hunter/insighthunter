@@ -1,0 +1,26 @@
+---
+import type { Tier } from '@ih/types';
+import { TIER_PRICING, tierAtLeast } from '@ih/tier-config';
+const { required } = Astro.props as { required: Tier };
+const user = Astro.locals.user as { tier: Tier };
+const hasAccess = tierAtLeast(user?.tier ?? 'free', required);
+const priceDiff = TIER_PRICING[required] - TIER_PRICING[user?.tier ?? 'free'];
+---
+{hasAccess
+  ? <slot />
+  : <div class="tier-gate">
+      <div class="tier-gate__icon">🔒</div>
+      <h3>Upgrade to unlock this feature</h3>
+      <p>Your current plan: <strong>{user?.tier ?? 'free'}</strong>. This feature requires <strong>{required}</strong> or above.</p>
+      {priceDiff > 0 && <p class="tier-gate__price">Upgrade for just <strong>${priceDiff}/mo more</strong></p>}
+      <a href="/dashboard/upgrade" class="btn btn--primary">View upgrade options →</a>
+    </div>
+}
+<style>
+  .tier-gate { text-align: center; padding: var(--space-16); background: var(--color-surface); border: 2px dashed var(--color-border); border-radius: var(--radius-xl); }
+  .tier-gate__icon { font-size: 3rem; margin-bottom: var(--space-4); }
+  .tier-gate h3 { font-size: 1.25rem; margin-bottom: var(--space-3); }
+  .tier-gate p { color: var(--color-text-muted); margin-bottom: var(--space-3); font-size: 0.9rem; }
+  .tier-gate__price { color: var(--color-primary); font-weight: 500; }
+  .btn { margin-top: var(--space-4); }
+</style>

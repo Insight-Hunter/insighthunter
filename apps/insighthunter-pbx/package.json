@@ -3,42 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "scripts": {
-    "dev":      "wrangler dev",
-    "deploy":   "wrangler deploy",
-    "typecheck": "tsc --noEmit",
-    "lint":     "eslint src --ext .ts",
-    "format":   "prettier --write src",
-    "db:init":  "wrangler d1 execute insighthunter-pbx --local --file=db/schema.sql",
-    "db:migrate": "wrangler d1 migrations apply insighthunter-pbx --local",
-    "db:migrate:prod": "wrangler d1 migrations apply insighthunter-pbx --remote",
-    "tail":     "wrangler tail"
-  },
-
-  "dependencies": {
-    "hono":   "^4.7.4",
-    "zod":    "^3.24.2",
-    "agents": "^0.0.99"
-  },
-
-  "devDependencies": {
-    "typescript":                "^5.8.2",
-    "wrangler":                  "^4.4.0",
-    "@cloudflare/workers-types": "^4.20250401.0",
-
-    "prettier":                  "^3.5.3",
-    "@typescript-eslint/eslint-plugin": "^8.29.0",
-    "@typescript-eslint/parser":        "^8.29.0",
-    "eslint":                           "^9.23.0",
-
-    "vitest":        "^3.1.1",
-    "@vitest/ui":    "^3.1.1"
-  },
-
-  "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
-  },
-
-  "packageManager": "pnpm@9.15.4"
+  "scripts": { "dev": "wrangler dev src/index.ts", "deploy": "wrangler deploy", "typecheck": "tsc --noEmit" },
+  "dependencies": { "@ih/types": "*", "@ih/tier-config": "*", "hono": "^4.7.4" },
+  "devDependencies": { "@cloudflare/workers-types": "^4.20250310.0", "typescript": "^5.7.3", "wrangler": "^3.109.3" }
 }

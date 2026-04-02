@@ -1,0 +1,10 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import TierGate from '../../components/dashboard/TierGate.astro';
+import BookkeepingApp from '../../components/dashboard/BookkeepingApp.svelte';
+---
+<DashboardLayout title="Bookkeeping">
+  <TierGate required="lite">
+    <BookkeepingApp client:load />
+  </TierGate>
+</DashboardLayout>

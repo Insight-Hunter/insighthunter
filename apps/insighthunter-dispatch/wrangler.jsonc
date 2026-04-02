@@ -1,0 +1,33 @@
+// insighthunter-dispatch — Workers for Platforms dispatch router
+{
+  "name": "insighthunter-dispatch",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "dispatch_namespaces": [
+    {
+      "binding": "TENANT_WORKERS",
+      "namespace": "insighthunter-tenants"
+    }
+  ],
+  "services": [
+    { "binding": "AUTH_WORKER",        "service": "insighthunter-auth" },
+    { "binding": "BOOKKEEPING_WORKER", "service": "insighthunter-bookkeeping" },
+    { "binding": "BIZFORMA_WORKER",    "service": "insighthunter-bizforma" },
+    { "binding": "PBX_WORKER",         "service": "insighthunter-pbx" },
+    { "binding": "PAYROLL_WORKER",     "service": "insighthunter-payroll" },
+    { "binding": "AI_WORKER",          "service": "insighthunter-ai" }
+  ],
+  "kv_namespaces": [
+    { "binding": "TENANT_CACHE", "id": "REPLACE_AFTER_PROVISION" }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production",
+    "CF_ACCOUNT_ID": "REPLACE_WITH_ACCOUNT_ID"
+  }
+  // Secrets: JWT_SECRET, CF_API_TOKEN
+}
