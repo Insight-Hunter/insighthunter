@@ -1,5 +1,24 @@
 {
+  "name": "insighthunter-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev --local --persist-to .wrangler/state",
+    "deploy": "wrangler deploy",
+    "deploy:preview": "wrangler deploy --env preview",
+    "db:migrate": "wrangler d1 migrations apply insighthunter-main",
+    "db:migrate:preview": "wrangler d1 migrations apply insighthunter-preview --env preview",
+    "db:studio": "wrangler d1 studio insighthunter-main",
+    "tail": "wrangler tail insighthunter-api",
+    "types": "wrangler types"
+  },
   "dependencies": {
-    "mmv": "^0.0.0-alpha.0"
+    "hono": "^4.6.0",
+    "pnpm": "^10.33.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250310.0",
+    "typescript": "^5.7.0",
+    "wrangler": "^4.0.0"
   }
 }
