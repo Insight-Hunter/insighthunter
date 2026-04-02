@@ -1,0 +1,5 @@
+---
+// Clear session and redirect
+Astro.cookies.delete('ih_session', { path: '/' });
+return Astro.redirect('/auth/login');
+---

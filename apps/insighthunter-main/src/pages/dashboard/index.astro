@@ -1,0 +1,79 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import type { AuthUser } from '@ih/types';
+const user = Astro.locals.user as AuthUser;
+---
+<DashboardLayout title="Overview">
+  <div class="overview">
+    <div class="kpi-grid">
+      {[
+        { label: 'Revenue MTD',   id: 'revenue',  icon: '↑', color: 'var(--color-success)' },
+        { label: 'Expenses MTD',  id: 'expenses', icon: '↓', color: 'var(--color-danger)' },
+        { label: 'Net Income',    id: 'net',      icon: '◈', color: 'var(--color-primary)' },
+        { label: 'Cash Balance',  id: 'cash',     icon: '◉', color: 'var(--taupe-500)' },
+      ].map(kpi => (
+        <div class="kpi-card">
+          <div class="kpi-card__label">{kpi.label}</div>
+          <div class="kpi-card__value" id={kpi.id} style={`color:${kpi.color}`}>—</div>
+          <div class="kpi-card__icon" style={`color:${kpi.color}`}>{kpi.icon}</div>
+        </div>
+      ))}
+    </div>
+
+    <div class="overview__grid">
+      <div class="card">
+        <h3 class="card__title">Revenue (last 6 months)</h3>
+        <div id="revenue-chart" class="chart-placeholder">Loading…</div>
+      </div>
+      <div class="card">
+        <h3 class="card__title">AI Insights</h3>
+        <div id="insights-list">
+          <p style="color:var(--color-text-muted);font-size:0.875rem;">Ask the AI CFO assistant to generate insights for your business.</p>
+          <a href="/dashboard/ai" class="btn btn--ghost btn--sm" style="margin-top:var(--space-4);">Open AI CFO →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Fetch KPI data from bookkeeping reports
+    async function loadKPIs() {
+      const token = localStorage.getItem('ih_access_token');
+      if (!token) return;
+      const now = new Date();
+      const from = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+      const to = now.toISOString().slice(0,10);
+      try {
+        const [plRes, bsRes] = await Promise.all([
+          fetch(`/api/bookkeeping/reports/pl?from=${from}&to=${to}`, { headers: { Authorization: `Bearer ${token}` }}),
+          fetch(`/api/bookkeeping/reports/balance-sheet?as_of=${to}`, { headers: { Authorization: `Bearer ${token}` }}),
+        ]);
+        if (plRes.ok) {
+          const pl = await plRes.json() as { revenue: number; expenses: number; net_income: number };
+          const fmt = (n: number) => new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format(n);
+          document.getElementById('revenue')!.textContent = fmt(pl.revenue);
+          document.getElementById('expenses')!.textContent = fmt(pl.expenses);
+          document.getElementById('net')!.textContent = fmt(pl.net_income);
+        }
+        if (bsRes.ok) {
+          const bs = await bsRes.json() as { total_assets: number };
+          const fmt = (n: number) => new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format(n);
+          document.getElementById('cash')!.textContent = fmt(bs.total_assets);
+        }
+      } catch { /* silent fail — data loads when available */ }
+    }
+    loadKPIs();
+  </script>
+</DashboardLayout>
+
+<style>
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-8); }
+  .kpi-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-5); position: relative; overflow: hidden; }
+  .kpi-card__label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: var(--space-2); }
+  .kpi-card__value { font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; }
+  .kpi-card__icon { position: absolute; top: var(--space-4); right: var(--space-4); font-size: 1.5rem; opacity: 0.3; }
+  .overview__grid { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6); }
+  .card__title { font-size: 0.875rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: var(--space-4); }
+  .chart-placeholder { height: 200px; display: flex; align-items: center; justify-content: center; color: var(--color-text-subtle); font-size: 0.875rem; background: var(--color-bg-subtle); border-radius: var(--radius-md); }
+  @media (max-width: 768px) { .overview__grid { grid-template-columns: 1fr; } }
+</style>
