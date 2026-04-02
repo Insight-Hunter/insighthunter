@@ -121,8 +121,8 @@ info "Setting secrets..."
 echo ""
 
 SECRETS=(
-  "TELNYX_API_KEY:Your Telnyx API key (from telnyx.com > API Keys)"
-  "TELNYX_WEBHOOK_SECRET:Telnyx Ed25519 public key (from Telnyx portal > Webhooks)"
+  "TELNYX_API_KEY:KEY019D4DC6B03F137F389C6B90D611FAD2_ZYdG5dQkomjuwyLGECNT0r" 
+  "TELNYX_WEBHOOK_SECRET:Id11JlUZhA2SYNQDO5/qjS2l7MnkFHQ+lQXukCzEkD0="
   "STRIPE_SECRET_KEY:Stripe secret key (sk_live_... or sk_test_...)"
   "STRIPE_WEBHOOK_SECRET:Stripe webhook signing secret (whsec_...)"
   "STRIPE_PK:Stripe publishable key (pk_live_... or pk_test_...)"
