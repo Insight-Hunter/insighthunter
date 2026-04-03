@@ -27,7 +27,11 @@
   ],
   "vars": {
     "ENVIRONMENT": "production",
+<<<<<<< HEAD
     "CF_ACCOUNT_ID": "18c8e61a3669253dcfd0c7eec6be36a3"
+=======
+    "CF_ACCOUNT_ID": "REPLACE_WITH_ACCOUNT_ID"
+>>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
   }
   // Secrets: JWT_SECRET, CF_API_TOKEN
 }

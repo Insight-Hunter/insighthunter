@@ -1,20 +1,30 @@
+# wrangler.toml — BizForma Cloudflare Worker Configuration
 
-name = "insighthunter-bizforma"
-main = "src/backend/index.ts"
-compatibility_date = "2025-03-07"
+name            = "bizforma"
+main            = "src/worker.ts"
+compatibility_date  = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
 
-# Secrets to set:
-# wrangler secret put STRIPE_SECRET_KEY
-# wrangler secret put STRIPE_WEBHOOK_SECRET
-# wrangler secret put JWT_SECRET
-# wrangler secret put APP_URL  (https://insighthunter.app)
-
+# ── Observability ────────────────────────────────────────────────────────────
 [observability]
-enabled = true
+enabled           = true
 head_sampling_rate = 1
 
+# ── Static Assets (React SPA) ────────────────────────────────────────────────
+[assets]
+directory               = "./dist/"
+not_found_handling      = "single-page-application"
+binding                 = "ASSETS"
+
+# ── KV Namespaces ────────────────────────────────────────────────────────────
+[[kv_namespaces]]
+binding    = "BIZFORMA_KV"
+id         = "YOUR_KV_NAMESPACE_ID"
+preview_id = "YOUR_KV_PREVIEW_NAMESPACE_ID"
+
+# ── D1 Database ──────────────────────────────────────────────────────────────
 [[d1_databases]]
+<<<<<<< HEAD
 binding = "DB"
 database_name = "bizforma-db"
 database_id = "a388931a-e89c-4860-8433-d02f4a478332"
@@ -38,10 +48,35 @@ class_name = "ComplianceAgent"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["FormationAgent", "ComplianceAgent"]
+=======
+binding       = "BIZFORMA_DB"
+database_name = "bizforma"
+database_id   = "YOUR_D1_DATABASE_ID"
 
+# ── Workers AI ───────────────────────────────────────────────────────────────
+[ai]
+binding = "AI"
+>>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
+
+# ── Analytics Engine ─────────────────────────────────────────────────────────
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"
-dataset = "bizforma-requests"
+dataset = "bizforma_events"
 
+# ── Environment Variables ─────────────────────────────────────────────────────
 [vars]
-AUTH_WORKER_URL = "https://auth.insighthunter.workers.dev"
+ENVIRONMENT = "production"
+
+# ── Development Overrides ────────────────────────────────────────────────────
+[env.development]
+name = "bizforma-dev"
+
+[env.development.vars]
+ENVIRONMENT = "development"
+
+# ── Staging Overrides ─────────────────────────────────────────────────────────
+[env.staging]
+name = "bizforma-staging"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"

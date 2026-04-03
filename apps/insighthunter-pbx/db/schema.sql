@@ -1,64 +1,74 @@
--- apps/insighthunter-pbx/db/schema.sql
-
-CREATE TABLE IF NOT EXISTS pbx_numbers (
-  id            TEXT PRIMARY KEY,
-  user_id       TEXT NOT NULL,
-  phone_number  TEXT NOT NULL UNIQUE,
-  friendly_name TEXT NOT NULL DEFAULT '',
-  twilio_sid    TEXT NOT NULL,
-  status        TEXT NOT NULL DEFAULT 'active', -- active | released
-  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
-  updated_at    TEXT NOT NULL DEFAULT (datetime('now'))
+CREATE TABLE IF NOT EXISTS extensions (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  number TEXT NOT NULL,
+  name TEXT NOT NULL,
+  user_id TEXT,
+  voicemail_enabled INTEGER NOT NULL DEFAULT 1,
+  forward_to TEXT,
+  created_at TEXT NOT NULL,
+  UNIQUE(org_id, number)
 );
 
-CREATE TABLE IF NOT EXISTS pbx_calls (
-  id            TEXT PRIMARY KEY,
-  user_id       TEXT NOT NULL,
-  direction     TEXT NOT NULL,   -- inbound | outbound
-  from_number   TEXT NOT NULL,
-  to_number     TEXT NOT NULL,
-  call_sid      TEXT,
-  duration      INTEGER DEFAULT 0,
-  status        TEXT NOT NULL DEFAULT 'ringing',
-  recording_url TEXT,
-  created_at    TEXT NOT NULL DEFAULT (datetime('now'))
+CREATE TABLE IF NOT EXISTS phone_numbers (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  did TEXT NOT NULL UNIQUE,
+  friendly_name TEXT NOT NULL,
+  assigned_to TEXT,
+  telnyx_number_id TEXT NOT NULL,
+  created_at TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS pbx_voicemails (
-  id              TEXT PRIMARY KEY,
-  user_id         TEXT NOT NULL,
-  from_number     TEXT NOT NULL,
-  recording_url   TEXT NOT NULL,
-  recording_sid   TEXT,
-  duration        INTEGER DEFAULT 0,
-  transcription   TEXT,
-  listened        INTEGER NOT NULL DEFAULT 0,
-  created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+CREATE INDEX IF NOT EXISTS idx_phone_numbers_org ON phone_numbers(org_id);
+
+CREATE TABLE IF NOT EXISTS call_logs (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  direction TEXT NOT NULL CHECK(direction IN ('inbound','outbound')),
+  from_number TEXT NOT NULL,
+  to_number TEXT NOT NULL,
+  started_at TEXT NOT NULL,
+  ended_at TEXT,
+  duration INTEGER,
+  status TEXT NOT NULL DEFAULT 'ringing',
+  recording_key TEXT,
+  telnyx_call_id TEXT NOT NULL UNIQUE,
+  created_at TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS pbx_sms (
-  id            TEXT PRIMARY KEY,
-  user_id       TEXT NOT NULL,
-  direction     TEXT NOT NULL,   -- inbound | outbound
-  from_number   TEXT NOT NULL,
-  to_number     TEXT NOT NULL,
-  body          TEXT NOT NULL DEFAULT '',
-  twilio_sid    TEXT,
-  status        TEXT NOT NULL DEFAULT 'received',
-  created_at    TEXT NOT NULL DEFAULT (datetime('now'))
+CREATE INDEX IF NOT EXISTS idx_call_logs_org_started ON call_logs(org_id, started_at DESC);
+
+CREATE TABLE IF NOT EXISTS voicemails (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  extension_id TEXT,
+  from_number TEXT NOT NULL,
+  received_at TEXT NOT NULL,
+  duration INTEGER NOT NULL DEFAULT 0,
+  transcription TEXT,
+  audio_key TEXT NOT NULL,
+  read INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS pbx_routes (
-  id            TEXT PRIMARY KEY,
-  user_id       TEXT NOT NULL,
-  label         TEXT NOT NULL,   -- e.g. "sales", "support"
-  forward_to    TEXT NOT NULL,   -- phone number to forward to
-  description   TEXT DEFAULT '',
-  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
-  UNIQUE(user_id, label)
+CREATE INDEX IF NOT EXISTS idx_voicemails_org ON voicemails(org_id, received_at DESC);
+
+CREATE TABLE IF NOT EXISTS ivr_config (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL UNIQUE,
+  greeting TEXT NOT NULL,
+  options_json TEXT NOT NULL DEFAULT '[]',
+  updated_at TEXT NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_pbx_calls_user     ON pbx_calls(user_id);
-CREATE INDEX IF NOT EXISTS idx_pbx_vmail_user     ON pbx_voicemails(user_id);
-CREATE INDEX IF NOT EXISTS idx_pbx_sms_user       ON pbx_sms(user_id);
-CREATE INDEX IF NOT EXISTS idx_pbx_routes_user    ON pbx_routes(user_id);
+CREATE TABLE IF NOT EXISTS pbx_settings (
+  org_id TEXT PRIMARY KEY,
+  business_hours_start TEXT NOT NULL DEFAULT '09:00',
+  business_hours_end TEXT NOT NULL DEFAULT '17:00',
+  timezone TEXT NOT NULL DEFAULT 'America/New_York',
+  after_hours_action TEXT NOT NULL DEFAULT 'voicemail',
+  hold_music_key TEXT,
+  updated_at TEXT NOT NULL
+);
+

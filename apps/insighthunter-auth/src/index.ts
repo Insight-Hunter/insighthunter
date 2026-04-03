@@ -18,32 +18,55 @@ interface Env {
 // ─── Password hashing (HMAC-SHA256 + random salt) ─────────────────────────────
 
 async function hashPassword(plain: string): Promise<string> {
-  const salt = crypto.randomUUID().replace(/-/g, '');
-  const key = await crypto.subtle.importKey(
+  const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+  const salt = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
     'raw',
-    new TextEncoder().encode(salt),
-    { name: 'HMAC', hash: 'SHA-256' },
+    encoder.encode(plain),
+    'PBKDF2',
     false,
-    ['sign']
+    ['deriveBits']
   );
-  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(plain));
-  const hash = btoa(String.fromCharCode(...new Uint8Array(sig)));
-  return `${hash}:${salt}`;
+  const hashBuffer = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: saltBytes,
+      iterations: 600000,
+      hash: 'SHA-256'
+    },
+    keyMaterial,
+    256
+  );
+  const hash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return `${salt}:${hash}`;
+}
 }
 
 async function verifyPassword(plain: string, stored: string): Promise<boolean> {
-  const [, salt] = stored.split(':');
-  if (!salt) return false;
-  const key = await crypto.subtle.importKey(
+  const [saltHex, storedHash] = stored.split(':');
+  if (!saltHex || !storedHash) return false;
+  const salt = new Uint8Array(saltHex.match(/.{2}/g)!.map(h => parseInt(h, 16)));
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
     'raw',
-    new TextEncoder().encode(salt),
-    { name: 'HMAC', hash: 'SHA-256' },
+    encoder.encode(plain),
+    'PBKDF2',
     false,
-    ['sign']
+    ['deriveBits']
   );
-  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(plain));
-  const hash = btoa(String.fromCharCode(...new Uint8Array(sig)));
-  return `${hash}:${salt}` === stored;
+  const hashBuffer = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 600000,
+      hash: 'SHA-256'
+    },
+    keyMaterial,
+    256
+  );
+  const hash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return hash === storedHash;
 }
 
 // ─── CORS allowed origins ─────────────────────────────────────────────────────
