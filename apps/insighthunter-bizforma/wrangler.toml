@@ -17,11 +17,15 @@ head_sampling_rate = 1
 [[d1_databases]]
 binding = "DB"
 database_name = "bizforma-db"
-database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
+database_id = "a388931a-e89c-4860-8433-d02f4a478332"
 
 [[r2_buckets]]
 binding = "R2_DOCS"
 bucket_name = "bizforma-documents"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "af7391791e95423b82c1cd877c0992e3"
 
 [[durable_objects.bindings]]
 name = "FORMATION_AGENT"

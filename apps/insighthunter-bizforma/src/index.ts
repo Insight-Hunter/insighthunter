@@ -1,238 +1,374 @@
-// apps/insighthunter-bizforma/src/index.ts
-import { Hono } from 'hono'
-import { cors } from 'hono/cors'
-import { getCookie } from 'hono/cookie'
+import { Hono } from 'hono';
+import { DurableObject } from 'cloudflare:workers';
+import type { AuthUser } from '@ih/types';
+import { scoreEntities, recommendEntity } from './entityMatrix.js';
 
-export interface Env {
-  DB:                  D1Database
-  STRIPE_SECRET_KEY:   string   // sk_live_... or sk_test_...
-  STRIPE_WEBHOOK_SECRET: string // whsec_...
-  JWT_SECRET:          string
-  APP_URL:             string   // https://insighthunter.app
+// ─── Env / types ──────────────────────────────────────────────────────────────
+
+interface Env {
+  DB: D1Database;
+  DOCUMENTS: R2Bucket;
+  CACHE: KVNamespace;
+  BIZ_EVENTS: AnalyticsEngineDataset;
+  FORMATION_AGENT: DurableObjectNamespace;
+  COMPLIANCE_AGENT: DurableObjectNamespace;
+  JWT_SECRET: string;
+  BOOKKEEPING_WORKER_URL: string;
 }
 
-// ── State filing fees (passed through at cost) ────────────────
-const STATE_FEES: Record<string, number> = {
-  AL:50,AK:250,AZ:50,AR:45,CA:70,CO:50,CT:120,DE:90,FL:125,GA:100,
-  HI:50,ID:100,IL:150,IN:95,IA:50,KS:160,KY:40,LA:100,ME:175,MD:100,
-  MA:500,MI:50,MN:155,MS:50,MO:50,MT:35,NE:105,NV:75,NH:100,NJ:125,
-  NM:50,NY:200,NC:125,ND:135,OH:99,OK:100,OR:100,PA:125,RI:150,SC:110,
-  SD:150,TN:300,TX:300,UT:54,VT:125,VA:100,WA:200,WV:100,WI:130,WY:100,
-}
-const SERVICE_FEE = 14900 // $149.00 in cents
+interface IHLocals { user: AuthUser }
 
-// ── JWT verify (mirrors auth worker) ─────────────────────────
-async function verifyJWT(token: string, secret: string) {
-  try {
-    const enc = new TextEncoder()
-    const parts = token.split('.')
-    if (parts.length !== 3) return null
-    const key = await crypto.subtle.importKey('raw', enc.encode(secret),
-      { name: 'HMAC', hash: 'SHA-256' }, false, ['verify'])
-    const sig = Uint8Array.from(
-      atob(parts[2].replace(/-/g,'+').replace(/_/g,'/')), c => c.charCodeAt(0))
-    const valid = await crypto.subtle.verify('HMAC', key, sig,
-      enc.encode(`${parts[0]}.${parts[1]}`))
-    if (!valid) return null
-    const payload = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')))
-    if (payload.exp < Math.floor(Date.now()/1000)) return null
-    return payload as { sub: string; email: string; plan: string }
-  } catch { return null }
-}
+// ─── State filing fees per state (illustrative subset) ───────────────────────
 
-async function requireAuth(c: any) {
-  const token = getCookie(c, 'ih_token') ?? c.req.header('Authorization')?.replace('Bearer ','')
-  if (!token) return c.json({ error: 'Unauthenticated' }, 401)
-  const user = await verifyJWT(token, c.env.JWT_SECRET)
-  if (!user) return c.json({ error: 'Invalid or expired session.' }, 401)
-  return user
-}
+const STATE_RULES: Record<string, { filing_fee: number; timeline_days: number }> = {
+  DE: { filing_fee: 90,  timeline_days: 3 },
+  WY: { filing_fee: 102, timeline_days: 7 },
+  NV: { filing_fee: 425, timeline_days: 10 },
+  FL: { filing_fee: 125, timeline_days: 14 },
+  TX: { filing_fee: 300, timeline_days: 14 },
+  CA: { filing_fee: 70,  timeline_days: 30 },
+  NY: { filing_fee: 200, timeline_days: 21 },
+  default: { filing_fee: 150, timeline_days: 14 },
+};
 
-// ── Stripe helper: POST to Stripe API ────────────────────────
-async function stripe(env: Env, path: string, body: Record<string, unknown>) {
-  const encoded = Object.entries(body)
-    .flatMap(([k, v]) => Array.isArray(v)
-      ? v.map((item, i) => [`${k}[${i}]`, String(item)])
-      : [[k, String(v)]])
-    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-    .join('&')
+// ─── Durable Object: FormationAgent ──────────────────────────────────────────
 
-  const res = await fetch(`https://api.stripe.com/v1/${path}`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: encoded,
-  })
-  return res.json() as Promise<any>
-}
+export class FormationAgent extends DurableObject {
+  async fetch(request: Request): Promise<Response> {
+    const url = new URL(request.url);
+    const path = url.pathname;
 
-// ── Stripe webhook signature verification ────────────────────
-async function verifyStripeSignature(
-  payload: string, header: string, secret: string
-): Promise<boolean> {
-  try {
-    const parts   = Object.fromEntries(header.split(',').map(p => p.split('=')))
-    const ts      = parts['t']
-    const sig     = parts['v1']
-    const signed  = `${ts}.${payload}`
-    const enc     = new TextEncoder()
-    const key     = await crypto.subtle.importKey('raw', enc.encode(secret),
-      { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
-    const mac     = await crypto.subtle.sign('HMAC', key, enc.encode(signed))
-    const expected = Array.from(new Uint8Array(mac))
-      .map(b => b.toString(16).padStart(2,'0')).join('')
-    // Replay window: 5 minutes
-    if (Math.abs(Date.now()/1000 - parseInt(ts)) > 300) return false
-    return expected === sig
-  } catch { return false }
-}
-
-// ── Plan upgrade: set standard for 6 months ──────────────────
-async function upgradePlanFromBizForma(db: D1Database, userId: string) {
-  const expires = new Date()
-  expires.setMonth(expires.getMonth() + 6)
-  await db.prepare(`
-    UPDATE users
-    SET plan          = 'standard',
-        plan_expires  = ?,
-        plan_source   = 'bizforma_promo',
-        bizforma_paid = 1,
-        updated_at    = datetime('now')
-    WHERE id = ?`)
-    .bind(expires.toISOString(), userId)
-    .run()
-}
-
-const app = new Hono<{ Bindings: Env }>()
-
-app.use('*', cors({
-  origin: o => o?.includes('insighthunter.app') || o?.includes('localhost') ? o : null,
-  credentials: true,
-  allowMethods: ['GET','POST','OPTIONS'],
-  allowHeaders: ['Content-Type','Authorization','Stripe-Signature'],
-}))
-
-// ── GET /bizforma/states — state fee lookup ───────────────────
-app.get('/bizforma/states', (c) => {
-  return c.json({ states: STATE_FEES, service_fee: SERVICE_FEE })
-})
-
-// ── POST /bizforma/checkout — create Stripe session ──────────
-app.post('/bizforma/checkout', async (c) => {
-  const user = await requireAuth(c)
-  if (user instanceof Response) return user
-
-  // Reject if already paid
-  const existing = await c.env.DB.prepare(
-    'SELECT bizforma_paid FROM users WHERE id=?')
-    .bind(user.sub).first<{ bizforma_paid: number }>()
-  if (existing?.bizforma_paid) {
-    return c.json({ error: 'BizForma already purchased on this account.' }, 409)
-  }
-
-  const { entity_type = 'LLC', state = 'GA', business_name = 'My Business' } =
-    await c.req.json<{ entity_type?: string; state?: string; business_name?: string }>()
-
-  const stateFee = (STATE_FEES[state.toUpperCase()] ?? 100) * 100 // to cents
-  const totalCents = SERVICE_FEE + stateFee
-
-  const session = await stripe(c.env, 'checkout/sessions', {
-    mode:                         'payment',
-    'payment_method_types[0]':    'card',
-    'line_items[0][price_data][currency]':                    'usd',
-    'line_items[0][price_data][product_data][name]':          `BizForma — ${entity_type} Formation`,
-    'line_items[0][price_data][product_data][description]':   `${business_name} · ${state} · Includes 6 months Insight Standard ($474 value)`,
-    'line_items[0][price_data][unit_amount]':                 String(SERVICE_FEE),
-    'line_items[0][quantity]':                                '1',
-    'line_items[1][price_data][currency]':                    'usd',
-    'line_items[1][price_data][product_data][name]':          `${state} State Filing Fee`,
-    'line_items[1][price_data][product_data][description]':   `Passed through at cost — ${state} Secretary of State`,
-    'line_items[1][price_data][unit_amount]':                 String(stateFee),
-    'line_items[1][quantity]':                                '1',
-    success_url: `${c.env.APP_URL}/bizforma-success.html?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url:  `${c.env.APP_URL}/features/bizforma.html?cancelled=1`,
-    customer_email: user.email,
-    'metadata[user_id]':       user.sub,
-    'metadata[entity_type]':   entity_type,
-    'metadata[state]':         state,
-    'metadata[business_name]': business_name,
-  })
-
-  if (session.error) {
-    console.error('Stripe error:', session.error)
-    return c.json({ error: 'Failed to create checkout session.' }, 500)
-  }
-
-  // Log pending order in D1
-  await c.env.DB.prepare(`
-    INSERT OR REPLACE INTO formation_orders
-      (id, user_id, stripe_session_id, entity_type, state, business_name, status, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, 'pending', datetime('now'))`)
-    .bind(crypto.randomUUID(), user.sub, session.id,
-      entity_type, state, business_name)
-    .run()
-
-  return c.json({ checkout_url: session.url, session_id: session.id })
-})
-
-// ── POST /bizforma/webhook — Stripe payment confirmed ─────────
-app.post('/bizforma/webhook', async (c) => {
-  const payload = await c.req.text()
-  const sig     = c.req.header('Stripe-Signature') ?? ''
-
-  const valid = await verifyStripeSignature(payload, sig, c.env.STRIPE_WEBHOOK_SECRET)
-  if (!valid) return c.json({ error: 'Invalid signature' }, 400)
-
-  const event = JSON.parse(payload)
-
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object
-    const userId  = session.metadata?.user_id
-
-    if (!userId) {
-      console.error('Webhook missing user_id in metadata')
-      return c.json({ received: true })
+    if (request.method === 'GET' && path === '/state') {
+      const state = await this.ctx.storage.get<string>('status') ?? 'QUESTIONNAIRE';
+      const caseId = await this.ctx.storage.get<string>('caseId');
+      return Response.json({ status: state, caseId });
     }
 
-    // Upgrade plan
-    await upgradePlanFromBizForma(c.env.DB, userId)
+    if (request.method === 'POST' && path === '/init') {
+      const { caseId, status } = await request.json<{ caseId: string; status: string }>();
+      await this.ctx.storage.put('caseId', caseId);
+      await this.ctx.storage.put('status', status);
+      return Response.json({ ok: true });
+    }
 
-    // Update order status
-    await c.env.DB.prepare(`
-      UPDATE formation_orders
-      SET status = 'paid', stripe_payment_intent = ?, updated_at = datetime('now')
-      WHERE stripe_session_id = ?`)
-      .bind(session.payment_intent, session.id)
-      .run()
+    if (request.method === 'POST' && path === '/advance') {
+      const { status } = await request.json<{ status: string }>();
+      await this.ctx.storage.put('status', status);
+      return Response.json({ status });
+    }
 
-    console.log(`BizForma paid — upgraded user ${userId} to Standard for 6 months`)
+    return Response.json({ error: 'Not found' }, { status: 404 });
+  }
+}
+
+// ─── Durable Object: ComplianceAgent ─────────────────────────────────────────
+
+export class ComplianceAgent extends DurableObject {
+  async fetch(request: Request): Promise<Response> {
+    const url = new URL(request.url);
+
+    if (request.method === 'POST' && url.pathname === '/schedule') {
+      const { eventId, dueDate, orgId, title } = await request.json<{
+        eventId: string; dueDate: string; orgId: string; title: string;
+      }>();
+      await this.ctx.storage.put('eventId', eventId);
+      await this.ctx.storage.put('orgId', orgId);
+      await this.ctx.storage.put('title', title);
+      const alarmTime = new Date(dueDate).getTime();
+      if (alarmTime > Date.now()) {
+        await this.ctx.storage.setAlarm(alarmTime);
+      }
+      return Response.json({ scheduled: true, dueDate });
+    }
+
+    return Response.json({ error: 'Not found' }, { status: 404 });
   }
 
-  if (event.type === 'checkout.session.expired') {
-    const session = event.data.object
-    await c.env.DB.prepare(
-      "UPDATE formation_orders SET status='expired' WHERE stripe_session_id=?")
-      .bind(session.id).run()
+  async alarm(): Promise<void> {
+    const eventId = await this.ctx.storage.get<string>('eventId');
+    const orgId   = await this.ctx.storage.get<string>('orgId');
+    const title   = await this.ctx.storage.get<string>('title');
+    console.log(JSON.stringify({ event: 'compliance_due', eventId, orgId, title, timestamp: new Date().toISOString() }));
+    // In production: enqueue to email/notification queue
+  }
+}
+
+// ─── App ──────────────────────────────────────────────────────────────────────
+
+const app = new Hono<{ Bindings: Env; Variables: IHLocals }>();
+
+app.use('*', async (c, next) => {
+  const raw = c.req.header('X-IH-User');
+  if (!raw) return c.json({ error: 'Missing user context', code: 'NO_USER' }, 401);
+  try { c.set('user', JSON.parse(raw) as AuthUser); } catch {
+    return c.json({ error: 'Invalid user context', code: 'BAD_USER' }, 400);
+  }
+  return next();
+});
+
+// ─── Formation Cases ──────────────────────────────────────────────────────────
+
+app.get('/cases', async (c) => {
+  const user = c.get('user');
+  const { results } = await c.env.DB.prepare('SELECT * FROM formation_cases WHERE org_id = ? ORDER BY created_at DESC').bind(user.orgId).all();
+  return c.json(results);
+});
+
+app.post('/cases', async (c) => {
+  const user = c.get('user');
+  const body = await c.req.json<{ business_name?: string; state?: string }>().catch(() => ({}));
+  const id = crypto.randomUUID().replace(/-/g, '');
+  await c.env.DB.prepare(`INSERT INTO formation_cases (id, org_id, user_id, business_name, state) VALUES (?, ?, ?, ?, ?)`)
+    .bind(id, user.orgId, user.userId, body.business_name ?? null, body.state ?? null).run();
+
+  // Init FormationAgent Durable Object
+  const doId = c.env.FORMATION_AGENT.idFromName(id);
+  const agent = c.env.FORMATION_AGENT.get(doId);
+  await agent.fetch(new Request('https://do/init', {
+    method: 'POST',
+    body: JSON.stringify({ caseId: id, status: 'QUESTIONNAIRE' }),
+    headers: { 'Content-Type': 'application/json' },
+  }));
+
+  const case_ = await c.env.DB.prepare('SELECT * FROM formation_cases WHERE id = ?').bind(id).first();
+  return c.json(case_, 201);
+});
+
+app.get('/cases/:id', async (c) => {
+  const user = c.get('user');
+  const id = c.req.param('id');
+  const case_ = await c.env.DB.prepare('SELECT * FROM formation_cases WHERE id = ? AND org_id = ?').bind(id, user.orgId).first();
+  if (!case_) return c.json({ error: 'Case not found', code: 'NOT_FOUND' }, 404);
+  const { results: answers } = await c.env.DB.prepare('SELECT * FROM questionnaire_answers WHERE case_id = ?').bind(id).all();
+  const { results: einApps } = await c.env.DB.prepare('SELECT * FROM ein_applications WHERE case_id = ?').bind(id).all();
+  const { results: stateRegs } = await c.env.DB.prepare('SELECT * FROM state_registrations WHERE case_id = ?').bind(id).all();
+  return c.json({ ...case_, answers, ein_applications: einApps, state_registrations: stateRegs });
+});
+
+app.patch('/cases/:id', async (c) => {
+  const user = c.get('user');
+  const id = c.req.param('id');
+  const case_ = await c.env.DB.prepare('SELECT * FROM formation_cases WHERE id = ? AND org_id = ?').bind(id, user.orgId).first<{ org_id: string; status: string }>();
+  if (!case_) return c.json({ error: 'Case not found', code: 'NOT_FOUND' }, 404);
+
+  const body = await c.req.json<{ status?: string; entity_type?: string; state?: string; business_name?: string }>();
+  const updates: string[] = [];
+  const vals: unknown[] = [];
+  if (body.status)        { updates.push('status = ?');        vals.push(body.status); }
+  if (body.entity_type)   { updates.push('entity_type = ?');   vals.push(body.entity_type); }
+  if (body.state)         { updates.push('state = ?');         vals.push(body.state); }
+  if (body.business_name) { updates.push('business_name = ?'); vals.push(body.business_name); }
+  if (!updates.length) return c.json({ error: 'No fields to update', code: 'NO_CHANGES' }, 400);
+
+  updates.push("updated_at = datetime('now')");
+  vals.push(id, user.orgId);
+  await c.env.DB.prepare(`UPDATE formation_cases SET ${updates.join(', ')} WHERE id = ? AND org_id = ?`).bind(...vals).run();
+
+  // Advance Durable Object state
+  if (body.status) {
+    const doId = c.env.FORMATION_AGENT.idFromName(id);
+    const agent = c.env.FORMATION_AGENT.get(doId);
+    await agent.fetch(new Request('https://do/advance', {
+      method: 'POST',
+      body: JSON.stringify({ status: body.status }),
+      headers: { 'Content-Type': 'application/json' },
+    }));
   }
 
-  return c.json({ received: true })
-})
+  // On COMPLETE: call bookkeeping seed endpoint
+  if (body.status === 'COMPLETE') {
+    fetch(`${c.env.BOOKKEEPING_WORKER_URL}/seed`, {
+      method: 'POST',
+      headers: {
+        'X-Internal-Secret': c.env.JWT_SECRET,
+        'X-Org-Id': user.orgId,
+      },
+    }).catch(err => console.error('Bookkeeping seed failed:', err));
 
-// ── GET /bizforma/order-status — poll from success page ──────
-app.get('/bizforma/order-status', async (c) => {
-  const user = await requireAuth(c)
-  if (user instanceof Response) return user
+    c.env.BIZ_EVENTS.writeDataPoint({ blobs: ['formation_complete', id], indexes: [user.orgId] });
+  }
 
-  const order = await c.env.DB.prepare(`
-    SELECT o.*, u.plan, u.plan_expires
-    FROM formation_orders o
-    JOIN users u ON u.id = o.user_id
-    WHERE o.user_id = ? ORDER BY o.created_at DESC LIMIT 1`)
-    .bind(user.sub).first<any>()
+  const updated = await c.env.DB.prepare('SELECT * FROM formation_cases WHERE id = ?').bind(id).first();
+  return c.json(updated);
+});
 
-  return c.json({ order: order ?? null })
-})
+// ─── Questionnaire answers ────────────────────────────────────────────────────
 
-export default app
+app.post('/cases/:id/answers', async (c) => {
+  const user = c.get('user');
+  const id = c.req.param('id');
+  const case_ = await c.env.DB.prepare('SELECT id FROM formation_cases WHERE id = ? AND org_id = ?').bind(id, user.orgId).first();
+  if (!case_) return c.json({ error: 'Case not found', code: 'NOT_FOUND' }, 404);
+
+  const body = await c.req.json<Array<{ question: string; answer: string }>>();
+  if (!Array.isArray(body)) return c.json({ error: 'Array of {question, answer} required', code: 'INVALID_BODY' }, 400);
+
+  const stmts = body.map(({ question, answer }) => {
+    const aId = crypto.randomUUID().replace(/-/g, '');
+    return c.env.DB.prepare('INSERT INTO questionnaire_answers (id, case_id, question, answer) VALUES (?, ?, ?, ?)')
+      .bind(aId, id, question, answer);
+  });
+  await c.env.DB.batch(stmts);
+
+  // Score entities and recommend
+  const allAnswers = [...body, ...(await c.env.DB.prepare('SELECT question, answer FROM questionnaire_answers WHERE case_id = ?').bind(id).all()).results as Array<{ question: string; answer: string }>];
+  const scores = scoreEntities(allAnswers);
+  const recommended = recommendEntity(scores);
+
+  return c.json({ saved: body.length, scores, recommended });
+});
+
+// ─── EIN Application ──────────────────────────────────────────────────────────
+
+app.post('/cases/:id/ein', async (c) => {
+  const user = c.get('user');
+  const caseId = c.req.param('id');
+  const case_ = await c.env.DB.prepare('SELECT id FROM formation_cases WHERE id = ? AND org_id = ?').bind(caseId, user.orgId).first();
+  if (!case_) return c.json({ error: 'Case not found', code: 'NOT_FOUND' }, 404);
+
+  const einId = crypto.randomUUID().replace(/-/g, '');
+  await c.env.DB.batch([
+    c.env.DB.prepare('INSERT INTO ein_applications (id, case_id, status) VALUES (?, ?, \'PENDING\')').bind(einId, caseId),
+    c.env.DB.prepare("UPDATE formation_cases SET status = 'EIN_PENDING', updated_at = datetime('now') WHERE id = ?").bind(caseId),
+  ]);
+
+  const app_ = await c.env.DB.prepare('SELECT * FROM ein_applications WHERE id = ?').bind(einId).first();
+  return c.json(app_, 201);
+});
+
+app.patch('/cases/:id/ein/:einId', async (c) => {
+  const user = c.get('user');
+  const { id: caseId, einId } = c.req.param();
+  const case_ = await c.env.DB.prepare('SELECT id FROM formation_cases WHERE id = ? AND org_id = ?').bind(caseId, user.orgId).first();
+  if (!case_) return c.json({ error: 'Case not found', code: 'NOT_FOUND' }, 404);
+
+  const body = await c.req.json<{ status?: string; ein?: string }>();
+  const stmts: D1PreparedStatement[] = [];
+  if (body.status === 'APPROVED' && body.ein) {
+    stmts.push(c.env.DB.prepare("UPDATE ein_applications SET status = 'APPROVED', ein = ?, approved_at = datetime('now') WHERE id = ?").bind(body.ein, einId));
+    stmts.push(c.env.DB.prepare("UPDATE formation_cases SET status = 'EIN_COMPLETE', updated_at = datetime('now') WHERE id = ?").bind(caseId));
+  } else if (body.status) {
+    stmts.push(c.env.DB.prepare('UPDATE ein_applications SET status = ? WHERE id = ?').bind(body.status, einId));
+  }
+  if (stmts.length) await c.env.DB.batch(stmts);
+  const app_ = await c.env.DB.prepare('SELECT * FROM ein_applications WHERE id = ?').bind(einId).first();
+  return c.json(app_);
+});
+
+// ─── State Registration ───────────────────────────────────────────────────────
+
+app.post('/cases/:id/state-reg', async (c) => {
+  const user = c.get('user');
+  const caseId = c.req.param('id');
+  const case_ = await c.env.DB.prepare('SELECT id, state FROM formation_cases WHERE id = ? AND org_id = ?').bind(caseId, user.orgId).first<{ id: string; state: string | null }>();
+  if (!case_) return c.json({ error: 'Case not found', code: 'NOT_FOUND' }, 404);
+
+  const body = await c.req.json<{ state?: string }>();
+  const state = body.state ?? case_.state ?? 'default';
+  const rule = STATE_RULES[state] ?? STATE_RULES.default;
+
+  const regId = crypto.randomUUID().replace(/-/g, '');
+  await c.env.DB.batch([
+    c.env.DB.prepare('INSERT INTO state_registrations (id, case_id, state, filing_fee) VALUES (?, ?, ?, ?)').bind(regId, caseId, state, rule.filing_fee),
+    c.env.DB.prepare("UPDATE formation_cases SET status = 'STATE_PENDING', updated_at = datetime('now') WHERE id = ?").bind(caseId),
+  ]);
+
+  return c.json({ id: regId, state, ...rule }, 201);
+});
+
+app.get('/state-rules/:state', (c) => {
+  const state = c.req.param('state').toUpperCase();
+  const rule = STATE_RULES[state] ?? STATE_RULES.default;
+  return c.json({ state, ...rule });
+});
+
+// ─── Compliance Events ────────────────────────────────────────────────────────
+
+app.get('/compliance', async (c) => {
+  const user = c.get('user');
+  const { from, to, status } = c.req.query();
+  let query = 'SELECT * FROM compliance_events WHERE org_id = ?';
+  const params: unknown[] = [user.orgId];
+  if (from)   { query += ' AND due_date >= ?'; params.push(from); }
+  if (to)     { query += ' AND due_date <= ?'; params.push(to); }
+  if (status) { query += ' AND status = ?';    params.push(status.toUpperCase()); }
+  query += ' ORDER BY due_date ASC';
+  const { results } = await c.env.DB.prepare(query).bind(...params).all();
+  return c.json(results);
+});
+
+app.post('/compliance', async (c) => {
+  const user = c.get('user');
+  const body = await c.req.json<{ type: string; title: string; due_date: string; case_id?: string; notes?: string }>();
+  if (!body.type || !body.title || !body.due_date) {
+    return c.json({ error: 'type, title, due_date required', code: 'MISSING_FIELDS' }, 400);
+  }
+  const id = crypto.randomUUID().replace(/-/g, '');
+  await c.env.DB.prepare('INSERT INTO compliance_events (id, org_id, case_id, type, title, due_date, notes) VALUES (?, ?, ?, ?, ?, ?, ?)')
+    .bind(id, user.orgId, body.case_id ?? null, body.type, body.title, body.due_date, body.notes ?? null).run();
+
+  // Schedule alarm via ComplianceAgent DO
+  const doId = c.env.COMPLIANCE_AGENT.idFromName(id);
+  const agent = c.env.COMPLIANCE_AGENT.get(doId);
+  await agent.fetch(new Request('https://do/schedule', {
+    method: 'POST',
+    body: JSON.stringify({ eventId: id, dueDate: body.due_date, orgId: user.orgId, title: body.title }),
+    headers: { 'Content-Type': 'application/json' },
+  }));
+
+  const event = await c.env.DB.prepare('SELECT * FROM compliance_events WHERE id = ?').bind(id).first();
+  return c.json(event, 201);
+});
+
+app.patch('/compliance/:id', async (c) => {
+  const user = c.get('user');
+  const id = c.req.param('id');
+  const body = await c.req.json<{ status?: string; notes?: string }>();
+  const updates: string[] = [];
+  const vals: unknown[] = [];
+  if (body.status) { updates.push('status = ?'); vals.push(body.status.toUpperCase()); }
+  if (body.notes !== undefined) { updates.push('notes = ?'); vals.push(body.notes); }
+  if (!updates.length) return c.json({ error: 'No fields to update', code: 'NO_CHANGES' }, 400);
+  vals.push(id, user.orgId);
+  await c.env.DB.prepare(`UPDATE compliance_events SET ${updates.join(', ')} WHERE id = ? AND org_id = ?`).bind(...vals).run();
+  const event = await c.env.DB.prepare('SELECT * FROM compliance_events WHERE id = ?').bind(id).first();
+  return c.json(event);
+});
+
+// ─── Documents ────────────────────────────────────────────────────────────────
+
+app.post('/documents/upload', async (c) => {
+  const user = c.get('user');
+  const formData = await c.req.formData();
+  const file = formData.get('file') as File | null;
+  if (!file) return c.json({ error: 'file field required', code: 'MISSING_FILE' }, 400);
+
+  const r2Key = `${user.orgId}/${crypto.randomUUID()}-${file.name}`;
+  await c.env.DOCUMENTS.put(r2Key, file.stream(), {
+    httpMetadata: { contentType: file.type },
+    customMetadata: { orgId: user.orgId, filename: file.name },
+  });
+
+  return c.json({ r2_key: r2Key, filename: file.name, size: file.size }, 201);
+});
+
+app.get('/documents/*', async (c) => {
+  const user = c.get('user');
+  const key = c.req.path.replace('/documents/', '');
+  const obj = await c.env.DOCUMENTS.get(key);
+  if (!obj) return c.json({ error: 'Document not found', code: 'NOT_FOUND' }, 404);
+
+  // Verify org ownership via custom metadata
+  const orgId = obj.customMetadata?.orgId;
+  if (orgId !== user.orgId) return c.json({ error: 'Forbidden', code: 'FORBIDDEN' }, 403);
+
+  const filename = obj.customMetadata?.filename ?? 'document';
+  return new Response(obj.body, {
+    headers: {
+      'Content-Type': obj.httpMetadata?.contentType ?? 'application/octet-stream',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+    },
+  });
+});
+
+export default app;

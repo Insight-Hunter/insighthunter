@@ -1,0 +1,33 @@
+{
+  "name": "insighthunter-bizforma",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "insighthunter-bizforma", "database_id": "REPLACE_AFTER_PROVISION" }
+  ],
+  "r2_buckets": [
+    { "binding": "DOCUMENTS", "bucket_name": "ih-bizforma-docs" }
+  ],
+  "kv_namespaces": [
+    { "binding": "CACHE", "id": "REPLACE_AFTER_PROVISION" }
+  ],
+  "analytics_engine_datasets": [
+    { "binding": "BIZ_EVENTS", "dataset": "ih_bizforma_events" }
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "FORMATION_AGENT", "class_name": "FormationAgent" },
+      { "name": "COMPLIANCE_AGENT", "class_name": "ComplianceAgent" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_classes": ["FormationAgent", "ComplianceAgent"] }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production",
+    "BOOKKEEPING_WORKER_URL": "https://insighthunter-bookkeeping.ACCOUNT.workers.dev"
+  }
+  // Secrets: JWT_SECRET
+}
