@@ -1,0 +1,21 @@
+{
+  "name": "insighthunter-reports",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "browser": { "binding": "BROWSER" },
+  "r2_buckets": [
+    { "binding": "REPORTS", "bucket_name": "insighthunter-reports" }
+  ],
+  "d1_databases": [
+    { "binding": "DB", "database_name": "insighthunter-db", "database_id": "REPLACE_WITH_D1_ID" }
+  ],
+  "analytics_engine_datasets": [
+    { "binding": "ANALYTICS", "dataset": "insighthunter_events" }
+  ],
+  "vars": {
+    "AUTH_WORKER_URL": "https://insighthunter-auth.workers.dev",
+    "APP_URL": "https://insighthunter.app"
+  }
+}
