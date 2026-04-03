@@ -1,54 +1,39 @@
 #!/bin/bash
 set -e
 
-echo "═══════════════════════════════════════════════"
-echo "  InsightHunter — Production Deploy"
-echo "═══════════════════════════════════════════════"
+if [ -f .env ]; then
+  echo "Loading environment variables from .env"
+  export $(grep -v '^[[:space:]]*#' .env | grep -E '^[a-zA-Z_][a-zA-Z0-9_]*=' | xargs)
+fi
 
-echo ""
-echo "▶ Installing dependencies..."
-npm install
-
-echo ""
-echo "▶ Running D1 migrations..."
-bash scripts/migrate.sh
-
-echo ""
-echo "▶ [1/7] Deploying insighthunter-auth..."
-cd apps/insighthunter-auth && npx wrangler deploy && cd ../..
-
-echo ""
-echo "▶ [2/7] Deploying insighthunter-bookkeeping..."
-cd apps/insighthunter-bookkeeping && npx wrangler deploy && cd ../..
-
-echo ""
-echo "▶ [3/7] Deploying insighthunter-bizforma..."
-cd apps/insighthunter-bizforma && npx wrangler deploy && cd ../..
-
-echo ""
-echo "▶ [4/7] Deploying insighthunter-pbx..."
-cd apps/insighthunter-pbx && npx wrangler deploy && cd ../..
-
-echo ""
-echo "▶ [5/7] Deploying insighthunter-payroll..."
-cd apps/insighthunter-payroll && npx wrangler deploy && cd ../..
-
-echo ""
-echo "▶ [6/7] Deploying insighthunter-ai..."
-cd apps/insighthunter-ai && npx wrangler deploy && cd ../..
-
-echo ""
-echo "▶ [7/7] Deploying insighthunter-dispatch (must be last)..."
-cd apps/insighthunter-dispatch && npx wrangler deploy && cd ../..
-
-echo ""
-echo "▶ Building and deploying insighthunter-main (Pages)..."
-cd apps/insighthunter-main
+# Build the Next.js application
+echo "Building Next.js application..."
 npm run build
-npx wrangler pages deploy dist --project-name=insighthunter-main
-cd ../..
 
-echo ""
-echo "═══════════════════════════════════════════════"
-echo "  ✅ Deploy complete!"
-echo "═══════════════════════════════════════════════"
+# Remove cache directories
+rm -rf .next/cache
+rm -rf dev
+
+echo "Deploying insighthunter-auth..."
+npx wrangler deploy --config apps/insighthunter-auth/wrangler.toml
+
+echo "Deploying insighthunter..."
+npx wrangler pages deploy
+
+echo "Deployjng Bizforma...."
+npx wrangler deploy --config apps/insighthunter-bizforma/wrangler.toml"
+
+# Install dependencies for insighthunter-bookkeeping
+echo "Installing dependencies for insighthunter-bookkeeping..."
+(cd apps/insighthunter-bookkeeping && npm install)
+
+echo "Deploying insighthunter-bookkeeping..."
+npx wrangler deploy --config apps/insighthunter-bookkeeping/wrangler.toml
+
+echo "Deploying insighthunter-lite..."
+npx wrangler deploy --config apps/insighthunter-lite/wrangler.toml
+
+echo "Deploying insighthunter-pbx..."
+npx wrangler deploy --config apps/insighthunter-pbx/wrangler.toml
+
+echo "All applications deployed successfully!"
