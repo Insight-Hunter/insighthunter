@@ -15,7 +15,7 @@
     { "binding": "ANALYTICS", "dataset": "insighthunter_events" }
   ],
   "vars": {
-    "AUTH_WORKER_URL": "https://insighthunter-auth.workers.dev",
+    "AUTH_WORKER_URL": "https://auth.insighthunter.app",
     "APP_URL": "https://insighthunter.app"
   }
 }
