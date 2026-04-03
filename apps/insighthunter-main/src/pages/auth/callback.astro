@@ -1,0 +1,19 @@
+---
+// OAuth callback — exchanges code for token, sets cookie, redirects
+import { setToken } from '../../lib/auth';
+const code = Astro.url.searchParams.get('code');
+const next = Astro.url.searchParams.get('state') || '/dashboard';
+
+if (code) {
+  const res = await fetch(`${import.meta.env.AUTH_WORKER_URL}/oauth/callback`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code }),
+  });
+  if (res.ok) {
+    const body = await res.json() as { data: { token: string } };
+    Astro.cookies.set('ih_session', body.data.token, { path: '/', httpOnly: false, sameSite: 'lax', secure: true });
+  }
+}
+return Astro.redirect(next);
+---

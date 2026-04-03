@@ -1,13 +1,19 @@
 ---
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
-import TierGate from '../../components/dashboard/TierGate.astro';
+import InsightCard from '../../components/dashboard/InsightCard.svelte';
+import EmptyState from '../../components/shared/EmptyState.astro';
+const insights = [
+  { id:'1', type:'alert', severity:'warning', title:'Burn rate rising 8% MoM', body:'Your monthly expenses have increased for 3 consecutive months. If unchecked, runway shortens to 3.2 months by Q3.', actionLabel:'View forecast', actionUrl:'/dashboard/forecast', createdAt: new Date().toISOString() },
+  { id:'2', type:'recommendation', severity:'info', title:'Invoice $6,400 remains unpaid >30 days', body:'Client ABC has an outstanding invoice. Following up within 48 hours improves collection rates by 40%.', createdAt: new Date().toISOString() },
+  { id:'3', type:'forecast', severity:'info', title:'Revenue on track for +12% this quarter', body:'Based on current pipeline and historical seasonality, Q1 revenue is projected at $72k.', createdAt: new Date().toISOString() },
+];
 ---
-<DashboardLayout title="Insights">
-  <TierGate required="lite">
-    <div class="card">
-      <h3 style="font-family:var(--font-display);margin-bottom:var(--space-4);">AI-Generated Insights</h3>
-      <p style="color:var(--color-text-muted);font-size:0.875rem;margin-bottom:var(--space-6);">Ask your AI CFO to analyze your financial data and surface insights, anomalies, and trends.</p>
-      <a href="/dashboard/ai" class="btn btn--primary">Open AI CFO Assistant →</a>
-    </div>
-  </TierGate>
+<DashboardLayout title="AI Insights">
+  <h1 style="font-family:var(--font-display);font-size:var(--text-xl);font-style:italic;margin-bottom:var(--space-6);">AI CFO Insights</h1>
+  {insights.length === 0
+    ? <EmptyState icon="🧠" title="No insights yet" body="Upload transaction data and your AI CFO will surface alerts within minutes." ctaLabel="Upload CSV" ctaHref="/dashboard/bookkeeping" />
+    : <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+        {insights.map(i => <InsightCard client:load insight={i} />)}
+      </div>
+  }
 </DashboardLayout>
