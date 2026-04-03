@@ -1,31 +1,16 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  export let message = '';
+  export let type: 'success' | 'error' | 'info' = 'info';
+  export let visible = false;
 
-  interface Toast { id: string; message: string; type: 'success' | 'error' | 'warning' | 'info'; }
-
-  let toasts: Toast[] = $state([]);
-
-  export function show(message: string, type: Toast['type'] = 'info') {
-    const id = crypto.randomUUID();
-    toasts = [...toasts, { id, message, type }];
-    setTimeout(() => dismiss(id), 4000);
-  }
-
-  function dismiss(id: string) {
-    toasts = toasts.filter(t => t.id !== id);
-  }
-
-  // Export globally
-  onMount(() => {
-    (window as any).toast = show;
-  });
+  const colors = { success: 'var(--color-success)', error: 'var(--color-error)', info: 'var(--color-primary)' };
+  const icons  = { success: '✓', error: '✕', info: 'ℹ' };
 </script>
 
-<div class="toast-container">
-  {#each toasts as toast (toast.id)}
-    <div class="toast toast--{toast.type}" role="alert">
-      <span>{toast.message}</span>
-      <button onclick={() => dismiss(toast.id)} style="background:none;border:none;color:inherit;cursor:pointer;margin-left:8px;">✕</button>
-    </div>
-  {/each}
-</div>
+{#if visible}
+  <div role="status" aria-live="polite"
+    style="position:fixed;bottom:var(--space-6);right:var(--space-6);z-index:200;background:var(--color-surface);border:1px solid var(--color-border);border-left:4px solid {colors[type]};border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:var(--space-4) var(--space-5);display:flex;align-items:center;gap:var(--space-3);max-width:360px;">
+    <span style="color:{colors[type]};font-weight:700;">{icons[type]}</span>
+    <span style="font-size:var(--text-sm);">{message}</span>
+  </div>
+{/if}
