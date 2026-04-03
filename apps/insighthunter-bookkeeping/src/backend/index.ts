@@ -1,139 +1,102 @@
-// apps/insighthunter-bookkeeping/src/backend/index.ts
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import { BookkeepingLedger } from './durable-objects/BookkeepingLedger';
-import { InvoiceManager } from './durable-objects/InvoiceManager';
-import { SubscriptionManager } from './durable-objects/SubscriptionManager';
-import { BankConnectionManager } from './durable-objects/BankConnectionManager';
-
-export { BookkeepingLedger, InvoiceManager, SubscriptionManager, BankConnectionManager };
-
-export interface Env {
-  // Durable Objects
-  BOOKKEEPING_LEDGER: DurableObjectNamespace;
-  INVOICE_MANAGER: DurableObjectNamespace;
-  SUBSCRIPTION_MANAGER: DurableObjectNamespace;
-  BANK_CONNECTION_MANAGER: DurableObjectNamespace;
-  
-  // R2 Buckets
-  SPREADSHEET_UPLOADS: R2Bucket;
-
-  // Secrets
-  QUICKBOOKS_CLIENT_ID: string;
-  QUICKBOOKS_CLIENT_SECRET: string;
-  STRIPE_SECRET_KEY: string;
-  STRIPE_WEBHOOK_SECRET: string;
-  PLAID_CLIENT_ID: string;
-  PLAID_SECRET: string;
-  OPENAI_API_KEY: string;
-  
-  // Vars
-  QUICKBOOKS_ENVIRONMENT: string;
-  QUICKBOOKS_REDIRECT_URI: string;
-  FRONTEND_URL: string;
-}
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { secureHeaders } from "hono/secure-headers";
+import type { Env, ClassificationJob } from "./types";
+import { analyticsLogger } from "./middleware/logger";
+import accounts from "./routes/accounts";
+import transactions from "./routes/transactions";
+import journalEntries from "./routes/journalEntries";
+import reconciliation from "./routes/reconciliation";
+import quickbooks from "./routes/quickbooks";
+import billing from "./routes/billing";
+import ai from "./routes/ai";
+import { BookkeepingAgent } from "./agents/BookkeepingAgent";
+import { ReconciliationAgent } from "./agents/ReconciliationAgent";
 
 const app = new Hono<{ Bindings: Env }>();
 
-app.use('*', cors({
-  origin: (origin) => origin,
-  credentials: true,
-}));
+// Global middleware
+app.use(
+  "*",
+  cors({
+    origin: [
+      "https://insighthunter.app",
+      "https://bookkeeping.insighthunter.app",
+    ],
+    credentials: true,
+  })
+);
+app.use("*", (c, next) => secureHeaders()(c, next));
+app.use("*", analyticsLogger);
 
 // Health check
-app.get('/health', (c) => {
-  return c.json({ status: 'healthy', timestamp: new Date().toISOString() });
-});
+app.get("/health", (c) =>
+  c.json({
+    status: "ok",
+    service: "insighthunter-bookkeeping",
+    time: new Date().toISOString(),
+  })
+);
 
-// NOTE: The X-Authenticated-User-Id header is added by the insighthunter-main gateway.
+// API routes (all prefixed with /api by the frontend hook)
+const api = app.basePath("/api");
+api.route("/accounts", accounts);
+api.route("/transactions", transactions);
+api.route("/journal-entries", journalEntries);
+api.route("/reconciliation", reconciliation);
+api.route("/quickbooks", quickbooks);
+api.route("/billing", billing);
+api.route("/ai", ai);
 
-// Subscription routes
-app.post('/api/subscriptions/create', async (c) => {
-  const userId = c.req.header('X-Authenticated-User-Id');
-  const { planId } = await c.req.json();
-  const id = c.env.SUBSCRIPTION_MANAGER.idFromName(userId);
-  const manager = c.env.SUBSCRIPTION_MANAGER.get(id);
-  return manager.fetch(c.req.raw);
-});
-
-app.get('/api/subscriptions/:userId', async (c) => {
-  const userId = c.req.param('userId'); // or from header
-  const id = c.env.SUBSCRIPTION_MANAGER.idFromName(userId);
-  const manager = c.env.SUBSCRIPTION_MANAGER.get(id);
-  return manager.fetch(c.req.raw);
-});
-
-app.post('/api/subscriptions/:userId/cancel', async (c) => {
-  const userId = c.req.param('userId'); // or from header
-  const id = c.env.SUBSCRIPTION_MANAGER.idFromName(userId);
-  const manager = c.env.SUBSCRIPTION_MANAGER.get(id);
-  return manager.fetch(c.req.raw);
-});
-
-// Stripe webhook
-app.post('/api/webhooks/stripe', async (c) => {
-  const id = c.env.SUBSCRIPTION_MANAGER.idFromName('webhook-handler');
-  const manager = c.env.SUBSCRIPTION_MANAGER.get(id);
-  return manager.fetch(c.req.raw);
-});
-
-// Bank connection routes
-app.all('/api/bank/*', async (c) => {
-  const userId = c.req.header('X-Authenticated-User-Id');
-  const id = c.env.BANK_CONNECTION_MANAGER.idFromName(userId);
-  const manager = c.env.BANK_CONNECTION_MANAGER.get(id);
-  return manager.fetch(c.req.raw);
-});
-
-// Ledger routes
-app.all('/api/ledger/:companyId/*', async (c) => {
-  const companyId = c.req.param('companyId');
-  const id = c.env.BOOKKEEPING_LEDGER.idFromName(companyId);
-  const ledger = c.env.BOOKKEEPING_LEDGER.get(id);
-  return ledger.fetch(c.req.raw);
-});
-
-// Invoice routes
-app.all('/api/invoices/:companyId/*', async (c) => {
-  const companyId = c.req.param('companyId');
-  const id = c.env.INVOICE_MANAGER.idFromName(companyId);
-  const manager = c.env.INVOICE_MANAGER.get(id);
-  return manager.fetch(c.req.raw);
-});
-
-// Spreadsheet upload routes
-app.post('/api/upload/spreadsheet', async (c) => {
-  const { companyId, file } = await c.req.parseBody();
-  
-  if (!(file instanceof File)) {
-    return c.json({ error: 'No file provided' }, 400);
+// Agent WebSocket endpoint for AI bookkeeping agent (one per org)
+app.get("/agent/bookkeeping", async (c) => {
+  if (c.req.header("Upgrade") !== "websocket") {
+    return c.json({ error: "Expected WebSocket upgrade" }, 426);
   }
 
-  const key = `${companyId}/${Date.now()}-${file.name}`;
-  await c.env.SPREADSHEET_UPLOADS.put(key, file.stream());
+  const orgId = c.req.query("org");
+  const token = c.req.query("token");
 
-  return c.json({ 
-    success: true, 
-    key,
-    name: file.name,
-    size: file.size,
-  });
-});
-
-app.get('/api/upload/spreadsheet/:key', async (c) => {
-  const key = c.req.param('key');
-  const object = await c.env.SPREADSHEET_UPLOADS.get(key);
-
-  if (!object) {
-    return c.json({ error: 'File not found' }, 404);
+  if (!orgId || !token) {
+    return c.json({ error: "Missing org or token" }, 400);
   }
 
-  return new Response(object.body, {
-    headers: {
-      'Content-Type': 'application/octet-stream',
-      'Content-Disposition': `attachment; filename="${key.split('/').pop()}"`,
-    },
+  // Validate token with auth worker before upgrading
+  const res = await fetch(`${c.env.AUTH_WORKER_URL}/api/session/validate`, {
+    headers: { Authorization: `Bearer ${token}` },
   });
+  if (!res.ok) {
+    return c.json({ error: "Invalid session" }, 401);
+  }
+
+  // Route WebSocket to the BookkeepingAgent DO using Agents runtime
+  const id = c.env.BOOKKEEPING_AGENT.idFromName(orgId);
+  const stub = c.env.BOOKKEEPING_AGENT.get(id);
+  return stub.fetch(c.req.raw);
 });
 
-export default app;
+// Queue consumer: classification jobs
+export default {
+  fetch: app.fetch,
+  // Cloudflare Queues consumer for CLASSIFICATION_QUEUE
+  async queue(batch: MessageBatch<ClassificationJob>, env: Env) {
+    for (const msg of batch.messages) {
+      try {
+        const job = msg.body;
+        const id = env.BOOKKEEPING_AGENT.idFromName(job.orgId);
+        const agent = env.BOOKKEEPING_AGENT.get(id);
+        // Call BookkeepingAgent's HTTP interface for classification
+        await agent.fetch("https://internal/classify", {
+          method: "POST",
+          body: JSON.stringify(job),
+        });
+      } catch (err) {
+        console.error("Classification queue error:", err);
+        msg.retry();
+      }
+    }
+  },
+} satisfies ExportedHandler<Env>;
+
+// Export Durable Object classes for Wrangler
+export { BookkeepingAgent, ReconciliationAgent };

@@ -1,23 +1,35 @@
+
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ES2022",
+    "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2022"],
-    "types": ["@cloudflare/workers-types"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
     "strict": true,
-    "noEmit": true,
     "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "exactOptionalPropertyTypes": false,
-    "skipLibCheck": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "types": ["@cloudflare/workers-types"],
     "paths": {
-      "@/*": ["./src/*"],
-      "@insighthunter/types": ["./src/types"]
+      "@backend/*": ["./src/backend/*"],
+      "@frontend/*": ["./src/frontend/*"]
     }
   },
-  "include": ["src/**/*.ts", "tests/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
-}
+
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { cloudflare } from "@cloudflare/vite-plugin";
+
+export default defineConfig({
+  plugins: [
+    cloudflare(),
+    react(),
+  ],
+  build: {
+    outDir: "dist/frontend",
+    rollupOptions: {
+      input: "src/frontend/index.html",
+    },
+  },
+});

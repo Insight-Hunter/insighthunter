@@ -1,134 +1,411 @@
-# Bizforma — InsightHunters Business Formation Assistant
-### Astro + Svelte + Hono + Cloudflare Workers PWA
+# 🚀 BizForma — Complete Business Formation App
+<<<<<<< HEAD
+=======
+
+> Part of the [InsightHunter](https://insighthunter.app) platform  
+> Located at: `apps/insighthunter-bizforma`
+
+BizForma is a full-featured, step-by-step business formation guide that walks entrepreneurs through every stage of starting a business — from conceptualization through launch — with legal compliance, tax setup, digital presence, and marketing built in.
+>>>>>>> 80e9ff9f4c6320f821152e2c4249d40a01aafc11
+
+> Part of the [InsightHunter](https://insighthunter.app) platform  
+> Located at: `apps/insighthunter-bizforma`
+
+<<<<<<< HEAD
+BizForma is a full-featured, step-by-step business formation guide that walks entrepreneurs through every stage of starting a business — from conceptualization through launch — with legal compliance, tax setup, digital presence, and marketing built in.
+
+-----
+=======
+## 📋 Features
+
+### 5 Phases / 23 Steps covering:
+
+| Phase | Steps |
+|-------|-------|
+| 💡 **Conceptualize** | Business idea, market research, business model canvas, name check, legal structure selection |
+| 📋 **Register** | State registration, EIN/federal tax ID, licenses & permits, registered agent, operating agreement |
+| 💰 **Finance & Tax** | Business bank account, accounting setup, federal tax (IRS), state tax, payroll, funding strategy |
+| 🌐 **Digital Presence** | Domain selection + DNS check, website platform, SEO strategy, social media setup |
+| 🚀 **Launch & Market** | Brand identity, marketing plan, launch readiness checklist |
+
+### Backend Features (Cloudflare Workers)
+- **Business name availability** check with AI-powered alternatives
+- **Real DNS domain availability** check across 7 TLDs
+- **AI document generation** (operating agreement outline, business plan summary, marketing strategy)
+- **Tax deadline calendar** with all federal + payroll deadlines
+- **Progress persistence** via KV (90-day TTL)
+- **Analytics tracking** via Analytics Engine
+- **Export progress** as JSON or text summary
 
 ---
 
-## Stack
+## 🏗️ Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | **Astro 5** (hybrid SSR/static) |
-| UI Components | **Svelte 5** (reactive, zero-bundle overhead) |
-| API Router | **Hono** (runs on Cloudflare Workers) |
-| AI | **Workers AI** (llama-3.1-8b-instruct) |
-| Database | **Cloudflare D1** (SQLite at the edge) |
-| Cache/Sessions | **Cloudflare KV** |
-| Document Storage | **Cloudflare R2** |
-| Styling | **Tailwind CSS v3** + CSS custom properties (Apple HIG tokens) |
-| PWA | Web App Manifest + Service Worker (offline-capable) |
-| Design | Apple Human Interface Guidelines — dark mode, SF Pro fonts, glass materials |
+| Frontend | React 18 + Framer Motion |
+| Design System | Apple Human Interface Guidelines |
+| Backend | Cloudflare Workers + Hono |
+| Storage | Cloudflare KV + D1 |
+| AI | Cloudflare Workers AI (Llama 3.1) |
+| Analytics | Cloudflare Analytics Engine |
+| Build | Vite 5 |
+| Deploy | Cloudflare Pages + Workers |
+>>>>>>> 80e9ff9f4c6320f821152e2c4249d40a01aafc11
 
----
+## 📋 Features
 
-## File Tree
+<<<<<<< HEAD
+### 5 Phases / 23 Steps covering:
 
+|Phase                 |Steps                                                                                            |
+|----------------------|-------------------------------------------------------------------------------------------------|
+|💡 **Conceptualize**   |Business idea, market research, business model canvas, name check, legal structure selection     |
+|📋 **Register**        |State registration, EIN/federal tax ID, licenses & permits, registered agent, operating agreement|
+|💰 **Finance & Tax**   |Business bank account, accounting setup, federal tax (IRS), state tax, payroll, funding strategy |
+|🌐 **Digital Presence**|Domain selection + DNS check, website platform, SEO strategy, social media setup                 |
+|🚀 **Launch & Market** |Brand identity, marketing plan, launch readiness checklist                                       |
+
+### Backend Features (Cloudflare Workers)
+
+- **Business name availability** check with AI-powered alternatives
+- **Real DNS domain availability** check across 7 TLDs
+- **AI document generation** (operating agreement outline, business plan summary, marketing strategy)
+- **Tax deadline calendar** with all federal + payroll deadlines
+- **Progress persistence** via KV (90-day TTL)
+- **Analytics tracking** via Analytics Engine
+- **Export progress** as JSON or text summary
+
+-----
+
+## 🏗️ Tech Stack
+
+|Layer        |Technology                       |
+|-------------|---------------------------------|
+|Frontend     |React 18 + Framer Motion         |
+|Design System|Apple Human Interface Guidelines |
+|Backend      |Cloudflare Workers + Hono        |
+|Storage      |Cloudflare KV + D1               |
+|AI           |Cloudflare Workers AI (Llama 3.1)|
+|Analytics    |Cloudflare Analytics Engine      |
+|Build        |Vite 5                           |
+|Deploy       |Cloudflare Pages + Workers       |
+
+-----
+
+## 🚀 Setup & Deployment
+
+### Prerequisites
+
+- Node.js 18+
+- Cloudflare account
+- Wrangler CLI: `npm install -g wrangler`
+
+### Step 1: Clone and Install
+=======
+## 🚀 Setup & Deployment
+
+### Prerequisites
+- Node.js 18+
+- Cloudflare account
+- Wrangler CLI: `npm install -g wrangler`
+
+### Step 1: Clone and Install
+```bash
+cd apps/insighthunter-bizforma
+npm install
 ```
-bizforma/
-├── astro.config.mjs              ← Astro + Svelte + Cloudflare adapter
-├── wrangler.jsonc                ← D1, KV, R2, AI, Assets bindings
-├── tailwind.config.js            ← Apple color tokens
-├── tsconfig.json
-├── schema.sql                    ← D1 database schema
-│
-├── worker/
-│   └── index.ts                  ← Hono API (all /api/* routes)
-│
-├── src/
-│   ├── pages/
-│   │   └── index.astro           ← Single entry page
-│   ├── layouts/
-│   │   └── Base.astro            ← PWA meta, Apple HIG CSS tokens, SW registration
-│   ├── stores/
-│   │   └── wizard.ts             ← Svelte reactive store (all 11 step state)
-│   ├── lib/
-│   │   └── api.ts                ← Frontend API client (fetch + stream)
-│   └── components/
-│       ├── WizardShell.svelte    ← Main shell: nav, progress, step routing, chat
-│       ├── ui/
-│       │   ├── ProgressBar.svelte  ← Apple-style sticky progress indicator
-│       │   ├── AiChat.svelte       ← Floating AI assistant (bottom sheet / side panel)
-│       │   └── GlassField.svelte   ← Reusable glass-morphism form field
-│       └── steps/
-│           ├── ConceptStep.svelte      ← Step 1: Business idea
-│           ├── NamingStep.svelte       ← Step 2: Name + AI suggestions
-│           ├── EntityStep.svelte       ← Step 3: Entity type + AI recommendation
-│           ├── RegistrationStep.svelte ← Step 4: State registration
-│           ├── EINTaxStep.svelte       ← Step 5: EIN + tax election
-│           ├── ComplianceStep.svelte   ← Step 6: State compliance
-│           ├── AccountingStep.svelte   ← Step 7: Accounting
-│           ├── FinancingStep.svelte    ← Step 8: Funding
-│           ├── MarketingStep.svelte    ← Step 9: Marketing
-│           ├── WebDesignStep.svelte    ← Step 10: Web & domain
-│           └── CalendarStep.svelte     ← Step 11: AI compliance calendar + .ics export
-│
-└── public/
-    ├── manifest.json             ← PWA manifest (installable)
-    ├── sw.js                     ← Service worker (offline support)
-    └── icons/                    ← App icons (add your own PNGs here)
+
+### Step 2: Authenticate Wrangler
+```bash
+wrangler login
 ```
 
----
+### Step 3: Create Cloudflare Resources
+```bash
+# Create D1 database
+wrangler d1 create bizforma
+# → Copy the database_id to wrangler.jsonc
 
-## Apple HIG Design Features
+# Create KV namespace
+wrangler kv namespace create BIZFORMA_KV
+# → Copy the id and preview_id to wrangler.jsonc
+```
 
-- **SF Pro system font** — uses `-apple-system, BlinkMacSystemFont` stack
-- **Dark mode by default** — `#0a0a14` background, white labels at varying opacities
-- **Glassmorphism** — `backdrop-filter: blur(20px)` nav + card surfaces
-- **Safe area insets** — `env(safe-area-inset-*)` for notch/home indicator
-- **Spring animations** — `cubic-bezier(0.34, 1.56, 0.64, 1)` for interactive elements
-- **Apple color system** — blue `#0a84ff`, green `#30d158`, orange `#ff9f0a`, etc.
-- **iOS toggle switches** — native-looking boolean toggles with spring transitions
-- **Bottom sheet** — AI chat presents as an iOS-style bottom sheet on mobile, side panel on desktop
-- **`100dvh`** — uses dynamic viewport height for proper mobile layout
-- **Haptic-style interactions** — `scale(0.96)` on button press
+### Step 4: Update wrangler.jsonc
+Replace the placeholder IDs with your actual resource IDs:
+```jsonc
+"kv_namespaces": [{
+  "binding": "BIZFORMA_KV",
+  "id": "YOUR_ACTUAL_KV_ID",          // ← replace
+  "preview_id": "YOUR_PREVIEW_KV_ID"  // ← replace
+}],
+"d1_databases": [{
+  "binding": "BIZFORMA_DB",
+  "database_name": "bizforma",
+  "database_id": "YOUR_ACTUAL_D1_ID"  // ← replace
+}]
+```
 
----
+### Step 5: Run Database Migrations
+```bash
+# Local development
+npm run db:migrate:local
 
-## Quick Start
+# Production
+npm run db:migrate
+```
+>>>>>>> 80e9ff9f4c6320f821152e2c4249d40a01aafc11
+
+### Step 6: Local Development
+```bash
+<<<<<<< HEAD
+cd apps/insighthunter-bizforma
+npm install
+```
+
+### Step 2: Authenticate Wrangler
 
 ```bash
-# Install
-npm install
+wrangler login
+```
 
-# Create Cloudflare resources
-npm run db:create      # D1 database
-npm run kv:create      # KV namespace
-npm run r2:create      # R2 bucket
-npm run db:init        # Initialize schema
+### Step 3: Create Cloudflare Resources
 
-# Update wrangler.jsonc with real IDs from above commands
+```bash
+# Create D1 database
+wrangler d1 create bizforma
+# → Copy the database_id to wrangler.jsonc
 
-# Set secrets
-wrangler secret put ANTHROPIC_API_KEY   # optional
+# Create KV namespace
+wrangler kv namespace create BIZFORMA_KV
+# → Copy the id and preview_id to wrangler.jsonc
+```
 
+### Step 4: Update wrangler.jsonc
+
+Replace the placeholder IDs with your actual resource IDs:
+
+```jsonc
+"kv_namespaces": [{
+  "binding": "BIZFORMA_KV",
+  "id": "YOUR_ACTUAL_KV_ID",          // ← replace
+  "preview_id": "YOUR_PREVIEW_KV_ID"  // ← replace
+}],
+"d1_databases": [{
+  "binding": "BIZFORMA_DB",
+  "database_name": "bizforma",
+  "database_id": "YOUR_ACTUAL_D1_ID"  // ← replace
+}]
+```
+
+### Step 5: Run Database Migrations
+
+```bash
 # Local development
-npm run dev            # Astro dev server (port 4321)
-npm run worker:dev     # Hono Worker (port 8787) — proxied by Vite
+npm run db:migrate:local
 
-# Deploy
+# Production
+npm run db:migrate
+```
+
+### Step 6: Local Development
+
+```bash
+npm run dev
+# Frontend: http://localhost:5173
+# Worker:   http://localhost:8787
+```
+
+### Step 7: Deploy to Production
+
+```bash
+npm run deploy
+=======
+npm run dev
+# Frontend: http://localhost:5173
+# Worker:   http://localhost:8787
+```
+
+### Step 7: Deploy to Production
+```bash
 npm run deploy
 ```
 
 ---
 
-## API Routes (Hono Worker)
+## 🔧 API Reference
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | /api/health | Health check |
-| POST | /api/session | Create/resume wizard session (KV) |
-| PUT | /api/session/:id | Save step progress (KV) |
-| POST | /api/business | Save business data (D1 + KV) |
-| GET | /api/business | Retrieve by name or ID |
-| POST | /api/ai/names | AI business name suggestions |
-| POST | /api/ai/entity | AI entity type recommendation |
-| POST | /api/ai/calendar | AI compliance calendar |
-| POST | /api/ai/chat | Streaming AI chat (SSE) |
-| POST | /api/documents/:id | Upload to R2 |
-| GET | /api/documents/:id/:file | Download from R2 |
-| GET | /api/compliance/:id | Get compliance events (D1) |
-| POST | /api/compliance/:id | Save compliance event (D1) |
+### `GET /api/health`
+Health check.
+
+### `POST /api/progress`
+Save form progress.
+```json
+{ "sessionId": "uuid", "businessName": "Acme LLC", "data": { ... } }
+```
+
+### `GET /api/progress/:sessionId`
+Load saved progress.
+
+### `POST /api/check-name`
+Check business name availability + AI suggestions.
+```json
+{ "name": "Acme Solutions", "state": "Delaware" }
+```
+
+### `POST /api/check-domain`
+Check domain availability across 7 TLDs via real DNS.
+```json
+{ "domain": "acmesolutions" }
+```
+
+### `GET /api/resources/:step`
+Get curated resources for a given step (e.g., `/api/resources/ein`).
+
+### `POST /api/generate-doc`
+AI-powered document generation.
+```json
+{
+  "docType": "operating_agreement",
+  "businessData": { "name": "Acme LLC", "state": "Delaware", "member_count": 2 }
+}
+```
+Supported docTypes: `operating_agreement`, `business_plan_summary`, `marketing_strategy`, `launch_checklist`
+
+### `GET /api/deadlines`
+Federal and payroll tax deadline calendar.
+
+### `POST /api/export`
+Export progress as a formatted summary.
 
 ---
 
-*Built by InsightHunters — making business formation simple.*
+## 📁 Project Structure
+
+>>>>>>> 80e9ff9f4c6320f821152e2c4249d40a01aafc11
+```
+apps/insighthunter-bizforma/
+├── src/
+│   ├── main.jsx        # React entry point
+│   ├── index.jsx       # BizForma React app (all 23 steps)
+│   └── worker.ts       # Cloudflare Worker API
+├── schema.sql          # D1 database schema
+├── wrangler.jsonc      # Cloudflare configuration
+├── vite.config.ts      # Vite build configuration
+├── package.json
+├── index.html
+└── README.md
+```
+
+---
+
+## ⚖️ Legal Disclaimer
+
+BizForma provides educational guidance and general information. It is not a substitute for advice from a licensed attorney, CPA, or financial advisor. Always consult qualified professionals for your specific business situation, especially for tax elections, contracts, and regulatory compliance.
+
+<<<<<<< HEAD
+-----
+
+## 🔧 API Reference
+
+### `GET /api/health`
+
+Health check.
+
+### `POST /api/progress`
+
+Save form progress.
+
+```json
+{ "sessionId": "uuid", "businessName": "Acme LLC", "data": { ... } }
+```
+
+### `GET /api/progress/:sessionId`
+
+Load saved progress.
+
+### `POST /api/check-name`
+
+Check business name availability + AI suggestions.
+
+```json
+{ "name": "Acme Solutions", "state": "Delaware" }
+```
+
+### `POST /api/check-domain`
+
+Check domain availability across 7 TLDs via real DNS.
+
+```json
+{ "domain": "acmesolutions" }
+```
+
+### `GET /api/resources/:step`
+
+Get curated resources for a given step (e.g., `/api/resources/ein`).
+
+### `POST /api/generate-doc`
+
+AI-powered document generation.
+
+```json
+{
+  "docType": "operating_agreement",
+  "businessData": { "name": "Acme LLC", "state": "Delaware", "member_count": 2 }
+}
+```
+
+Supported docTypes: `operating_agreement`, `business_plan_summary`, `marketing_strategy`, `launch_checklist`
+
+### `GET /api/deadlines`
+
+Federal and payroll tax deadline calendar.
+
+### `POST /api/export`
+
+Export progress as a formatted summary.
+
+-----
+
+## 📁 Project Structure
+
+```
+apps/insighthunter-bizforma/
+├── src/
+│   ├── main.jsx        # React entry point
+│   ├── index.jsx       # BizForma React app (all 23 steps)
+│   └── worker.ts       # Cloudflare Worker API
+├── schema.sql          # D1 database schema
+├── wrangler.jsonc      # Cloudflare configuration
+├── vite.config.ts      # Vite build configuration
+├── package.json
+├── index.html
+└── README.md
+```
+
+-----
+
+## ⚖️ Legal Disclaimer
+
+BizForma provides educational guidance and general information. It is not a substitute for advice from a licensed attorney, CPA, or financial advisor. Always consult qualified professionals for your specific business situation, especially for tax elections, contracts, and regulatory compliance.
+
+-----
+=======
+---
+>>>>>>> 80e9ff9f4c6320f821152e2c4249d40a01aafc11
+
+## 🔗 Useful Links
+
+- [IRS Small Business Center](https://www.irs.gov/businesses/small-businesses-self-employed)
+- [SBA Business Guide](https://www.sba.gov/business-guide)
+- [SCORE Free Mentoring](https://www.score.org)
+- [Cloudflare Workers Docs](https://developers.cloudflare.com/workers)
+
+<<<<<<< HEAD
+-----
+=======
+---
+>>>>>>> 80e9ff9f4c6320f821152e2c4249d40a01aafc11
+
+*Built with ❤️ by InsightHunter | [insighthunter.app](https://insighthunter.app)*
