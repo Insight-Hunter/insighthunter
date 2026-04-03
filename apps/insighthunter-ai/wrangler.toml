@@ -15,14 +15,13 @@ binding = "VECTORS"
 index_name = "insighthunter-insights"
 
 [[kv_namespaces]]
-binding = "SESSIONS"
-id = "REPLACE_WITH_SESSIONS_KV_ID"
-preview_id = "REPLACE_WITH_SESSIONS_KV_PREVIEW_ID"
+binding = "USAGE"
+id = "52a1b194a3eb423cb11b43170e536098"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-main"
-database_id = "REPLACE_WITH_D1_ID"
+database_id = "03f5086d-171b-417b-951c-01a043e067c2"
 migrations_dir = "../../apps/insighthunter-api/migrations"
 
 [durable_objects]

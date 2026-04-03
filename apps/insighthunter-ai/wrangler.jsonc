@@ -1,0 +1,26 @@
+{
+  "name": "insighthunter-ai",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "insighthunter-ai", "database_id": "REPLACE_AFTER_PROVISION" }
+  ],
+  "kv_namespaces": [
+    { "binding": "USAGE", "id": "REPLACE_AFTER_PROVISION" }
+  ],
+  "ai": { "binding": "AI" },
+  "vectorize": [
+    { "binding": "VECTORIZE", "index_name": "ih-financial-docs" }
+  ],
+  "analytics_engine_datasets": [
+    { "binding": "AI_EVENTS", "dataset": "ih_ai_events" }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production",
+    "EMBED_MODEL": "@cf/baai/bge-small-en-v1.5",
+    "CHAT_MODEL": "@cf/meta/llama-3.1-8b-instruct"
+  }
+  // Secrets: JWT_SECRET
+}

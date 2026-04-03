@@ -1,23 +1,38 @@
 {
-  "name": "insighthunter-api",
-  "version": "1.0.0",
+  "name": "insighthunter",
   "private": true,
+  "workspaces": [
+    "packages/@ih/types",
+    "packages/@ih/tier-config",
+    "packages/@ih/auth-client",
+    "apps/insighthunter-auth",
+    "apps/insighthunter-dispatch",
+    "apps/insighthunter-bookkeeping",
+    "apps/insighthunter-bizforma",
+    "apps/insighthunter-pbx",
+    "apps/insighthunter-payroll",
+    "apps/insighthunter-ai",
+    "apps/insighthunter-main",
+    "workers-for-platforms/tenant-base-worker"
+  ],
   "scripts": {
-    "dev":     "wrangler dev --local --persist-to .wrangler/state",
-    "deploy":  "wrangler deploy",
-    "deploy:preview": "wrangler deploy --env preview",
-    "db:migrate":     "wrangler d1 migrations apply insighthunter-main",
-    "db:migrate:preview": "wrangler d1 migrations apply insighthunter-preview --env preview",
-    "db:studio": "wrangler d1 studio insighthunter-main",
-    "tail":    "wrangler tail insighthunter-api",
-    "types":   "wrangler types"
-  },
-  "dependencies": {
-    "hono": "^4.6.0"
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "deploy": "bash scripts/deploy.sh",
+    "provision": "bash scripts/provision.sh",
+    "migrate": "bash scripts/migrate.sh",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250310.0",
-    "typescript": "^5.7.0",
-    "wrangler": "^4.0.0"
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3",
+    "wrangler": "^4.76.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "openssl": "^2.0.0"
   }
 }

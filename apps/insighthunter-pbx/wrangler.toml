@@ -15,8 +15,12 @@ new_classes = ["PBXRoom"]
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-pbx"
-database_id = "REPLACE_WITH_D1_ID"
+database_id = "ed35a395-88e3-4015-8b65-68a44973ea74"
 migrations_dir = "migrations"
+
+[[kv_namespaces]]
+binding = "CALL_STATE"
+id = "367a7407a51c4a049191d2c67675e032"
 
 [vars]
 ENVIRONMENT = "production"
