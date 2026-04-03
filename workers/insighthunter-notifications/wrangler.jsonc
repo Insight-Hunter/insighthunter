@@ -14,7 +14,7 @@
     { "binding": "ANALYTICS", "dataset": "insighthunter_events" }
   ],
   "vars": {
-    "AUTH_WORKER_URL": "https://insighthunter-auth.workers.dev",
+    "AUTH_WORKER_URL": "https://auth.insighthunter.app",
     "MAILCHANNELS_URL": "https://api.mailchannels.net/tx/v1/send",
     "FROM_EMAIL": "noreply@insighthunter.app",
     "FROM_NAME": "Insight Hunter"
