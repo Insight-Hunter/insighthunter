@@ -19,12 +19,11 @@ binding                 = "ASSETS"
 # ── KV Namespaces ────────────────────────────────────────────────────────────
 [[kv_namespaces]]
 binding    = "BIZFORMA_KV"
-id         = "YOUR_KV_NAMESPACE_ID"
-preview_id = "YOUR_KV_PREVIEW_NAMESPACE_ID"
+id         = "6529b00482d04c0fa4a0bfa52027c262"
+preview_id = "6529b00482d04c0fa4a0bfa52027c262"
 
 # ── D1 Database ──────────────────────────────────────────────────────────────
 [[d1_databases]]
-<<<<<<< HEAD
 binding = "DB"
 database_name = "bizforma-db"
 database_id = "a388931a-e89c-4860-8433-d02f4a478332"
@@ -48,7 +47,6 @@ class_name = "ComplianceAgent"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["FormationAgent", "ComplianceAgent"]
-=======
 binding       = "BIZFORMA_DB"
 database_name = "bizforma"
 database_id   = "YOUR_D1_DATABASE_ID"
@@ -56,7 +54,6 @@ database_id   = "YOUR_D1_DATABASE_ID"
 # ── Workers AI ───────────────────────────────────────────────────────────────
 [ai]
 binding = "AI"
->>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
 
 # ── Analytics Engine ─────────────────────────────────────────────────────────
 [[analytics_engine_datasets]]
