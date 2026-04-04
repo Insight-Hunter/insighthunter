@@ -177,11 +177,11 @@ app.get('/api/pbx/call-logs', async (c) => {
   const [{ results }, countRow] = await Promise.all([
     c.env.PBX_DB.prepare(
       `SELECT * FROM call_logs WHERE org_id=? ${clause} ORDER BY started_at DESC LIMIT ? OFFSET ?`,
-    ).bind(c.get('orgId'), limit, offset).all(),
+    ).bind(c.get('orgId'), ...(safeDir ? [safeDir] : []), limit, offset).all(),
 
     c.env.PBX_DB.prepare(
       `SELECT COUNT(*) AS total FROM call_logs WHERE org_id=? ${clause}`,
-    ).bind(c.get('orgId')).first<{ total: number }>(),
+    ).bind(c.get('orgId'), ...(safeDir ? [safeDir] : [])).first<{ total: number }>(),
   ]);
 
   return c.json({ data: results, page, limit, total: countRow?.total ?? 0 });
