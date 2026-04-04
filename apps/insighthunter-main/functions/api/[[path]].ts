@@ -1,10 +1,25 @@
-// Proxy all /api/* requests to the DISPATCH_WORKER service binding
-interface Env {
-  DISPATCH_WORKER: Fetcher;
-}
+export const onRequest: PagesFunction<{
+  AUTH_WORKER: Fetcher;
+  BOOKKEEPING_WORKER: Fetcher;
+  BIZFORMA_WORKER: Fetcher;
+  INSIGHTS_WORKER: Fetcher;
+}> = async ({ request, env, params }) => {
+  const url = new URL(request.url);
+  const path = (params.path as string[]).join('/');
 
-export const onRequest: PagesFunction<Env> = async (context) => {
-  const url = new URL(context.request.url);
-  // Forward unchanged — dispatch worker handles all auth + routing
-  return context.env.DISPATCH_WORKER.fetch(context.request);
+  // Route to specific workers based on the first path segment
+  if (path.startsWith('auth/')) {
+    return env.AUTH_WORKER.fetch(request);
+  }
+  if (path.startsWith('bookkeeping/')) {
+    return env.BOOKKEEPING_WORKER.fetch(request);
+  }
+  if (path.startsWith('bizforma/')) {
+    return env.BIZFORMA_WORKER.fetch(request);
+  }
+  if (path.startsWith('insights/')) {
+    return env.INSIGHTS_WORKER.fetch(request);
+  }
+
+  return new Response('Not Found', { status: 404 });
 };

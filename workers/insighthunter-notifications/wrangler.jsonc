@@ -1,0 +1,22 @@
+{
+  "name": "insighthunter-notifications",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "kv_namespaces": [
+    { "binding": "NOTIFS_KV", "id": "REPLACE_WITH_KV_ID", "preview_id": "REPLACE_WITH_KV_PREVIEW_ID" }
+  ],
+  "d1_databases": [
+    { "binding": "DB", "database_name": "insighthunter-db", "database_id": "REPLACE_WITH_D1_ID" }
+  ],
+  "analytics_engine_datasets": [
+    { "binding": "ANALYTICS", "dataset": "insighthunter_events" }
+  ],
+  "vars": {
+    "AUTH_WORKER_URL": "https://auth.insighthunter.app",
+    "MAILCHANNELS_URL": "https://api.mailchannels.net/tx/v1/send",
+    "FROM_EMAIL": "noreply@insighthunter.app",
+    "FROM_NAME": "Insight Hunter"
+  }
+}

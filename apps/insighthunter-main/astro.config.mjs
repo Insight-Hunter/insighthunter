@@ -7,6 +7,6 @@ export default defineConfig({
   adapter: cloudflare({ mode: 'advanced' }),
   integrations: [svelte()],
   vite: {
-    css: { preprocessorOptions: { scss: { additionalData: `@use '/src/styles/theme.scss' as *;` } } },
+    css: { preprocessorOptions: { scss: { additionalData: `@use '/src/styles/_vars.scss' as *;` } } },
   },
 });
