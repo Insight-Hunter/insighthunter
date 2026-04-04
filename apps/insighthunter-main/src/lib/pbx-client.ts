@@ -37,37 +37,6 @@ export interface Voicemail {
 export interface IVROption { digit: string; label: string; action: string; target: string; }
 export interface IVRConfig { greeting: string; options: IVROption[]; }
 
-export const pbxClient = {
-  // Extensions
-  listExtensions: () => api<{ data: Extension[] }>('/api/extensions'),
-  createExtension: (b: Partial<Extension>) => api<{ data: Extension }>('/api/extensions', { method: 'POST', body: JSON.stringify(b) }),
-  updateExtension: (id: string, b: Partial<Extension>) => api<{ ok: boolean }>(`/api/extensions/${id}`, { method: 'PUT', body: JSON.stringify(b) }),
-  deleteExtension: (id: string) => api<{ ok: boolean }>(`/api/extensions/${id}`, { method: 'DELETE' }),
-
-  // Phone Numbers
-  listNumbers: () => api<{ data: PhoneNumber[] }>('/api/numbers'),
-  searchNumbers: (area_code?: string) => api<unknown>('/api/numbers/search', { method: 'POST', body: JSON.stringify({ area_code }) }),
-  provisionNumber: (phone_number: string, friendly_name: string) =>
-    api<{ data: PhoneNumber }>('/api/numbers/provision', { method: 'POST', body: JSON.stringify({ phone_number, friendly_name }) }),
-  releaseNumber: (id: string) => api<{ ok: boolean }>(`/api/numbers/${id}`, { method: 'DELETE' }),
-
-  // Call Logs
-  listCallLogs: (page = 1) => api<{ data: CallLog[]; total: number; page: number }>(`/api/call-logs?page=${page}`),
-  callStats: () => api<{ data: { status: string; count: number; total_seconds: number }[] }>('/api/call-logs/stats'),
-
-  // Voicemail
-  listVoicemail: () => api<{ data: Voicemail[] }>('/api/voicemail'),
-  getVoicemailAudioUrl: (id: string) => `${PBX_BASE}/api/voicemail/${id}/audio`,
-  markRead: (id: string) => api<{ ok: boolean }>(`/api/voicemail/${id}/read`, { method: 'PUT' }),
-  deleteVoicemail: (id: string) => api<{ ok: boolean }>(`/api/voicemail/${id}`, { method: 'DELETE' }),
-
-  // IVR
-  getIVR: () => api<{ data: IVRConfig | null }>('/api/ivr'),
-  saveIVR: (config: IVRConfig) => api<{ ok: boolean }>('/api/ivr', { method: 'PUT', body: JSON.stringify(config) }),
-
-  // ─── Additions to apps/insighthunter-main/src/lib/pbx-client.ts ──────────────
-// Append below IVRConfig types
-
 export interface PBXSettings {
   // Business hours
   timezone:          string;
@@ -102,24 +71,38 @@ export interface PBXSettings {
   maxConcurrentCalls?:   number;
   ringTimeout?:          number;
 }
-// ─── Methods to add to PBXClient class ───────────────────────────────────────
 
-// GET /api/pbx/settings
-  async getSettings(): Promise<{ data: PBXSettings | null }> {
-  return this.request<{ data: PBXSettings | null }>('/api/pbx/settings');
-}
+export const pbxClient = {
+  // Extensions
+  listExtensions: () => api<{ data: Extension[] }>('/api/extensions'),
+  createExtension: (b: Partial<Extension>) => api<{ data: Extension }>('/api/extensions', { method: 'POST', body: JSON.stringify(b) }),
+  updateExtension: (id: string, b: Partial<Extension>) => api<{ ok: boolean }>(`/api/extensions/${id}`, { method: 'PUT', body: JSON.stringify(b) }),
+  deleteExtension: (id: string) => api<{ ok: boolean }>(`/api/extensions/${id}`, { method: 'DELETE' }),
 
-// PUT /api/pbx/settings
-async saveSettings(settings: PBXSettings): Promise<{ ok: boolean }> {
-  return this.request<{ ok: boolean }>('/api/pbx/settings', {
-    method: 'PUT',
-    body: JSON.stringify(settings),
-  });
-}
+  // Phone Numbers
+  listNumbers: () => api<{ data: PhoneNumber[] }>('/api/numbers'),
+  searchNumbers: (area_code?: string) => api<unknown>('/api/numbers/search', { method: 'POST', body: JSON.stringify({ area_code }) }),
+  provisionNumber: (phone_number: string, friendly_name: string) =>
+    api<{ data: PhoneNumber }>('/api/numbers/provision', { method: 'POST', body: JSON.stringify({ phone_number, friendly_name }) }),
+  releaseNumber: (id: string) => api<{ ok: boolean }>(`/api/numbers/${id}`, { method: 'DELETE' }),
+
+  // Call Logs
+  listCallLogs: (page = 1) => api<{ data: CallLog[]; total: number; page: number }>(`/api/call-logs?page=${page}`),
+  callStats: () => api<{ data: { status: string; count: number; total_seconds: number }[] }>('/api/call-logs/stats'),
+
+  // Voicemail
+  listVoicemail: () => api<{ data: Voicemail[] }>('/api/voicemail'),
+  getVoicemailAudioUrl: (id: string) => `${PBX_BASE}/api/voicemail/${id}/audio`,
+  markRead: (id: string) => api<{ ok: boolean }>(`/api/voicemail/${id}/read`, { method: 'PUT' }),
+  deleteVoicemail: (id: string) => api<{ ok: boolean }>(`/api/voicemail/${id}`, { method: 'DELETE' }),
+
+  // IVR
+  getIVR: () => api<{ data: IVRConfig | null }>('/api/ivr'),
+  saveIVR: (config: IVRConfig) => api<{ ok: boolean }>('/api/ivr', { method: 'PUT', body: JSON.stringify(config) }),
 
   // Settings
-  getSettings: () => api<{ data: Record<string, string> }>('/api/settings'),
-  saveSettings: (s: Record<string, string>) => api<{ ok: boolean }>('/api/settings', { method: 'PUT', body: JSON.stringify(s) }),
+  getSettings: () => api<{ data: PBXSettings | null }>('/api/pbx/settings'),
+  saveSettings: (settings: PBXSettings) => api<{ ok: boolean }>('/api/pbx/settings', { method: 'PUT', body: JSON.stringify(settings) }),
 
   // WebRTC
   getWebRTCToken: () => api<{ token: string }>('/api/webrtc-token'),

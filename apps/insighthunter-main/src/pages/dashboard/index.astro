@@ -1,79 +1,44 @@
 ---
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
-import type { AuthUser } from '@ih/types';
-const user = Astro.locals.user as AuthUser;
+import KPICard from '../../components/dashboard/KPICard.svelte';
+import RevenueChart from '../../components/dashboard/RevenueChart.svelte';
+import CashFlowChart from '../../components/dashboard/CashFlowChart.svelte';
+import ActivityFeed from '../../components/dashboard/ActivityFeed.svelte';
+import QuickActions from '../../components/dashboard/QuickActions.svelte';
 ---
-<DashboardLayout title="Overview">
-  <div class="overview">
-    <div class="kpi-grid">
-      {[
-        { label: 'Revenue MTD',   id: 'revenue',  icon: '↑', color: 'var(--color-success)' },
-        { label: 'Expenses MTD',  id: 'expenses', icon: '↓', color: 'var(--color-danger)' },
-        { label: 'Net Income',    id: 'net',      icon: '◈', color: 'var(--color-primary)' },
-        { label: 'Cash Balance',  id: 'cash',     icon: '◉', color: 'var(--taupe-500)' },
-      ].map(kpi => (
-        <div class="kpi-card">
-          <div class="kpi-card__label">{kpi.label}</div>
-          <div class="kpi-card__value" id={kpi.id} style={`color:${kpi.color}`}>—</div>
-          <div class="kpi-card__icon" style={`color:${kpi.color}`}>{kpi.icon}</div>
-        </div>
-      ))}
-    </div>
-
-    <div class="overview__grid">
-      <div class="card">
-        <h3 class="card__title">Revenue (last 6 months)</h3>
-        <div id="revenue-chart" class="chart-placeholder">Loading…</div>
-      </div>
-      <div class="card">
-        <h3 class="card__title">AI Insights</h3>
-        <div id="insights-list">
-          <p style="color:var(--color-text-muted);font-size:0.875rem;">Ask the AI CFO assistant to generate insights for your business.</p>
-          <a href="/dashboard/ai" class="btn btn--ghost btn--sm" style="margin-top:var(--space-4);">Open AI CFO →</a>
-        </div>
-      </div>
-    </div>
+<DashboardLayout title="Dashboard">
+  <h1 style="font-family:var(--font-display);font-size:var(--text-xl);font-style:italic;margin-bottom:var(--space-5);">Good morning.</h1>
+  <div class="kpi-grid">
+    <KPICard client:load label="Revenue" value="$24,850" delta={12.4} prefix="" />
+    <KPICard client:load label="Expenses" value="$11,200" delta={-3.1} />
+    <KPICard client:load label="Net Income" value="$13,650" delta={18.6} />
+    <KPICard client:load label="Cash Balance" value="$42,000" delta={5.2} />
+    <KPICard client:load label="Burn Rate" value="$11,200" delta={-3.1} suffix="/mo" />
+    <KPICard client:load label="Runway" value="3.8" delta={0.3} suffix=" months" />
   </div>
-
-  <script>
-    // Fetch KPI data from bookkeeping reports
-    async function loadKPIs() {
-      const token = localStorage.getItem('ih_access_token');
-      if (!token) return;
-      const now = new Date();
-      const from = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
-      const to = now.toISOString().slice(0,10);
-      try {
-        const [plRes, bsRes] = await Promise.all([
-          fetch(`/api/bookkeeping/reports/pl?from=${from}&to=${to}`, { headers: { Authorization: `Bearer ${token}` }}),
-          fetch(`/api/bookkeeping/reports/balance-sheet?as_of=${to}`, { headers: { Authorization: `Bearer ${token}` }}),
-        ]);
-        if (plRes.ok) {
-          const pl = await plRes.json() as { revenue: number; expenses: number; net_income: number };
-          const fmt = (n: number) => new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format(n);
-          document.getElementById('revenue')!.textContent = fmt(pl.revenue);
-          document.getElementById('expenses')!.textContent = fmt(pl.expenses);
-          document.getElementById('net')!.textContent = fmt(pl.net_income);
-        }
-        if (bsRes.ok) {
-          const bs = await bsRes.json() as { total_assets: number };
-          const fmt = (n: number) => new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format(n);
-          document.getElementById('cash')!.textContent = fmt(bs.total_assets);
-        }
-      } catch { /* silent fail — data loads when available */ }
-    }
-    loadKPIs();
-  </script>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5);">
+    <RevenueChart client:load data={[
+      {month:'Oct',revenue:20100,expenses:10200},
+      {month:'Nov',revenue:22400,expenses:11000},
+      {month:'Dec',revenue:21800,expenses:10800},
+      {month:'Jan',revenue:24850,expenses:11200},
+    ]} />
+    <CashFlowChart client:load data={[
+      {month:'Oct',balance:36000,forecast:false},
+      {month:'Nov',balance:38400,forecast:false},
+      {month:'Dec',balance:39600,forecast:false},
+      {month:'Jan',balance:42000,forecast:false},
+      {month:'Feb',balance:44200,forecast:true},
+      {month:'Mar',balance:46800,forecast:true},
+      {month:'Apr',balance:49100,forecast:true},
+    ]} />
+  </div>
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-5);">
+    <ActivityFeed client:load items={[
+      {id:'1',text:'CSV uploaded: Jan_transactions.csv',time:'2 hours ago',icon:'📤'},
+      {id:'2',text:'AI insight: Revenue up 12.4% MoM',time:'2 hours ago',icon:'🧠'},
+      {id:'3',text:'Report exported: January P&L.pdf',time:'Yesterday',icon:'📄'},
+    ]} />
+    <QuickActions client:load />
+  </div>
 </DashboardLayout>
-
-<style>
-  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-8); }
-  .kpi-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-5); position: relative; overflow: hidden; }
-  .kpi-card__label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: var(--space-2); }
-  .kpi-card__value { font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; }
-  .kpi-card__icon { position: absolute; top: var(--space-4); right: var(--space-4); font-size: 1.5rem; opacity: 0.3; }
-  .overview__grid { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6); }
-  .card__title { font-size: 0.875rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: var(--space-4); }
-  .chart-placeholder { height: 200px; display: flex; align-items: center; justify-content: center; color: var(--color-text-subtle); font-size: 0.875rem; background: var(--color-bg-subtle); border-radius: var(--radius-md); }
-  @media (max-width: 768px) { .overview__grid { grid-template-columns: 1fr; } }
-</style>

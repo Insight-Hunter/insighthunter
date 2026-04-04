@@ -1,10 +1,10 @@
 ---
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
 import TierGate from '../../components/dashboard/TierGate.astro';
-import BizFormaApp from '../../components/dashboard/BizFormaApp.svelte';
+import WizardShell from '../../components/dashboard/bizforma/WizardShell.svelte';
 ---
 <DashboardLayout title="BizForma">
   <TierGate required="standard">
-    <BizFormaApp client:load />
+    <WizardShell client:load />
   </TierGate>
 </DashboardLayout>
