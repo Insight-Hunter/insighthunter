@@ -377,26 +377,29 @@ app.post('/webhook/telnyx', async (c) => {
   const rawBody   = await c.req.text();
 
   // Ed25519 signature verification
-  if (sig && c.env.TELNYX_WEBHOOK_SECRET) {
-    try {
-      const pubKey = await crypto.subtle.importKey(
-        'raw',
-        Uint8Array.from(atob(c.env.TELNYX_WEBHOOK_SECRET), ch => ch.charCodeAt(0)),
-        { name: 'Ed25519', namedCurve: 'Ed25519' },
-        false,
-        ['verify'],
-      );
-      const sigBytes = Uint8Array.from(atob(sig), ch => ch.charCodeAt(0));
-      const valid    = await crypto.subtle.verify(
-        'Ed25519', pubKey,
-        sigBytes,
-        new TextEncoder().encode(`${timestamp}|${rawBody}`),
-      );
-      if (!valid) return c.json({ error: 'Invalid signature' }, 401);
-    } catch (e) {
-      console.error('Webhook signature error:', e);
-      return c.json({ error: 'Signature verification failed' }, 401);
-    }
+  // Ed25519 signature verification
+  if (!sig || !c.env.TELNYX_WEBHOOK_SECRET) {
+    return c.json({ error: 'Missing signature or webhook secret' }, 401);
+  }
+
+  try {
+    const pubKey = await crypto.subtle.importKey(
+      'raw',
+      Uint8Array.from(atob(c.env.TELNYX_WEBHOOK_SECRET), ch => ch.charCodeAt(0)),
+      { name: 'Ed25519', namedCurve: 'Ed25519' },
+      false,
+      ['verify'],
+    );
+    const sigBytes = Uint8Array.from(atob(sig), ch => ch.charCodeAt(0));
+    const valid    = await crypto.subtle.verify(
+      'Ed25519', pubKey,
+      sigBytes,
+      new TextEncoder().encode(`${timestamp}|${rawBody}`),
+    );
+    if (!valid) return c.json({ error: 'Invalid signature' }, 401);
+  } catch (e) {
+    console.error('Webhook signature error:', e);
+    return c.json({ error: 'Signature verification failed' }, 401);
   }
 
   const event = JSON.parse(rawBody) as {
