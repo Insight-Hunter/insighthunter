@@ -1,8 +1,13 @@
 #!/bin/bash
 set -e
 # Run once after provisioning to set the shared JWT_SECRET on all workers.
+<<<<<<< HEAD
+CLOUDFLARE_API_TOKEN="
+JWT_SECRET="5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777)"
+=======
 
 JWT_SECRET=$(openssl rand -base64 48)
+>>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
 echo "Generated JWT_SECRET. Applying to all workers..."
 
 for app in insighthunter-auth insighthunter-dispatch insighthunter-bookkeeping insighthunter-bizforma insighthunter-pbx insighthunter-payroll insighthunter-ai; do

@@ -9,13 +9,22 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+<<<<<<< HEAD
+    "@ih/auth-client": "*",
+    "@ih/types": "*",
+=======
     "@ih/types": "*",
     "@ih/auth-client": "*",
+>>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
     "hono": "^4.7.4"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250310.0",
     "typescript": "^5.7.3",
+<<<<<<< HEAD
+    "wrangler": "^4.76.0"
+=======
     "wrangler": "^3.109.3"
+>>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
   }
 }

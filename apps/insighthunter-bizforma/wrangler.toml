@@ -24,6 +24,31 @@ preview_id = "YOUR_KV_PREVIEW_NAMESPACE_ID"
 
 # ── D1 Database ──────────────────────────────────────────────────────────────
 [[d1_databases]]
+<<<<<<< HEAD
+binding = "DB"
+database_name = "bizforma-db"
+database_id = "a388931a-e89c-4860-8433-d02f4a478332"
+
+[[r2_buckets]]
+binding = "R2_DOCS"
+bucket_name = "bizforma-documents"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "af7391791e95423b82c1cd877c0992e3"
+
+[[durable_objects.bindings]]
+name = "FORMATION_AGENT"
+class_name = "FormationAgent"
+
+[[durable_objects.bindings]]
+name = "COMPLIANCE_AGENT"
+class_name = "ComplianceAgent"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["FormationAgent", "ComplianceAgent"]
+=======
 binding       = "BIZFORMA_DB"
 database_name = "bizforma"
 database_id   = "YOUR_D1_DATABASE_ID"
@@ -31,6 +56,7 @@ database_id   = "YOUR_D1_DATABASE_ID"
 # ── Workers AI ───────────────────────────────────────────────────────────────
 [ai]
 binding = "AI"
+>>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
 
 # ── Analytics Engine ─────────────────────────────────────────────────────────
 [[analytics_engine_datasets]]
