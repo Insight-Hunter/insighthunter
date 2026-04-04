@@ -190,15 +190,17 @@ app.get('/api/pbx/call-logs', async (c) => {
 // ── Voicemails ────────────────────────────────────────────────────────────────
 app.get('/api/pbx/voicemails', async (c) => {
   const unreadOnly = new URL(c.req.url).searchParams.get('unread') === '1';
+  const unreadOnly = new URL(c.req.url).searchParams.get('unread') === '1';
   const clause     = unreadOnly ? 'AND read_at IS NULL' : '';
 
-  const { results } = await c.env.PBX_DB.prepare(`
+  const query = `
     SELECT id, from_number, to_number, duration_seconds, transcript, read_at, created_at
     FROM voicemails
     WHERE org_id=? ${clause}
     ORDER BY created_at DESC
     LIMIT 100
-  `).bind(c.get('orgId')).all();
+  `;
+  const { results } = await c.env.PBX_DB.prepare(query).bind(c.get('orgId')).all();
 
   return c.json({ data: results });
 });
