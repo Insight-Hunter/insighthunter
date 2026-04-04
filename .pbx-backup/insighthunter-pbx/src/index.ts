@@ -171,7 +171,8 @@ app.get('/api/pbx/call-logs', async (c) => {
   const offset    = (page - 1) * limit;
 
   const safeDir = direction === 'inbound' || direction === 'outbound' ? direction : null;
-  const clause  = safeDir ? `AND direction = '${safeDir}'` : '';
+  const clause  = safeDir ? 'AND direction = ?' : '';
+  const clauseBindings = safeDir ? [safeDir] : [];
 
   const [{ results }, countRow] = await Promise.all([
     c.env.PBX_DB.prepare(
