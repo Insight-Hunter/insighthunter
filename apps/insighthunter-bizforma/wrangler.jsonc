@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
 {
   "name": "insighthunter-bizforma",
   "main": "src/index.ts",
@@ -31,6 +34,8 @@
     "BOOKKEEPING_WORKER_URL": "https://insighthunter-bookkeeping.ACCOUNT.workers.dev"
   }
   // Secrets: JWT_SECRET
+<<<<<<< HEAD
+=======
 =======
 // wrangler.jsonc — BizForma Cloudflare Worker Configuration
 {
@@ -97,4 +102,5 @@
     "local_protocol": "http"
   }
 >>>>>>> bdb8d72bac05a30df17d5344c730aa98817b96d4
+>>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
 }

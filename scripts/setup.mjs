@@ -24,18 +24,18 @@ let   written = 0;
 function w(path, content) {
   const full = join(ROOT, path);
   mkdirSync(dirname(full), { recursive: true });
-  writeFileSync(full, content.replace(/^\n/, ''));
+  writeFileSync(full, content.replace(/^\\n/, ''));
   written++;
-  process.stdout.write(`  ✓  ${path}\n`);
+  process.stdout.write(`  ✓  ${path}\\n`);
 }
 
-console.log('\n🚀  InsightHunter Monorepo Bootstrap\n');
+console.log('\\n🚀  InsightHunter Monorepo Bootstrap\\n');
 
 // ══════════════════════════════════════════════════════════════
 //  ROOT
 // ══════════════════════════════════════════════════════════════
 
-w('package.json', `\
+w('package.json', `\\
 {
   "name": "insighthunter",
   "private": true,
@@ -50,7 +50,7 @@ w('package.json', `\
 }
 `);
 
-w('.gitignore', `\
+w('.gitignore', `\\
 node_modules
 dist
 .wrangler
@@ -60,7 +60,7 @@ dist
 *.env.local
 `);
 
-w('README.md', `\
+w('README.md', `\\
 # InsightHunter Monorepo
 
 | App | Purpose | Stack |
@@ -70,25 +70,25 @@ w('README.md', `\
 | insighthunter-bizforma | Business formation + compliance | Hono, D1, DO |
 
 ## Quick Start
-\`\`\`bash
+\\`\\`\\`bash
 node setup.mjs --install
 cd insighthunter
 npm run dev:main
-\`\`\`
+\\`\\`\\`
 
 ## Deploy
-\`\`\`bash
+\\`\\`\\`bash
 npm run deploy
-\`\`\`
+\\`\\`\\`
 `);
 
 // ══════════════════════════════════════════════════════════════
 //  APP: insighthunter-bookkeeping
 // ══════════════════════════════════════════════════════════════
 
-console.log('\n📒  insighthunter-bookkeeping\n');
+console.log('\\n📒  insighthunter-bookkeeping\\n');
 
-w('apps/insighthunter-bookkeeping/package.json', `\
+w('apps/insighthunter-bookkeeping/package.json', `\\
 {
   "name": "insighthunter-bookkeeping",
   "version": "1.0.0",
@@ -109,7 +109,7 @@ w('apps/insighthunter-bookkeeping/package.json', `\
 }
 `);
 
-w('apps/insighthunter-bookkeeping/tsconfig.json', `\
+w('apps/insighthunter-bookkeeping/tsconfig.json', `\\
 {
   "compilerOptions": {
     "target": "ES2022",
@@ -125,7 +125,7 @@ w('apps/insighthunter-bookkeeping/tsconfig.json', `\
 }
 `);
 
-w('apps/insighthunter-bookkeeping/wrangler.jsonc', `\
+w('apps/insighthunter-bookkeeping/wrangler.jsonc', `\\
 {
   "name": "insighthunter-bookkeeping",
   "main": "src/index.ts",
@@ -161,7 +161,7 @@ w('apps/insighthunter-bookkeeping/wrangler.jsonc', `\
 }
 `);
 
-w('apps/insighthunter-bookkeeping/src/db/schema.sql', `\
+w('apps/insighthunter-bookkeeping/src/db/schema.sql', `\\
 -- Chart of Accounts
 CREATE TABLE IF NOT EXISTS bookkeeping_accounts (
   id          TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
@@ -220,7 +220,7 @@ CREATE TABLE IF NOT EXISTS attachments (
 CREATE INDEX IF NOT EXISTS idx_attach_txn ON attachments(transaction_id);
 `);
 
-w('apps/insighthunter-bookkeeping/src/index.ts', `\
+w('apps/insighthunter-bookkeeping/src/index.ts', `\\
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { jwt } from 'hono/jwt';
@@ -269,8 +269,8 @@ const DEFAULT_COA: Array<{ code: string; name: string; type: AccountType; subtyp
   { code: '2200', name: 'Sales Tax Payable',        type: 'LIABILITY', subtype: 'Current'   },
   { code: '2300', name: 'Payroll Liabilities',      type: 'LIABILITY', subtype: 'Current'   },
   { code: '2500', name: 'Long-Term Debt',           type: 'LIABILITY', subtype: 'LongTerm'  },
-  { code: '3000', name: "Owner's Equity",           type: 'EQUITY',    subtype: 'Equity'    },
-  { code: '3100', name: "Owner's Draw",             type: 'EQUITY',    subtype: 'Equity'    },
+  { code: '3000', name: "Owner\\'s Equity",           type: 'EQUITY',    subtype: 'Equity'    },
+  { code: '3100', name: "Owner\\'s Draw",             type: 'EQUITY',    subtype: 'Equity'    },
   { code: '3200', name: 'Retained Earnings',        type: 'EQUITY',    subtype: 'Equity'    },
   { code: '4000', name: 'Revenue',                  type: 'REVENUE',   subtype: 'Operating' },
   { code: '4100', name: 'Service Revenue',          type: 'REVENUE',   subtype: 'Operating' },
@@ -517,7 +517,7 @@ app.post('/attachments/:txnId', async (c) => {
   const file = fd.get('file') as File | null;
   if (!file) return c.json({ error: 'No file' }, 400);
   const key = 'receipts/' + orgId + '/' + txnId + '/' + crypto.randomUUID() + '-' + file.name;
-  await c.env.RECEIPTS.put(key, await file.arrayBuffer(), { httpMeta { contentType: file.type }, customMeta { orgId, txnId } });
+  await c.env.RECEIPTS.put(key, await file.arrayBuffer(), { httpMeta: { contentType: file.type }, customMeta: { orgId, txnId } });
   const row = await c.env.DB.prepare('INSERT INTO attachments (org_id,transaction_id,r2_key,filename,size) VALUES (?,?,?,?,?) RETURNING *').bind(orgId, txnId, key, file.name, file.size).first();
   return c.json({ attachment: row }, 201);
 });
@@ -560,7 +560,7 @@ app.get('/reports/trial-balance', async (c) => {
   const cached = await c.env.REPORT_CACHE.get(key, 'json');
   if (cached) return c.json(cached);
   const { results } = await c.env.DB.prepare(
-    'SELECT ba.id,ba.code,ba.name,ba.type,ba.subtype,COALESCE(SUM(tl.debit),0) as total_debit,COALESCE(SUM(tl.credit),0) as total_credit,COALESCE(SUM(tl.debit),0)-COALESCE(SUM(tl.credit),0) as balance FROM bookkeeping_accounts ba LEFT JOIN transaction_lines tl ON tl.account_id=ba.id LEFT JOIN transactions t ON t.id=tl.transaction_id AND t.status=\'POSTED\' AND t.date<=? AND t.org_id=? WHERE ba.org_id=? AND ba.is_active=1 GROUP BY ba.id ORDER BY ba.code,ba.name'
+    'SELECT ba.id,ba.code,ba.name,ba.type,ba.subtype,COALESCE(SUM(tl.debit),0) as total_debit,COALESCE(SUM(tl.credit),0) as total_credit,COALESCE(SUM(tl.debit),0)-COALESCE(SUM(tl.credit),0) as balance FROM bookkeeping_accounts ba LEFT JOIN transaction_lines tl ON tl.account_id=ba.id LEFT JOIN transactions t ON t.id=tl.transaction_id AND t.status=\\'POSTED\\' AND t.date<=? AND t.org_id=? WHERE ba.org_id=? AND ba.is_active=1 GROUP BY ba.id ORDER BY ba.code,ba.name'
   ).bind(as_of, orgId, orgId).all();
   const report = { as_of, generated_at: new Date().toISOString(), rows: results };
   await c.env.REPORT_CACHE.put(key, JSON.stringify(report), { expirationTtl: 300 });
@@ -610,9 +610,9 @@ export default app;
 //  APP: insighthunter-bizforma
 // ══════════════════════════════════════════════════════════════
 
-console.log('\n🏢  insighthunter-bizforma\n');
+console.log('\\n🏢  insighthunter-bizforma\\n');
 
-w('apps/insighthunter-bizforma/package.json', `\
+w('apps/insighthunter-bizforma/package.json', `\\
 {
   "name": "insighthunter-bizforma",
   "version": "1.0.0",
@@ -633,7 +633,7 @@ w('apps/insighthunter-bizforma/package.json', `\
 }
 `);
 
-w('apps/insighthunter-bizforma/tsconfig.json', `\
+w('apps/insighthunter-bizforma/tsconfig.json', `\\
 {
   "compilerOptions": {
     "target": "ES2022",
@@ -648,7 +648,7 @@ w('apps/insighthunter-bizforma/tsconfig.json', `\
 }
 `);
 
-w('apps/insighthunter-bizforma/wrangler.jsonc', `\
+w('apps/insighthunter-bizforma/wrangler.jsonc', `\\
 {
   "name": "insighthunter-bizforma",
   "main": "src/index.ts",
@@ -694,7 +694,7 @@ w('apps/insighthunter-bizforma/wrangler.jsonc', `\
 }
 `);
 
-w('apps/insighthunter-bizforma/src/db/schema.sql', `\
+w('apps/insighthunter-bizforma/src/db/schema.sql', `\\
 CREATE TABLE IF NOT EXISTS formation_cases (
   id            TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
   org_id        TEXT NOT NULL,
@@ -752,7 +752,7 @@ CREATE TABLE IF NOT EXISTS compliance_events (
 CREATE INDEX IF NOT EXISTS idx_ce_org_due ON compliance_events(org_id, due_date);
 `);
 
-w('apps/insighthunter-bizforma/src/types.ts', `\
+w('apps/insighthunter-bizforma/src/types.ts', `\\
 export interface Env {
   DB: D1Database;
   DOCUMENTS: R2Bucket;
@@ -780,7 +780,7 @@ export interface ComplianceEvent {
 }
 `);
 
-w('apps/insighthunter-bizforma/src/utils/entityMatrix.ts', `\
+w('apps/insighthunter-bizforma/src/utils/entityMatrix.ts', `\\
 // Scoring weights for entity type recommendation
 interface Answer { key: string; value: string; }
 
@@ -811,13 +811,13 @@ export function scoreEntity(answers: Answer[]): Array<{ type: string; score: num
   const scores: Record<string, number> = { SOLE_PROP: 0, LLC: 0, S_CORP: 0, C_CORP: 0, PARTNERSHIP: 0 };
   for (const { key, value } of answers) {
     const w = WEIGHTS[key]?.[value];
-    if (w) Object.entries(w).forEach(([type, pts]) => { scores[type] = (scores[type] ?? 0) + pts; });
+    if (w) Object.entries(w).forEach(([type, pts]) => { scores[type] = (scores[type] ?? 0) + (pts ?? 0); });
   }
   return Object.entries(scores).sort((a, b) => b[1] - a[1]).map(([type, score]) => ({ type, score }));
 }
 `);
 
-w('apps/insighthunter-bizforma/src/utils/stateRules.ts', `\
+w('apps/insighthunter-bizforma/src/utils/stateRules.ts', `\\
 // Per-state filing fees and timelines
 export interface StateRule {
   name: string; fee: number; timeline_days: number; annual_report: boolean; annual_fee: number;
@@ -841,7 +841,7 @@ export function getStateRule(code: string): StateRule | null {
 }
 `);
 
-w('apps/insighthunter-bizforma/src/services/bookkeepingHandoffService.ts', `\
+w('apps/insighthunter-bizforma/src/services/bookkeepingHandoffService.ts', `\\
 import type { Env } from '../types';
 
 export async function seedBookkeepingCoA(orgId: string, env: Env): Promise<void> {
@@ -858,7 +858,7 @@ export async function seedBookkeepingCoA(orgId: string, env: Env): Promise<void>
 }
 `);
 
-w('apps/insighthunter-bizforma/src/agents/FormationAgent.ts', `\
+w('apps/insighthunter-bizforma/src/agents/FormationAgent.ts', `\\
 import { DurableObject } from 'cloudflare:workers';
 import type { Env } from '../types';
 
@@ -902,7 +902,7 @@ export class FormationAgent extends DurableObject<Env> {
 }
 `);
 
-w('apps/insighthunter-bizforma/src/agents/ComplianceAgent.ts', `\
+w('apps/insighthunter-bizforma/src/agents/ComplianceAgent.ts', `\\
 import { DurableObject } from 'cloudflare:workers';
 import type { Env } from '../types';
 
@@ -926,7 +926,7 @@ export class ComplianceAgent extends DurableObject<Env> {
 }
 `);
 
-w('apps/insighthunter-bizforma/src/index.ts', `\
+w('apps/insighthunter-bizforma/src/index.ts', `\\
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { jwt } from 'hono/jwt';
@@ -1112,7 +1112,7 @@ app.post('/documents/upload', async (c) => {
   const caseId = fd.get('case_id') as string | null;
   if (!file) return c.json({ error: 'No file' }, 400);
   const key = 'docs/' + orgId + '/' + (caseId ?? 'general') + '/' + crypto.randomUUID() + '-' + file.name;
-  await c.env.DOCUMENTS.put(key, await file.arrayBuffer(), { httpMeta { contentType: file.type }, customMeta { orgId, caseId: caseId ?? '' } });
+  await c.env.DOCUMENTS.put(key, await file.arrayBuffer(), { httpMeta: { contentType: file.type }, customMeta: { orgId, caseId: caseId ?? '' } });
   return c.json({ key, filename: file.name, size: file.size }, 201);
 });
 
@@ -1132,9 +1132,9 @@ export default app;
 //  APP: insighthunter-main (Astro + Svelte)
 // ══════════════════════════════════════════════════════════════
 
-console.log('\n🌐  insighthunter-main\n');
+console.log('\\n🌐  insighthunter-main\\n');
 
-w('apps/insighthunter-main/package.json', `\
+w('apps/insighthunter-main/package.json', `\\
 {
   "name": "insighthunter-main",
   "version": "1.0.0",
@@ -1159,7 +1159,7 @@ w('apps/insighthunter-main/package.json', `\
 }
 `);
 
-w('apps/insighthunter-main/tsconfig.json', `\
+w('apps/insighthunter-main/tsconfig.json', `\\
 {
   "compilerOptions": {
     "target": "ES2022",
@@ -1175,7 +1175,7 @@ w('apps/insighthunter-main/tsconfig.json', `\
 }
 `);
 
-w('apps/insighthunter-main/astro.config.mjs', `\
+w('apps/insighthunter-main/astro.config.mjs', `\\
 import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 import svelte from '@astrojs/svelte';
@@ -1190,7 +1190,7 @@ export default defineConfig({
 });
 `);
 
-w('apps/insighthunter-main/wrangler.jsonc', `\
+w('apps/insighthunter-main/wrangler.jsonc', `\\
 {
   "name": "insighthunter-main",
   "pages_build_output_dir": "dist",
@@ -1209,7 +1209,7 @@ w('apps/insighthunter-main/wrangler.jsonc', `\
 
 // ── Styles ───────────────────────────────────────────────────────────────────
 
-w('apps/insighthunter-main/src/styles/theme.scss', `\
+w('apps/insighthunter-main/src/styles/theme.scss', `\\
 // ─── Sandtaupe Palette ────────────────────────────────────────────────────────
 :root {
   // Sand tones
@@ -1277,7 +1277,7 @@ w('apps/insighthunter-main/src/styles/theme.scss', `\
 }
 `);
 
-w('apps/insighthunter-main/src/styles/globals.scss', `\
+w('apps/insighthunter-main/src/styles/globals.scss', `\\
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { font-size: 16px; -webkit-font-smoothing: antialiased; }
@@ -1310,7 +1310,7 @@ input:focus, select:focus, textarea:focus {
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-w('apps/insighthunter-main/src/types/index.ts', `\
+w('apps/insighthunter-main/src/types/index.ts', `\\
 export interface AuthUser {
   id: string;
   email: string;
@@ -1338,3 +1338,237 @@ export interface AppDefinition {
   icon: string;
   route: string;
   tier: string[];
+}
+`);
+
+// ── App Data ─────────────────────────────────────────────────────────────────
+
+w('apps/insighthunter-main/src/data/apps.ts', `\\
+import type { AppDefinition } from '../types';
+
+export const APPS: AppDefinition[] = [
+  { slug: 'dashboard',   name: 'Dashboard',   description: 'Central command',    icon: '📊', route: '/dashboard',      tier: ['free', 'lite', 'standard', 'pro'] },
+  { slug: 'bookkeeping', name: 'Bookkeeping', description: 'Financial records',  icon: '📚', route: '/bookkeeping',    tier: ['lite', 'standard', 'pro'] },
+  { slug: 'payroll',     name: 'Payroll',     description: 'Manage employees',   icon: '💰', route: '/payroll',        tier: ['standard', 'pro'] },
+  { slug: 'reports',     name: 'Reports',     description: 'Financial insights', icon: '📈', route: '/reports',        tier: ['standard', 'pro'] },
+  { slug: 'bizforma',    name: 'BizForma',    description: 'Form a company',     icon: '🏢', route: '/bizforma/start', tier: ['free', 'lite', 'standard', 'pro'] },
+  { slug: 'ai',          name: 'InsightAI',   description: 'AI assistant',       icon: '🤖', route: '/ai/chat',        tier: ['pro'] },
+];
+`);
+
+// ── Marketing & Dashboard Pages ──────────────────────────────────────────────
+
+w('apps/insighthunter-main/src/pages/index.astro', `\\
+---
+import MainLayout from '../layouts/MainLayout.astro';
+---
+<MainLayout title="InsightHunter">
+  <h1>Welcome to InsightHunter</h1>
+  <p>Business intelligence at your fingertips.</p>
+  <a href="/dashboard">Go to Dashboard</a>
+</MainLayout>
+`);
+
+w('apps/insighthunter-main/src/pages/dashboard/index.astro', `\\
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+import AppGrid from '../../components/AppGrid.svelte';
+import { APPS } from '../../data/apps';
+---
+<AppLayout title="Dashboard">
+  <h2>Applications</h2>
+  <AppGrid apps={APPS} client:load />
+</AppLayout>
+`);
+
+w('apps/insighthunter-main/src/layouts/MainLayout.astro', `\\
+---
+interface Props { title: string; }
+const { title } = Astro.props;
+import '../styles/globals.scss';
+---
+<!doctype html>
+<html>
+  <head>
+    <title>{title}</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/login">Login</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>
+`);
+
+w('apps/insighthunter-main/src/layouts/AppLayout.astro', `\\
+---
+interface Props { title: string; }
+const { title } = Astro.props;
+import '../styles/globals.scss';
+import Sidebar from '../components/Sidebar.svelte';
+---
+<!doctype html>
+<html>
+  <head>
+    <title>{title} | InsightHunter</title>
+  </head>
+  <body>
+    <div class="app-container">
+      <Sidebar client:load />
+      <main class="app-content">
+        <slot />
+      </main>
+    </div>
+    <style>
+      .app-container { display: flex; }
+      .app-content { flex-grow: 1; padding: var(--space-8); }
+    </style>
+  </body>
+</html>
+`);
+
+// ── Svelte Components ────────────────────────────────────────────────────────
+
+w('apps/insighthunter-main/src/components/AppGrid.svelte', `\\
+<script lang="ts">
+  import type { AppDefinition } from '../types';
+  export let apps: AppDefinition[];
+</script>
+
+<div class="grid">
+  {#each apps as app}
+    <a href={app.route} class="card">
+      <span class="icon">{app.icon}</span>
+      <h3>{app.name}</h3>
+      <p>{app.description}</p>
+    </a>
+  {/each}
+</div>
+
+<style lang="scss">
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+.card {
+  display: block;
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+}
+.icon { font-size: var(--text-3xl); }
+h3 { margin-top: var(--space-2); }
+p { color: var(--color-muted); font-size: var(--text-sm); }
+</style>
+`);
+
+w('apps/insighthunter-main/src/components/Sidebar.svelte', `\\
+<script lang="ts">
+  import { APPS } from '../data/apps';
+</script>
+
+<aside>
+  <div class="logo">IH</div>
+  <nav>
+    {#each APPS as app}
+      <a href={app.route}>
+        <span class="icon">{app.icon}</span>
+        {app.name}
+      </a>
+    {/each}
+  </nav>
+</aside>
+
+<style lang="scss">
+aside {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  padding: var(--space-4);
+}
+.logo { font-size: var(--text-2xl); font-weight: bold; text-align: center; margin-bottom: var(--space-8); }
+nav a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-1);
+  &:hover { background: var(--color-taupe-100); }
+}
+.icon { width: 24px; text-align: center; }
+</style>
+`);
+
+
+// ── Cloudflare Functions (Middleware) ────────────────────────────────────────
+
+w('apps/insighthunter-main/functions/_middleware.ts', `\\
+import type { PagesFunction } from '@cloudflare/workers-types';
+import { jwt } from 'hono/jwt'
+
+// Protect all routes under /dashboard
+export const onRequest: PagesFunction = async ({ request, next, env }) => {
+  const url = new URL(request.url);
+  if (url.pathname.startsWith('/dashboard')) {
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+    if (!token) return new Response('Unauthorized', { status: 401 });
+
+    try {
+      // In a real app, you'd verify the JWT and check permissions
+      // const decoded = await jwt.verify(token, env.JWT_SECRET);
+      return next();
+    } catch (e) {
+      return new Response('Invalid token', { status: 401 });
+    }
+  }
+  return next();
+};
+`);
+
+
+// ══════════════════════════════════════════════════════════════
+//  FINAL STEPS
+// ══════════════════════════════════════════════════════════════
+
+if (INSTALL) {
+  console.log('\\n📦  Installing dependencies (this may take a minute)...\\n');
+  try {
+    execSync('npm install', { cwd: ROOT, stdio: 'inherit' });
+  } catch (e) {
+    console.error('\\n❌  Dependency installation failed.');
+    console.error('    Please run `npm install` inside the `insighthunter` directory manually.\\n');
+  }
+}
+
+console.log(`\\n✅  ${written} files written in \`./insighthunter/\`\\n`);
+
+if (INSTALL) {
+  console.log('To start the main dashboard app:');
+  console.log('  \\x1b[36mcd insighthunter');
+  console.log('  npm run dev:main\\x1b[0m\\n');
+} else {
+  console.log('Next steps:');
+  console.log('  \\x1b[36mcd insighthunter');
+  console.log('  npm install');
+  console.log('  npm run dev:main\\x1b[0m\\n');
+}

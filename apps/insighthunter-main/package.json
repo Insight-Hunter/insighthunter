@@ -12,6 +12,18 @@
   "dependencies": {
     "@astrojs/cloudflare": "^12.3.1",
     "@astrojs/svelte": "^7.0.4",
+<<<<<<< HEAD
+    "@ih/tier-config": "*",
+    "@ih/types": "*",
+    "astro": "^5.5.3",
+    "svelte": "^5.20.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250310.0",
+    "sass": "^1.85.1",
+    "typescript": "^5.7.3",
+    "wrangler": "^4.76.0"
+=======
     "astro": "^5.5.3",
     "svelte": "^5.20.2",
     "@ih/types": "*",
@@ -22,5 +34,6 @@
     "typescript": "^5.7.3",
     "wrangler": "^3.109.3",
     "sass": "^1.85.1"
+>>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
   }
 }
