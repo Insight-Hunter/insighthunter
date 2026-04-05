@@ -1,4 +1,4 @@
-name = "insighthunter-ai"
+name = "insighthunter-insights"
 main = "src/index.ts"
 compatibility_date = "2025-11-01"
 compatibility_flags = ["nodejs_compat"]
@@ -22,11 +22,11 @@ id = "52a1b194a3eb423cb11b43170e536098"
 binding = "DB"
 database_name = "insighthunter-main"
 database_id = "03f5086d-171b-417b-951c-01a043e067c2"
-migrations_dir = "../../apps/insighthunter-api/migrations"
+migrations_dir = "../../apps/insighthunter-main/migrations"
 
-[durable_objects]
+[durable_objects];
 bindings = [
-  { name = "AI_SESSION", class_name = "AISession", script_name = "insighthunter-ai" }
+  { name = "AI_SESSION", class_name = "AISession", script_name = "insighthunter-insights" }
 ]
 
 [[migrations]]
@@ -39,7 +39,7 @@ dataset = "insighthunter_events"
 
 [vars]
 ENVIRONMENT = "production"
-ALLOWED_ORIGINS = "https://insighthunter.app,https://app.insighthunter.app"
+ALLOWED_ORIGINS = "https://insighthunter.app,https://auth.insighthunter.app"
 CHAT_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 EMBED_MODEL = "@cf/baai/bge-large-en-v1.5"
 SUMMARY_MODEL = "@cf/meta/llama-3.1-8b-instruct"
