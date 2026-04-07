@@ -4,6 +4,9 @@ import { z } from "zod";
 import type { Env } from "../types";
 import { hashPassword, verifyPassword } from "../utils/crypto";
 import { TenantProvisioningService } from "../services/tenantProvisioningService";
+import { uploadTenantScript } from "../services/uploadTenantScript";
+import { buildDefaultTenantScript } from "../services/tenantScriptTemplate";
+
 
 const auth = new Hono<{ Bindings: Env }>();
 
@@ -23,6 +26,71 @@ auth.post("/signup", async (c) => {
   }
 
   const { email, password, orgName, tier } = body;
+// src/backend/routes/auth.ts  (signup handler — excerpt)
+
+// Inside auth.post("/signup", ...) — after D1 user/org rows are created:
+
+async function provisionTenantWorker(
+  env: Env,
+  orgId: string,
+  tier: string
+): 
+  
+  Promise<{ scriptName: string; kvNamespaceId: string }> {
+  const scriptName = `tenant-${orgId}`;
+
+  // Step A: Create a dedicated KV namespace for this tenant
+  const kvRes = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/storage/kv/namespaces`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.CF_API_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title: `ih-tenant-${orgId}` }),
+    }
+  );
+
+  const kvJson = await kvRes.json<{
+    success: boolean;
+    result: { id: string };
+  }>();
+
+  if (!kvJson.success) {
+    throw new Error(`KV namespace creation failed for org ${orgId}`);
+  }
+
+  const kvNamespaceId = kvJson.result.id;
+
+  // Step B: Build and upload the default tenant script
+  const scriptContent = buildDefaultTenantScript({
+    orgId,
+    tier,
+    platformApiUrl: env.PLATFORM_API_URL,
+  });
+
+  const uploadResult = await uploadTenantScript({
+    accountId: env.CF_ACCOUNT_ID,
+    apiToken: env.CF_API_TOKEN,
+    dispatchNamespace: env.WFP_DISPATCH_NAMESPACE,
+    scriptName,
+    scriptContent,
+    kvNamespaceId,
+    orgId,
+    tier: tier as "lite" | "standard" | "pro",
+    annotations: {
+      message: `Initial provisioning — ${tier} tier`,
+      tag: `signup-${Date.now()}`,
+    },
+  });
+
+  console.log(
+    `Tenant Worker uploaded: ${scriptName} startup_ms=${uploadResult.startup_time_ms}`
+  );
+
+  return { scriptName, kvNamespaceId };
+}
 
   // --- 1. Check for existing user ---
   const existing = await c.env.DB.prepare(
