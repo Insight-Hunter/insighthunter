@@ -1,0 +1,27 @@
+{
+  "name": "insighthunter-dispatch",
+  "main": "src/backend/dispatchWorker/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+
+  // The dispatch namespace — points at all tenant Workers
+  "dispatch_namespaces": [
+    {
+      "binding": "TENANT_DISPATCHER",
+      "namespace": "ih-tenants"
+    }
+  ],
+
+  // KV for custom domain → orgId routing
+  "kv_namespaces": [
+    {
+      "binding": "ORG_ROUTES",
+      "id": "<ORG_ROUTES_KV_ID>"
+    }
+  ],
+
+  "routes": [
+    { "pattern": "*.insighthunter.app/*", "zone_name": "insighthunter.app" }
+  ]
+}
