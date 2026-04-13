@@ -1,1 +1,0 @@
-export class FormationAgent extends DurableObject { async fetch(request: Request) { return new Response(JSON.stringify({ ok: true, type: "formation-agent", url: request.url }), { headers: { "content-type": "application/json" } }); } }
