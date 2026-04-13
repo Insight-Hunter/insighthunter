@@ -51,7 +51,7 @@ database_id   = "a388931a-e89c-4860-8433-d02f4a478332"
 
 # ── R2 Buckets ───────────────────────────────────────────────────────────────
 [[r2_buckets]]
-binding     = "R2_DOCS"
+binding     = "DOCUMENTS"
 bucket_name = "bizforma-documents"
 
 # ── Queues ───────────────────────────────────────────────────────────────────
