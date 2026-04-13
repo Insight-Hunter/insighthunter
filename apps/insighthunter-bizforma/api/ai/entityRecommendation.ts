@@ -1,0 +1,1 @@
+import { Hono } from "hono"; import { recommendEntity } from "../../services/entityAdvisorService"; export const entityRecommendationApi = new Hono(); entityRecommendationApi.post("/", async (c) => c.json({ recommendations: recommendEntity(await c.req.json<any>()) }));
