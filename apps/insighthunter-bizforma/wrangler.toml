@@ -1,20 +1,33 @@
 # wrangler.toml — BizForma Cloudflare Worker Configuration
 
-name            = "bizforma"
-main            = "src/worker.ts"
-compatibility_date  = "2025-03-07"
+name               = "insighthunter-bizforma"
+main               = "src/worker.ts"
+compatibility_date = "2026-04-12"
 compatibility_flags = ["nodejs_compat"]
 
 # ── Observability ────────────────────────────────────────────────────────────
 [observability]
-enabled           = true
+enabled            = true
 head_sampling_rate = 1
 
 # ── Static Assets (React SPA) ────────────────────────────────────────────────
 [assets]
-directory               = "./dist/"
-not_found_handling      = "single-page-application"
-binding                 = "ASSETS"
+directory          = "./dist/"
+binding            = "ASSETS"
+not_found_handling = "single-page-application"
+
+# ── Workers AI ───────────────────────────────────────────────────────────────
+[ai]
+binding = "AI"
+
+# ── Environment Variables ─────────────────────────────────────────────────────
+[vars]
+ENVIRONMENT           = "production"
+APP_ORIGIN            = "https://bizforma.insighthunter.app"
+AUTH_ORIGIN           = "https://auth.insighthunter.app"
+AUTH_AUDIENCE         = "bizforma"
+AUTH_INTROSPECT_PATH  = "/api/introspect"
+PROVISIONING_ENABLED  = "false"
 
 # ── KV Namespaces ────────────────────────────────────────────────────────────
 [[kv_namespaces]]
@@ -22,47 +35,63 @@ binding    = "BIZFORMA_KV"
 id         = "6529b00482d04c0fa4a0bfa52027c262"
 preview_id = "6529b00482d04c0fa4a0bfa52027c262"
 
-# ── D1 Database ──────────────────────────────────────────────────────────────
-[[d1_databases]]
-binding = "DB"
-database_name = "bizforma-db"
-database_id = "a388931a-e89c-4860-8433-d02f4a478332"
-
-[[r2_buckets]]
-binding = "R2_DOCS"
-bucket_name = "bizforma-documents"
+[[kv_namespaces]]
+binding    = "SESSIONS"
+id         = "REPLACE_KV_ID"
 
 [[kv_namespaces]]
-binding = "CACHE"
-id = "af7391791e95423b82c1cd877c0992e3"
+binding    = "CACHE"
+id         = "af7391791e95423b82c1cd877c0992e3"
 
+# ── D1 Database ──────────────────────────────────────────────────────────────
+[[d1_databases]]
+binding       = "DB"
+database_name = "bizforma-db"
+database_id   = "a388931a-e89c-4860-8433-d02f4a478332"
+
+# ── R2 Buckets ───────────────────────────────────────────────────────────────
+[[r2_buckets]]
+binding     = "R2_DOCS"
+bucket_name = "bizforma-documents"
+
+# ── Queues ───────────────────────────────────────────────────────────────────
+[[queues.producers]]
+binding = "DOCUMENT_QUEUE"
+queue   = "bizforma-document-jobs"
+
+[[queues.producers]]
+binding = "REMINDER_QUEUE"
+queue   = "bizforma-reminders"
+
+[[queues.consumers]]
+queue = "bizforma-document-jobs"
+
+[[queues.consumers]]
+queue = "bizforma-reminders"
+
+# ── Durable Objects ──────────────────────────────────────────────────────────
 [[durable_objects.bindings]]
-name = "FORMATION_AGENT"
+name       = "FORMATION_AGENT"
 class_name = "FormationAgent"
 
 [[durable_objects.bindings]]
-name = "COMPLIANCE_AGENT"
+name       = "COMPLIANCE_AGENT"
 class_name = "ComplianceAgent"
 
+# ── Durable Object Migrations ────────────────────────────────────────────────
 [[migrations]]
-tag = "v1"
+tag               = "v1"
 new_sqlite_classes = ["FormationAgent", "ComplianceAgent"]
-binding       = "BIZFORMA_DB"
-database_name = "bizforma"
-database_id   = "YOUR_D1_DATABASE_ID"
-
-# ── Workers AI ───────────────────────────────────────────────────────────────
-[ai]
-binding = "AI"
 
 # ── Analytics Engine ─────────────────────────────────────────────────────────
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"
 dataset = "bizforma_events"
 
-# ── Environment Variables ─────────────────────────────────────────────────────
-[vars]
-ENVIRONMENT = "production"
+# ── Routes ───────────────────────────────────────────────────────────────────
+[[routes]]
+pattern   = "bizforma.insighthunter.app/*"
+zone_name = "insighthunter.app"
 
 # ── Development Overrides ────────────────────────────────────────────────────
 [env.development]
