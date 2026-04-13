@@ -1,1 +1,299 @@
-import { useMemo, useState } from "react"; import type { IntakeAnswers } from "../types/formation"; import { api } from "../utils/api"; import ProgressStepper from "./ProgressStepper"; import ConceptStep from "./steps/ConceptStep"; import NameSelectionStep from "./steps/NameSelectionStep"; import EntityTypeStep from "./steps/EntityTypeStep"; import RegistrationStep from "./steps/RegistrationStep"; import EINTaxStep from "./steps/EINTaxStep"; import ComplianceStep from "./steps/ComplianceStep"; import AccountingStep from "./steps/AccountingStep"; import FinancingStep from "./steps/FinancingStep"; import MarketingStep from "./steps/MarketingStep"; import WebDesignStep from "./steps/WebDesignStep"; import CalendarStep from "./steps/CalendarStep"; const initialState: IntakeAnswers = { concept: "", businessName: "", entityType: "LLC", stateCode: "GA", owners: "1 founder", payrollIntent: "No employees yet", fundingPlan: "", marketingPlan: "", websiteNeeds: "" }; const stepDefs = [{ label: "Concept", Component: ConceptStep }, { label: "Name", Component: NameSelectionStep }, { label: "Entity", Component: EntityTypeStep }, { label: "Registration", Component: RegistrationStep }, { label: "EIN & Tax", Component: EINTaxStep }, { label: "Compliance", Component: ComplianceStep }, { label: "Accounting", Component: AccountingStep }, { label: "Financing", Component: FinancingStep }, { label: "Marketing", Component: MarketingStep }, { label: "Web & Email", Component: WebDesignStep }, { label: "Calendar", Component: CalendarStep }] as const; export default function BusinessWizard({ user }: { user: { email?: string; sub: string; tenantId: string } }) { const [step, setStep] = useState(0); const [answers, setAnswers] = useState<IntakeAnswers>(initialState); const [saving, setSaving] = useState(false); const [message, setMessage] = useState(""); const Current = stepDefs[step].Component; const summary = useMemo(() => ({ owner: user.email || user.sub, state: answers.stateCode, entity: answers.entityType, name: answers.businessName || "Untitled business" }), [answers, user]); async function saveDraft() { setSaving(true); setMessage(""); try { const business = await api<{ business: { id: string } }>("/api/protected/business", { method: "POST", body: JSON.stringify({ name: answers.businessName || "Untitled business", stateCode: answers.stateCode, entityType: answers.entityType }) }); await api("/api/protected/formation", { method: "POST", body: JSON.stringify({ businessId: business.business.id, intake: answers }) }); setMessage("Draft saved to BizForma."); } catch (error) { setMessage(error instanceof Error ? error.message : "Save failed"); } finally { setSaving(false); } } return <div className="app-shell"><aside className="sidebar"><div><div className="eyebrow">BizForma</div><h2>Formation workspace</h2><p>Tenant: {user.tenantId}</p></div><ProgressStepper current={step} steps={stepDefs.map((item) => item.label)} /><div className="summary-card"><div><strong>Name:</strong> {summary.name}</div><div><strong>Entity:</strong> {summary.entity}</div><div><strong>State:</strong> {summary.state}</div><div><strong>Owner:</strong> {summary.owner}</div></div></aside><main className="workspace"><div className="workspace-header"><div><div className="eyebrow">11-step formation wizard</div><h1>{stepDefs[step].label}</h1></div><button className="secondary" onClick={saveDraft} disabled={saving}>{saving ? "Saving…" : "Save draft"}</button></div><Current values={answers} onChange={setAnswers} /><div className="toolbar"><button className="secondary" onClick={() => setStep((value) => Math.max(0, value - 1))} disabled={step === 0}>Back</button><button className="primary" onClick={() => step < stepDefs.length - 1 ? setStep((value) => value + 1) : saveDraft()}>{step < stepDefs.length - 1 ? "Next step" : "Finish & save"}</button></div>{message ? <div className="flash">{message}</div> : null}</main></div>; }
+import React, { useMemo, useState } from "react";
+import ProgressStepper from "./ProgressStepper";
+import {
+  GlassButton,
+  GlassCard,
+  GlassPanel,
+  GlassSection,
+} from "./GlassComponents";
+
+type WizardStepId =
+  | "concept"
+  | "name"
+  | "entity"
+  | "registration"
+  | "ein"
+  | "compliance"
+  | "accounting"
+  | "financing"
+  | "marketing"
+  | "web"
+  | "calendar";
+
+export type BizFormaWizardState = {
+  concept: string;
+  targetCustomer: string;
+  businessName: string;
+  alternateNames: string[];
+  entityType: string;
+  formationState: string;
+  registeredAgent: string;
+  needsEin: boolean;
+  taxNotes: string;
+  complianceNotes: string;
+  accountingStack: string;
+  financingPlan: string;
+  marketingPlan: string;
+  domainStatus: string;
+  calendarNotes: string;
+};
+
+type StepComponentProps = {
+  state: BizFormaWizardState;
+  update: (patch: Partial<BizFormaWizardState>) => void;
+};
+
+function StepPlaceholder({
+  title,
+  description,
+  fields,
+}: {
+  title: string;
+  description: string;
+  fields: React.ReactNode;
+}) {
+  return (
+    <GlassSection title={title} description={description}>
+      <GlassCard>{fields}</GlassCard>
+    </GlassSection>
+  );
+}
+
+function ConceptStep({ state, update }: StepComponentProps) {
+  return (
+    <StepPlaceholder
+      title="Business concept"
+      description="Define the idea, customer profile, and intended offer before formation choices are scored."
+      fields={
+        <div className="grid gap-4">
+          <textarea
+            value={state.concept}
+            onChange={(e) => update({ concept: e.target.value })}
+            placeholder="Describe the business idea, product, or service"
+            className="min-h-32 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-slate-300/70 focus:border-teal-300/70 focus:outline-none"
+          />
+          <input
+            value={state.targetCustomer}
+            onChange={(e) => update({ targetCustomer: e.target.value })}
+            placeholder="Who is the target customer?"
+            className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-slate-300/70 focus:border-teal-300/70 focus:outline-none"
+          />
+        </div>
+      }
+    />
+  );
+}
+
+function NameSelectionStep({ state, update }: StepComponentProps) {
+  return (
+    <StepPlaceholder
+      title="Name selection"
+      description="Capture the primary business name and fallback options for state availability checks."
+      fields={
+        <div className="grid gap-4">
+          <input
+            value={state.businessName}
+            onChange={(e) => update({ businessName: e.target.value })}
+            placeholder="Preferred business name"
+            className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-slate-300/70 focus:border-teal-300/70 focus:outline-none"
+          />
+          <input
+            value={state.alternateNames[0] ?? ""}
+            onChange={(e) =>
+              update({
+                alternateNames: [
+                  e.target.value,
+                  state.alternateNames[1] ?? "",
+                  state.alternateNames[2] ?? "",
+                ],
+              })
+            }
+            placeholder="Alternate name 1"
+            className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-slate-300/70 focus:border-teal-300/70 focus:outline-none"
+          />
+          <input
+            value={state.alternateNames[1] ?? ""}
+            onChange={(e) =>
+              update({
+                alternateNames: [
+                  state.alternateNames[0] ?? "",
+                  e.target.value,
+                  state.alternateNames[2] ?? "",
+                ],
+              })
+            }
+            placeholder="Alternate name 2"
+            className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-slate-300/70 focus:border-teal-300/70 focus:outline-none"
+          />
+        </div>
+      }
+    />
+  );
+}
+
+function GenericStep({
+  title,
+  description,
+  value,
+  onChange,
+  placeholder,
+}: {
+  title: string;
+  description: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <StepPlaceholder
+      title={title}
+      description={description}
+      fields={
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="min-h-36 w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-slate-300/70 focus:border-teal-300/70 focus:outline-none"
+        />
+      }
+    />
+  );
+}
+
+const wizardSteps: Array<{ id: WizardStepId; title: string }> = [
+  { id: "concept", title: "Concept" },
+  { id: "name", title: "Name" },
+  { id: "entity", title: "Entity" },
+  { id: "registration", title: "Registration" },
+  { id: "ein", title: "EIN & Tax" },
+  { id: "compliance", title: "Compliance" },
+  { id: "accounting", title: "Accounting" },
+  { id: "financing", title: "Financing" },
+  { id: "marketing", title: "Marketing" },
+  { id: "web", title: "Web & Domain" },
+  { id: "calendar", title: "Calendar" },
+];
+
+const initialState: BizFormaWizardState = {
+  concept: "",
+  targetCustomer: "",
+  businessName: "",
+  alternateNames: ["", "", ""],
+  entityType: "",
+  formationState: "",
+  registeredAgent: "",
+  needsEin: true,
+  taxNotes: "",
+  complianceNotes: "",
+  accountingStack: "",
+  financingPlan: "",
+  marketingPlan: "",
+  domainStatus: "",
+  calendarNotes: "",
+};
+
+export default function BusinessWizard() {
+  const [stepIndex, setStepIndex] = useState(0);
+  const [state, setState] = useState<BizFormaWizardState>(initialState);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const step = wizardSteps[stepIndex];
+  const progress = Math.round(((stepIndex + 1) / wizardSteps.length) * 100);
+
+  function update(patch: Partial<BizFormaWizardState>) {
+    setState((current) => ({ ...current, ...patch }));
+  }
+
+  async function saveDraft() {
+    setIsSaving(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  const renderedStep = useMemo(() => {
+    switch (step.id) {
+      case "concept":
+        return <ConceptStep state={state} update={update} />;
+      case "name":
+        return <NameSelectionStep state={state} update={update} />;
+      case "entity":
+        return (
+          <GenericStep
+            title="Entity type"
+            description="Capture owner count, liability concerns, tax preference, and growth plans."
+            value={state.entityType}
+            onChange={(value) => update({ entityType: value })}
+            placeholder="Example: Single-owner consulting business, wants liability protection and simple tax handling."
+          />
+        );
+      case "registration":
+        return (
+          <GenericStep
+            title="Registration"
+            description="Track formation state, registered agent, and filing path."
+            value={`${state.formationState}\n${state.registeredAgent}`.trim()}
+            onChange={(value) => update({ formationState: value })}
+            placeholder="Formation state, registered agent, filing readiness, and state-specific notes."
+          />
+        );
+      case "ein":
+        return (
+          <GenericStep
+            title="EIN and tax"
+            description="Prepare EIN details, SS-4 notes, and early tax registrations."
+            value={state.taxNotes}
+            onChange={(value) => update({ taxNotes: value })}
+            placeholder="Responsible party, EIN timing, payroll intent, and tax classification notes."
+          />
+        );
+      case "compliance":
+        return (
+          <GenericStep
+            title="Compliance"
+            description="List annual report needs, BOI tracking, permits, and renewal tasks."
+            value={state.complianceNotes}
+            onChange={(value) => update({ complianceNotes: value })}
+            placeholder="Annual report, BOI, licenses, permits, registered agent, and deadlines."
+          />
+        );
+      case "accounting":
+        return (
+          <GenericStep
+            title="Accounting"
+            description="Define bookkeeping stack, chart of accounts needs, and advisor support."
+            value={state.accountingStack}
+            onChange={(value) => update({ accountingStack: value })}
+            placeholder="Software, CPA relationship, bookkeeping workflow, and tax planning approach."
+          />
+        );
+      case "financing":
+        return (
+          <GenericStep
+            title="Financing"
+            description="Capture funding path, banking setup, and startup cost planning."
+            value={state.financingPlan}
+            onChange={(value) => update({ financingPlan: value })}
+            placeholder="Owner capital, loans, grants, bank account setup, and startup cash needs."
+          />
+        );
+      case "marketing":
+        return (
+          <GenericStep
+            title="Marketing"
+            description="Define launch channels, positioning, and budget assumptions."
+            value={state.marketingPlan}
+            onChange={(value) => update({ marketingPlan: value })}
+            placeholder="Target channels, launch offer, messaging, brand priorities, and budget."
+          />
+        );
+      case "web":
+        return (
+          <GenericStep
+            title="Web and domain"
+            description="Track domain, website, DNS, email, and online presence decisions."
+            value={state.domainStatus}
+            onChange={(value) => update({ domainStatus: value })}
+            placeholder="Domain purchased, DNS setup, business email, and site launch 
