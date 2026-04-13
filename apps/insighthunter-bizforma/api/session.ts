@@ -1,0 +1,30 @@
+import { Hono } from 'hono';
+import { getCookie, setCookie, deleteCookie } from 'hono/cookie';
+import { createSession, getSession } from '../services/sessionService';
+import { introspectAccessToken } from '../utils/auth';
+
+export const sessionApi = new Hono();
+
+sessionApi.get('/callback', async (c) => {
+  const accessToken = c.req.query('access_token');
+  const redirectTo = c.req.query('redirect_to') || '/app';
+  if (!accessToken) return c.redirect('/?auth=missing-token');
+  const user = await introspectAccessToken(c.env as any, accessToken);
+  if (!user) return c.redirect('/?auth=invalid-token');
+  const sessionId = await createSession(c.env as any, user);
+  setCookie(c, 'bizforma_session', sessionId, { httpOnly: true, secure: true, sameSite: 'Lax', path: '/', maxAge: 60 * 60 * 24 * 7 });
+  return c.redirect(redirectTo);
+});
+
+sessionApi.get('/me', async (c) => {
+  const sessionId = getCookie(c, 'bizforma_session');
+  if (!sessionId) return c.json({ authenticated: false });
+  const session = await getSession(c.env as any, sessionId);
+  if (!session) return c.json({ authenticated: false });
+  return c.json({ authenticated: true, user: session.user });
+});
+
+sessionApi.post('/logout', async (c) => {
+  deleteCookie(c, 'bizforma_session', { path: '/' });
+  return c.json({ ok: true });
+});
