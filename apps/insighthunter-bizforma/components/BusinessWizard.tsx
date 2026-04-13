@@ -164,14 +164,10 @@ const wizardSteps: Array<{ id: WizardStepId; title: string; shortTitle: string; 
   { id: "concept", 
     title: "Business concept",
     shortTitle: "Concept",
-    description: "Define your idea, audience, and launch goals.",
-    isValid: true,
-    hasDraft: true },
+    description: "Define your idea, audience, and launch goals." },
   { id: "name", 
     title: "Name",
-    description: "Choose an available, brandable business name.",
-    status: "in-progress",
-    hasDraft: true },
+    description: "Choose an available, brandable business name." },
   { id: "entity", 
    title: "Entity",
    shortTitle: "Entity",
@@ -207,7 +203,7 @@ const wizardSteps: Array<{ id: WizardStepId; title: string; shortTitle: string; 
   { id: "calendar", 
     title: "Compliance Calendar", 
     shortTitle: "Calendar",
-    description: "AI-generated filing and tax deadline calendar.",},
+    description: "AI-generated filing and tax deadline calendar."},
 ];
 
 const initialState: BizFormaWizardState = {
