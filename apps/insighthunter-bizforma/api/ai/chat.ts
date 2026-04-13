@@ -1,0 +1,1 @@
+import { Hono } from "hono"; import { askAdvisor } from "../../services/aiAdvisorService"; export const chatApi = new Hono(); chatApi.post("/", async (c) => c.json({ result: await askAdvisor(c.env, (await c.req.json<any>()).message) }));

@@ -1,0 +1,1 @@
+import { Hono } from "hono"; import { getStateRequirements } from "../services/stateService"; export const stateRegistrationApi = new Hono(); stateRegistrationApi.get("/:stateCode", (c) => c.json({ state: getStateRequirements(c.req.param("stateCode").toUpperCase()) }));
