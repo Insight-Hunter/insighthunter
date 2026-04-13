@@ -1,0 +1,1 @@
+export class ComplianceAgent extends DurableObject { async fetch(request: Request) { return new Response(JSON.stringify({ ok: true, type: "compliance-agent", url: request.url }), { headers: { "content-type": "application/json" } }); } }

@@ -1,0 +1,1 @@
+{"compilerOptions":{"target":"ES2022","module":"ESNext","moduleResolution":"Bundler","lib":["ES2022","DOM"],"strict":true,"jsx":"react-jsx","types":["@cloudflare/workers-types"]},"include":["src","components","types","services","db","utils","App.tsx"]}
