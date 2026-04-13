@@ -1,1 +1,30 @@
-{"name":"@insighthunter/bizforma","private":true,"version":"1.0.0","type":"module","scripts":{"dev":"wrangler dev","deploy":"wrangler deploy","typecheck":"tsc --noEmit"},"dependencies":{"hono":"^4.7.7","react":"^18.3.1","react-dom":"^18.3.1"},"devDependencies":{"@cloudflare/workers-types":"^4.20260405.0","typescript":"^5.8.3"}}
+{
+  "name": "@insighthunter/bizforma",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "BizForma by Insight Hunter - Cloudflare-native business formation and compliance app",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "cf:dev": "wrangler dev",
+    "cf:deploy": "wrangler deploy",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "^4.6.12",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260320.0",
+    "@types/node": "^22.15.3",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.8.3",
+    "vite": "^5.4.18",
+    "wrangler": "^4.11.1"
+  }
+}
