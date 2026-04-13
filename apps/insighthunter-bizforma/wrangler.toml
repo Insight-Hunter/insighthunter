@@ -37,7 +37,7 @@ preview_id = "6529b00482d04c0fa4a0bfa52027c262"
 
 [[kv_namespaces]]
 binding    = "SESSIONS"
-id         = "REPLACE_KV_ID"
+id         = "60e34ba310ca40c79edec05470c7a271"
 
 [[kv_namespaces]]
 binding    = "CACHE"
