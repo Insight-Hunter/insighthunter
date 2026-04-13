@@ -1,30 +1,10 @@
 {
-<<<<<<< HEAD
   "name": "insighthunter-bizforma",
-  "version": "1.0.0",
-=======
-  "name": "bizforma",
   "version": "1.1.0",
   "description": "BizForma — Complete Business Formation App by InsightHunter",
->>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
   "private": true,
   "type": "module",
   "scripts": {
-<<<<<<< HEAD
-    "dev": "wrangler dev src/index.ts",
-    "deploy": "wrangler deploy",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@ih/tier-config": "*",
-    "@ih/types": "*",
-    "hono": "^4.7.4"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250310.0",
-    "typescript": "^5.7.3",
-    "wrangler": "^4.76.0"
-=======
     "dev": "concurrently \"npm run dev:worker\" \"npm run dev:ui\"",
     "dev:worker": "wrangler dev --port 8787",
     "dev:ui": "vite --port 5173",
@@ -55,6 +35,5 @@
     "vite": "^5.4.0",
     "vitest": "^2.1.0",
     "wrangler": "^3.80.0"
->>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
   }
 }
