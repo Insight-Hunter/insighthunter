@@ -1,1 +1,88 @@
-import type { Env } from "../types/env"; import type { IntakeAnswers } from "../types/formation"; export async function createBusiness(env: Env, tenantId: string, name: string, stateCode: string, entityType: string) { const id = crypto.randomUUID(); await env.DB.prepare("INSERT INTO businesses (id, tenant_id, name, state_code, entity_type) VALUES (?, ?, ?, ?, ?)").bind(id, tenantId, name, stateCode, entityType).run(); return { id, name, stateCode, entityType }; } export async function listBusinesses(env: Env, tenantId: string) { return (await env.DB.prepare("SELECT * FROM businesses WHERE tenant_id = ? ORDER BY created_at DESC").bind(tenantId).all()).results; } export async function createFormationCase(env: Env, tenantId: string, businessId: string, intake: IntakeAnswers) { const id = crypto.randomUUID(); await env.DB.prepare("INSERT INTO formation_cases (id, tenant_id, business_id, status, intake_json) VALUES (?, ?, ?, ?, ?)").bind(id, tenantId, businessId, "draft", JSON.stringify(intake)).run(); return { id, businessId, status: "draft", intake }; } export async function updateFormationCase(env: Env, id: string, intake: IntakeAnswers, status = "draft") { await env.DB.prepare("UPDATE formation_cases SET intake_json = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(JSON.stringify(intake), status, id).run(); return { id, status, intake }; } export async function listFormationCases(env: Env, tenantId: string) { const rows = (await env.DB.prepare("SELECT * FROM formation_cases WHERE tenant_id = ? ORDER BY updated_at DESC").bind(tenantId).all()).results as Array<Record<string, unknown>>; return rows.map((row) => ({ ...row, intake: JSON.parse(String(row.intake_json || "{}")) })); }
+import type { D1Database } from "@cloudflare/workers-types";
+
+export type DbSession = {
+  id: string;
+  tenant_id: string;
+  user_id: string;
+  payload_json: string;
+};
+
+export type DbBusiness = {
+  id: string;
+  tenant_id: string;
+  owner_user_id: string;
+  legal_name: string | null;
+  preferred_name: string | null;
+  formation_state: string | null;
+  entity_type: string | null;
+  status: string;
+};
+
+export type DbFormationCase = {
+  id: string;
+  tenant_id: string;
+  business_id: string;
+  stage: string;
+  status: string;
+  progress: number;
+  intake_json: string;
+};
+
+export async function getSessionById(db: D1Database, id: string) {
+  return db
+    .prepare(`SELECT * FROM sessions WHERE id = ?1 LIMIT 1`)
+    .bind(id)
+    .first<DbSession | null>();
+}
+
+export async function upsertSession(
+  db: D1Database,
+  input: { id: string; tenantId: string; userId: string; payloadJson: string },
+) {
+  await db
+    .prepare(`
+      INSERT INTO sessions (id, tenant_id, user_id, payload_json, created_at, updated_at)
+      VALUES (?1, ?2, ?3, ?4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      ON CONFLICT(id) DO UPDATE SET
+        payload_json = excluded.payload_json,
+        updated_at = CURRENT_TIMESTAMP
+    `)
+    .bind(input.id, input.tenantId, input.userId, input.payloadJson)
+    .run();
+
+  return getSessionById(db, input.id);
+}
+
+export async function insertBusiness(
+  db: D1Database,
+  input: {
+    id: string;
+    tenantId: string;
+    ownerUserId: string;
+    legalName?: string;
+    preferredName?: string;
+    formationState?: string;
+    entityType?: string;
+  },
+) {
+  await db
+    .prepare(`
+      INSERT INTO businesses (
+        id, tenant_id, owner_user_id, legal_name, preferred_name, formation_state, entity_type, status
+      ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, 'draft')
+    `)
+    .bind(
+      input.id,
+      input.tenantId,
+      input.ownerUserId,
+      input.legalName ?? null,
+      input.preferredName ?? null,
+      input.formationState ?? null,
+      input.entityType ?? null,
+    )
+    .run();
+
+  return db.prepare(`SELECT * FROM businesses WHERE id = ?1`).bind(input.id).first<DbBusiness>();
+}
+
+export async function getBusinessById(db: D1Database, id: string) 
