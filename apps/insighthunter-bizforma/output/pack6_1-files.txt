@@ -1,0 +1,6 @@
+./utils/validate.ts
+./utils/signing.ts
+./queues/documentQueue.ts
+./components/ai/NameSuggestionsPanel.tsx
+./components/documents/DocumentList.tsx
+./README-Pack6.1.md

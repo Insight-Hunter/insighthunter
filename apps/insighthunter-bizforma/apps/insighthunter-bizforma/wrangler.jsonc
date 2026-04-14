@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "insighthunter-bizforma",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-04-12",
+  "observability": { "enabled": true },
+  "assets": { "directory": "./dist", "binding": "ASSETS", "not_found_handling": "single-page-application" },
+  "d1_databases": [{ "binding": "DB", "database_name": "bizforma", "database_id": "REPLACE_D1_ID" }],
+  "kv_namespaces": [{ "binding": "SESSIONS", "id": "REPLACE_SESSIONS_KV_ID" }],
+  "r2_buckets": [{ "binding": "DOCUMENTS", "bucket_name": "bizforma-documents" }],
+  "durable_objects": { "bindings": [{ "name": "FORMATION_AGENT", "class_name": "FormationAgent" }, { "name": "COMPLIANCE_AGENT", "class_name": "ComplianceAgent" }] },
+  "queues": { "producers": [{ "binding": "DOCUMENT_QUEUE", "queue": "bizforma-document-jobs" }, { "binding": "REMINDER_QUEUE", "queue": "bizforma-reminders" }] },
+  "ai": { "binding": "AI" },
+  "vars": { "APP_ORIGIN": "https://bizforma.insighthunter.app", "AUTH_ORIGIN": "https://auth.insighthunter.app", "AUTH_AUDIENCE": "bizforma", "AUTH_INTROSPECT_PATH": "/api/introspect", "PROVISIONING_ENABLED": "false" },
+  "routes": [{ "pattern": "bizforma.insighthunter.app/*", "zone_name": "insighthunter.app" }],
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["FormationAgent", "ComplianceAgent"] }]
+}
