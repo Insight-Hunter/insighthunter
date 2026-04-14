@@ -9,7 +9,7 @@ import type {
   Queue,
 } from "@cloudflare/workers-types";
 
-import sessionRoutes from "../api/session";
+import { sessionApi } from "../api/session";
 import { handleDocumentQueue } from "../queues/documentQueue";
 import { handleReminderQueue } from "../queues/reminderQueue";
 import {
@@ -23,7 +23,7 @@ import {
 } from "../services/complianceService";
 import {
   getWizardSession,
-  saveWizardSession,
+  upsertWizardSession,
 } from "../services/sessionService";
 
 export type AuthContext = {
@@ -124,22 +124,27 @@ app.use("/api/*", async (c, next) => {
   await next();
 });
 
-app.route("/api/session", sessionRoutes);
+app.route("/api/session", sessionApi);
 
 app.post("/api/session", async (c) => {
+  const auth = c.get("auth");
   const body = await c.req.json<{
     sessionId: string;
-    tenantId: string;
-    userId: string;
-    payload: Record<string, unknown>;
+    currentStep: number;
+    data: Record<string, any>;
   }>();
 
-  const session = await saveWizardSession(c.env as never, body);
+  const session = await upsertWizardSession(c.env as never, auth, body);
   return c.json(session);
 });
 
 app.get("/api/session/:id", async (c) => {
-  const session = await getWizardSession(c.env as never, c.req.param("id"));
+  const auth = c.get("auth");
+  const session = await getWizardSession(
+    c.env as never,
+    auth,
+    c.req.param("id"),
+  );
   return c.json(session ?? { error: "Not found" }, session ? 200 : 404);
 });
 

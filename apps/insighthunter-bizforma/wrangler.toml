@@ -1,5 +1,5 @@
 # wrangler.toml — BizForma Cloudflare Worker Configuration
-
+account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
 name               = "insighthunter-bizforma"
 main               = "src/worker.ts"
 compatibility_date = "2026-04-12"
@@ -47,7 +47,7 @@ id         = "af7391791e95423b82c1cd877c0992e3"
 [[d1_databases]]
 binding       = "DB"
 database_name = "bizforma-db"
-database_id   = "a388931a-e89c-4860-8433-d02f4a478332"
+database_id   = "4f48922a-76be-4f04-aa0e-6c834c6c99a5"
 
 # ── R2 Buckets ───────────────────────────────────────────────────────────────
 [[r2_buckets]]
