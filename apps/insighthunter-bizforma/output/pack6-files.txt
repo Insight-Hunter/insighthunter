@@ -1,0 +1,15 @@
+./src/worker.ts
+./api/session.ts
+./api/business.ts
+./api/documents.ts
+./api/ai/nameSuggestions.ts
+./api/ai/entityRecommendation.ts
+./services/aiAdvisorService.ts
+./services/documentService.ts
+./services/pdfService.ts
+./types/env.ts
+./utils/auth.ts
+./db/migrations/0007_pack6_documents_ai.sql
+./wrangler.jsonc
+./package.json
+./README-Pack6.md
