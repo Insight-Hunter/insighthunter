@@ -41,7 +41,6 @@ async function hashPassword(plain: string): Promise<string> {
   const hash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
   return `${salt}:${hash}`;
 }
-}
 
 async function verifyPassword(plain: string, stored: string): Promise<boolean> {
   const [saltHex, storedHash] = stored.split(':');
@@ -71,7 +70,7 @@ async function verifyPassword(plain: string, stored: string): Promise<boolean> {
 
 // ─── CORS allowed origins ─────────────────────────────────────────────────────
 
-const ALLOWED_ORIGINS = /^https:\/\/(www\.)?insighthunter\.app$|^https:\/\/.*\.insighthunter\.app$/;
+const ALLOWED_ORIGINS = /^https:\/\/([\w-]+\.)?insighthunter\.app$/;
 
 // ─── Hono app ─────────────────────────────────────────────────────────────────
 

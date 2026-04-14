@@ -1,0 +1,9 @@
+{
+  "name": "insighthunter",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter insighthunter-main dev",
+    "build": "pnpm --filter insighthunter-main build",
+    "preview": "pnpm --filter insighthunter-main preview"
+  }
+}
