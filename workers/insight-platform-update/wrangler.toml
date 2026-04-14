@@ -3,30 +3,13 @@ main = "src/index.ts"
 compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
 
-[observability]
-enabled = true
-head_sampling_rate = 1
-
-[[routes]]
-pattern = "api.insighthunter.com/api/*"
-zone_name = "insighthunter.com"
-
-[[dispatch_namespaces]]
-binding = "DISPATCHER"
-namespace = "insight-users"
+[[r2_buckets]]
+binding = "R2"
 
 [[d1_databases]]
-binding = "PLATFORM_DB"
-database_name = "insight-platform-db"
-database_id = "fe51ad9c-c08b-4fe4-9c0a-67361d9f2c09"
-
-[[kv_namespaces]]
-binding = "ROUTING_CACHE"
-id = "a9db8755115f44048b7d334c42a999e5"
-
-[[analytics_engine_datasets]]
-binding = "EVENTS"
-dataset = "insight_api_events"
+binding = "DB"
+database_name = "insighthunter-dev"
+database_id = "e8a5b59a-4713-4876-9289-c6e9389e6754"
 
 [vars]
-CF_ACCOUNT_ID = "18c8e61a3669253dcfd0c7eec6be36a3"
+ENVIRONMENT = "development"
