@@ -303,3 +303,56 @@ export async function listWizardSessionsForUser(
     updatedAt: row.updated_at,
   }));
 }
+// services/sessionService.ts
+
+export interface WizardSession {
+  id: string;
+  userId: string;
+   Record<string, unknown>;
+  updatedAt: string;
+}
+
+export async function createSession(
+  db: D1Database,
+  userId: string,
+   Record<string, unknown> = {}
+): Promise<WizardSession> {
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+  await db
+    .prepare(
+      "INSERT INTO sessions (id, user_id, data, updated_at) VALUES (?, ?, ?, ?)"
+    )
+    .bind(id, userId, JSON.stringify(data), now)
+    .run();
+  return { id, userId, data, updatedAt: now };
+}
+
+export async function getSession(
+  db: D1Database,
+  sessionId: string
+): Promise<WizardSession | null> {
+  const row = await db
+    .prepare("SELECT * FROM sessions WHERE id = ?")
+    .bind(sessionId)
+    .first<{ id: string; user_id: string;  string; updated_at: string }>();
+  if (!row) return null;
+  return {
+    id: row.id,
+    userId: row.user_id,
+     JSON.parse(row.data),
+    updatedAt: row.updated_at,
+  };
+}
+
+export async function saveWizardSession(
+  db: D1Database,
+  sessionId: string,
+   Record<string, unknown>
+): Promise<void> {
+  await db
+    .prepare("UPDATE sessions SET data = ?, updated_at = ? WHERE id = ?")
+    .bind(JSON.stringify(data), new Date().toISOString(), sessionId)
+    .run();
+}
+
