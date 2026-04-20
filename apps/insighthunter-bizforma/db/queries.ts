@@ -84,5 +84,43 @@ export async function insertBusiness(
 
   return db.prepare(`SELECT * FROM businesses WHERE id = ?1`).bind(input.id).first<DbBusiness>();
 }
-
 export async function getBusinessById(db: D1Database, id: string) 
+// db/queries.ts — add these exports alongside existing ones
+
+export async function insertComplianceEvent(db: D1Database, event: {
+  id: string; businessId: string; title: string; dueDate: string; status: string;
+}) {
+  return db.prepare(
+    "INSERT INTO compliance_events (id, business_id, title, due_date, status) VALUES (?, ?, ?, ?, ?)"
+  ).bind(event.id, event.businessId, event.title, event.dueDate, event.status).run();
+}
+
+export async function listComplianceEventsByBusiness(db: D1Database, businessId: string) {
+  return db.prepare(
+    "SELECT * FROM compliance_events WHERE business_id = ? ORDER BY due_date ASC"
+  ).bind(businessId).all();
+}
+
+export async function getBusinessById(db: D1Database, id: string) {
+  return db.prepare("SELECT * FROM businesses WHERE id = ?").bind(id).first();
+}
+
+export async function getFormationCaseById(db: D1Database, id: string) {
+  return db.prepare("SELECT * FROM formation_cases WHERE id = ?").bind(id).first();
+}
+
+export async function insertFormationCase(db: D1Database, fc: {
+  id: string; businessId: string; stage: string; createdAt: string;
+}) {
+  return db.prepare(
+    "INSERT INTO formation_cases (id, business_id, stage, created_at) VALUES (?, ?, ?, ?)"
+  ).bind(fc.id, fc.businessId, fc.stage, fc.createdAt).run();
+}
+
+export async function updateFormationCaseStage(db: D1Database, id: string, stage: string) {
+  return db.prepare(
+    "UPDATE formation_cases SET stage = ?, updated_at = ? WHERE id = ?"
+  ).bind(stage, new Date().toISOString(), id).run();
+}
+
+
