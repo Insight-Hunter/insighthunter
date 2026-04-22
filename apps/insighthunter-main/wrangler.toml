@@ -1,6 +1,6 @@
 name = "insighthunter-main"
 pages_build_output_dir = "dist"
-compatibility_date = "2025-03-07"
+compatibility_date = "2026-04-12"
 compatibility_flags = ["nodejs_compat"]
 
 [[routes]]
