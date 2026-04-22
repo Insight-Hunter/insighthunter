@@ -29,7 +29,7 @@ binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
 
 [[analytics_engine_datasets]]
-binding = "PAGE_EVENTS"
+binding = "PAGE_REQUESTS"
 dataset = "ih_page_views"
 
 [vars]
