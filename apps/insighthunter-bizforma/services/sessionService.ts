@@ -308,14 +308,14 @@ export async function listWizardSessionsForUser(
 export interface WizardSession {
   id: string;
   userId: string;
-   Record<string, unknown>;
+  data: Record<string, unknown>;
   updatedAt: string;
 }
 
 export async function createSession(
   db: D1Database,
   userId: string,
-   Record<string, unknown> = {}
+  data: Record<string, unknown> = {}
 ): Promise<WizardSession> {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
@@ -335,12 +335,12 @@ export async function getSession(
   const row = await db
     .prepare("SELECT * FROM sessions WHERE id = ?")
     .bind(sessionId)
-    .first<{ id: string; user_id: string;  string; updated_at: string }>();
+    .first<{ id: string; user_id: string; data: string; updated_at: string }>();
   if (!row) return null;
   return {
     id: row.id,
     userId: row.user_id,
-     JSON.parse(row.data),
+    data: JSON.parse(row.data),
     updatedAt: row.updated_at,
   };
 }
@@ -348,11 +348,10 @@ export async function getSession(
 export async function saveWizardSession(
   db: D1Database,
   sessionId: string,
-   Record<string, unknown>
+  data: Record<string, unknown>
 ): Promise<void> {
   await db
     .prepare("UPDATE sessions SET data = ?, updated_at = ? WHERE id = ?")
     .bind(JSON.stringify(data), new Date().toISOString(), sessionId)
     .run();
 }
-
