@@ -3,6 +3,11 @@ pages_build_output_dir = "dist"
 compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
 
+[[routes]]
+pattern = "bizforma.insighthunter.app"
+zone_name = "insighthunter.app"
+custom_domain = true
+
 [observability]
 enabled = true
 
@@ -14,6 +19,11 @@ service = "insighthunter-dispatch"
 binding = "AUTH_WORKER"
 service = "insighthunter-auth"
 
+[[services]]
+binding = "AUTH"
+service = "insighthunter-auth"
+environment = "production"
+
 [[kv_namespaces]]
 binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
@@ -24,6 +34,13 @@ dataset = "ih_page_views"
 
 [vars]
 PUBLIC_APP_URL = "https://insighthunter.app"
+
+[[dispatch_namespaces]]
+binding = "BIZFORMA"
+namespace = "platform.insighthunter.app"
+
+[dispatch_namespaces.outbound]
+service = "insighthunter-bizforma"
 
 # Secrets are not stored in wrangler.toml.
 # Set JWT_SECRET with:

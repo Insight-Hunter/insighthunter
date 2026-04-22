@@ -1,5 +1,29 @@
 {
-    "compilerOptions": { ... },
-    "include": ["src/**/*", "services/**/*"]  // make sure services/ is here
+    "compilerOptions": {
+      "target": "ESNext",
+      "module": "ESNext",
+      "moduleResolution": "Bundler",
+      "lib": ["ESNext"],
+      "strict": true,
+      "noEmit": true,
+      "skipLibCheck": true,
+      "isolatedModules": true,
+      "allowSyntheticDefaultImports": true,
+      "resolveJsonModule": true,
+      "noUnusedLocals": false,
+      "noUnusedParameters": false,
+      "exactOptionalPropertyTypes": false,
+      "jsx": "react-jsx",
+      "types": []
+    },
+    "include": [
+      "src/**/*",
+      "services/**/*",
+      "worker-configuration.d.ts"
+    ],
+    "exclude": [
+      "node_modules",
+      "dist"
+    ]
   }
   
