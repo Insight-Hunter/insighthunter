@@ -303,7 +303,6 @@ export async function listWizardSessionsForUser(
     updatedAt: row.updated_at,
   }));
 }
-// services/sessionService.ts
 
 export interface WizardSession {
   id: string;
