@@ -5,6 +5,7 @@ import svelte from '@astrojs/svelte';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
+  root: './apps/insighthunter-main',
   output: 'server',           // Required for Cloudflare Pages SSR + middleware
   adapter: cloudflare({
     mode: 'directory',        // Use /functions directory for Pages Functions
@@ -25,5 +26,12 @@ export default defineConfig({
     optimizeDeps: {
       exclude: ['@astrojs/svelte'],
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `@use \'/src/styles/_vars.scss\' as *;`
+        }
+      }
+    }
   },
 });

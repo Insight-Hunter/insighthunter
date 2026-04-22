@@ -1,0 +1,5 @@
+{
+    "compilerOptions": { ... },
+    "include": ["src/**/*", "services/**/*"]  // make sure services/ is here
+  }
+  
