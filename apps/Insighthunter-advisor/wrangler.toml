@@ -1,0 +1,56 @@
+name = "insighthunter-advisor"
+main = "src/index.ts"
+compatibility_date = "2026-04-24"
+
+[assets]
+directory = "./dist"
+binding   = "ASSETS"
+
+[observability]
+enabled            = true
+head_sampling_rate = 1
+
+[[d1_databases]]
+binding       = "DB"
+database_name = "insighthunter-advisor"
+database_id   = "<YOUR_D1_ID>"
+
+[[kv_namespaces]]
+binding = "ADVISOR_KV"
+id      = "<YOUR_KV_ID>"
+
+[[queues.producers]]
+binding = "EMAIL_QUEUE"
+queue   = "advisor-email-queue"
+
+[[queues.consumers]]
+queue          = "advisor-email-queue"
+max_batch_size = 20
+max_retries    = 3
+
+# Service Bindings — zero-latency same-network calls to sibling Workers.
+# Replace each `service` value with the exact worker name shown in your
+# Cloudflare dashboard: Workers & Pages > your worker > Settings > Bindings.
+
+[[services]]
+binding    = "BIZFORMA_SERVICE"
+service    = "insighthunter-bizforma"
+entrypoint = "default"
+
+[[services]]
+binding    = "COMPLIANCE_SERVICE"
+service    = "insighthunter-compliance"
+entrypoint = "default"
+
+[[services]]
+binding    = "PAYROLL_SERVICE"
+service    = "insighthunter-payroll"
+entrypoint = "default"
+
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "insighthunter_advisor"
+
+[vars]
+AUTH_SERVICE_URL = "https://auth.insighthunter.app"
+ENVIRONMENT      = "production"
