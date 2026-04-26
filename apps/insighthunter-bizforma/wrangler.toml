@@ -86,7 +86,7 @@ new_sqlite_classes = ["FormationAgent", "ComplianceAgent"]
 # ── Analytics Engine ─────────────────────────────────────────────────────────
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"
-dataset = "bizforma_events"
+dataset = "bizforma_requests"
 
 # ── Routes ───────────────────────────────────────────────────────────────────
 [[routes]]
