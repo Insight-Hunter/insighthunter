@@ -1,0 +1,25 @@
+{
+  "name": "ih-notification-queue",
+  "main": "index.ts",
+  "compatibility_date": "2025-03-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "queues": {
+    "consumers": [
+      {
+        "queue": "ih-notifications",
+        "max_batch_size": 50,
+        "max_batch_timeout": 5,
+        "max_retries": 3,
+        "dead_letter_queue": "ih-notifications-dlq"
+      }
+    ]
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "ih-notifications", "database_id": "REPLACE_WITH_DB_ID" }
+  ],
+  "vars": {
+    "RESEND_FROM": "noreply@insighthunter.app",
+    "ENVIRONMENT": "production"
+  }
+}

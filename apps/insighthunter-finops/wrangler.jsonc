@@ -1,0 +1,63 @@
+{
+  "name": "ih-finops-api",
+  "main": "workers/api/index.ts",
+  "compatibility_date": "2025-03-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "routes": [
+    { "pattern": "finops.insighthunter.app/api/*", "zone_name": "insighthunter.app" }
+  ],
+  "d1_databases": [
+    { "binding": "DB",      "database_name": "ih-finops",    "database_id": "REPLACE_DB_ID_FINOPS"  },
+    { "binding": "ADVISOR_DB", "database_name": "ih-advisor","database_id": "REPLACE_DB_ID_ADVISOR" }
+  ],
+  "r2_buckets": [
+    { "binding": "DOCS", "bucket_name": "ih-documents" }
+  ],
+  "queues": {
+    "producers": [
+      { "binding": "APPROVALS_WORKFLOW", "queue": "ih-finops-approvals" },
+      { "binding": "RECEIPT_QUEUE",      "queue": "ih-finops-receipts"  },
+      { "binding": "REMINDER_QUEUE",     "queue": "ih-finops-reminders" },
+      { "binding": "PDF_QUEUE",          "queue": "ih-finops-pdf"       },
+      { "binding": "NOTIFICATIONS",      "queue": "ih-notifications"    }
+    ]
+  },
+  "workflows": [
+    {
+      "binding": "APPROVALS_WORKFLOW",
+      "name": "ih-finops-approvals",
+      "class_name": "BillApprovalWorkflow",
+      "script_name": "workers/approvals/index.ts"
+    }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production",
+    "AUTH_ORIGIN": "https://auth.insighthunter.app"
+  },
+  "workers": [
+    {
+      "name": "ih-finops-receipts",
+      "main": "workers/receipts/index.ts",
+      "queues": { "consumers": [{ "queue": "ih-finops-receipts", "max_batch_size": 5, "max_retries": 3 }] },
+      "ai": { "binding": "AI" },
+      "r2_buckets": [{ "binding": "DOCS", "bucket_name": "ih-documents" }],
+      "d1_databases": [{ "binding": "DB", "database_name": "ih-finops", "database_id": "REPLACE_DB_ID_FINOPS" }]
+    },
+    {
+      "name": "ih-finops-pdf",
+      "main": "workers/pdf/index.ts",
+      "queues": { "consumers": [{ "queue": "ih-finops-pdf", "max_batch_size": 3, "max_retries": 3 }] },
+      "browser_rendering": { "binding": "BROWSER" },
+      "r2_buckets": [{ "binding": "DOCS", "bucket_name": "ih-documents" }],
+      "d1_databases": [{ "binding": "DB", "database_name": "ih-finops", "database_id": "REPLACE_DB_ID_FINOPS" }]
+    },
+    {
+      "name": "ih-finops-reminders",
+      "main": "workers/reminders/index.ts",
+      "crons": ["0 8 * * *"],
+      "d1_databases": [{ "binding": "DB", "database_name": "ih-finops", "database_id": "REPLACE_DB_ID_FINOPS" }],
+      "queues_producers": [{ "binding": "NOTIFICATIONS", "queue": "ih-notifications" }]
+    }
+  ]
+}
