@@ -34,6 +34,7 @@ dataset = "ih_page_views"
 
 [vars]
 PUBLIC_APP_URL = "https://insighthunter.app"
+AUTH_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
 
 [[dispatch_namespaces]]
 binding = "BIZFORMA"
@@ -41,7 +42,3 @@ namespace = "platform.insighthunter.app"
 
 [dispatch_namespaces.outbound]
 service = "insighthunter-bizforma"
-
-# Secrets are not stored in wrangler.toml.
-# Set JWT_SECRET with:
-# wrangler secret put JWT_SECRET

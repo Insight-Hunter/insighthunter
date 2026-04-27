@@ -1,0 +1,88 @@
+
+# Generated from wrangler.jsonc by scripts/convert-wrangler.mjs
+# 2026-04-27T04:58:26.723Z
+
+name = "ih-ledger-api"
+main = "workers/api/index.ts"
+compatibility_date = "2025-03-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[queues]
+
+[[queues.producers]]
+binding = "RULES_QUEUE"
+queue = "ih-ledger-rules"
+
+[[queues.producers]]
+binding = "SYNC_QUEUE"
+queue = "ih-ledger-sync"
+
+[[queues.producers]]
+binding = "NOTIFICATIONS"
+queue = "ih-notifications"
+
+[vars]
+ENVIRONMENT = "production"
+AUTH_ORIGIN = "https://auth.insighthunter.app"
+AUTH_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
+
+[[routes]]
+pattern = "ledger.insighthunter.app/api/*"
+zone_name = "insighthunter.app"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ih-ledger"
+database_id = "0328f669-398c-48d9-991a-8747c89cb6d6"
+
+[[workflows]]
+binding = "CLOSE_WORKFLOW"
+name = "ih-ledger-close"
+class_name = "MonthEndCloseWorkflow"
+script_name = "workers/close/index.ts"
+
+[[workers]]
+name = "ih-ledger-rules"
+main = "workers/rules/index.ts"
+
+[workers.queues]
+
+[[workers.queues.consumers]]
+queue = "ih-ledger-rules"
+max_batch_size = 10
+max_retries = 3
+
+[workers.ai]
+binding = "AI"
+
+[[workers.d1_databases]]
+binding = "DB"
+database_name = "ih-ledger"
+database_id = "0328f669-398c-48d9-991a-8747c89cb6d6"
+
+[[workers.queues_producers]]
+binding = "NOTIFICATIONS"
+queue = "ih-notifications"
+
+[[workers]]
+name = "ih-ledger-sync"
+main = "workers/sync/index.ts"
+
+[workers.queues]
+
+[[workers.queues.consumers]]
+queue = "ih-ledger-sync"
+max_batch_size = 5
+max_retries = 5
+
+[[workers.d1_databases]]
+binding = "DB"
+database_name = "ih-ledger"
+database_id = "0328f669-398c-48d9-991a-8747c89cb6d6"
+
+[[workers.queues_producers]]
+binding = "NOTIFICATIONS"
+queue = "ih-notifications"

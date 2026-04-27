@@ -1,3 +1,4 @@
+
 # wrangler.toml — BizForma Cloudflare Worker Configuration
 account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
 name               = "insighthunter-bizforma"
@@ -28,6 +29,7 @@ AUTH_ORIGIN           = "https://auth.insighthunter.app"
 AUTH_AUDIENCE         = "bizforma"
 AUTH_INTROSPECT_PATH  = "/api/introspect"
 PROVISIONING_ENABLED  = "false"
+AUTH_SECRET           = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
 
 # ── KV Namespaces ────────────────────────────────────────────────────────────
 [[kv_namespaces]]

@@ -1,0 +1,123 @@
+
+# Generated from wrangler.jsonc by scripts/convert-wrangler.mjs
+# 2026-04-27T04:58:26.681Z
+
+name = "ih-finops-api"
+main = "workers/api/index.ts"
+compatibility_date = "2025-03-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[queues]
+
+[[queues.producers]]
+binding = "APPROVALS_WORKFLOW"
+queue = "ih-finops-approvals"
+
+[[queues.producers]]
+binding = "RECEIPT_QUEUE"
+queue = "ih-finops-receipts"
+
+[[queues.producers]]
+binding = "REMINDER_QUEUE"
+queue = "ih-finops-reminders"
+
+[[queues.producers]]
+binding = "PDF_QUEUE"
+queue = "ih-finops-pdf"
+
+[[queues.producers]]
+binding = "NOTIFICATIONS"
+queue = "ih-notifications"
+
+[vars]
+ENVIRONMENT = "production"
+AUTH_ORIGIN = "https://auth.insighthunter.app"
+AUTH_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
+
+
+[[routes]]
+pattern = "finops.insighthunter.app/api/*"
+zone_name = "insighthunter.app"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ih-finops"
+database_id = "a98820b1-5ebc-4131-8e1d-d91953136013"
+
+[[d1_databases]]
+binding = "ADVISOR_DB"
+database_name = "ih-advisor"
+database_id = "e3d4545c-16c2-4e2b-9dc3-3f4ae580be0b"
+
+[[r2_buckets]]
+binding = "DOCS"
+bucket_name = "ih-documents"
+
+[[workflows]]
+binding = "APPROVALS_WORKFLOW"
+name = "ih-finops-approvals"
+class_name = "BillApprovalWorkflow"
+script_name = "workers/approvals/index.ts"
+
+[[workers]]
+name = "ih-finops-receipts"
+main = "workers/receipts/index.ts"
+
+[workers.queues]
+
+[[workers.queues.consumers]]
+queue = "ih-finops-receipts"
+max_batch_size = 5
+max_retries = 3
+
+[workers.ai]
+binding = "AI"
+
+[[workers.r2_buckets]]
+binding = "DOCS"
+bucket_name = "ih-documents"
+
+[[workers.d1_databases]]
+binding = "DB"
+database_name = "ih-finops"
+database_id = "a98820b1-5ebc-4131-8e1d-d91953136013"
+
+[[workers]]
+name = "ih-finops-pdf"
+main = "workers/pdf/index.ts"
+
+[workers.queues]
+
+[[workers.queues.consumers]]
+queue = "ih-finops-pdf"
+max_batch_size = 3
+max_retries = 3
+
+[workers.browser_rendering]
+binding = "BROWSER"
+
+[[workers.r2_buckets]]
+binding = "DOCS"
+bucket_name = "ih-documents"
+
+[[workers.d1_databases]]
+binding = "DB"
+database_name = "ih-finops"
+database_id = "a98820b1-5ebc-4131-8e1d-d91953136013"
+
+[[workers]]
+name = "ih-finops-reminders"
+main = "workers/reminders/index.ts"
+crons = ["0 8 * * *"]
+
+[[workers.d1_databases]]
+binding = "DB"
+database_name = "ih-finops"
+database_id = "a98820b1-5ebc-4131-8e1d-d91953136013"
+
+[[workers.queues_producers]]
+binding = "NOTIFICATIONS"
+queue = "ih-notifications"
