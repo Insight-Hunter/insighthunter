@@ -5,5 +5,8 @@
     "dev": "pnpm --filter insighthunter-main dev",
     "build": "pnpm --filter insighthunter-main build",
     "preview": "pnpm --filter insighthunter-main preview"
+  },
+  "devDependencies": {
+    "wrangler": "^4.85.0"
   }
 }
