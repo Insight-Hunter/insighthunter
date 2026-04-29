@@ -45,3 +45,8 @@ export interface BaseEnv {
   AUTH_ORIGIN: string;          // https://auth.insighthunter.app
   ENVIRONMENT: string;          // production | staging | development
 }
+
+// shared/types/index.ts
+export * from './auth';
+export * from './env';
+
