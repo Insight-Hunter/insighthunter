@@ -12,11 +12,11 @@ command = "npm install --legacy-peer-deps && npm run build"
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-auth-db"
-database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
+database_id = "b9a67a07-96a6-424b-8409-d022b7246294"
 
 [[kv_namespaces]]
-binding = "KV"
-id = "8ac9bbaeda4d410db31878ebb8b8a3f1"
+binding = "PAYROLL_CACHE"
+id = "192305553e184131b7d5306e579759c9"
 
 [[routes]]
 pattern = "payroll.insighthunter.app/api/*"
@@ -33,3 +33,5 @@ service = "insighthunter-agents"
 # Secrets:
 # wrangler secret put JWT_SECRET
 # wrangler secret put STRIPE_KEY
+ext
+

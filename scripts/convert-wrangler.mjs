@@ -100,11 +100,11 @@ i += 2;
 continue;
 }
 // String literal — skip contents so we don’t strip // inside strings
-if (src[i] === ‘”’) {
+if (src[i] === ‘"’) {
 out += src[i++];
 while (i < src.length) {
 if (src[i] === ‘\’) { out += src[i++]; out += src[i++]; continue; }
-if (src[i] === ‘”’)  { out += src[i++]; break; }
+if (src[i] === ‘"’)  { out += src[i++]; break; }
 out += src[i++];
 }
 continue;

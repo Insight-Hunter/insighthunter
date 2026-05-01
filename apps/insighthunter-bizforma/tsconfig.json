@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["@cloudflare/workers-types", "node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@src/*": ["src/*"],
+      "@components/*": ["components/*"],
+      "@api/*": ["api/*"],
+      "@services/*": ["services/*"],
+      "@lib/*": ["lib/*"],
+      "@types/*": ["types/*"],
+      "@utils/*": ["utils/*"],
+      "@styles/*": ["styles/*"],
+      "@data/*": ["data/*"]
+    }
+  },
+  "include": [
+    "App.tsx",
+    "src",
+    "components",
+    "api",
+    "services",
+    "agents",
+    "workflows",
+    "queues",
+    "db",
+    "data",
+    "lib",
+    "types",
+    "utils",
+    "vite.config.ts"
+  ],
+  "exclude": ["dist", "node_modules"]
+}

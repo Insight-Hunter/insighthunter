@@ -8,19 +8,18 @@ enabled = true
 head_sampling_rate = 1
 
 [[kv_namespaces]]
-binding = "AUTH_KV" 
-id = "..." 
+binding = "SESSIONS"
+id = "60e34ba310ca40c79edec05470c7a271"
+
+[[kv_namespaces]]
+binding = "REFRESH_TOKENS"
+id = "ba8d224a437949969d990db3aef71a87"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-auth"
-database_id = "..."
-
-[[kv_namespaces]]
-binding = "OAUTH_KV"
-id = "your-kv-namespace-id"
+database_id = "36b4a6b7-3509-4cd2-9cdc-7a35990affd5"
 
 [vars]
 JWT_SECRET = "your-secret-here"
-[vars]
 SITE_URL = "https://insighthunter.app"

@@ -9,8 +9,8 @@
       "binding": "DISPATCH",
       "namespace": "insighthunter-tenants",
       "outbound": {
-        "worker": { "service": "insighthunter-auth" },
-        "params": [{ "name": "orgId" }]
+        "service": "insighthunter-auth",
+        "params": ["orgId"]
       }
     }
   ],
