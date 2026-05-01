@@ -50,12 +50,6 @@ binding = "DB"
 database_name = "insighthunter-ai"
 database_id = "REPLACE_AFTER_PROVISION"
 migrations_dir = "../../apps/insighthunter-main/migrations"
-bindings = "["
-{ name = "AI_SESSION\", class_name = \"AISession\", script_name = \"insighthunter-insights\" "
-
-[[migrations]]
-tag = "v1"
-new_classes = ["AISession"]
 
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"
