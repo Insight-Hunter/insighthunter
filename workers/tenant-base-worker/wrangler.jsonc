@@ -1,0 +1,5 @@
+{
+  "name": "ih-tenant-base",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07"
+}

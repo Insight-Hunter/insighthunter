@@ -171,16 +171,17 @@ app.get('/api/pbx/call-logs', async (c) => {
   const offset    = (page - 1) * limit;
 
   const safeDir = direction === 'inbound' || direction === 'outbound' ? direction : null;
-  const clause  = safeDir ? `AND direction = '${safeDir}'` : '';
+  const clause  = safeDir ? 'AND direction = ?' : '';
+  const clauseBindings = safeDir ? [safeDir] : [];
 
   const [{ results }, countRow] = await Promise.all([
     c.env.PBX_DB.prepare(
       `SELECT * FROM call_logs WHERE org_id=? ${clause} ORDER BY started_at DESC LIMIT ? OFFSET ?`,
-    ).bind(c.get('orgId'), limit, offset).all(),
+    ).bind(c.get('orgId'), ...(safeDir ? [safeDir] : []), limit, offset).all(),
 
     c.env.PBX_DB.prepare(
       `SELECT COUNT(*) AS total FROM call_logs WHERE org_id=? ${clause}`,
-    ).bind(c.get('orgId')).first<{ total: number }>(),
+    ).bind(c.get('orgId'), ...(safeDir ? [safeDir] : [])).first<{ total: number }>(),
   ]);
 
   return c.json({ data: results, page, limit, total: countRow?.total ?? 0 });
@@ -189,15 +190,17 @@ app.get('/api/pbx/call-logs', async (c) => {
 // ── Voicemails ────────────────────────────────────────────────────────────────
 app.get('/api/pbx/voicemails', async (c) => {
   const unreadOnly = new URL(c.req.url).searchParams.get('unread') === '1';
+  const unreadOnly = new URL(c.req.url).searchParams.get('unread') === '1';
   const clause     = unreadOnly ? 'AND read_at IS NULL' : '';
 
-  const { results } = await c.env.PBX_DB.prepare(`
+  const query = `
     SELECT id, from_number, to_number, duration_seconds, transcript, read_at, created_at
     FROM voicemails
     WHERE org_id=? ${clause}
     ORDER BY created_at DESC
     LIMIT 100
-  `).bind(c.get('orgId')).all();
+  `;
+  const { results } = await c.env.PBX_DB.prepare(query).bind(c.get('orgId')).all();
 
   return c.json({ data: results });
 });
@@ -374,26 +377,29 @@ app.post('/webhook/telnyx', async (c) => {
   const rawBody   = await c.req.text();
 
   // Ed25519 signature verification
-  if (sig && c.env.TELNYX_WEBHOOK_SECRET) {
-    try {
-      const pubKey = await crypto.subtle.importKey(
-        'raw',
-        Uint8Array.from(atob(c.env.TELNYX_WEBHOOK_SECRET), ch => ch.charCodeAt(0)),
-        { name: 'Ed25519', namedCurve: 'Ed25519' },
-        false,
-        ['verify'],
-      );
-      const sigBytes = Uint8Array.from(atob(sig), ch => ch.charCodeAt(0));
-      const valid    = await crypto.subtle.verify(
-        'Ed25519', pubKey,
-        sigBytes,
-        new TextEncoder().encode(`${timestamp}|${rawBody}`),
-      );
-      if (!valid) return c.json({ error: 'Invalid signature' }, 401);
-    } catch (e) {
-      console.error('Webhook signature error:', e);
-      return c.json({ error: 'Signature verification failed' }, 401);
-    }
+  // Ed25519 signature verification
+  if (!sig || !c.env.TELNYX_WEBHOOK_SECRET) {
+    return c.json({ error: 'Missing signature or webhook secret' }, 401);
+  }
+
+  try {
+    const pubKey = await crypto.subtle.importKey(
+      'raw',
+      Uint8Array.from(atob(c.env.TELNYX_WEBHOOK_SECRET), ch => ch.charCodeAt(0)),
+      { name: 'Ed25519', namedCurve: 'Ed25519' },
+      false,
+      ['verify'],
+    );
+    const sigBytes = Uint8Array.from(atob(sig), ch => ch.charCodeAt(0));
+    const valid    = await crypto.subtle.verify(
+      'Ed25519', pubKey,
+      sigBytes,
+      new TextEncoder().encode(`${timestamp}|${rawBody}`),
+    );
+    if (!valid) return c.json({ error: 'Invalid signature' }, 401);
+  } catch (e) {
+    console.error('Webhook signature error:', e);
+    return c.json({ error: 'Signature verification failed' }, 401);
   }
 
   const event = JSON.parse(rawBody) as {

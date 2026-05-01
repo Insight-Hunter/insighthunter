@@ -21,22 +21,26 @@ new_classes = ["CallSessionDO"]
 [[d1_databases]]
 binding       = "PBX_DB"
 database_name = "pbx-db"
-database_id   = "e78c7a6f-c529-4f2f-aba1-9ee12f998876"          # wrangler d1 create pbx-db
+database_id   = "e78c7a6f-c529-4f2f-aba1-9ee12f998876"          
+# wrangler d1 create pbx-db
 
 # ── R2 Bucket ─────────────────────────────────────────────────────────────────
 [[r2_buckets]]
 binding     = "PBX_AUDIO"
-bucket_name = "pbx-audio"               # wrangler r2 bucket create pbx-audio
+bucket_name = "pbx-audio"               
+# wrangler r2 bucket create pbx-audio
 
 # ── KV Namespace ──────────────────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "PBX_KV"
-id      = "431a1ca78ac84ba8ad3cd0c08d662fe9"           # wrangler kv namespace create pbx-kv
+id      = "431a1ca78ac84ba8ad3cd0c08d662fe9"           
+# wrangler kv namespace create pbx-kv
 
 # ── Queues ────────────────────────────────────────────────────────────────────
 [[queues.producers]]
 binding = "VM_QUEUE"
-queue   = "pbx-vm-transcription"        # wrangler queues create pbx-vm-transcription
+queue   = "pbx-vm-transcription"        
+# wrangler queues create pbx-vm-transcription
 
 [[queues.consumers]]
 queue             = "pbx-vm-transcription"
@@ -118,7 +122,7 @@ new_classes = ["CallSessionDO"]
 [env.production]
 name   = "insighthunter-pbx"
 routes = [
-  { pattern = "pbx-api.insighthunter.app/*", zone_name = "insighthunter.app" }
+  { pattern = "pbx.insighthunter.app/*", zone_name = "insighthunter.app" }
 ]
 
 [[env.production.d1_databases]]

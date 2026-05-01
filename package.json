@@ -2,18 +2,11 @@
   "name": "insighthunter",
   "private": true,
   "scripts": {
-    "dev":       "turbo run dev --parallel",
-    "build":     "turbo run build",
-    "test":      "turbo run test",
-    "deploy":    "turbo run deploy",
-    "db:migrate":"wrangler d1 migrations apply insighthunter-db --remote",
-    "db:seed":   "tsx scripts/seed-d1.ts"
+    "dev": "pnpm --filter insighthunter-main dev",
+    "build": "pnpm --filter insighthunter-main build",
+    "preview": "pnpm --filter insighthunter-main preview"
   },
   "devDependencies": {
-    "turbo":      "latest",
-    "typescript": "^5.4",
-    "vitest":     "^1.6",
-    "wrangler":   "^3.x"
-  },
-  "packageManager": "pnpm@9"
+    "wrangler": "^4.85.0"
+  }
 }

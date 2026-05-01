@@ -1,0 +1,17 @@
+{
+  "name": "ih-document-vault",
+  "main": "index.ts",
+  "compatibility_date": "2025-03-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "r2_buckets": [
+    { "binding": "DOCS", "bucket_name": "ih-documents" }
+  ],
+  "d1_databases": [
+    { "binding": "DB", "database_name": "ih-vault-meta", "database_id": "REPLACE_WITH_DB_ID" }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production",
+    "AUTH_ORIGIN": "https://auth.insighthunter.app"
+  }
+}

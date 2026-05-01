@@ -1,0 +1,1 @@
+import { Hono } from "hono"; export const aiFormFillApi = new Hono(); aiFormFillApi.post("/", async (c) => { const body = await c.req.json<any>(); return c.json({ suggestions: Object.fromEntries(Object.keys(body || {}).map((k) => [k, "Suggested value"])) }); });

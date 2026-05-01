@@ -1,0 +1,15 @@
+name = "insight-platform-dispatch"
+main = "src/index.ts"
+compatibility_date = "2025-03-07"
+compatibility_flags = ["nodejs_compat"]
+
+[[r2_buckets]]
+binding = "R2"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-dev"
+database_id = "e8a5b59a-4713-4876-9289-c6e9389e6754"
+
+[vars]
+ENVIRONMENT = "development"

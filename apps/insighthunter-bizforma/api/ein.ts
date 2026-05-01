@@ -1,0 +1,1 @@
+import { Hono } from "hono"; import { buildSS4Prefill } from "../services/einService"; export const einApi = new Hono(); einApi.post("/prefill", async (c) => c.json(buildSS4Prefill(await c.req.json<any>())));

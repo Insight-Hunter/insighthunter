@@ -1,0 +1,18 @@
+name = "insighthunter-roadmap"
+main = "index.ts"
+compatibility_date = "2026-04-22"
+
+[observability]
+enabled = true
+
+# Uncomment and adjust one of the route blocks below when you are ready to bind a domain.
+
+# Dedicated subdomain example
+[[routes]]
+pattern = "roadmap.insighthunter.app"
+custom_domain = true
+
+# API route on an existing domain example
+# [[routes]]
+# pattern = "api.insighthunter.app/roadmap*"
+# custom_domain = true
