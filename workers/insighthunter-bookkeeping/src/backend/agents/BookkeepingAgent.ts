@@ -86,6 +86,29 @@ async onRequest(request: Request): Promise<Response> {
     });
   }
 
+  if (url.pathname === "/transactions/bulk" && request.method === "POST") {
+    const { orgId, transactions } = await request.json();
+    this.setState({ ...this.state, orgId });
+    for (const tx of transactions) {
+      // Create transaction in DB
+      const txId = crypto.randomUUID();
+      const now = new Date().toISOString();
+      await this.env.DB.prepare(
+        `INSERT INTO transactions (id, org_id, date, description, amount, status, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, 'pending_classification', ?, ?)`
+      )
+        .bind(txId, orgId, tx.date, tx.description, tx.amount, now, now)
+        .run();
+
+      // Enqueue for classification
+      const job = { orgId, transactionId: txId };
+      await this.runClassification(job);
+    }
+    return new Response(JSON.stringify({ ok: true }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   return new Response("Not found", { status: 404 });
 }
 
