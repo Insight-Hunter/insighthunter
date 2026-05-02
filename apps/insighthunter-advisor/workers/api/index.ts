@@ -15,7 +15,7 @@ export interface Env extends BaseEnv {
 const app = new Hono<{ Bindings: Env }>();
 
 // CORS — allow insighthunter.app and advisor.insighthunter.app
-app.use(o
+app.use(
   "*",
   cors({
     origin: ["https://insighthunter.app", "https://advisor.insighthunter.app"],
