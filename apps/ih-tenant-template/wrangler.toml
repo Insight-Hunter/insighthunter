@@ -1,0 +1,26 @@
+name = "tenant-TEMPLATE"
+main = "src/worker.ts"
+compatibility_date = "2025-04-01"
+
+[observability]
+enabled = true
+
+# These bindings are filled by the platform worker at deploy time
+[[kv_namespaces]]
+binding = "IH_TENANT_KV"
+id = "REPLACE_AT_PROVISION_TIME"
+
+[[d1_databases]]
+binding = "IH_TENANT_DB"
+database_name = "ih-tenant-TEMPLATE"
+database_id = "REPLACE_AT_PROVISION_TIME"
+
+[[r2_buckets]]
+binding = "IH_DOCS"
+bucket_name = "ih-docs"
+
+[vars]
+ORG_ID = "REPLACE_AT_PROVISION_TIME"
+ORG_TIER = "lite"
+
+# Secrets: JWT_SECRET (same as platform)
