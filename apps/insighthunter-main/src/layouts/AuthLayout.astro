@@ -1,27 +1,46 @@
 ---
-import '../styles/theme.scss';
-const { title = 'InsightHunter' } = Astro.props;
+export interface Props { title: string; }
+const { title } = Astro.props;
 ---
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{title} — InsightHunter</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <title>{title} | Insight Hunter</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@700,400&f[]=satoshi@400,500&display=swap" rel="stylesheet" />
 </head>
-<body class="auth-body">
-<div class="auth-wrapper">
-  <a href="/" class="auth-logo">InsightHunter</a>
-  <div class="card auth-card"><slot /></div>
-  <p class="auth-footer"><a href="/">← Back to home</a></p>
-</div>
+<body>
+  <div class="auth-shell">
+    <slot />
+  </div>
 </body>
 </html>
-<style>
-  .auth-body { background: var(--color-bg-subtle); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-  .auth-wrapper { width: 100%; max-width: 420px; padding: var(--space-6); }
-  .auth-logo { display: block; text-align: center; font-family: var(--font-display); font-size: 1.75rem; color: var(--taupe-800); font-weight: 700; margin-bottom: var(--space-6); text-decoration: none; }
-  .auth-card { padding: var(--space-8); }
-  .auth-footer { text-align: center; margin-top: var(--space-4); font-size: 0.875rem; color: var(--color-text-muted); }
+
+<style is:global>
+  :root { --bg:#0d0d0d; --card:#1c1b19; --gold:#C9A84C; --white:#FFFFFF; --muted:#999; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--white); font-family: 'Satoshi','Inter',sans-serif; -webkit-font-smoothing: antialiased; }
+  .auth-shell { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .auth-card { width: 100%; max-width: 420px; background: var(--card); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 40px; }
+  .auth-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; font-weight: 700; color: var(--gold); font-family: 'General Sans','Inter',sans-serif; }
+  h1 { font-size: 1.6rem; margin-bottom: 6px; }
+  .auth-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 28px; }
+  .auth-form { display: flex; flex-direction: column; gap: 18px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+  input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px 14px; color: var(--white); font-size: 0.9rem; outline: none; font-family: inherit; }
+  input:focus { border-color: var(--gold); }
+  .btn-submit { background: var(--gold); color: #000; font-weight: 700; padding: 12px; border: none; border-radius: 8px; font-size: 0.95rem; cursor: pointer; font-family: inherit; margin-top: 4px; }
+  .btn-submit:hover { opacity: 0.88; }
+  .error-msg { color: #ef4444; font-size: 0.85rem; text-align: center; }
+  .auth-links { display: flex; justify-content: center; gap: 12px; margin-top: 20px; font-size: 0.85rem; color: var(--muted); }
+  .auth-links a { color: var(--gold); }
+  .oauth-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+  .oauth-divider::before, .oauth-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
+  .oauth-divider span { font-size: 0.8rem; color: var(--muted); }
+  .btn-oauth { display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 11px; font-size: 0.9rem; color: var(--white); text-decoration: none; transition: border-color 0.2s; }
+  .btn-oauth:hover { border-color: rgba(255,255,255,0.3); }
 </style>
