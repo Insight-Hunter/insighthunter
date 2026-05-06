@@ -1,0 +1,41 @@
+---
+const testimonials = [
+  { name: "Maria T.", role: "Owner, Bloom Bakery", quote: "I replaced QuickBooks AND my accountant's monthly fee. Insight Hunter pays for itself every month." },
+  { name: "Derek W.", role: "Founder, Apex Contracting", quote: "The BizForma wizard walked me through my LLC setup in 40 minutes. Worth every penny." },
+  { name: "Priya S.", role: "CEO, Spark Consulting", quote: "The AI CFO caught a cash flow problem 6 weeks before it would have hit. Game changer." },
+];
+---
+<section class="testimonials">
+  <div class="t-inner">
+    <h2>Trusted by Small Business Owners</h2>
+    <div class="t-grid">
+      {testimonials.map((t) => (
+        <div class="t-card">
+          <p class="t-quote">"{t.quote}"</p>
+          <div class="t-author">
+            <span class="t-name">{t.name}</span>
+            <span class="t-role">{t.role}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+.testimonials { padding: 80px 24px; background: var(--surface, #141414); }
+.t-inner { max-width: 1100px; margin: 0 auto; }
+h2 { text-align: center; font-size: 2rem; margin-bottom: 48px; }
+.t-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.t-card {
+  background: var(--card, #1c1b19);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 28px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+.t-quote { color: var(--white); font-size: 0.95rem; line-height: 1.7; flex: 1; }
+.t-author { display: flex; flex-direction: column; gap: 4px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; }
+.t-name { font-weight: 700; font-size: 0.9rem; color: var(--white); }
+.t-role { font-size: 0.8rem; color: var(--gold); }
+</style>

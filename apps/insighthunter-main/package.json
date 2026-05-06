@@ -1,39 +1,25 @@
 {
-  "name": "insighthunter-main",
-  "version": "1.0.0",
+  "name": "@ih/main",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "typecheck": "astro check"
+    "deploy": "wrangler pages deploy dist --project-name ih-main"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^12.3.1",
-    "@astrojs/svelte": "^7.0.4",
-<<<<<<< HEAD
-    "@ih/tier-config": "*",
-    "@ih/types": "*",
-    "astro": "^5.5.3",
-    "svelte": "^5.20.2"
+    "@astrojs/cloudflare": "^11.0.0",
+    "@astrojs/svelte": "^5.0.0",
+    "@astrojs/tailwind": "^5.0.0",
+    "astro": "^4.8.0",
+    "hono": "^4.3.0",
+    "svelte": "^5.0.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250310.0",
-    "sass": "^1.85.1",
-    "typescript": "^5.7.3",
-    "wrangler": "^4.76.0"
-=======
-    "astro": "^5.5.3",
-    "svelte": "^5.20.2",
-    "@ih/types": "*",
-    "@ih/tier-config": "*"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250310.0",
-    "typescript": "^5.7.3",
-    "wrangler": "^3.109.3",
-    "sass": "^1.85.1"
->>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
+    "typescript": "^5.4.0",
+    "@cloudflare/workers-types": "^4.20240524.0",
+    "tailwindcss": "^3.4.0"
   }
 }
