@@ -1,0 +1,88 @@
+---
+import { tiers, addons } from '../../data/pricing';
+---
+<section class="pricing" id="pricing">
+  <div class="pricing-inner">
+    <h2>Simple, Transparent Pricing</h2>
+    <p class="pricing-sub">Start free. Scale when you're ready.</p>
+
+    <div class="pricing-grid">
+      {tiers.map((tier) => (
+        <div class={`pricing-card ${tier.id === 'standard' ? 'featured' : ''}`}>
+          {tier.id === 'standard' && <span class="featured-badge">Most Popular</span>}
+          <h3 class="tier-name">{tier.name}</h3>
+          <div class="tier-price">
+            <span class="price-amount">${tier.price}</span>
+            <span class="price-period">/mo</span>
+          </div>
+          <ul class="tier-features">
+            {tier.features.map((f) => (
+              <li>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 8L6.5 11.5L13 5" stroke="#C9A84C" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                {f}
+              </li>
+            ))}
+          </ul>
+          <a href={`https://auth.insighthunter.app/register?tier=${tier.id}`} class={`tier-cta ${tier.id === 'standard' ? 'cta-gold' : 'cta-outline'}`}>
+            {tier.price === 0 ? 'Start Free' : 'Get Started'}
+          </a>
+        </div>
+      ))}
+    </div>
+
+    <h3 class="addon-title">Add-Ons</h3>
+    <div class="addon-grid">
+      {addons.map((addon) => (
+        <div class="addon-card">
+          <span class="addon-name">{addon.name}</span>
+          <span class="addon-price">${addon.price}/mo</span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+.pricing { padding: 80px 24px; background: var(--bg); }
+.pricing-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
+h2 { font-size: 2.2rem; margin-bottom: 12px; }
+.pricing-sub { color: var(--muted); margin-bottom: 48px; }
+.pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 48px; }
+.pricing-card {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: left;
+  position: relative;
+}
+.pricing-card.featured { border-color: var(--gold); }
+.featured-badge {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: var(--gold); color: #000; font-weight: 700;
+  font-size: 11px; padding: 4px 12px; border-radius: 100px;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.tier-name { font-size: 1.3rem; font-weight: 700; color: var(--white); margin-bottom: 16px; }
+.tier-price { margin-bottom: 24px; }
+.price-amount { font-size: 2.8rem; font-weight: 700; color: var(--white); }
+.price-period { color: var(--muted); font-size: 1rem; }
+.tier-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.tier-features li { display: flex; gap: 10px; align-items: flex-start; font-size: 0.9rem; color: var(--muted); }
+.tier-cta { display: block; text-align: center; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; }
+.cta-gold { background: var(--gold); color: #000; }
+.cta-outline { border: 1px solid rgba(255,255,255,0.2); color: var(--white); }
+.cta-outline:hover { border-color: var(--gold); color: var(--gold); }
+.addon-title { font-size: 1.5rem; margin-bottom: 24px; color: var(--white); }
+.addon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.addon-card {
+  background: var(--surface-alt, #1a1a1a);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; padding: 16px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.addon-name { font-size: 0.9rem; color: var(--white); }
+.addon-price { font-size: 0.875rem; color: var(--gold); font-weight: 600; }
+</style>
