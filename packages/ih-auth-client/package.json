@@ -1,0 +1,17 @@
+{
+  "name": "@ih/auth-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./jwt": "./src/jwt.ts",
+    "./session": "./src/session.ts",
+    "./middleware": "./src/middleware.ts",
+    "./types": "./src/types.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "hono": "^4.3.0"
+  }
+}
