@@ -1,0 +1,26 @@
+name = "ih-auth-worker"
+main = "src/worker.ts"
+compatibility_date = "2025-04-01"
+
+[observability]
+enabled = true
+
+routes = [{ pattern = "auth.insighthunter.app/*", zone_name = "insighthunter.app" }]
+
+[[d1_databases]]
+binding = "IH_AUTH_DB"
+database_name = "ih-auth-db"
+database_id = "c32b6411-aed5-40ae-b9e1-af5a64561082"
+
+[[kv_namespaces]]
+binding = "IH_AUTH_KV"
+id = "28474b5f5f064190b051c99ce50b68e8"
+
+[[queues.producers]]
+binding = "IH_WELCOME_QUEUE"
+queue = "ih-welcome-queue"
+
+[ai]
+binding = "AI"
+
+# Secrets: JWT_SECRET, PLATFORM_SERVICE_TOKEN, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET

@@ -1,64 +1,9 @@
 ---
-import DashboardLayout from '../../layouts/DashboardLayout.astro';
-import KPICard from '../../components/dashboard/KPICard.svelte';
-import RevenueChart from '../../components/dashboard/RevenueChart.svelte';
-import CashFlowChart from '../../components/dashboard/CashFlowChart.svelte';
-import ActivityFeed from '../../components/dashboard/ActivityFeed.svelte';
-import QuickActions from '../../components/dashboard/QuickActions.svelte';
-import { apiGet } from '../../lib/api';
-
-// Helper function to get the start and end dates for the last 4 months
-function getMonthRange() {
-  const now = new Date();
-  const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  const startDate = new Date(now.getFullYear(), now.getMonth() - 3, 1);
-  return {
-    from: startDate.toISOString().split('T')[0],
-    to: endDate.toISOString().split('T')[0],
-  };
-}
-
-const { from, to } = getMonthRange();
-
-// Fetch P&L data
-let plData = null;
-try {
-  plData = await apiGet(`/statements/pl?date_from=${from}&date_to=${to}`);
-  console.log('P&L data:', plData);
-} catch (error) {
-  console.error('Error fetching P&L data:', error);
-}
-
-const revenue = plData?.pl?.income?.total ?? 0;
-const expenses = plData?.pl?.expenses?.total ?? 0;
-const netIncome = revenue - expenses;
-
-const revenueData = plData?.pl?.income?.accounts?.map(account => ({
-  month: new Date(account.date).toLocaleString('default', { month: 'short' }),
-  revenue: account.balance,
-  expenses: 0, // Replace with actual expense data if available
-})) ?? [];
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
 ---
-<DashboardLayout title="Dashboard">
-  <h1 style="font-family:var(--font-display);font-size:var(--text-xl);font-style:italic;margin-bottom:var(--space-5);">Good morning.</h1>
-  <div class="kpi-grid">
-    <KPICard client:load label="Revenue" value={revenue} delta={12.4} prefix="$" />
-    <KPICard client:load label="Expenses" value={expenses} delta={-3.1} prefix="$" />
-    <KPICard client:load label="Net Income" value={netIncome} delta={18.6} prefix="$" />
-    <KPICard client:load label="Cash Balance" value="$42,000" delta={5.2} />
-    <KPICard client:load label="Burn Rate" value="$11,200" delta={-3.1} suffix="/mo" />
-    <KPICard client:load label="Runway" value="3.8" delta={0.3} suffix=" months" />
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5);">
-    <RevenueChart client:load data={revenueData} />
-    <CashFlowChart client:load data={[]} />
-  </div>
-  <div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-5);">
-    <ActivityFeed client:load items={[
-      {id:'1',text:'CSV uploaded: Jan_transactions.csv',time:'2 hours ago',icon:'📤'},
-      {id:'2',text:'AI insight: Revenue up 12.4% MoM',time:'2 hours ago',icon:'🧠'},
-      {id:'3',text:'Report exported: January P&L.pdf',time:'Yesterday',icon:'📄'},
-    ]} />
-    <QuickActions client:load />
-  </div>
-</DashboardLayout>
+<MarketingLayout title="Dashboard index">
+  <section class="container" style="padding:60px 24px">
+    <h1 style="font-family:var(--font-display);font-size:2rem;margin-bottom:12px">Dashboard index</h1>
+    <p style="color:var(--muted)">Authenticated dashboard scaffold ready for API wiring.</p>
+  </section>
+</MarketingLayout>

@@ -1,12 +1,26 @@
 {
   "name": "insighthunter",
   "private": true,
+  "type": "module",
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "pnpm --filter insighthunter-main dev",
-    "build": "pnpm --filter insighthunter-main build",
-    "preview": "pnpm --filter insighthunter-main preview"
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "deploy:main": "cd apps/insighthunter-main && npm run deploy",
+    "deploy:auth": "cd apps/insighthunter-auth && npx wrangler deploy",
+    "deploy:bizforma": "cd apps/insighthunter-bizforma && npx wrangler deploy",
+    "deploy:payroll": "cd apps/insighthunter-payroll && npx wrangler deploy",
+    "deploy:pbx": "cd apps/insighthunter-pbx && npx wrangler deploy",
+    "deploy:bookkeeping": "cd apps/insighthunter-bookkeeping && npx wrangler deploy",
+    "deploy:report": "cd apps/insighthunter-report && npx wrangler deploy",
+    "deploy:scout": "cd apps/insighthunter-scout && npx wrangler deploy",
+    "deploy:whitelabel": "cd apps/insighthunter-whitelabel && npx wrangler deploy",
+    "deploy:platform": "cd apps/ih-platform-worker && npx wrangler deploy",
+    "deploy:tenant-template": "cd apps/ih-tenant-template && npx wrangler deploy"
   },
   "devDependencies": {
-    "wrangler": "^4.85.0"
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
   }
 }

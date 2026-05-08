@@ -1,0 +1,8 @@
+name = "ih-bookkeeping-worker"
+main = "src/worker.ts"
+compatibility_date = "2025-04-01"
+
+[observability]
+enabled = true
+
+routes = [{ pattern = "bookkeeping.insighthunter.app/*", zone_name = "insighthunter.app" }]

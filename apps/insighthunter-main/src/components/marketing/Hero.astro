@@ -1,0 +1,90 @@
+---
+---
+<section class="hero">
+  <div class="hero-inner">
+    <span class="hero-eyebrow">AI-Powered Financial Intelligence</span>
+    <h1 class="hero-headline">Stop Flying Blind.<br /><span class="gold">Know Your Numbers.</span></h1>
+    <p class="hero-sub">
+      Insight Hunter gives small businesses enterprise-grade bookkeeping, payroll,
+      cash flow forecasting, and an AI CFO — all in one platform.
+    </p>
+    <div class="hero-actions">
+      <a href="https://auth.insighthunter.app/register" class="btn-primary">Start Free — No Card Required</a>
+      <a href="/pricing" class="btn-ghost">See Pricing →</a>
+    </div>
+    <div class="hero-badges">
+      <span class="badge">✓ Cloudflare-native · Global Edge</span>
+      <span class="badge">✓ Per-account data isolation</span>
+      <span class="badge">✓ SOC 2 ready</span>
+    </div>
+  </div>
+</section>
+
+<style>
+.hero {
+  min-height: 92vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%),
+              var(--bg-navy, #141522);
+}
+.hero-inner { max-width: 780px; text-align: center; }
+.hero-eyebrow {
+  display: inline-block;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  padding: 6px 16px;
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 100px;
+}
+.hero-headline {
+  font-size: clamp(2.4rem, 7vw, 4.2rem);
+  line-height: 1.12;
+  margin-bottom: 24px;
+  color: var(--white);
+}
+.hero-headline .gold { color: var(--gold); }
+.hero-sub {
+  font-size: 1.15rem;
+  color: var(--muted);
+  max-width: 600px;
+  margin: 0 auto 36px;
+  line-height: 1.7;
+}
+.hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+.btn-primary {
+  background: var(--gold);
+  color: #000;
+  font-weight: 700;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: opacity 0.2s;
+  display: inline-block;
+}
+.btn-primary:hover { opacity: 0.88; }
+.btn-ghost {
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--white);
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  display: inline-block;
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+.hero-badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.badge {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 4px 10px;
+  border: 1px solid #333;
+  border-radius: 4px;
+}
+</style>

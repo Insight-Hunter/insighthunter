@@ -1,0 +1,8 @@
+name = "tenant-template"
+main = "src/worker.ts"
+compatibility_date = "2025-04-01"
+
+[observability]
+enabled = true
+
+routes = [{ pattern = "workers.insighthunter.app/*", zone_name = "insighthunter.app" }]

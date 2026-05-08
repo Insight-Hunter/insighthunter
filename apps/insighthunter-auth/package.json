@@ -1,0 +1,16 @@
+{
+  "name": "@ih/ih-auth-worker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "echo build complete",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "hono": "^4.3.0",
+    "zod": "^3.23.0",
+    "@hono/zod-validator": "^0.2.2"
+  }
+}

@@ -1,10 +1,9 @@
 ---
-import DashboardLayout from '../../layouts/DashboardLayout.astro';
-import TierGate from '../../components/dashboard/TierGate.astro';
-import WizardShell from '../../components/dashboard/bizforma/WizardShell.svelte';
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
 ---
-<DashboardLayout title="BizForma">
-  <TierGate required="standard">
-    <WizardShell client:load />
-  </TierGate>
-</DashboardLayout>
+<MarketingLayout title="Dashboard bizforma">
+  <section class="container" style="padding:60px 24px">
+    <h1 style="font-family:var(--font-display);font-size:2rem;margin-bottom:12px">Dashboard bizforma</h1>
+    <p style="color:var(--muted)">Authenticated dashboard scaffold ready for API wiring.</p>
+  </section>
+</MarketingLayout>

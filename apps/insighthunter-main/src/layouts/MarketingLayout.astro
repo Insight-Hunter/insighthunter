@@ -1,37 +1,22 @@
 ---
-import '../styles/theme.scss';
-const { title = 'InsightHunter — AI CFO for Small Business' } = Astro.props;
+const { title = 'Insight Hunter' } = Astro.props;
 ---
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{title}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@400;500;600&family=Source+Serif+4&display=swap" rel="stylesheet" />
-</head>
-<body>
-<nav class="nav">
-  <div class="nav__inner">
-    <a href="/" class="nav__logo">InsightHunter</a>
-    <div class="nav__links">
-      <a href="/pricing">Pricing</a>
-      <a href="/about">About</a>
-      <a href="/auth/login" class="btn btn--ghost">Sign in</a>
-      <a href="/auth/register" class="btn btn--primary">Get started</a>
-    </div>
-  </div>
-</nav>
-<main><slot /></main>
-<footer class="footer">
-  <div class="footer__inner">
-    <span>© 2025 InsightHunter. All rights reserved.</span>
-    <nav class="footer__links">
-      <a href="/privacy">Privacy</a>
-      <a href="/terms">Terms</a>
-    </nav>
-  </div>
-</footer>
-</body>
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://api.fontshare.com" />
+    <link href="https://api.fontshare.com/v2/css?f[]=general-sans@700,500&f[]=satoshi@400,500&display=swap" rel="stylesheet" />
+    <style>
+      :root{--bg:#0d0d0d;--bg-navy:#141522;--surface:#141414;--surface2:#1a1a1a;--card:#1c1b19;--gold:#C9A84C;--white:#fff;--muted:#999;--r:16px;--font-display:'General Sans','Inter',sans-serif;--font-body:'Satoshi','Inter',sans-serif}
+      *{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font-body);background:var(--bg);color:var(--white)}a{text-decoration:none;color:inherit}.container{max-width:1200px;margin:0 auto;padding:0 24px}
+      .btn{display:inline-block;padding:14px 22px;border-radius:10px;font-weight:700}.btn-gold{background:var(--gold);color:#111}.btn-outline{border:1px solid rgba(255,255,255,.18)}
+      .card{background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:var(--r)}
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
 </html>
