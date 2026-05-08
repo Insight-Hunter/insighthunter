@@ -1,0 +1,33 @@
+---
+import AppCard from './AppCard.astro';
+import { apps } from '../../data/apps';
+---
+<section class="features" id="features">
+  <div class="features-inner">
+    <h2>Everything Your Business Needs</h2>
+    <p class="features-sub">One platform. No subscription sprawl.</p>
+    <div class="features-grid">
+      {apps.map((app) => (
+        <AppCard
+          name={app.name}
+          tier={app.tier}
+          description={app.description}
+          href={app.href}
+          icon={app.icon}
+        />
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+.features { padding: 80px 24px; background: var(--bg-navy, #141522); }
+.features-inner { max-width: 1200px; margin: 0 auto; }
+h2 { font-size: 2.2rem; text-align: center; margin-bottom: 12px; }
+.features-sub { text-align: center; color: var(--muted); margin-bottom: 48px; }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+</style>

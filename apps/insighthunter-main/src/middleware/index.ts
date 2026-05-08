@@ -1,49 +1,35 @@
-import { defineMiddleware } from 'astro:middleware';
+import type { MiddlewareHandler } from 'astro';
+import { verifyJWT } from '@ih/auth-client/jwt';
 
-export const onRequest = defineMiddleware(async (context, next) => {
+export const onRequest: MiddlewareHandler = async (context, next) => {
   const { pathname } = context.url;
 
-  // Only protect /dashboard/* routes
-  if (!pathname.startsWith('/dashboard')) {
-    return next();
-  }
+  // Only protect /dashboard routes
+  if (!pathname.startsWith('/dashboard')) return next();
 
-  const env = context.locals.runtime?.env as {
-    AUTH_WORKER: Fetcher;
-    JWT_SECRET: string;
-  } | undefined;
-
-  // Read token from cookie or Authorization header
-  const cookie = context.cookies.get('ih_session');
-  const authHeader = context.request.headers.get('Authorization');
-  const token = cookie?.value ?? authHeader?.replace('Bearer ', '') ?? null;
+  const cookies = context.request.headers.get('cookie') || '';
+  const match = cookies.match(/ih_session=([^;]+)/);
+  const token = match?.[1];
 
   if (!token) {
-    const next_ = encodeURIComponent(pathname);
-    return context.redirect(`/auth/login?next=${next_}`);
+    return context.redirect(
+      `https://auth.insighthunter.app/login?redirect_uri=${encodeURIComponent(context.url.href)}`
+    );
   }
 
-  try {
-    const verifyRes = await env?.AUTH_WORKER.fetch(new Request('https://internal/auth/verify', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Internal-Secret': env.JWT_SECRET,
-      },
-      body: JSON.stringify({ token }),
-    }));
+  const secret = (context.locals as any).runtime?.env?.JWT_SECRET || '';
+  const payload = token ? await verifyJWT(token, secret) : null;
 
-    if (!verifyRes || !verifyRes.ok) {
-      context.cookies.delete('ih_session', { path: '/' });
-      const next_ = encodeURIComponent(pathname);
-      return context.redirect(`/auth/login?next=${next_}`);
-    }
-
-    const user = await verifyRes.json();
-    context.locals.user = user;
-    return next();
-  } catch {
-    context.cookies.delete('ih_session', { path: '/' });
-    return context.redirect('/auth/login');
+  if (!payload) {
+    return context.redirect(`https://auth.insighthunter.app/login?redirect_uri=${encodeURIComponent(context.url.href)}`);
   }
-});
+
+  (context.locals as any).session = {
+    userId: payload.userId,
+    orgId: payload.orgId,
+    email: payload.email,
+    tier: payload.tier,
+  };
+
+  return next();
+};
