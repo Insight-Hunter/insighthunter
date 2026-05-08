@@ -1,0 +1,28 @@
+name = "ih-platform-worker"
+main = "src/worker.ts"
+compatibility_date = "2025-04-01"
+
+[observability]
+enabled = true
+
+[[dispatch_namespaces]]
+binding = "DISPATCH_NS"
+namespace = "ih-apps"
+
+[[kv_namespaces]]
+binding = "IH_REGISTRY"
+id = "REPLACE_WITH_KV_ID"
+
+[[d1_databases]]
+binding = "IH_PLATFORM_DB"
+database_name = "ih-platform-db"
+database_id = "REPLACE_WITH_D1_ID"
+
+[vars]
+CF_ACCOUNT_ID = "REPLACE_WITH_ACCOUNT_ID"
+
+# Secrets (set via: wrangler secret put JWT_SECRET, CF_API_TOKEN)
+# JWT_SECRET, CF_API_TOKEN
+
+[triggers]
+crons = []
