@@ -1,9 +1,8 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
     "types": ["@cloudflare/workers-types"]
-  }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/backend/types/package.json"]
 }
