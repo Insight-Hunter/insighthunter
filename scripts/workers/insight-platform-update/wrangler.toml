@@ -1,0 +1,45 @@
+name = "insight-platform-dispatch"
+main = "src/index.ts"
+compatibility_date = "2025-03-07"
+compatibility_flags = ["nodejs_compat"]
+
+<<<<<<< HEAD
+[[r2_buckets]]
+binding = "R2"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-dev"
+database_id = "e8a5b59a-4713-4876-9289-c6e9389e6754"
+
+[vars]
+ENVIRONMENT = "development"
+=======
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[[routes]]
+pattern = "api.insighthunter.com/api/*"
+zone_name = "insighthunter.com"
+
+[[dispatch_namespaces]]
+binding = "DISPATCHER"
+namespace = "insight-users"
+
+[[d1_databases]]
+binding = "PLATFORM_DB"
+database_name = "insight-platform-db"
+database_id = "fe51ad9c-c08b-4fe4-9c0a-67361d9f2c09"
+
+[[kv_namespaces]]
+binding = "ROUTING_CACHE"
+id = "a9db8755115f44048b7d334c42a999e5"
+
+[[analytics_engine_datasets]]
+binding = "EVENTS"
+dataset = "insight_api_events"
+
+[vars]
+CF_ACCOUNT_ID = "18c8e61a3669253dcfd0c7eec6be36a3"
+>>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f

@@ -1,0 +1,76 @@
+<<<<<<< HEAD
+<nav style="position:sticky;top:0;background:rgba(13,13,13,.88);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06)">
+  <div class="container" style="height:68px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+    <a href="/" style="display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700">
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><path d="M20 4C20 4 12 12 12 20C12 25.5 15.6 30 20 30C24.4 30 28 25.5 28 20C28 15 26 11 26 11C26 11 25 16 20 16C15 16 17 10 20 4Z" fill="#C9A84C"/></svg>
+      <span>Insight Hunter</span>
+    </a>
+    <div style="display:flex;gap:20px;color:var(--muted)">
+      <a href="/features">Features</a><a href="/pricing">Pricing</a><a href="/about">About</a>
+    </div>
+    <div style="display:flex;gap:12px"><a class="btn btn-outline" href="/auth/login">Sign In</a><a class="btn btn-gold" href="/auth/register">Start Free</a></div>
+  </div>
+</nav>
+=======
+---
+---
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Flame + arrow icon -->
+        <path d="M14 2C14 2 8 8 8 14C8 18.4 10.8 22 14 22C17.2 22 20 18.4 20 14C20 10 18 7 18 7C18 7 17 12 14 12C11 12 12 8 14 2Z" fill="#C9A84C"/>
+        <path d="M14 26L11 22H17L14 26Z" fill="#C9A84C"/>
+        <path d="M14 16L18 12" stroke="#C9A84C" stroke-width="2" stroke-linecap="round"/>
+        <path d="M16 12H18V14" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="nav-brand">Insight Hunter</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/features">Features</a></li>
+      <li><a href="/pricing">Pricing</a></li>
+      <li><a href="/about">About</a></li>
+    </ul>
+    <div class="nav-ctas">
+      <a href="https://auth.insighthunter.app/login" class="nav-login">Sign In</a>
+      <a href="https://auth.insighthunter.app/register" class="nav-signup">Start Free</a>
+    </div>
+  </div>
+</nav>
+
+<style>
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,13,13,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex; align-items: center; gap: 32px;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 700; font-size: 1.1rem; font-family: var(--font-display);
+  color: var(--white);
+}
+.nav-links {
+  display: flex; gap: 28px; list-style: none; flex: 1;
+}
+.nav-links a { color: var(--muted); font-size: 0.9rem; transition: color 0.2s; }
+.nav-links a:hover { color: var(--white); }
+.nav-ctas { display: flex; gap: 12px; margin-left: auto; }
+.nav-login { color: var(--muted); font-size: 0.9rem; padding: 8px 16px; }
+.nav-login:hover { color: var(--white); }
+.nav-signup {
+  background: var(--gold); color: #000; font-weight: 700;
+  font-size: 0.875rem; padding: 8px 18px; border-radius: 6px;
+}
+.nav-signup:hover { opacity: 0.88; }
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+}
+</style>
+>>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f

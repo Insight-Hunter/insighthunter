@@ -1,0 +1,61 @@
+<<<<<<< HEAD
+name = "insighthunter-main"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-04-12"
+compatibility_flags = ["nodejs_compat"]
+
+[[routes]]
+pattern = "bizforma.insighthunter.app"
+zone_name = "insighthunter.app"
+custom_domain = true
+=======
+name = "ih-main"
+compatibility_date = "2025-04-01"
+pages_build_output_dir = "dist"
+>>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
+
+[observability]
+enabled = true
+
+<<<<<<< HEAD
+[[services]]
+binding = "DISPATCH_WORKER"
+service = "insighthunter-dispatch"
+
+[[services]]
+binding = "AUTH_WORKER"
+service = "insighthunter-auth"
+
+[[services]]
+binding = "AUTH"
+service = "insighthunter-auth"
+environment = "production"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "60e34ba310ca40c79edec05470c7a271"
+
+[[analytics_engine_datasets]]
+binding = "PAGE_REQUESTS"
+dataset = "ih_page_views"
+
+[vars]
+PUBLIC_APP_URL = "https://insighthunter.app"
+AUTH_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
+
+[[dispatch_namespaces]]
+binding = "BIZFORMA"
+namespace = "platform.insighthunter.app"
+
+[dispatch_namespaces.outbound]
+service = "insighthunter-bizforma"
+=======
+[[kv_namespaces]]
+binding = "IH_MAIN_KV"
+id = "REPLACE_WITH_KV_ID"
+
+[vars]
+JWT_SECRET = "REPLACE_VIA_SECRET"
+
+# Deploy: wrangler pages deploy dist --project-name ih-main
+>>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f

@@ -1,0 +1,39 @@
+---
+<<<<<<< HEAD
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+---
+<MarketingLayout title="Dashboard index">
+  <section class="container" style="padding:60px 24px">
+    <h1 style="font-family:var(--font-display);font-size:2rem;margin-bottom:12px">Dashboard index</h1>
+    <p style="color:var(--muted)">Authenticated dashboard scaffold ready for API wiring.</p>
+  </section>
+</MarketingLayout>
+=======
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import KPICard from '../../components/dashboard/KPICard.svelte';
+---
+<DashboardLayout title="Dashboard">
+  <div class="dash-header">
+    <h1>Good morning ✦</h1>
+    <p class="dash-sub">Here's your financial snapshot.</p>
+  </div>
+
+  <div class="kpi-grid">
+    <KPICard client:load label="Monthly Revenue" value="$24,800" change="12% vs last month" positive={true} icon="💰" />
+    <KPICard client:load label="Cash on Hand" value="$11,240" change="3% vs last week" positive={true} icon="🏦" />
+    <KPICard client:load label="Expenses (MTD)" value="$8,420" change="5% vs last month" positive={false} icon="📉" />
+    <KPICard client:load label="Open Invoices" value="$6,300" change="2 overdue" positive={false} icon="📄" />
+  </div>
+</DashboardLayout>
+
+<style>
+.dash-header { margin-bottom: 32px; }
+h1 { font-size: 1.8rem; color: #fff; margin-bottom: 6px; }
+.dash-sub { color: #999; font-size: 0.95rem; }
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+</style>
+>>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f

@@ -1,26 +1,40 @@
 {
   "name": "insighthunter",
   "private": true,
-  "type": "module",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "packages/@ih/types",
+    "packages/@ih/tier-config",
+    "packages/@ih/auth-client",
+    "apps/insighthunter-auth",
+    "apps/insighthunter-dispatch",
+    "apps/insighthunter-bookkeeping",
+    "apps/insighthunter-bizforma",
+    "apps/insighthunter-pbx",
+    "apps/insighthunter-payroll",
+    "apps/insighthunter-ai",
+    "apps/insighthunter-main",
+    "workers-for-platforms/tenant-base-worker"
+  ],
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
-    "lint": "turbo run lint",
-    "deploy:main": "cd apps/insighthunter-main && npm run deploy",
-    "deploy:auth": "cd apps/insighthunter-auth && npx wrangler deploy",
-    "deploy:bizforma": "cd apps/insighthunter-bizforma && npx wrangler deploy",
-    "deploy:payroll": "cd apps/insighthunter-payroll && npx wrangler deploy",
-    "deploy:pbx": "cd apps/insighthunter-pbx && npx wrangler deploy",
-    "deploy:bookkeeping": "cd apps/insighthunter-bookkeeping && npx wrangler deploy",
-    "deploy:report": "cd apps/insighthunter-report && npx wrangler deploy",
-    "deploy:scout": "cd apps/insighthunter-scout && npx wrangler deploy",
-    "deploy:whitelabel": "cd apps/insighthunter-whitelabel && npx wrangler deploy",
-    "deploy:platform": "cd apps/ih-platform-worker && npx wrangler deploy",
-    "deploy:tenant-template": "cd apps/ih-tenant-template && npx wrangler deploy"
+    "dev":       "turbo run dev --parallel",
+    "build":     "turbo run build",
+    "test":      "turbo run test",
+    "deploy":    "turbo run deploy",
+    "db:migrate":"wrangler d1 migrations apply insighthunter-db --remote",
+    "db:seed":   "tsx scripts/seed-d1.ts"
   },
   "devDependencies": {
-    "turbo": "^2.0.0",
-    "typescript": "^5.4.0"
-  }
+    "@cloudflare/workers-types": "^4.20250310.0",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3",
+    "wrangler": "^4.76.0",
+    "vitest": "^1.6"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "openssl": "^2.0.0"
+  },
+  "packageManager": "pnpm@9"
 }

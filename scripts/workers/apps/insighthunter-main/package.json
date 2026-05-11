@@ -1,0 +1,25 @@
+{
+  "name": "@ih/main",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "deploy": "wrangler pages deploy dist --project-name ih-main"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^11.0.0",
+    "@astrojs/svelte": "^5.0.0",
+    "@astrojs/tailwind": "^5.0.0",
+    "astro": "^4.8.0",
+    "hono": "^4.3.0",
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@cloudflare/workers-types": "^4.20240524.0",
+    "tailwindcss": "^3.4.0"
+  }
+}

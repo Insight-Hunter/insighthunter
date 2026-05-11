@@ -1,0 +1,48 @@
+<<<<<<< HEAD
+name = "ih-payroll-worker"
+main = "src/worker.ts"
+compatibility_date = "2025-04-01"
+
+[observability]
+enabled = true
+
+routes = [{ pattern = "payroll.insighthunter.app/*", zone_name = "insighthunter.app" }]
+=======
+account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
+name = "insighthunter-payroll"
+main = "src/index.ts"
+compatibility_date = "2025-11-01"
+
+[observability]
+enabled = true
+
+[build]
+command = "npm install --legacy-peer-deps && npm run build"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-auth-db"
+database_id = "b9a67a07-96a6-424b-8409-d022b7246294"
+
+[[kv_namespaces]]
+binding = "PAYROLL_CACHE"
+id = "192305553e184131b7d5306e579759c9"
+
+[[routes]]
+pattern = "payroll.insighthunter.app/api/*"
+zone_name = "insighthunter.app"
+
+[[services]]
+binding = "AUTH_WORKER"
+service = "insighthunter-auth"
+
+[[services]]
+binding = "AGENTS_WORKER"
+service = "insighthunter-agents"
+
+# Secrets:
+# wrangler secret put JWT_SECRET
+# wrangler secret put STRIPE_KEY
+ext
+
+>>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
