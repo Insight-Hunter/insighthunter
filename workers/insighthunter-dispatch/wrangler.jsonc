@@ -1,0 +1,33 @@
+{
+  "name": "insighthunter-dispatch",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "dispatch_namespaces": [
+    {
+      "binding": "DISPATCH",
+      "namespace": "insighthunter-tenants",
+      "outbound": {
+        "worker": { "service": "insighthunter-auth" },
+        "params": [{ "name": "orgId" }]
+      }
+    }
+  ],
+  "services": [
+    { "binding": "AUTH_WORKER",          "service": "insighthunter-auth" },
+    { "binding": "BOOKKEEPING_WORKER",   "service": "insighthunter-bookkeeping" },
+    { "binding": "INSIGHTS_WORKER",      "service": "insighthunter-insights" },
+    { "binding": "REPORTS_WORKER",       "service": "insighthunter-reports" },
+    { "binding": "NOTIFICATIONS_WORKER", "service": "insighthunter-notifications" },
+    { "binding": "PAYROLL_WORKER",       "service": "insighthunter-payroll" },
+    { "binding": "PBX_WORKER",           "service": "insighthunter-pbx" }
+  ],
+  "analytics_engine_datasets": [
+    { "binding": "ANALYTICS", "dataset": "insighthunter_events" }
+  ],
+  "routes": [
+    { "pattern": "insighthunter.app/api/*",  "zone_name": "insighthunter.app" },
+    { "pattern": "*.insighthunter.app/*",    "zone_name": "insighthunter.app" }
+  ]
+}

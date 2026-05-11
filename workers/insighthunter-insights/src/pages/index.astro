@@ -1,0 +1,13 @@
+---
+// Redirect authenticated users to dashboard
+import { getSessionToken, getSession } from "@/lib/auth/session";
+import type { Env } from "@/types";
+
+const env   = (Astro.locals as any).runtime?.env as Env | undefined;
+const token = getSessionToken(Astro.request);
+if (env && token) {
+  const session = await getSession(env.IH_SESSIONS, token);
+  if (session) return Astro.redirect("/dashboard", 302);
+}
+return Astro.redirect("/auth/login", 302);
+---

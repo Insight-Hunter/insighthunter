@@ -1,0 +1,66 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+---
+<AuthLayout title="Create Account">
+  <h1 class="text-2xl font-semibold text-white mb-1">Get started free</h1>
+  <p class="text-sm text-slate-400 mb-6">Create your Insight Hunter Lite account.</p>
+  <form id="register-form" novalidate class="space-y-4">
+    <div>
+      <label for="name" class="block text-sm font-medium text-slate-300 mb-1.5">Full Name</label>
+      <input id="name" name="name" type="text" required autocomplete="name"
+        class="ih-input" placeholder="Jane Smith" />
+    </div>
+    <div>
+      <label for="email" class="block text-sm font-medium text-slate-300 mb-1.5">Work Email</label>
+      <input id="email" name="email" type="email" required autocomplete="email"
+        class="ih-input" placeholder="jane@company.com" />
+    </div>
+    <div>
+      <label for="password" class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+      <input id="password" name="password" type="password" required minlength="8" autocomplete="new-password"
+        class="ih-input" placeholder="At least 8 characters" />
+    </div>
+    <div id="error-msg" class="hidden rounded-lg bg-red-900/40 border border-red-700 px-4 py-2 text-sm text-red-300"></div>
+    <button type="submit" class="ih-btn-primary w-full">Create Account</button>
+  </form>
+  <p class="mt-6 text-center text-sm text-slate-500">
+    Already have an account? <a href="/auth/login" class="text-brand-400 hover:text-brand-300 underline underline-offset-2">Sign in</a>
+  </p>
+</AuthLayout>
+
+<style lang="postcss">
+  .ih-input  { @apply w-full rounded-lg border border-surface-700 bg-surface-900 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 transition; }
+  .ih-btn-primary { @apply rounded-lg bg-brand-600 hover:bg-brand-500 disabled:bg-surface-700 disabled:cursor-not-allowed px-4 py-2.5 text-sm font-semibold text-white transition-colors; }
+</style>
+
+<script>
+  const form      = document.getElementById("register-form") as HTMLFormElement;
+  const errorMsg  = document.getElementById("error-msg")!;
+  const submitBtn = form.querySelector("button[type=submit]") as HTMLButtonElement;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Creating account…";
+    errorMsg.classList.add("hidden");
+
+    const fd = new FormData(form);
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: fd.get("name"), email: fd.get("email"), password: fd.get("password") }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.message || "Registration failed.");
+      }
+      window.location.href = "/dashboard";
+    } catch (err) {
+      errorMsg.textContent = (err instanceof Error && err.message) || "Registration failed.";
+      errorMsg.classList.remove("hidden");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Create Account";
+    }
+  });
+</script>
