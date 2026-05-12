@@ -2,16 +2,39 @@ const { execSync } = require('child_process');
 const { writeFileSync, readFileSync, existsSync } = require('fs');
 const path = require('path');
 
-const项目根目录 = path.resolve(__dirname, '..');
-const appsDir = path.join(项目根目录, 'apps');
+const direct = path.resolve(__dirname, '..');
+const appsDir = path.join(direct, 'apps');
+const workersDir = path.join(direct, 'workers');
 
 // List of app directories to process
 const appDirectories = [
   'ih-platform-worker',
   'insighthunter-main',
+  'ih-tenant-template',
   'insighthunter-auth',
   'insighthunter-bookkeeping',
-  // Add other app directories here...
+  'insighthunter-bizforma',
+  'insighthunter-ledger',
+  'insighthunter-advisor',
+  'insighthunter-finops',
+  'insighthunter-payroll',
+  'insighthunter-report',
+  'insighthunter-roadmap',
+  'insighthunter-scout',
+  'insighthunter-whitelabel',
+  'insighthunter-pro-services'
+];
+
+const workerDirectories = [
+  'insight-platform-update',
+  'insighthunter-auth',
+  'insighthunter-bookkeeping',
+  'insighthunter-cron',
+  'insighthunter-dispatch',
+  'insighthunter-insights',
+  'insighthunter-notifications',
+  'insighthunter-reports',
+  'tenant-base-worker'
 ];
 
 function getWranglerConfig(appDir) {
@@ -22,13 +45,13 @@ function getWranglerConfig(appDir) {
   return null;
 }
 
-function generateBindings() {
+function generateBindings(directories, baseDir) {
   if (!process.env.CF_ACCOUNT_ID || !process.env.CF_API_TOKEN) {
     throw new Error('CF_ACCOUNT_ID and CF_API_TOKEN must be set in environment');
   }
 
-  appDirectories.forEach(app => {
-    const appPath = path.join(appsDir, app);
+  directories.forEach(app => {
+    const appPath = path.join(baseDir, app);
     const mainWranglerConfig = getWranglerConfig(appPath);
 
     if (mainWranglerConfig) {
@@ -50,4 +73,5 @@ function generateBindings() {
   });
 }
 
-generateBindings();
+generateBindings(appDirectories, appsDir);
+generateBindings(workerDirectories, workersDir);
