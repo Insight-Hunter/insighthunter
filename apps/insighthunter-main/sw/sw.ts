@@ -17,11 +17,7 @@ self.addEventListener("activate", (e: ExtendableEvent) => {
   e.waitUntil(
     caches
       .keys()
-<<<<<<< HEAD
-      .then((keys) =>f
-=======
       .then((keys) =>
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
         Promise.all(
           keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))
         )

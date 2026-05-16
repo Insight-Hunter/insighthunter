@@ -1,0 +1,6 @@
+# Generated from wrangler.jsonc by scripts/convert-wrangler.mjs
+# 2026-04-27T04:58:26.820Z
+
+name = "ih-tenant-base"
+main = "src/index.ts"
+compatibility_date = "2025-03-07"

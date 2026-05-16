@@ -1,5 +1,5 @@
 import type { MiddlewareHandler } from 'astro';
-import { verifyJWT } from '@ih/auth-client/jwt.ts';
+import { verifyJWT } from '@ih/auth-client/jwt';
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const { pathname } = context.url;

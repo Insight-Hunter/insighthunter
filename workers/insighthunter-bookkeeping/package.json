@@ -12,8 +12,8 @@
     "db:seed": "wrangler d1 execute insighthunter-bookkeeping --file src/backend/db/seed.sql"
   },
   "dependencies": {
-    "@ih/tier-config": "*",
-    "@ih/types": "*",
+    "@ih/tier-config": "workspace:*",
+    "@ih/types": "workspace:*",
     "hono": "^4.7.4",
     "agents": "^0.0.71",
     "react": "^18.3.1",

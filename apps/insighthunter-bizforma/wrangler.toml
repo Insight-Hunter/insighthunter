@@ -1,25 +1,14 @@
-<<<<<<< HEAD
-name = "ih-bizforma-worker"
-main = "src/worker.ts"
-compatibility_date = "2025-04-01"
-=======
-# wrangler.toml — BizForma Cloudflare Worker Configuration
-
-name            = "bizforma"
+name            = "insighthunter-bizforma"
 main            = "src/worker.ts"
 compatibility_date  = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
 
 # ── Observability ────────────────────────────────────────────────────────────
 [observability]
-<<<<<<< HEAD
 enabled = true
+head_sampling_rate = 1
 
 routes = [{ pattern = "bizforma.insighthunter.app/*", zone_name = "insighthunter.app" }]
-=======
-enabled           = true
-head_sampling_rate = 1
 
 # ── Static Assets (React SPA) ────────────────────────────────────────────────
 [assets]
@@ -33,21 +22,22 @@ binding    = "BIZFORMA_KV"
 id         = "YOUR_KV_NAMESPACE_ID"
 preview_id = "YOUR_KV_PREVIEW_NAMESPACE_ID"
 
-# ── D1 Database ──────────────────────────────────────────────────────────────
-[[d1_databases]]
-<<<<<<< HEAD
-binding = "DB"
-database_name = "bizforma-db"
-database_id = "a388931a-e89c-4860-8433-d02f4a478332"
-
-[[r2_buckets]]
-binding = "R2_DOCS"
-bucket_name = "bizforma-documents"
-
 [[kv_namespaces]]
 binding = "CACHE"
 id = "af7391791e95423b82c1cd877c0992e3"
 
+# ── D1 Database ──────────────────────────────────────────────────────────────
+[[d1_databases]]
+binding       = "DB"
+database_name = "insighthunter-bizforma"
+database_id   = "ab885914-020c-47fa-b269-ce15710d2ffb"
+
+# ── R2 Buckets ───────────────────────────────────────────────────────────────
+[[r2_buckets]]
+binding = "R2_DOCS"
+bucket_name = "bizforma-documents"
+
+# ── Durable Objects ──────────────────────────────────────────────────────────
 [[durable_objects.bindings]]
 name = "FORMATION_AGENT"
 class_name = "FormationAgent"
@@ -59,15 +49,10 @@ class_name = "ComplianceAgent"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["FormationAgent", "ComplianceAgent"]
-=======
-binding       = "BIZFORMA_DB"
-database_name = "bizforma"
-database_id   = "YOUR_D1_DATABASE_ID"
 
 # ── Workers AI ───────────────────────────────────────────────────────────────
 [ai]
 binding = "AI"
->>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
 
 # ── Analytics Engine ─────────────────────────────────────────────────────────
 [[analytics_engine_datasets]]
@@ -91,4 +76,3 @@ name = "bizforma-staging"
 
 [env.staging.vars]
 ENVIRONMENT = "staging"
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f

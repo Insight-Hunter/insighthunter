@@ -35,8 +35,8 @@ zone_name = "insighthunter.app"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "ih-ledger"
-database_id = "0328f669-398c-48d9-991a-8747c89cb6d6"
+database_name = "insighthunter-ledger"
+database_id = "8dc66f6a-da61-4421-a092-a4845fc0db8d"
 
 [[workflows]]
 binding = "CLOSE_WORKFLOW"
@@ -60,8 +60,8 @@ binding = "AI"
 
 [[workers.d1_databases]]
 binding = "DB"
-database_name = "ih-ledger"
-database_id = "0328f669-398c-48d9-991a-8747c89cb6d6"
+database_name = "insighthunter-ledger"
+database_id = "8dc66f6a-da61-4421-a092-a4845fc0db8d"
 
 [[workers.queues_producers]]
 binding = "NOTIFICATIONS"
@@ -80,8 +80,8 @@ max_retries = 5
 
 [[workers.d1_databases]]
 binding = "DB"
-database_name = "ih-ledger"
-database_id = "0328f669-398c-48d9-991a-8747c89cb6d6"
+database_name = "insighthunter-ledger"
+database_id = "8dc66f6a-da61-4421-a092-a4845fc0db8d"
 
 [[workers.queues_producers]]
 binding = "NOTIFICATIONS"

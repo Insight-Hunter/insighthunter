@@ -1,0 +1,13 @@
+name = "ih-compliance-worker"
+main = "src/worker.ts"
+compatibility_date = "2025-04-01"
+
+[observability]
+enabled = true
+
+routes = [{ pattern = "compliance.insighthunter.app/*", zone_name = "insighthunter.app" }]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-compliance"
+database_id = "fb654cc9-ca6b-4e51-aae0-12f35fc9b2fd"

@@ -6,30 +6,62 @@ ENV=${1:-local}
 
 echo "=== Running D1 Migrations: $ENV ==="
 
+# --- Helper function to run migration ---
+run_migration() {
+  local app_dir=$1
+  local db_name=$2
+  local env=$3
+
+  echo "-> Migrating $app_dir..."
+  cd "$app_dir"
+
+  case $env in
+    local)
+      wrangler d1 migrations apply "$db_name" --local
+      ;;
+    preview)
+      wrangler d1 migrations apply "${db_name}-preview" --env preview
+      ;;
+    production)
+      wrangler d1 migrations apply "$db_name"
+      ;;
+  esac
+
+  cd ../.. # Go back to project root
+}
+
+
 case $ENV in
-  local)
-    cd apps/insighthunter-api
-    wrangler d1 migrations apply insighthunter-main --local
-    cd ../insighthunter-pbx
-    wrangler d1 migrations apply insighthunter-main --local
-    ;;
-  preview)
-    cd apps/insighthunter-api
-    wrangler d1 migrations apply insighthunter-preview --env preview
-    cd ../insighthunter-pbx
-    wrangler d1 migrations apply insighthunter-preview --env preview
+  local|preview)
+    run_migration "apps/insighthunter-api" "insighthunter-main" $ENV
+    run_migration "apps/insighthunter-pbx" "insighthunter-main" $ENV
+    run_migration "apps/insighthunter-advisor" "insighthunter-advisor" $ENV
+    run_migration "apps/insighthunter-auth" "insighthunter-auth" $ENV
+    run_migration "apps/insighthunter-bizforma" "insighthunter-bizforma" $ENV
+    run_migration "apps/insighthunter-bookkeeping" "insighthunter-bookkeeping" $ENV
+    run_migration "apps/insighthunter-insights" "insighthunter-insights" $ENV
+    run_migration "apps/insighthunter-payroll" "insighthunter-payroll" $ENV
+    run_migration "apps/insighthunter-report" "insighthunter-report" $ENV
+    run_migration "apps/insighthunter-scout" "insighthunter-scout" $ENV
     ;;
   production)
     echo "⚠️  Applying to PRODUCTION. Press Ctrl+C to cancel, Enter to continue..."
     read
-    cd apps/insighthunter-api
-    wrangler d1 migrations apply insighthunter-main
-    cd ../insighthunter-pbx
-    wrangler d1 migrations apply insighthunter-main
+    run_migration "apps/insighthunter-api" "insighthunter-main" $ENV
+    run_migration "apps/insighthunter-pbx" "insighthunter-main" $ENV
+    run_migration "apps/insighthunter-advisor" "insighthunter-advisor" $ENV
+    run_migration "apps/insighthunter-auth" "insighthunter-auth" $ENV
+    run_migration "apps/insighthunter-bizforma" "insighthunter-bizforma" $ENV
+    run_migration "apps/insighthunter-bookkeeping" "insighthunter-bookkeeping" $ENV
+    run_migration "apps/insighthunter-insights" "insighthunter-insights" $ENV
+    run_migration "apps/insighthunter-payroll" "insighthunter-payroll" $ENV
+    run_migration "apps/insighthunter-report" "insighthunter-report" $ENV
+    run_migration "apps/insighthunter-scout" "insighthunter-scout" $ENV
     ;;
   *)
     echo "Usage: bash migrate.sh [local|preview|production]"
     exit 1
     ;;
 esac
+
 echo "\n✅ Migrations complete for: $ENV"

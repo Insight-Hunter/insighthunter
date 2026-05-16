@@ -1,43 +1,43 @@
 ---
-import AuthLayout from '../../layouts/AuthLayout.astro';
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
 ---
-<AuthLayout title="Sign In">
-  <div class="auth-card">
-    <div class="auth-logo">
-      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-        <path d="M18 2C18 2 10 10 10 18C10 22.4 12.8 26 18 26C23.2 26 26 22.4 26 18C26 14 24 10 24 10C24 10 23 15 18 15C13 15 14 8 18 2Z" fill="#C9A84C"/>
-      </svg>
-      <span>Insight Hunter</span>
-    </div>
-    <h1>Welcome back</h1>
-    <p class="auth-sub">Sign in to your account</p>
-
-    <form id="login-form" class="auth-form">
-      <div class="field">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@company.com" />
+<MarketingLayout title="Sign In">
+  <section style="display:flex;justify-content:center;align-items:center;min-height:80vh;padding:24px;">
+    <div class="card" style="padding:40px;width:100%;max-width:420px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
+          <path d="M18 2C18 2 10 10 10 18C10 22.4 12.8 26 18 26C23.2 26 26 22.4 26 18C26 14 24 10 24 10C24 10 23 15 18 15C13 15 14 8 18 2Z" fill="#C9A84C"/>
+        </svg>
+        <span style="font-family:var(--font-display);font-weight:700;font-size:1.1rem;">Insight Hunter</span>
       </div>
-      <div class="field">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
+      <h1 style="font-family:var(--font-display);font-size:1.75rem;margin-bottom:6px;">Welcome back</h1>
+      <p style="color:var(--muted);margin-bottom:24px;font-size:0.9rem;">Sign in to your account</p>
+
+      <form id="login-form" style="display:flex;flex-direction:column;gap:16px;">
+        <div>
+          <label for="email" style="font-size:0.875rem;font-weight:500;display:block;margin-bottom:6px;">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@company.com"
+            style="width:100%;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.04);color:#fff;font-size:0.9rem;" />
+        </div>
+        <div>
+          <label for="password" style="font-size:0.875rem;font-weight:500;display:block;margin-bottom:6px;">Password</label>
+          <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••"
+            style="width:100%;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.04);color:#fff;font-size:0.9rem;" />
+        </div>
+        <button type="submit" style="background:var(--gold);color:#000;font-weight:700;padding:12px;border-radius:8px;border:none;cursor:pointer;">
+          Sign In
+        </button>
+        <div id="error-msg" style="display:none;color:#f87171;font-size:0.875rem;text-align:center;"></div>
+      </form>
+
+      <div style="margin-top:16px;text-align:center;font-size:0.875rem;color:var(--muted);display:flex;gap:12px;justify-content:center;">
+        <a href="/auth/forgot-password" style="color:var(--gold);">Forgot password?</a>
+        <span>·</span>
+        <a href="/auth/register" style="color:var(--gold);">Create account</a>
       </div>
-      <button type="submit" class="btn-submit">Sign In</button>
-      <div id="error-msg" class="error-msg" style="display:none;"></div>
-    </form>
-
-    <div class="auth-links">
-      <a href="/auth/forgot-password">Forgot password?</a>
-      <span>·</span>
-      <a href="/auth/register">Create account</a>
     </div>
-
-    <div class="oauth-divider"><span>or</span></div>
-    <a href="https://auth.insighthunter.app/oauth/google" class="btn-oauth">
-      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.616z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
-      Continue with Google
-    </a>
-  </div>
-</AuthLayout>
+  </section>
+</MarketingLayout>
 
 <script>
   const form = document.getElementById('login-form') as HTMLFormElement;

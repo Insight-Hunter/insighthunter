@@ -9,8 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ih/auth-client": "*",
-    "@ih/types": "*",
+    "@ih/auth-client": "workspace:*",
+    "@ih/types": "workspace:*",
     "hono": "^4.7.4"
   },
   "devDependencies": {

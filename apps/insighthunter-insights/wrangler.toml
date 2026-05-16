@@ -1,17 +1,7 @@
-<<<<<<< HEAD
-# Generated from wrangler.jsonc by scripts/convert-wrangler.mjs
-# 2026-04-27T04:58:26.790Z
-
-name = "insighthunter-ai"
-main = "src/index.ts"
-compatibility_date = "2025-03-07"
-compatibility_flags = ["nodejs_compat", "nodejs_compat"]
-=======
 name = "insighthunter-ai"
 main = "src/index.ts"
 compatibility_date = "2025-11-01"
 compatibility_flags = ["nodejs_compat"]
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
 
 [observability]
 enabled = true
@@ -20,13 +10,6 @@ head_sampling_rate = 1
 [ai]
 binding = "AI"
 
-<<<<<<< HEAD
-[vars]
-ENVIRONMENT = "production"
-ALLOWED_ORIGINS = "https://insighthunter.app,https://auth.insighthunter.app"
-CHAT_MODEL = "@cf/meta/llama-3.1-8b-instruct"
-EMBED_MODEL = "@cf/baai/bge-small-en-v1.5"
-=======
 [[vectorize]]
 binding = "VECTORS"
 index_name = "insighthunter-insights"
@@ -37,9 +20,9 @@ id = "52a1b194a3eb423cb11b43170e536098"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "insighthunter-main"
-database_id = "03f5086d-171b-417b-951c-01a043e067c2"
-migrations_dir = "../../apps/insighthunter-api/migrations"
+database_name = "insighthunter-insights"
+database_id = "dbded017-25e8-4559-a351-cbaeea01e4b2"
+migrations_dir = "../../apps/insighthunter-insights/migrations"
 
 [durable_objects]
 bindings = [
@@ -59,50 +42,15 @@ ENVIRONMENT = "production"
 ALLOWED_ORIGINS = "https://insighthunter.app,https://app.insighthunter.app"
 CHAT_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 EMBED_MODEL = "@cf/baai/bge-large-en-v1.5"
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
 SUMMARY_MODEL = "@cf/meta/llama-3.1-8b-instruct"
 MAX_TOKENS = "1024"
 HISTORY_LIMIT = "20"
 FREE_CHAT_LIMIT = "10"
 PRO_CHAT_LIMIT = "500"
 
-<<<<<<< HEAD
-[env]
-
-=======
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
 [env.preview]
 name = "insighthunter-ai-preview"
 
 [env.preview.vars]
 ENVIRONMENT = "preview"
 ALLOWED_ORIGINS = "https://preview.insighthunter.app"
-<<<<<<< HEAD
-
-[[vectorize]]
-binding = "VECTORS"
-index_name = "insighthunter-insights"
-
-[[vectorize]]
-binding = "VECTORIZE"
-index_name = "ih-financial-docs"
-
-[[kv_namespaces]]
-binding = "USAGE"
-id = "REPLACE_AFTER_PROVISION"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "insighthunter-ai"
-database_id = "REPLACE_AFTER_PROVISION"
-migrations_dir = "../../apps/insighthunter-main/migrations"
-
-[[analytics_engine_datasets]]
-binding = "ANALYTICS"
-dataset = "insighthunter_events"
-
-[[analytics_engine_datasets]]
-binding = "AI_EVENTS"
-dataset = "ih_ai_events"
-=======
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f

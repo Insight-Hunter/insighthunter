@@ -6,3 +6,8 @@ compatibility_date = "2025-04-01"
 enabled = true
 
 routes = [{ pattern = "scout.insighthunter.app/*", zone_name = "insighthunter.app" }]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-scout"
+database_id = "31b78efe-8889-48bf-8c7d-59f3ff37824e"

@@ -44,8 +44,8 @@ zone_name = "insighthunter.app"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "ih-finops"
-database_id = "a98820b1-5ebc-4131-8e1d-d91953136013"
+database_name = "insighthunter-finops"
+database_id = "44478794-d4dc-4fce-9184-646af572504c"
 
 [[d1_databases]]
 binding = "ADVISOR_DB"
@@ -82,8 +82,8 @@ bucket_name = "ih-documents"
 
 [[workers.d1_databases]]
 binding = "DB"
-database_name = "ih-finops"
-database_id = "a98820b1-5ebc-4131-8e1d-d91953136013"
+database_name = "insighthunter-finops"
+database_id = "44478794-d4dc-4fce-9184-646af572504c"
 
 [[workers]]
 name = "ih-finops-pdf"
@@ -105,8 +105,8 @@ bucket_name = "ih-documents"
 
 [[workers.d1_databases]]
 binding = "DB"
-database_name = "ih-finops"
-database_id = "a98820b1-5ebc-4131-8e1d-d91953136013"
+database_name = "insighthunter-finops"
+database_id = "44478794-d4dc-4fce-9184-646af572504c"
 
 [[workers]]
 name = "ih-finops-reminders"
@@ -115,8 +115,8 @@ crons = ["0 8 * * *"]
 
 [[workers.d1_databases]]
 binding = "DB"
-database_name = "ih-finops"
-database_id = "a98820b1-5ebc-4131-8e1d-d91953136013"
+database_name = "insighthunter-finops"
+database_id = "44478794-d4dc-4fce-9184-646af572504c"
 
 [[workers.queues_producers]]
 binding = "NOTIFICATIONS"

@@ -16,15 +16,10 @@ MAILCHANNELS_URL = "https://api.mailchannels.net/tx/v1/send"
 FROM_EMAIL = "noreply@insighthunter.app"
 FROM_NAME = "Insight Hunter"
 
-[[kv_namespaces]]
-binding = "NOTIFS_KV"
-id = "REPLACE_WITH_KV_ID"
-preview_id = "REPLACE_WITH_KV_PREVIEW_ID"
-
 [[d1_databases]]
 binding = "DB"
-database_name = "insighthunter-db"
-database_id = "REPLACE_WITH_D1_ID"
+database_name = "insighthunter-notifications"
+database_id = "a68f31d8-99fb-4e88-adc8-26ed1be54ca2"
 
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"

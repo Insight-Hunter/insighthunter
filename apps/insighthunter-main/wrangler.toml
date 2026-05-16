@@ -3,6 +3,11 @@ pages_build_output_dir = "dist"
 compatibility_date = "2026-04-12"
 compatibility_flags = ["nodejs_compat"]
 
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-main"
+database_id = "04854880-81f5-4c02-b555-905a34492b92"
+
 [[services]]
 binding = "DISPATCH_WORKER"
 service = "insighthunter-dispatch"

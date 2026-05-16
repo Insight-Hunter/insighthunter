@@ -6,3 +6,8 @@ compatibility_date = "2025-04-01"
 enabled = true
 
 routes = [{ pattern = "bookkeeping.insighthunter.app/*", zone_name = "insighthunter.app" }]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-bookkeeping"
+database_id = "1fe17233-e32a-4428-86dd-e5f4146db0aa"

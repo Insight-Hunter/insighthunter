@@ -6,3 +6,8 @@ compatibility_date = "2025-04-01"
 enabled = true
 
 routes = [{ pattern = "report.insighthunter.app/*", zone_name = "insighthunter.app" }]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-report"
+database_id = "57f706b1-82e6-4352-9952-75e9b38e39c7"

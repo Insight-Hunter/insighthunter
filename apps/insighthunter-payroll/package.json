@@ -9,8 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ih/tier-config": "*",
-    "@ih/types": "*",
+    "@ih/tier-config": "workspace:*",
+    "@ih/types": "workspace:*",
     "hono": "^4.7.4"
   },
   "devDependencies": {

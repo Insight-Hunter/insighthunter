@@ -1,14 +1,38 @@
 ---
 import MarketingLayout from '../layouts/MarketingLayout.astro';
-import PricingTable from '../components/marketing/PricingTable.astro';
-import CTABanner from '../components/marketing/CTABanner.astro';
+import Nav from '../components/marketing/Nav.astro';
+const plans = [
+  { name: 'Free', price: 0, features: ['5 transactions/mo', 'Basic bookkeeping', 'No AI assistant'] },
+  { name: 'Lite', price: 19, features: ['500 transactions/mo', 'Bookkeeping', '5 AI queries/day', 'Reports'] },
+  { name: 'Standard', price: 49, features: ['2,000 transactions/mo', 'Bookkeeping + Payroll', '20 AI queries/day', 'BizForma', 'PBX (3 ext.)'] },
+  { name: 'Pro', price: 99, features: ['Unlimited transactions', 'All features', 'Unlimited AI', 'Priority support', '4h SLA'] },
+  { name: 'Enterprise', price: 299, features: ['Everything in Pro', 'Dedicated worker', 'White-label', '1h SLA', 'Custom integrations'] },
+];
 ---
 <MarketingLayout title="Pricing">
-  <PricingTable />
-  <section style="background:var(--color-surface);padding:var(--space-12) var(--space-6);text-align:center;">
-    <h2 style="font-family:var(--font-display);font-size:var(--text-xl);font-style:italic;margin-bottom:var(--space-3);">Need a white-label license?</h2>
-    <p style="color:var(--color-text-muted);max-width:52ch;margin:0 auto var(--space-5);">Fractional CFOs and accounting practices can license the full platform under their own brand.</p>
-    <a href="/contact" class="btn btn-primary">Contact Sales</a>
+  <Nav />
+  <section class="container" style="padding:80px 24px;text-align:center;">
+    <h1 style="font-family:var(--font-display);font-size:2.5rem;margin-bottom:12px;">Simple, transparent pricing.</h1>
+    <p style="color:var(--muted);margin-bottom:48px;">Start free. Upgrade as you grow.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;text-align:left;">
+      {plans.map(plan => (
+        <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:14px;">
+          <div style="font-family:var(--font-display);font-weight:700;font-size:1.1rem;">{plan.name}</div>
+          <div style="font-family:var(--font-display);font-size:2.25rem;font-weight:700;">${plan.price}<span style="font-size:0.9rem;font-weight:400;color:var(--muted);">/mo</span></div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:0.875rem;color:var(--muted);flex:1;">
+            {plan.features.map(f => <li>· {f}</li>)}
+          </ul>
+          <a href="/auth/register" style="background:var(--gold);color:#000;font-weight:700;padding:10px;border-radius:8px;text-align:center;font-size:0.875rem;margin-top:auto;">
+            {plan.price === 0 ? 'Get Started Free' : `Start ${plan.name}`}
+          </a>
+        </div>
+      ))}
+    </div>
   </section>
-  <CTABanner />
+
+  <section style="background:var(--surface);padding:64px 24px;text-align:center;margin-top:48px;">
+    <h2 style="font-family:var(--font-display);font-size:1.75rem;font-style:italic;margin-bottom:12px;">Need a white-label license?</h2>
+    <p style="color:var(--muted);max-width:52ch;margin:0 auto 20px;">Fractional CFOs and accounting practices can license the full platform under their own brand.</p>
+    <a href="/contact" class="btn btn-gold">Contact Sales</a>
+  </section>
 </MarketingLayout>

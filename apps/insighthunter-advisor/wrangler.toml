@@ -13,7 +13,7 @@ head_sampling_rate = 1
 [[d1_databases]]
 binding       = "DB"
 database_name = "insighthunter-advisor"
-database_id   = "<YOUR_D1_ID>"
+database_id   = "2c5fabdf-eef2-4ca8-bb15-99e83e613460"
 
 [[kv_namespaces]]
 binding = "ADVISOR_KV"

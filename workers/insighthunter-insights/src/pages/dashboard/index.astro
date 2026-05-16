@@ -1,0 +1,57 @@
+---
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import type { User } from "@/types";
+const user = Astro.locals.user as User;
+---
+<DashboardLayout title="Overview">
+  <div class="mb-6">
+    <h2 class="text-lg font-semibold text-white">Good to see you, {user.name.split(" ")[0]} 👋</h2>
+    <p class="text-sm text-slate-400 mt-0.5">Here's a snapshot of your business finances.</p>
+  </div>
+
+  <!-- KPI cards (populated via client-side fetch) -->
+  <div id="kpi-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+    {["Revenue", "Expenses", "Net Income", "Cash Balance"].map(label => (
+      <div class="bg-surface-800 border border-surface-700 rounded-xl p-5">
+        <p class="text-xs text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+        <p class="text-2xl font-bold text-white kpi-value">—</p>
+        <p class="text-xs text-slate-500 mt-1 kpi-period">Loading…</p>
+      </div>
+    ))}
+  </div>
+
+  <!-- Connect prompt if no QBO connection -->
+  <div id="connect-prompt" class="hidden rounded-xl border border-brand-700 bg-brand-900/20 px-6 py-5 flex items-center gap-4">
+    <div class="text-3xl">🔗</div>
+    <div>
+      <p class="font-medium text-white text-sm">Connect QuickBooks to see live data</p>
+      <p class="text-xs text-slate-400 mt-0.5">Sync your P&amp;L, cash flow, and more in seconds.</p>
+    </div>
+    <a href="/dashboard/connect" class="ml-auto shrink-0 rounded-lg bg-brand-600 hover:bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors">
+      Connect
+    </a>
+  </div>
+</DashboardLayout>
+
+<script>
+  async function loadKPIs() {
+    try {
+      const res = await fetch("/api/qbo/summary");
+      if (res.status === 404) {
+        document.getElementById("connect-prompt")?.classList.remove("hidden");
+        return;
+      }
+      if (!res.ok) return;
+      const data = await res.json() as { revenue: number; expenses: number; netIncome: number; cash: number; period: string };
+      const values = [data.revenue, data.expenses, data.netIncome, data.cash];
+      const fmt    = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+      document.querySelectorAll(".kpi-value").forEach((el, i) => {
+        (el as HTMLElement).textContent = fmt.format(values[i]);
+      });
+      document.querySelectorAll(".kpi-period").forEach(el => {
+        (el as HTMLElement).textContent = data.period;
+      });
+    } catch { /* silent */ }
+  }
+  loadKPIs();
+</script>
