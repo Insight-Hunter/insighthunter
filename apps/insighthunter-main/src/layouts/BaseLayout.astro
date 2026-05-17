@@ -1,0 +1,76 @@
+---
+const {
+  title = "InsightHunter",
+  description = "AI Financial Intelligence for Small Business",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Satoshi:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --gold:#C9A84C;
+        --gold-light:#E8C97A;
+        --gold-dim:#8A6E28;
+        --bg:#0C0C0E;
+        --bg2:#111114;
+        --bg3:#17171C;
+        --surface:#1C1C22;
+        --border:rgba(201,168,76,0.15);
+        --border-dim:rgba(255,255,255,0.07);
+        --text:#F0EDE6;
+        --muted:#9B9690;
+        --danger:#E05252;
+        --success:#3FCF8E;
+        --r:8px;
+        --r-lg:16px;
+        --shadow:0 4px 24px rgba(0,0,0,0.6);
+        --font-display:'DM Serif Display', Georgia, serif;
+        --font-body:'Satoshi', system-ui, sans-serif;
+      }
+
+      *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+      html { scroll-behavior:smooth; }
+      body {
+        background:var(--bg);
+        color:var(--text);
+        font-family:var(--font-body);
+        font-size:16px;
+        line-height:1.6;
+        -webkit-font-smoothing:antialiased;
+      }
+      img,svg { display:block; max-width:100%; }
+      a { color:inherit; text-decoration:none; }
+      button { cursor:pointer; font:inherit; border:none; background:none; }
+      h1,h2,h3,h4 { font-family:var(--font-display); line-height:1.15; }
+      h1 { font-size:clamp(2.8rem,6vw,5.2rem); }
+      h2 { font-size:clamp(2rem,4vw,3.2rem); }
+      h3 { font-size:clamp(1.25rem,2.5vw,1.75rem); }
+      .gold { color:var(--gold); }
+      .italic { font-style:italic; }
+      .container { max-width:1160px; margin:0 auto; padding:0 24px; }
+      section { padding:96px 0; }
+      .eyebrow {
+        font-size:0.78rem;
+        font-weight:700;
+        letter-spacing:0.14em;
+        text-transform:uppercase;
+        color:var(--gold);
+      }
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

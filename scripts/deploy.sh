@@ -7,11 +7,11 @@ if [ -f .env ]; then
 fi
 
 echo "Installing dependencies..."
-pnpm install --recursive
+npx pnpm install --recursive
 
 # Build the main application
 echo "Building main application..."
-pnpm --filter insighthunter-main build
+(cd apps/insighthunter-main && npx pnpm build)
 
 echo "Deploying insighthunter (main frontend)..."
 (cd apps/insighthunter-main && npx wrangler pages deploy ../../dist)
@@ -28,4 +28,3 @@ for app_dir in apps/*; do
 done
 
 echo "All applications deployed successfully!"
-

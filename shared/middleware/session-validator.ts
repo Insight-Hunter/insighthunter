@@ -1,5 +1,4 @@
 // shared/middleware/session-validator.ts
-<<<<<<< HEAD
 // JWT session validator imported by every protected Worker.
 // Validates tokens issued by auth.insighthunter.app.
 
@@ -102,7 +101,6 @@ export function unauthorizedJson(message = "Unauthorized"): Response {
     status: 401,
     headers: { "content-type": "application/json; charset=utf-8" },
   });
-=======
 import type { Context, Next } from 'hono';
 import type { Session, SessionValidationResult } from '../types';
 
@@ -212,5 +210,4 @@ export async function sessionValidator(c: Context, next: Next) {
 
   c.set('session', result.session);
   await next();
->>>>>>> origin/main
 }

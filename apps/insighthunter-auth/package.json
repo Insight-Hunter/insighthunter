@@ -1,16 +1,21 @@
 {
-  "name": "@ih/ih-auth-worker",
+  "name": "insighthunter-auth",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
-    "build": "echo build complete",
-    "deploy": "wrangler deploy"
+    "dev": "wrangler dev src/index.ts",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "hono": "^4.3.0",
-    "zod": "^3.23.0",
-    "@hono/zod-validator": "^0.2.2"
+    "@ih/auth-client": "workspace:*",
+    "@ih/types": "workspace:*",
+    "hono": "^4.7.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250310.0",
+    "typescript": "^5.7.3",
+    "wrangler": "^4.76.0"
   }
 }

@@ -1,35 +1,27 @@
 ---
-import MarketingLayout from '../layouts/MarketingLayout.astro';
-import Nav from '../components/marketing/Nav.astro';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Nav from "../components/Nav.astro";
+import Hero from "../components/Hero.astro";
+import PlatformStrip from "../components/PlatformStrip.astro";
+import AppsGrid from "../components/AppsGrid.astro";
+import Architecture from "../components/Architecture.astro";
+import FeaturesDeepDive from "../components/FeaturesDeepDive.astro";
+import PricingSection from "../components/PricingSection.astro";
+import Integrations from "../components/Integrations.astro";
+import CTASection from "../components/CTASection.astro";
+import Footer from "../components/Footer.astro";
+import { site } from "../data/site";
 ---
-<MarketingLayout title="Stop Flying Blind — AI CFO for Small Business">
-  <Nav />
-  <section style="padding:96px 0;background:radial-gradient(circle at top, rgba(201,168,76,.08), transparent 40%), var(--bg-navy)">
-    <div class="container" style="text-align:center;max-width:860px">
-      <div style="display:inline-block;padding:8px 16px;border:1px solid rgba(201,168,76,.35);border-radius:999px;color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:18px">AI-Powered Financial Intelligence</div>
-      <h1 style="font-family:var(--font-display);font-size:clamp(2.5rem,6vw,4.8rem);line-height:1.08;margin-bottom:18px">Stop Flying Blind.<br /><span style="color:var(--gold)">Know Your Numbers.</span></h1>
-      <p style="max-width:680px;margin:0 auto 28px;color:var(--muted);font-size:1.08rem">Bookkeeping, payroll, business formation, reporting, PBX, and AI CFO insights built Cloudflare-native for small businesses.</p>
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-        <a class="btn btn-gold" href="/auth/register">Start Free</a>
-        <a class="btn btn-outline" href="/pricing">See Pricing</a>
-      </div>
-    </div>
-  </section>
 
-  <section class="container" style="padding:72px 24px">
-    <h2 style="font-family:var(--font-display);font-size:2rem;margin-bottom:20px">Platform Modules</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px">
-      {['Bookkeeping','BizForma','Payroll','PBX','Reports','Scout','White Label'].map((name) => (
-        <a href={`/features/${name.toLowerCase().replace(/ /g,'-')}`} class="card" style="padding:24px;display:block">
-          <div style="font-family:var(--font-display);font-weight:700">Insight Hunter</div>
-          <div style="color:var(--gold);font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:6px">{name}</div>
-          <p style="color:var(--muted);margin-top:12px;font-size:0.9rem;">Production-ready platform for {name}.</p>
-        </a>
-      ))}
-    </div>
-  </section>
-
-  <footer style="text-align:center;padding:40px 20px;color:var(--muted);font-size:14px;border-top:1px solid #222;">
-    <p>© 2025 Insight Hunter · Kings Mountain, NC · <a href="/contact" style="color:var(--gold)">Contact</a> · <a href="/about" style="color:var(--gold)">About</a></p>
-  </footer>
-</MarketingLayout>
+<BaseLayout title={site.meta.title} description={site.meta.description}>
+  <Nav links={site.navLinks} />
+  <Hero hero={site.hero} />
+  <PlatformStrip items={site.platformStrip} />
+  <AppsGrid apps={site.apps} />
+  <Architecture arch={site.architecture} />
+  <FeaturesDeepDive features={site.features} />
+  <PricingSection pricing={site.pricing} addons={site.addons} />
+  <Integrations integrations={site.integrations} />
+  <CTASection cta={site.cta} />
+  <Footer footer={site.footer} />
+</BaseLayout>
