@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^11.2.0",
-    "@astrojs/svelte": "^5.7.3",
+    "@astrojs/svelte": "^4.0.0",
     "@astrojs/tailwind": "^5.1.5",
     "@nanostores/react": "^1.1.0",
     "@tanstack/react-query": "^5.100.10",
@@ -21,7 +21,7 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^6.30.3",
-    "svelte": "^5.55.7"
+    "svelte": "^4.2.18"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260518.1",
