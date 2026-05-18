@@ -11,7 +11,7 @@ enabled = true
 head_sampling_rate = 1
 
 # ── Routes ───────────────────────────────────────────────────────────────
-[routes]
+[[routes]]
 pattern = "bizforma.insighthunter.app/*"
 zone_name = "insighthunter.app"
 
