@@ -4,63 +4,20 @@ This repository contains the source code for InsightHunter, a platform providing
 
 ## Project Structure
 
-The repository is a monorepo managed by Turborepo, organized as follows:
+The repository is a monorepo managed by pnpm workspaces and Turborepo, organized as follows:
 
 ```
 /
-├── apps/                 → Cloudflare Workers for API services
-│   ├── insighthunter-advisor/
-│   ├── insighthunter-auth/
-│   ├── insighthunter-finops/
-│   ├── insighthunter-ledger/
+├── apps/                 → Applications and services
+│   ├── insighthunter-main/     → The main marketing and dashboard frontend application
+│   ├── insighthunter-auth/     → Authentication service
+│   ├── insighthunter-bizforma/ → Business formation service
+│   ├── insighthunter-bookkeeping/ → Bookkeeping service
 │   └── ...
-├── docs/                 → Project documentation
 ├── packages/             → Shared libraries (e.g., UI components, types)
-├── public/               → Static assets for the marketing site (Cloudflare Pages)
-└── scripts/              → Build and deployment scripts
+├── scripts/              → Build and deployment scripts
+└── docs/                 → Project documentation
 ```
-
-## Quick Start
-
-To get started with local development:
-
-1.  **Clone and build the repository:**
-    ```bash
-    git clone <repository-url>
-    cd <repository-name>
-    npm install
-    ```
-
-2.  **Run a worker locally:**
-    ```bash
-    cd apps/insighthunter-auth
-    npm run dev
-    ```
-
-## Build and Deployment
-
-The project is built using a custom script and deployed via GitHub Actions.
-
-### Initial Build
-
-To create a new instance of the InsightHunter project, run the build script:
-
-```bash
-bash build-insighthunter.sh my-insighthunter
-cd my-insighthunter
-npm install
-```
-
-### Deployment
-
--   **Cloudflare Pages (Marketing Site):** Pushing to the `main` branch triggers a GitHub Action that deploys the `public/` directory to Cloudflare Pages.
--   **Cloudflare Workers (API Services):** Deployment of workers is also handled via GitHub Actions. The deployment order is critical:
-
-    1.  `shared/workers/notification-queue`
-    2.  `shared/workers/document-vault`
-    3.  `apps/insighthunter-advisor`
-    4.  `apps/insighthunter-ledger`
-    5.  `apps/insighthunter-finops`
 
 ## Technical Stack
 
@@ -71,7 +28,83 @@ npm install
 -   **Queues:** Cloudflare Queues
 -   **AI:** Cloudflare Workers AI
 -   **Workflows:** Durable Objects
--   **Build System:** Turborepo
+-   **Build System:** Turborepo, pnpm
+
+## Getting Started
+
+To get started with local development:
+
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    cd <repository-name>
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    pnpm install
+    ```
+
+3.  **Run development server:**
+    ```bash
+    pnpm dev
+    ```
+    This will run the development servers for all applications in parallel.
+
+## Build and Deployment
+
+### Build
+
+To build all applications, run the following command:
+```bash
+pnpm build
+```
+
+### Automated Deployment
+
+The easiest way to deploy all applications is to use the provided script:
+```bash
+bash scripts/deploy.sh
+```
+This script will deploy all applications in the correct order.
+
+### Manual Deployment
+
+You can also deploy each application manually.
+
+-   **Main App (Astro)**:
+    ```bash
+    pnpm run deploy:main
+    ```
+-   **Cloudflare Workers**:
+    ```bash
+    pnpm run deploy:auth
+    pnpm run deploy:bizforma
+    pnpm run deploy:payroll
+    pnpm run deploy:pbx
+    pnpm run deploy:bookkeeping
+    pnpm run deploy:report
+    pnpm run deploy:scout
+    pnpm run deploy:whitelabel
+    pnpm run deploy:platform
+    pnpm run deploy:tenant-template
+    ```
+
+## Services
+
+This monorepo contains the following applications and services:
+
+-   **insighthunter-main**: The main Astro-based frontend application, which includes the marketing site and user dashboard.
+-   **insighthunter-auth**: Handles user authentication and session management.
+-   **insighthunter-bizforma**: Service for business formation and compliance.
+-   **insighthunter-bookkeeping**: Bookkeeping and accounting service.
+-   **insighthunter-payroll**: Payroll management service.
+-   **insighthunter-pbx**: Cloud-based phone system.
+-   **insighthunter-report**: Generates financial reports.
+-   **insighthunter-scout**: Data scraping and analysis service.
+-   **insighthunter-whitelabel**: Whitelabeling service for partners.
+-   **ih-platform-worker**: Core platform worker for tenant management.
+-   **ih-tenant-template**: A template for new tenant workers.
 
 ## Cloudflare Setup
 
