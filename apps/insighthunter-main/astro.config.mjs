@@ -35,7 +35,7 @@ export default defineConfig({
       },
     },
     ssr: {
-      noExternal: [],
+      noExternal: ["svelte"],
     },
   },
   build: {
