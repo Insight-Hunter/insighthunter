@@ -1,11 +1,24 @@
 ---
+// src/pages/features/insight-lite.astro
 import MarketingLayout from '../../layouts/MarketingLayout.astro';
-import Nav from '../../components/marketing/Nav.astro';
 ---
-<MarketingLayout title="insight-lite">
-  <Nav />
-  <section class="container" style="padding:80px 24px">
-    <h1 style="font-family:var(--font-display);font-size:2.5rem;margin-bottom:14px">insight-lite</h1>
-    <p style="color:var(--muted);max-width:720px">Feature page scaffold for insight-lite. Brand palette, typography, and dark card system already applied.</p>
+
+<MarketingLayout title="Insight Lite | Insight Hunter" description="Essential visibility for owners who need clarity without enterprise complexity.">
+  <section class="container section">
+    <span class="eyebrow">Insight Lite</span>
+    <h1>Start with the essentials.</h1>
+    <p>Insight Lite gives smaller operators clean financial visibility, simple metrics, and a practical starting point for disciplined reporting.</p>
+    <div class="actions">
+      <a href="/insight-lite">Open app homepage</a>
+      <a href="/pricing">See pricing</a>
+    </div>
   </section>
 </MarketingLayout>
+
+<style>
+  .container { max-width: 980px; margin: 0 auto; padding: 0 1.25rem; }
+  .section { padding: 4rem 0; }
+  .actions { display: flex; gap: .75rem; margin-top: 1.25rem; flex-wrap: wrap; }
+  .actions a { padding: .85rem 1.1rem; border: 1px solid rgba(84,72,56,.18); border-radius: 999px; text-decoration: none; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; }
+</style>
