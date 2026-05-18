@@ -34,6 +34,9 @@ export default defineConfig({
         '@ih/tier-config': new URL('../../packages/ih-tier-config/src/index.ts', import.meta.url).pathname,
       },
     },
+    ssr: {
+      noExternal: [],
+    },
   },
   build: {
     outDir: '../../dist',
