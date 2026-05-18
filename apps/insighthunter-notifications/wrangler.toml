@@ -1,26 +1,35 @@
-# Generated from wrangler.jsonc by scripts/convert-wrangler.mjs
-# 2026-04-27T04:58:26.813Z
+# wrangler.toml — Notifications Cloudflare Worker Configuration
 
 name = "insighthunter-notifications"
 main = "src/index.ts"
 compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
 
+# ── Observability ────────────────────────────────────────────────────────
 [observability]
 enabled = true
 head_sampling_rate = 1
 
+# ── KV Namespaces ────────────────────────────────────────────────────────
+[[kv_namespaces]]
+binding = "NOTIFS_KV"
+id = "REPLACE_WITH_KV_ID"
+preview_id = "REPLACE_WITH_KV_PREVIEW_ID"
+
+# ── D1 Database ──────────────────────────────────────────────────────────
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-db"
+database_id = "REPLACE_WITH_D1_ID"
+
+# ── Analytics Engine ─────────────────────────────────────────────────────
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "insighthunter_events"
+
+# ── Environment Variables ────────────────────────────────────────────────
 [vars]
 AUTH_WORKER_URL = "https://auth.insighthunter.app"
 MAILCHANNELS_URL = "https://api.mailchannels.net/tx/v1/send"
 FROM_EMAIL = "noreply@insighthunter.app"
 FROM_NAME = "Insight Hunter"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "insighthunter-notifications"
-database_id = "a68f31d8-99fb-4e88-adc8-26ed1be54ca2"
-
-[[analytics_engine_datasets]]
-binding = "ANALYTICS"
-dataset = "insighthunter_events"

@@ -1,19 +1,27 @@
+# wrangler.toml — Auth Cloudflare Worker Configuration
+
 name = "insighthunter-auth"
 main = "src/index.ts"
 compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
 
+# ── Observability ────────────────────────────────────────────────────────
 [observability]
 enabled = true
 head_sampling_rate = 1
 
-[vars]
-JWT_SECRET = "your-secret-here"
-SITE_URL = "https://insighthunter.app"
-ENVIRONMENT = "production"
-ACCESS_TOKEN_TTL = "3600"
-REFRESH_TOKEN_TTL = "2592000"
+# ── Routes ───────────────────────────────────────────────────────────────
+[[routes]]
+pattern = "auth.insighthunter.app/*"
+zone_name = "insighthunter.app"
 
+# ── D1 Database ──────────────────────────────────────────────────────────
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-auth"
+database_id = "REPLACE_AFTER_PROVISION"
+
+# ── KV Namespaces ────────────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "SESSIONS"
 id = "REPLACE_AFTER_PROVISION"
@@ -22,11 +30,15 @@ id = "REPLACE_AFTER_PROVISION"
 binding = "REFRESH_TOKENS"
 id = "REPLACE_AFTER_PROVISION"
 
-[[d1_databases]]
-binding = "DB"
-database_name = "insighthunter-auth"
-database_id = "REPLACE_AFTER_PROVISION"
-
+# ── Analytics Engine ─────────────────────────────────────────────────────
 [[analytics_engine_datasets]]
 binding = "AUTH_EVENTS"
 dataset = "ih_auth_events"
+
+# ── Environment Variables ────────────────────────────────────────────────
+[vars]
+ENVIRONMENT = "production"
+ACCESS_TOKEN_TTL = "3600"
+REFRESH_TOKEN_TTL = "2592000"
+
+# ── Secrets (set via wrangler secret put): JWT_SECRET ───────────────────

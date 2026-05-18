@@ -1,13 +1,106 @@
-name = "ih-bookkeeping-worker"
-main = "src/worker.ts"
-compatibility_date = "2025-04-01"
+# wrangler.toml — Bookkeeping Cloudflare Worker Configuration
 
+name = "insighthunter-bookkeeping"
+main = "src/backend/index.ts"
+compatibility_date = "2025-03-07"
+compatibility_flags = ["nodejs_compat"]
+
+# ── Observability ────────────────────────────────────────────────────────
 [observability]
 enabled = true
+head_sampling_rate = 1
 
-routes = [{ pattern = "bookkeeping.insighthunter.app/*", zone_name = "insighthunter.app" }]
+# ── Routes ───────────────────────────────────────────────────────────────
+[[routes]]
+pattern = "bookkeeping.insighthunter.app/*"
+zone_name = "insighthunter.app"
 
+# ── Static Assets (React SPA) ────────────────────────────────────────────
+[assets]
+directory = "./dist/frontend"
+not_found_handling = "single-page-application"
+binding = "ASSETS"
+
+# ── D1 Database ──────────────────────────────────────────────────────────
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-bookkeeping"
-database_id = "1fe17233-e32a-4428-86dd-e5f4146db0aa"
+database_id = "REPLACE_AFTER_PROVISION"
+migrations_dir = "src/backend/db/migrations"
+
+# ── KV Namespaces ────────────────────────────────────────────────────────
+[[kv_namespaces]]
+binding = "TIER_USAGE"
+id = "REPLACE_KV_TIER_USAGE_ID"
+
+[[kv_namespaces]]
+binding = "SESSION_CACHE"
+id = "REPLACE_KV_SESSION_CACHE_ID"
+
+[[kv_namespaces]]
+binding = "QB_TOKENS"
+id = "REPLACE_KV_QB_TOKENS_ID"
+
+# ── R2 Buckets ───────────────────────────────────────────────────────────
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "ih-bookkeeping-documents"
+
+# ── Durable Objects ──────────────────────────────────────────────────────
+[durable_objects]
+bindings = [
+  { name = "BOOKKEEPING_AGENT",    class_name = "BookkeepingAgent"    },
+  { name = "RECONCILIATION_AGENT", class_name = "ReconciliationAgent" }
+]
+
+# ── Durable Object Migrations ────────────────────────────────────────────
+[[migrations]]
+tag = "v1"
+new_classes = ["BookkeepingAgent", "ReconciliationAgent"]
+
+# ── Queues ───────────────────────────────────────────────────────────────
+[[queues.producers]]
+binding = "CLASSIFICATION_QUEUE"
+queue = "bk-classification-queue"
+
+[[queues.producers]]
+binding = "QB_SYNC_QUEUE"
+queue = "bk-qb-sync-queue"
+
+[[queues.consumers]]
+queue = "bk-classification-queue"
+dead_letter_queue = "bk-classification-dlq"
+retry_delay = 30
+
+[[queues.consumers]]
+queue = "bk-qb-sync-queue"
+dead_letter_queue = "bk-qb-sync-dlq"
+retry_delay = 60
+
+# ── AI Binding ───────────────────────────────────────────────────────────
+[ai]
+binding = "AI"
+
+# ── Service Bindings ─────────────────────────────────────────────────────
+[[services]]
+binding = "USER_WORKERS"
+service = "ih-user-workers"
+
+# ── Analytics Engine ─────────────────────────────────────────────────────
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "bookkeeping_events"
+
+# ── Environment Variables ────────────────────────────────────────────────
+[vars]
+ENVIRONMENT = "production"
+AUTH_WORKER_URL = "https://auth.insighthunter.app"
+REPORTS_WORKER_URL = "https://reports.insighthunter.app"
+PAYROLL_WORKER_URL = "https://payroll.insighthunter.app"
+QB_REDIRECT_URI = "https://bookkeeping.insighthunter.app/api/quickbooks/callback"
+
+# ── Secrets (set via: wrangler secret put SECRET_NAME) ───────────────────
+# JWT_SECRET
+# QB_CLIENT_ID
+# QB_CLIENT_SECRET
+# ENCRYPTION_KEY

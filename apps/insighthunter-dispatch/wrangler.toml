@@ -1,23 +1,22 @@
-# Generated from wrangler.jsonc by scripts/convert-wrangler.mjs
-# 2026-04-27T04:58:26.770Z
+# wrangler.toml — Dispatch Cloudflare Worker Configuration
 
 name = "insighthunter-dispatch"
 main = "src/index.ts"
 compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
 
+# ── Observability ────────────────────────────────────────────────────────
 [observability]
 enabled = true
 head_sampling_rate = 1
 
+# ── Dispatch Namespace ───────────────────────────────────────────────────
 [[dispatch_namespaces]]
 binding = "DISPATCH"
 namespace = "insighthunter-tenants"
+outbound = { service = "insighthunter-auth", parameters = ["orgId"] }
 
-[dispatch_namespaces.outbound]
-service = "insighthunter-auth"
-params = ["orgId"]
-
+# ── Service Bindings ─────────────────────────────────────────────────────
 [[services]]
 binding = "AUTH_WORKER"
 service = "insighthunter-auth"
@@ -46,15 +45,12 @@ service = "insighthunter-payroll"
 binding = "PBX_WORKER"
 service = "insighthunter-pbx"
 
+# ── Analytics Engine ─────────────────────────────────────────────────────
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"
 dataset = "insighthunter_events"
 
-[[d1_databases]]
-binding = "DB"
-database_name = "insighthunter-dispatch"
-database_id = "2a0331eb-4775-4ad2-9126-0560336486df"
-
+# ── Routes ───────────────────────────────────────────────────────────────
 [[routes]]
 pattern = "insighthunter.app/api/*"
 zone_name = "insighthunter.app"

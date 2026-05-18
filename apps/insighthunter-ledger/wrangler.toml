@@ -1,17 +1,26 @@
+# wrangler.toml — Ledger Cloudflare Worker Configuration
 
-# Generated from wrangler.jsonc by scripts/convert-wrangler.mjs
-# 2026-04-27T04:58:26.723Z
-
-name = "ih-ledger-api"
+name = "insighthunter-ledger"
 main = "workers/api/index.ts"
 compatibility_date = "2025-03-01"
 compatibility_flags = ["nodejs_compat"]
 
+# ── Observability ────────────────────────────────────────────────────────
 [observability]
 enabled = true
 
-[queues]
+# ── Routes ───────────────────────────────────────────────────────────────
+[[routes]]
+pattern = "ledger.insighthunter.app/api/*"
+zone_name = "insighthunter.app"
 
+# ── D1 Database ──────────────────────────────────────────────────────────
+[[d1_databases]]
+binding = "DB"
+database_name = "ih-ledger"
+database_id = "REPLACE_DB_ID_LEDGER"
+
+# ── Queue Producers ──────────────────────────────────────────────────────
 [[queues.producers]]
 binding = "RULES_QUEUE"
 queue = "ih-ledger-rules"
@@ -24,65 +33,55 @@ queue = "ih-ledger-sync"
 binding = "NOTIFICATIONS"
 queue = "ih-notifications"
 
-[vars]
-ENVIRONMENT = "production"
-AUTH_ORIGIN = "https://auth.insighthunter.app"
-AUTH_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
-
-[[routes]]
-pattern = "ledger.insighthunter.app/api/*"
-zone_name = "insighthunter.app"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "insighthunter-ledger"
-database_id = "8dc66f6a-da61-4421-a092-a4845fc0db8d"
-
+# ── Workflows ────────────────────────────────────────────────────────────
 [[workflows]]
 binding = "CLOSE_WORKFLOW"
 name = "ih-ledger-close"
 class_name = "MonthEndCloseWorkflow"
 script_name = "workers/close/index.ts"
 
-[[workers]]
+# ── Environment Variables ────────────────────────────────────────────────
+[vars]
+ENVIRONMENT = "production"
+AUTH_ORIGIN = "https://auth.insighthunter.app"
+
+# ── Rules Worker ─────────────────────────────────────────────────────────
+[workers.rules]
 name = "ih-ledger-rules"
 main = "workers/rules/index.ts"
 
-[workers.queues]
-
-[[workers.queues.consumers]]
+[[workers.rules.queues.consumers]]
 queue = "ih-ledger-rules"
 max_batch_size = 10
 max_retries = 3
 
-[workers.ai]
+[workers.rules.ai]
 binding = "AI"
 
-[[workers.d1_databases]]
+[[workers.rules.d1_databases]]
 binding = "DB"
-database_name = "insighthunter-ledger"
-database_id = "8dc66f6a-da61-4421-a092-a4845fc0db8d"
+database_name = "ih-ledger"
+database_id = "REPLACE_DB_ID_LEDGER"
 
-[[workers.queues_producers]]
+[[workers.rules.queues.producers]]
 binding = "NOTIFICATIONS"
 queue = "ih-notifications"
 
-[[workers]]
+# ── Sync Worker ──────────────────────────────────────────────────────────
+[workers.sync]
 name = "ih-ledger-sync"
 main = "workers/sync/index.ts"
 
-[workers.queues]
-
-[[workers.queues.consumers]]
+[[workers.sync.queues.consumers]]
 queue = "ih-ledger-sync"
 max_batch_size = 5
 max_retries = 5
 
-[[workers.d1_databases]]
+[[workers.sync.d1_databases]]
 binding = "DB"
-database_name = "insighthunter-ledger"
-database_id = "8dc66f6a-da61-4421-a092-a4845fc0db8d"
+database_name = "ih-ledger"
+database_id = "REPLACE_DB_ID_LEDGER"
 
-[[workers.queues_producers]]
+[[workers.sync.queues.producers]]
 binding = "NOTIFICATIONS"
 queue = "ih-notifications"
