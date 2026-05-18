@@ -157,7 +157,7 @@ EOF2
 mkdir -p apps/insighthunter-main/src/{pages/{dashboard,auth,features},layouts,components/{marketing,dashboard},data,middleware}
 cat > apps/insighthunter-main/package.json <<'JSON'
 {
-  "name": "@ih/main",
+  "name": "insighthunter-main",
   "private": true,
   "version": "0.1.0",
   "type": "module",
