@@ -29,7 +29,7 @@ declare namespace Cloudflare {
 		HISTORY_LIMIT?: "20";
 		FREE_CHAT_LIMIT?: "10";
 		PRO_CHAT_LIMIT?: "500";
-		AI_SESSION?: DurableObjectNamespace /* AISession from insighthunter-ai */;
+		AI_SESSION?: DurableObjectNamespace /* AISession from insighthunter-insights */;
 	}
 }
 interface Env extends Cloudflare.Env {}

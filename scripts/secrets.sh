@@ -10,7 +10,7 @@ JWT_SECRET=$(openssl rand -base64 48)
 >>>>>>> 3ef6eeea63fa04e41ec012c634fef0504b5a5f25
 echo "Generated JWT_SECRET. Applying to all workers..."
 
-for app in insighthunter-auth insighthunter-dispatch insighthunter-bookkeeping insighthunter-bizforma insighthunter-pbx insighthunter-payroll insighthunter-ai; do
+for app in insighthunter-auth insighthunter-dispatch insighthunter-bookkeeping insighthunter-bizforma insighthunter-pbx insighthunter-payroll insighthunter-insights; do
   echo "  Setting on $app..."
   cd apps/$app
   echo "$JWT_SECRET" | npx wrangler secret put JWT_SECRET

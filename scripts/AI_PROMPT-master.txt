@@ -55,7 +55,7 @@ insighthunter/
     insighthunter-bizforma/           Formation, EIN, compliance + handoff
     insighthunter-pbx/                PBX call routing, voicemail, IVR
     insighthunter-payroll/            Payroll runs, pay stubs, tax forms
-    insighthunter-ai/                 AI CFO assistant + Vectorize RAG
+    insighthunter-insights/                 AI CFO assistant + Vectorize RAG
     insighthunter-main/               Astro + Svelte frontend on Pages
 
 ======================================================================
@@ -388,7 +388,7 @@ Requires Cloudflare Workers for Platforms enabled on the account (paid add-on).
     binding BIZFORMA_WORKER, service insighthunter-bizforma
     binding PBX_WORKER, service insighthunter-pbx
     binding PAYROLL_WORKER, service insighthunter-payroll
-    binding AI_WORKER, service insighthunter-ai
+    binding AI_WORKER, service insighthunter-insights
 
   kv_namespaces:
     binding TENANT_CACHE, id REPLACE_AFTER_PROVISION
@@ -995,7 +995,7 @@ Free and Lite tiers: 403 on all payroll routes.
                                  Used by bookkeeping for journal entry suggestions
 
 ======================================================================
-WORKER: insighthunter-ai
+WORKER: insighthunter-insights
 ======================================================================
 
 AI CFO assistant using Workers AI for inference and Vectorize for RAG.
@@ -1004,14 +1004,14 @@ Tier limits: free=0 queries/day, lite=10, standard=50, pro=200, enterprise=unlim
 
 --- wrangler.jsonc ---
 
-  name: insighthunter-ai
+  name: insighthunter-insights
   main: src/index.ts
   compatibility_date: 2025-03-07
   compatibility_flags: nodejs_compat
   observability: enabled true, head_sampling_rate 1
 
   d1_databases:
-    binding DB, database_name insighthunter-ai, database_id REPLACE
+    binding DB, database_name insighthunter-insights, database_id REPLACE
 
   kv_namespaces:
     binding USAGE, id REPLACE    tracks daily query counts per org
@@ -1236,7 +1236,7 @@ npx wrangler d1 create insighthunter-bookkeeping
 npx wrangler d1 create insighthunter-bizforma
 npx wrangler d1 create insighthunter-pbx
 npx wrangler d1 create insighthunter-payroll
-npx wrangler d1 create insighthunter-ai
+npx wrangler d1 create insighthunter-insights
 
 echo "Creating KV namespaces..."
 npx wrangler kv namespace create SESSIONS
@@ -1294,8 +1294,8 @@ cd apps/insighthunter-pbx && npx wrangler deploy && cd ../..
 echo "5 of 7: insighthunter-payroll"
 cd apps/insighthunter-payroll && npx wrangler deploy && cd ../..
 
-echo "6 of 7: insighthunter-ai"
-cd apps/insighthunter-ai && npx wrangler deploy && cd ../..
+echo "6 of 7: insighthunter-insights"
+cd apps/insighthunter-insights && npx wrangler deploy && cd ../..
 
 echo "7 of 7: insighthunter-dispatch (must come after all others)"
 cd apps/insighthunter-dispatch && npx wrangler deploy && cd ../..
@@ -1325,7 +1325,7 @@ JWT verification in each worker.
     cd apps/insighthunter-bizforma    && echo "$JWT_SECRET" | npx wrangler secret put JWT_SECRET
     cd apps/insighthunter-pbx         && echo "$JWT_SECRET" | npx wrangler secret put JWT_SECRET
     cd apps/insighthunter-payroll     && echo "$JWT_SECRET" | npx wrangler secret put JWT_SECRET
-    cd apps/insighthunter-ai          && echo "$JWT_SECRET" | npx wrangler secret put JWT_SECRET
+    cd apps/insighthunter-insights          && echo "$JWT_SECRET" | npx wrangler secret put JWT_SECRET
 
   Set Pages secrets via dashboard or:
     cd apps/insighthunter-main && npx wrangler pages secret put JWT_SECRET
@@ -1390,7 +1390,7 @@ Generate files in this order:
   9. apps/insighthunter-bizforma — wrangler.jsonc, schema.sql, src/index.ts and all agents
   10. apps/insighthunter-pbx — wrangler.jsonc, schema.sql, src/index.ts
   11. apps/insighthunter-payroll — wrangler.jsonc, schema.sql, src/index.ts
-  12. apps/insighthunter-ai — wrangler.jsonc, schema.sql, src/index.ts
+  12. apps/insighthunter-insights — wrangler.jsonc, schema.sql, src/index.ts
   13. apps/insighthunter-main — all layouts, pages, components, lib, styles
   14. scripts/provision.sh, scripts/deploy.sh, scripts/migrate.sh
   15. .env.example and README.md

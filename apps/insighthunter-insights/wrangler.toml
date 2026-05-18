@@ -1,56 +1,44 @@
-name = "insighthunter-ai"
+# wrangler.toml — AI Insights Cloudflare Worker Configuration
+
+name = "insighthunter-insights"
 main = "src/index.ts"
-compatibility_date = "2025-11-01"
+compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
 
+# ── Observability ────────────────────────────────────────────────────────
 [observability]
 enabled = true
 head_sampling_rate = 1
 
-[ai]
-binding = "AI"
-
-[[vectorize]]
-binding = "VECTORS"
-index_name = "insighthunter-insights"
-
-[[kv_namespaces]]
-binding = "USAGE"
-id = "52a1b194a3eb423cb11b43170e536098"
-
+# ── D1 Database ──────────────────────────────────────────────────────────
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-insights"
-database_id = "dbded017-25e8-4559-a351-cbaeea01e4b2"
-migrations_dir = "../../apps/insighthunter-insights/migrations"
+database_id = "REPLACE_AFTER_PROVISION"
 
-[durable_objects]
-bindings = [
-  { name = "AI_SESSION", class_name = "AISession", script_name = "insighthunter-ai" }
-]
+# ── KV Namespaces ────────────────────────────────────────────────────────
+[[kv_namespaces]]
+binding = "USAGE"
+id = "REPLACE_AFTER_PROVISION"
 
-[[migrations]]
-tag = "v1"
-new_classes = ["AISession"]
+# ── AI Binding ───────────────────────────────────────────────────────────
+[ai]
+binding = "AI"
 
+# ── Vectorize Index ──────────────────────────────────────────────────────
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "ih-financial-docs"
+
+# ── Analytics Engine ─────────────────────────────────────────────────────
 [[analytics_engine_datasets]]
-binding = "ANALYTICS"
-dataset = "insighthunter_events"
+binding = "AI_EVENTS"
+dataset = "ih_ai_events"
 
+# ── Environment Variables ────────────────────────────────────────────────
 [vars]
 ENVIRONMENT = "production"
-ALLOWED_ORIGINS = "https://insighthunter.app,https://app.insighthunter.app"
-CHAT_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
-EMBED_MODEL = "@cf/baai/bge-large-en-v1.5"
-SUMMARY_MODEL = "@cf/meta/llama-3.1-8b-instruct"
-MAX_TOKENS = "1024"
-HISTORY_LIMIT = "20"
-FREE_CHAT_LIMIT = "10"
-PRO_CHAT_LIMIT = "500"
+EMBED_MODEL = "@cf/baai/bge-small-en-v1.5"
+CHAT_MODEL = "@cf/meta/llama-3.1-8b-instruct"
 
-[env.preview]
-name = "insighthunter-ai-preview"
-
-[env.preview.vars]
-ENVIRONMENT = "preview"
-ALLOWED_ORIGINS = "https://preview.insighthunter.app"
+# ── Secrets (set via wrangler secret put): JWT_SECRET ───────────────────
