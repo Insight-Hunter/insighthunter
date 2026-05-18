@@ -1,23 +1,12 @@
-<<<<<<< HEAD
-# Generated from wrangler.jsonc by scripts/convert-wrangler.mjs
-# 2026-04-27T04:58:26.747Z
-
-name = "insighthunter-auth"
-main = "src/index.ts"
-compatibility_date = "2025-03-07"
-compatibility_flags = ["nodejs_compat", "nodejs_compat"]
-=======
 name = "insighthunter-auth"
 main = "src/index.ts"
 compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
 
 [observability]
 enabled = true
 head_sampling_rate = 1
 
-<<<<<<< HEAD
 [vars]
 JWT_SECRET = "your-secret-here"
 SITE_URL = "https://insighthunter.app"
@@ -32,29 +21,12 @@ id = "REPLACE_AFTER_PROVISION"
 [[kv_namespaces]]
 binding = "REFRESH_TOKENS"
 id = "REPLACE_AFTER_PROVISION"
-=======
-[[kv_namespaces]]
-binding = "SESSIONS"
-id = "60e34ba310ca40c79edec05470c7a271"
-
-[[kv_namespaces]]
-binding = "REFRESH_TOKENS"
-id = "ba8d224a437949969d990db3aef71a87"
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
 
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-auth"
-<<<<<<< HEAD
 database_id = "REPLACE_AFTER_PROVISION"
 
 [[analytics_engine_datasets]]
 binding = "AUTH_EVENTS"
 dataset = "ih_auth_events"
-=======
-database_id = "36b4a6b7-3509-4cd2-9cdc-7a35990affd5"
-
-[vars]
-JWT_SECRET = "your-secret-here"
-SITE_URL = "https://insighthunter.app"
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f

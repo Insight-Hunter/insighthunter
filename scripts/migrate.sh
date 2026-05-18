@@ -33,8 +33,6 @@ run_migration() {
 
 case $ENV in
   local|preview)
-    run_migration "apps/insighthunter-api" "insighthunter-main" $ENV
-    run_migration "apps/insighthunter-pbx" "insighthunter-main" $ENV
     run_migration "apps/insighthunter-advisor" "insighthunter-advisor" $ENV
     run_migration "apps/insighthunter-auth" "insighthunter-auth" $ENV
     run_migration "apps/insighthunter-bizforma" "insighthunter-bizforma" $ENV
@@ -43,12 +41,14 @@ case $ENV in
     run_migration "apps/insighthunter-payroll" "insighthunter-payroll" $ENV
     run_migration "apps/insighthunter-report" "insighthunter-report" $ENV
     run_migration "apps/insighthunter-scout" "insighthunter-scout" $ENV
+    run_migration "apps/ih-platform-worker" "ih-platform-worker" $ENV
+    run_migration "apps/ih-tenant-template" "ih-tenant-template" $ENV
+    run_migration "apps/insighthunter-finops" "insighthunter-finops" $ENV
+    run_migration "apps/insighthunter-ledger" "insighthunter-ledger" $ENV
     ;;
   production)
     echo "⚠️  Applying to PRODUCTION. Press Ctrl+C to cancel, Enter to continue..."
     read
-    run_migration "apps/insighthunter-api" "insighthunter-main" $ENV
-    run_migration "apps/insighthunter-pbx" "insighthunter-main" $ENV
     run_migration "apps/insighthunter-advisor" "insighthunter-advisor" $ENV
     run_migration "apps/insighthunter-auth" "insighthunter-auth" $ENV
     run_migration "apps/insighthunter-bizforma" "insighthunter-bizforma" $ENV
@@ -57,6 +57,10 @@ case $ENV in
     run_migration "apps/insighthunter-payroll" "insighthunter-payroll" $ENV
     run_migration "apps/insighthunter-report" "insighthunter-report" $ENV
     run_migration "apps/insighthunter-scout" "insighthunter-scout" $ENV
+    run_migration "apps/ih-platform-worker" "ih-platform-worker" $ENV
+    run_migration "apps/ih-tenant-template" "ih-tenant-template" $ENV
+    run_migration "apps/insighthunter-finops" "insighthunter-finops" $ENV
+    run_migration "apps/insighthunter-ledger" "insighthunter-ledger" $ENV
     ;;
   *)
     echo "Usage: bash migrate.sh [local|preview|production]"
