@@ -71,50 +71,6 @@ export class BookkeepingAgent extends Agent<Env, BookkeepingAgentState> {
         });
         break;
       }
-// Inside BookkeepingAgent class (agents/BookkeepingAgent.ts)
-
-async onRequest(request: Request): Promise<Response> {
-  const url = new URL(request.url);
-
-  if (url.pathname === "/classify" && request.method === "POST") {
-    const job = (await request.json()) as ClassificationJob;
-    // Ensure orgId is tracked in state for pending counts
-    this.setState({ ...this.state, orgId: job.orgId });
-    await this.runClassification(job);
-    return new Response(JSON.stringify({ ok: true }), {
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-<<<<<<< HEAD
-  if (url.pathname === "/transactions/bulk" && request.method === "POST") {
-    const { orgId, transactions } = await request.json();
-    this.setState({ ...this.state, orgId });
-    for (const tx of transactions) {
-      // Create transaction in DB
-      const txId = crypto.randomUUID();
-      const now = new Date().toISOString();
-      await this.env.DB.prepare(
-        `INSERT INTO transactions (id, org_id, date, description, amount, status, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, 'pending_classification', ?, ?)`
-      )
-        .bind(txId, orgId, tx.date, tx.description, tx.amount, now, now)
-        .run();
-
-      // Enqueue for classification
-      const job = { orgId, transactionId: txId };
-      await this.runClassification(job);
-    }
-    return new Response(JSON.stringify({ ok: true }), {
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-=======
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
-  return new Response("Not found", { status: 404 });
-}
-
       case "reject_classification": {
         const { queueItemId, accountId } = data.payload as {
           queueItemId: string;
@@ -129,6 +85,45 @@ async onRequest(request: Request): Promise<Response> {
       }
     }
   }
+  
+  async onRequest(request: Request): Promise<Response> {
+    const url = new URL(request.url);
+
+    if (url.pathname === "/classify" && request.method === "POST") {
+      const job = (await request.json()) as ClassificationJob;
+      // Ensure orgId is tracked in state for pending counts
+      this.setState({ ...this.state, orgId: job.orgId });
+      await this.runClassification(job);
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    if (url.pathname === "/transactions/bulk" && request.method === "POST") {
+      const { orgId, transactions } = await request.json();
+      this.setState({ ...this.state, orgId });
+      for (const tx of transactions) {
+        // Create transaction in DB
+        const txId = crypto.randomUUID();
+        const now = new Date().toISOString();
+        await this.env.DB.prepare(
+          `INSERT INTO transactions (id, org_id, date, description, amount, status, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, 'pending_classification', ?, ?)`
+        )
+          .bind(txId, orgId, tx.date, tx.description, tx.amount, now, now)
+          .run();
+
+        // Enqueue for classification
+        const job = { orgId, transactionId: txId };
+        await this.runClassification(job);
+      }
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response("Not found", { status: 404 });
+  }
 
   async onMessage_classifyBatch(jobs: ClassificationJob[]): Promise<void> {
     for (const job of jobs) {
@@ -139,24 +134,7 @@ async onRequest(request: Request): Promise<Response> {
   // Called from the Queue consumer — classify a single transaction
   async runClassification(job: ClassificationJob): Promise<void> {
     this.setState({
-   // Inside BookkeepingAgent class (agents/BookkeepingAgent.ts)
-
-async onRequest(request: Request): Promise<Response> {
-  const url = new URL(request.url);
-
-  if (url.pathname === "/classify" && request.method === "POST") {
-    const job = (await request.json()) as ClassificationJob;
-    // Ensure orgId is tracked in state for pending counts
-    this.setState({ ...this.state, orgId: job.orgId });
-    await this.runClassification(job);
-    return new Response(JSON.stringify({ ok: true }), {
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  return new Response("Not found", { status: 404 });
-}
-   ...this.state,
+      ...this.state,
       processingTransactionId: job.transactionId,
     });
 

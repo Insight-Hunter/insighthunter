@@ -15,7 +15,7 @@ export async function handleAccounts(
   if (method === 'GET' && pathname === '/accounts') {
     const cacheKey = accountsCacheKey(auth.orgId);
     const cached   = await cacheGet<Account[]>(env.KV, cacheKey);
-    if (cached) return Response.json({  cached, cached: true });
+    if (cached) return Response.json({ accounts: cached, cached: true });
 
     const accounts = await getAccounts(env.DB, auth.orgId);
     await cacheSet(env.KV, cacheKey, accounts, 300);
