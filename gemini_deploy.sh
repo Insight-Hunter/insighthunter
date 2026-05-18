@@ -15,5 +15,5 @@ echo "6 of 7: Deploying insighthunter-insights..."
 echo "7 of 7: Deploying insighthunter-dispatch (must come after all others)..."
 (cd apps/insighthunter-dispatch && npx wrangler deploy)
 echo "Building and deploying insighthunter-main..."
-(cd apps/insighthunter-main && npm install && npm run build && npx wrangler pages deploy dist --project-name ih-main)
+(cd apps/insighthunter-main && pnpm install && npm run build && npx wrangler pages deploy dist --project-name ih-main)
 echo "All applications deployed successfully."
