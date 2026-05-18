@@ -1,6 +1,6 @@
 // apps/insighthunter-finops/workers/api/index.ts
 <<<<<<< HEAD
-// ih-finops-api — Finance Operations API.
+// insighthunter-finops — Finance Operations API.
 // Routes: vendors, bills, bill approvals, reimbursements, spend policies, AR invoices.
 
 import { Hono } from "https://esm.sh/hono@4";
@@ -41,7 +41,7 @@ app.use("*", async (c, next) => {
   }
 });
 
-app.get("/health", (c) => c.json({ ok: true, service: "ih-finops-api" }));
+app.get("/health", (c) => c.json({ ok: true, service: "insighthunter-finops" }));
 
 // ─── VENDORS ──────────────────────────────────────────────────────────────────
 
@@ -430,7 +430,7 @@ async function seedDemo(db: D1Database, orgId: string) {
 
 app.get('/health', async (c) => {
   await ensureSchema(c.env.DB);
-  return c.json({ ok: true, service: 'ih-finops-api' });
+  return c.json({ ok: true, service: 'insighthunter-finops' });
 });
 
 app.use('/v1/*', sessionValidator);

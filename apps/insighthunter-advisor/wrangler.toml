@@ -17,7 +17,7 @@ database_id   = "2c5fabdf-eef2-4ca8-bb15-99e83e613460"
 
 [[kv_namespaces]]
 binding = "ADVISOR_KV"
-id      = "<YOUR_KV_ID>"
+id      = "385cc9cd0e8741dabaaff8dcb5ddbcdf"
 
 [[queues.producers]]
 binding = "EMAIL_QUEUE"

@@ -1,36 +1,48 @@
-account_id = "18c8e61a3669253dcfd0c7eec6be36a3"
+# wrangler.toml — Payroll Cloudflare Worker Configuration
+
 name = "insighthunter-payroll"
 main = "src/index.ts"
-compatibility_date = "2025-11-01"
+compatibility_date = "2025-03-07"
+compatibility_flags = ["nodejs_compat"]
 
+# ── Observability ────────────────────────────────────────────────────────
 [observability]
 enabled = true
+head_sampling_rate = 1
 
-[build]
-command = "npm install --legacy-peer-deps && npm run build"
-
+# ── D1 Database ──────────────────────────────────────────────────────────
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-payroll"
-database_id = "5d67e564-4604-4725-bee6-215894c19214"
+database_id = "6a8d3e2b-1c3b-4d2b-8d2b-6a8d3e2b1c3b"
 
+# ── R2 Buckets ───────────────────────────────────────────────────────────
+[[r2_buckets]]
+binding = "PAY_STUBS"
+bucket_name = "ih-pay-stubs"
+
+# ── KV Namespaces ────────────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "PAYROLL_CACHE"
-id = "192305553e184131b7d5306e579759c9"
+id = "ee5fe66bba9341c3b34bf7f9aab6bba8"
 
-[[routes]]
-pattern = "payroll.insighthunter.app/api/*"
-zone_name = "insighthunter.app"
+# ── Queue Producers ──────────────────────────────────────────────────────
+[[queues.producers]]
+binding = "PAYROLL_QUEUE"
+queue = "ih-payroll-queue"
 
-[[services]]
-binding = "AUTH_WORKER"
-service = "insighthunter-auth"
+# ── Queue Consumers ──────────────────────────────────────────────────────
+[[queues.consumers]]
+queue = "ih-payroll-queue"
+max_batch_size = 10
+max_retries = 3
+dead_letter_queue = "ih-payroll-dlq"
 
-[[services]]
-binding = "AGENTS_WORKER"
-service = "insighthunter-agents"
+# ── Analytics Engine ─────────────────────────────────────────────────────
+[[analytics_engine_datasets]]
+binding = "PAYROLL_EVENTS"
+dataset = "ih_payroll_events"
 
-# Secrets:
-# wrangler secret put JWT_SECRET
-# wrangler secret put STRIPE_KEY
-ext
+# ── Environment Variables ────────────────────────────────────────────────
+[vars]
+ENVIRONMENT = "production"

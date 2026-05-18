@@ -14,12 +14,12 @@ head_sampling_rate = 1
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-insights"
-database_id = "REPLACE_AFTER_PROVISION"
+database_id = "8d2b6a8d-3e2b-1c3b-4d2b-6a8d3e2b1c3b"
 
 # ── KV Namespaces ────────────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "USAGE"
-id = "REPLACE_AFTER_PROVISION"
+id = "bd5a717a1a04472a83c903f723f17214"
 
 # ── AI Binding ───────────────────────────────────────────────────────────
 [ai]

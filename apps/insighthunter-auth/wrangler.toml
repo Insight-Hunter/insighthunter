@@ -19,16 +19,16 @@ zone_name = "insighthunter.app"
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-auth"
-database_id = "REPLACE_AFTER_PROVISION"
+database_id = "36b4a6b7-3509-4cd2-9cdc-7a35990affd5"
 
 # ── KV Namespaces ────────────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "SESSIONS"
-id = "REPLACE_AFTER_PROVISION"
+id = "60e34ba310ca40c79edec05470c7a271"
 
 [[kv_namespaces]]
 binding = "REFRESH_TOKENS"
-id = "REPLACE_AFTER_PROVISION"
+id = "ba8d224a437949969d990db3aef71a87"
 
 # ── Analytics Engine ─────────────────────────────────────────────────────
 [[analytics_engine_datasets]]

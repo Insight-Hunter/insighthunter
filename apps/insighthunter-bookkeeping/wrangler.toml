@@ -25,21 +25,21 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-bookkeeping"
-database_id = "REPLACE_AFTER_PROVISION"
+database_id = "4a1f64b1-5129-43c7-8f5b-5f1e1e1a4b1e"
 migrations_dir = "src/backend/db/migrations"
 
 # ── KV Namespaces ────────────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "TIER_USAGE"
-id = "REPLACE_KV_TIER_USAGE_ID"
+id = "bd5a717a1a04472a83c903f723f17214"
 
 [[kv_namespaces]]
 binding = "SESSION_CACHE"
-id = "REPLACE_KV_SESSION_CACHE_ID"
+id = "0aba65ec13e440178b2a8318b77b016a"
 
 [[kv_namespaces]]
 binding = "QB_TOKENS"
-id = "REPLACE_KV_QB_TOKENS_ID"
+id = "e4d0112599154da2a2573d5a37926f08"
 
 # ── R2 Buckets ───────────────────────────────────────────────────────────
 [[r2_buckets]]

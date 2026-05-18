@@ -18,7 +18,7 @@ zone_name = "insighthunter.app"
 [[d1_databases]]
 binding = "DB"
 database_name = "ih-ledger"
-database_id = "REPLACE_DB_ID_LEDGER"
+database_id = "d3a7b6e4-3b2d-4c1d-8d2b-5e3e2b1c3b2d"
 
 # ── Queue Producers ──────────────────────────────────────────────────────
 [[queues.producers]]
@@ -61,7 +61,7 @@ binding = "AI"
 [[workers.rules.d1_databases]]
 binding = "DB"
 database_name = "ih-ledger"
-database_id = "REPLACE_DB_ID_LEDGER"
+database_id = "d3a7b6e4-3b2d-4c1d-8d2b-5e3e2b1c3b2d"
 
 [[workers.rules.queues.producers]]
 binding = "NOTIFICATIONS"
@@ -80,7 +80,7 @@ max_retries = 5
 [[workers.sync.d1_databases]]
 binding = "DB"
 database_name = "ih-ledger"
-database_id = "REPLACE_DB_ID_LEDGER"
+database_id = "d3a7b6e4-3b2d-4c1d-8d2b-5e3e2b1c3b2d"
 
 [[workers.sync.queues.producers]]
 binding = "NOTIFICATIONS"

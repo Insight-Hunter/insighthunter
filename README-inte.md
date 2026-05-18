@@ -15,7 +15,7 @@ Stack: Cloudflare Workers · Hono · D1 · R2 · Queues · Workflows · Workers 
 | | `ih-ledger-rules` | Queue consumer | Auto-categorization engine (rules + AI) |
 | | `ih-ledger-close` | Durable Workflow | Month-end close orchestration |
 | | `ih-ledger-sync` | Queue consumer | QBO / Xero sync |
-| **insighthunter-finops** | `ih-finops-api` | finops.insighthunter.app/api | Bills, vendors, reimbursements, AR invoices |
+| **insighthunter-finops** | `insighthunter-finops` | finops.insighthunter.app/api | Bills, vendors, reimbursements, AR invoices |
 | | `ih-finops-approvals` | Durable Workflow | Multi-step bill approval chain |
 | | `ih-finops-receipts` | Queue consumer | Receipt OCR + amount validation |
 | | `ih-finops-pdf` | Queue consumer | Invoice PDF generation via Browser Rendering |
@@ -67,7 +67,7 @@ wrangler r2 bucket create ih-documents
 ```bash
 # Repeat for each worker name
 wrangler secret put AUTH_SECRET         --name ih-advisor-api
-wrangler secret put VAULT_ENCRYPTION_KEY --name ih-finops-api
+wrangler secret put VAULT_ENCRYPTION_KEY --name insighthunter-finops
 wrangler secret put RESEND_API_KEY       --name ih-notification-queue
 wrangler secret put WEBHOOK_SIGNING_SECRET --name ih-notification-queue
 ```

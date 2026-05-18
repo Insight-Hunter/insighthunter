@@ -3,6 +3,9 @@ pages_build_output_dir = "dist"
 compatibility_date = "2026-04-12"
 compatibility_flags = ["nodejs_compat"]
 
+[observability]
+enabled = true
+
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-main"
@@ -32,3 +35,7 @@ dataset = "ih_page_views"
 [vars]
 PUBLIC_APP_URL = "https://insighthunter.app"
 AUTH_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
+
+[[dispatch_namespaces]]
+binding = "BIZFORMA"
+namespace = "platform.insighthunter.app"

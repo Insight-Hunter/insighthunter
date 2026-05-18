@@ -1,17 +1,36 @@
+# wrangler.toml — FinOps Cloudflare Worker Configuration
 
-# Generated from wrangler.jsonc by scripts/convert-wrangler.mjs
-# 2026-04-27T04:58:26.681Z
-
-name = "ih-finops-api"
+name = "insighthunter-finops"
 main = "workers/api/index.ts"
 compatibility_date = "2025-03-01"
 compatibility_flags = ["nodejs_compat"]
 
+# ── Observability ────────────────────────────────────────────────────────
 [observability]
 enabled = true
 
-[queues]
+# ── Routes ───────────────────────────────────────────────────────────────
+[[routes]]
+pattern = "finops.insighthunter.app/api/*"
+zone_name = "insighthunter.app"
 
+# ── D1 Databases ─────────────────────────────────────────────────────────
+[[d1_databases]]
+binding = "DB"
+database_name = "ih-finops"
+database_id = "5e3e2b1c-3b2d-4c1d-8d2b-5e3e2b1c3b2d"
+
+[[d1_databases]]
+binding = "ADVISOR_DB"
+database_name = "ih-advisor"
+database_id = "2c5fabdf-eef2-4ca8-bb15-99e83e613460"
+
+# ── R2 Buckets ───────────────────────────────────────────────────────────
+[[r2_buckets]]
+binding = "DOCS"
+bucket_name = "ih-documents"
+
+# ── Queue Producers ──────────────────────────────────────────────────────
 [[queues.producers]]
 binding = "APPROVALS_WORKFLOW"
 queue = "ih-finops-approvals"
@@ -32,92 +51,73 @@ queue = "ih-finops-pdf"
 binding = "NOTIFICATIONS"
 queue = "ih-notifications"
 
-[vars]
-ENVIRONMENT = "production"
-AUTH_ORIGIN = "https://auth.insighthunter.app"
-AUTH_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
-
-
-[[routes]]
-pattern = "finops.insighthunter.app/api/*"
-zone_name = "insighthunter.app"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "insighthunter-finops"
-database_id = "44478794-d4dc-4fce-9184-646af572504c"
-
-[[d1_databases]]
-binding = "ADVISOR_DB"
-database_name = "ih-advisor"
-database_id = "e3d4545c-16c2-4e2b-9dc3-3f4ae580be0b"
-
-[[r2_buckets]]
-binding = "DOCS"
-bucket_name = "ih-documents"
-
+# ── Workflows ────────────────────────────────────────────────────────────
 [[workflows]]
 binding = "APPROVALS_WORKFLOW"
 name = "ih-finops-approvals"
 class_name = "BillApprovalWorkflow"
 script_name = "workers/approvals/index.ts"
 
-[[workers]]
+# ── Environment Variables ────────────────────────────────────────────────
+[vars]
+ENVIRONMENT = "production"
+AUTH_ORIGIN = "https://auth.insighthunter.app"
+
+# ── Receipts Worker ──────────────────────────────────────────────────────
+[workers.receipts]
 name = "ih-finops-receipts"
 main = "workers/receipts/index.ts"
 
-[workers.queues]
-
-[[workers.queues.consumers]]
+[[workers.receipts.queues.consumers]]
 queue = "ih-finops-receipts"
 max_batch_size = 5
 max_retries = 3
 
-[workers.ai]
+[workers.receipts.ai]
 binding = "AI"
 
-[[workers.r2_buckets]]
+[[workers.receipts.r2_buckets]]
 binding = "DOCS"
 bucket_name = "ih-documents"
 
-[[workers.d1_databases]]
+[[workers.receipts.d1_databases]]
 binding = "DB"
-database_name = "insighthunter-finops"
-database_id = "44478794-d4dc-4fce-9184-646af572504c"
+database_name = "ih-finops"
+database_id = "5e3e2b1c-3b2d-4c1d-8d2b-5e3e2b1c3b2d"
 
-[[workers]]
+# ── PDF Worker ───────────────────────────────────────────────────────────
+[workers.pdf]
 name = "ih-finops-pdf"
 main = "workers/pdf/index.ts"
 
-[workers.queues]
-
-[[workers.queues.consumers]]
+[[workers.pdf.queues.consumers]]
 queue = "ih-finops-pdf"
 max_batch_size = 3
 max_retries = 3
 
-[workers.browser_rendering]
+[workers.pdf.browser_rendering]
 binding = "BROWSER"
 
-[[workers.r2_buckets]]
+[[workers.pdf.r2_buckets]]
 binding = "DOCS"
 bucket_name = "ih-documents"
 
-[[workers.d1_databases]]
+[[workers.pdf.d1_databases]]
 binding = "DB"
-database_name = "insighthunter-finops"
-database_id = "44478794-d4dc-4fce-9184-646af572504c"
+database_name = "ih-finops"
+database_id = "5e3e2b1c-3b2d-4c1d-8d2b-5e3e2b1c3b2d"
 
-[[workers]]
+# ── Reminders Worker ─────────────────────────────────────────────────────
+[workers.reminders]
 name = "ih-finops-reminders"
 main = "workers/reminders/index.ts"
 crons = ["0 8 * * *"]
 
-[[workers.d1_databases]]
+[[workers.reminders.d1_databases]]
 binding = "DB"
-database_name = "insighthunter-finops"
-database_id = "44478794-d4dc-4fce-9184-646af572504c"
+database_name = "ih-finops"
+database_id = "5e3e2b1c-3b2d-4c1d-8d2b-5e3e2b1c3b2d"
 
-[[workers.queues_producers]]
+[[workers.reminders.queues.producers]]
 binding = "NOTIFICATIONS"
 queue = "ih-notifications"

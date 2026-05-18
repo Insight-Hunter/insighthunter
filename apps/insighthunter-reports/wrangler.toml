@@ -1,31 +1,36 @@
-# Generated from wrangler.jsonc by scripts/convert-wrangler.mjs
-# 2026-04-27T04:58:26.817Z
+# wrangler.toml — Reports Cloudflare Worker Configuration
 
 name = "insighthunter-reports"
 main = "src/index.ts"
 compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
 
+# ── Observability ────────────────────────────────────────────────────────
 [observability]
 enabled = true
 head_sampling_rate = 1
 
+# ── Browser Rendering ──────────────────────────────────────────────────
 [browser]
 binding = "BROWSER"
 
-[vars]
-AUTH_WORKER_URL = "https://auth.insighthunter.app"
-APP_URL = "https://insighthunter.app"
-
+# ── R2 Buckets ───────────────────────────────────────────────────────────
 [[r2_buckets]]
 binding = "REPORTS"
 bucket_name = "insighthunter-reports"
 
+# ── D1 Databases ─────────────────────────────────────────────────────────
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-db"
-database_id = "REPLACE_WITH_D1_ID"
+database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
 
+# ── Analytics Engine ─────────────────────────────────────────────────────
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"
 dataset = "insighthunter_events"
+
+# ── Environment Variables ────────────────────────────────────────────────
+[vars]
+AUTH_WORKER_URL = "https://auth.insighthunter.app"
+APP_URL = "https://insighthunter.app"

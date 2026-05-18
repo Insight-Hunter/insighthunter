@@ -11,23 +11,15 @@ namespace = "ih-apps"
 
 [[kv_namespaces]]
 binding = "IH_REGISTRY"
-<<<<<<< HEAD
 id = "894edb7e9e5a4f00b191aec4ae0716c4"
-=======
-id = "REPLACE_WITH_KV_ID"
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
 
 [[d1_databases]]
 binding = "IH_PLATFORM_DB"
 database_name = "ih-platform-db"
-<<<<<<< HEAD
 database_id = "eb034589-7f38-4f1f-af73-259d762c6b35"
-=======
-database_id = "REPLACE_WITH_D1_ID"
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
 
 [vars]
-CF_ACCOUNT_ID = "REPLACE_WITH_ACCOUNT_ID"
+CF_ACCOUNT_ID = "18c8e61a3669253dcfd0c7eec6be36a3"
 
 # Secrets (set via: wrangler secret put JWT_SECRET, CF_API_TOKEN)
 # JWT_SECRET, CF_API_TOKEN
