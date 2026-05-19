@@ -1,7 +1,6 @@
 // apps/insighthunter-pbx/src/routes/billing.ts
 // Self-hosted billing portal endpoints — no Stripe redirect.
 import { Hono } from 'hono';
-import { z }    from 'zod';
 
 interface Env {
   PBX_DB:                D1Database;
