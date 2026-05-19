@@ -5,7 +5,6 @@
 import { Hono } from "https://esm.sh/hono@4";
 import { cors } from "https://esm.sh/hono@4/cors";
 import * as sessionValidator from "../../../../shared/middleware/session-validator.ts";
-import { unauthorizedJson } from "../../../../shared/middleware/session-validator.ts";
 import type { BaseEnv } from "../../../../shared/types/index.ts";
 
 export interface Env extends BaseEnv {
@@ -33,7 +32,7 @@ app.use("*", async (c, next) => {
   try {
     const validateSession = sessionValidator.validateSession;
     if (typeof validateSession !== "function") {
-      return unauthorizedJson(c);
+      return c.json({ ok: false, error: "Unauthorized" }, 401);
     }
     const user = await validateSession(c.req.raw, c.env);
     c.set("user" as never, user);
