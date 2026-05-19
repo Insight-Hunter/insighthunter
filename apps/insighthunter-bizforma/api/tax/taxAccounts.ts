@@ -1,1 +1,1 @@
-import { Hono } from "hono"; import { getTaxTasks } from "../../services/taxAccountService"; export const taxAccountsApi = new Hono(); taxAccountsApi.get("/", (c) => c.json({ tasks: getTaxTasks() }));
+import { Hono } from "hono"; import * as taxAccountService from "../../services/taxAccountService"; export const taxAccountsApi = new Hono(); taxAccountsApi.get("/", (c) => c.json({ tasks: taxAccountService.getTaxTasks() }));
