@@ -1,22 +1,28 @@
 ---
-import MarketingLayout from '../../layouts/MarketingLayout.astro';
-const tiers = ['free', 'lite', 'standard', 'pro', 'enterprise'];
-const pricing: Record<string, number> = { free: 0, lite: 19, standard: 49, pro: 99, enterprise: 299 };
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import { pricingTiers } from '../../data/pricing';
 ---
-<MarketingLayout title="Upgrade Plan">
-  <section class="container" style="padding:60px 24px">
-    <h1 style="font-family:var(--font-display);font-size:2rem;margin-bottom:32px">Choose your plan</h1>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
-      {tiers.map(tier => (
-        <div class="card" style="padding:24px;display:flex;flex-direction:column;gap:12px;">
-          <div style="font-weight:600;color:var(--muted);font-size:0.875rem;text-transform:capitalize;">{tier}</div>
-          <div style="font-family:var(--font-display);font-size:2rem;font-weight:700;">${pricing[tier]}<span style="font-size:0.875rem;font-weight:400;color:var(--muted);">/mo</span></div>
-          <a href={`mailto:sales@insighthunter.app?subject=Upgrade to ${tier}`}
-            style="background:var(--gold);color:#000;font-weight:700;padding:10px;border-radius:8px;text-align:center;font-size:0.875rem;margin-top:auto;">
-            Select
-          </a>
-        </div>
+
+<DashboardLayout title="Upgrade">
+  <section class="dashboard-page">
+    <p class="eyebrow">Upgrade</p>
+    <h1>Expand your access</h1>
+    <div class="grid">
+      {pricingTiers.map((tier) => (
+        <article class="panel">
+          <h2>{tier.name}</h2>
+          <p>{tier.description}</p>
+          <a href="/pricing">Review tier</a>
+        </article>
       ))}
     </div>
   </section>
-</MarketingLayout>
+</DashboardLayout>
+
+<style>
+  .dashboard-page { display: grid; gap: 1rem; }
+  .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .panel { border: 1px solid rgba(84,72,56,.14); border-radius: 18px; padding: 1rem; }
+  a { text-decoration: none; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; margin: 0; }
+</style>

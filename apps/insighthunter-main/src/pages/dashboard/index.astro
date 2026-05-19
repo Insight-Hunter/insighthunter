@@ -1,34 +1,53 @@
 ---
-import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import KPICard from '../../components/dashboard/KPICard.svelte';
+import RevenueChart from '../../components/dashboard/RevenueChart.svelte';
+import CashFlowChart from '../../components/dashboard/CashFlowChart.svelte';
+import InsightCard from '../../components/dashboard/InsightCard.svelte';
+import ActivityFeed from '../../components/dashboard/ActivityFeed.svelte';
+import QuickActions from '../../components/dashboard/QuickActions.svelte';
 ---
-<MarketingLayout title="Dashboard">
-  <section class="container" style="padding:60px 24px">
-    <div style="margin-bottom:32px;">
-      <h1 style="font-size:1.8rem;color:#fff;margin-bottom:6px;">Good morning ✦</h1>
-      <p style="color:#999;font-size:0.95rem;">Here's your financial snapshot.</p>
+
+<DashboardLayout title="Dashboard">
+  <section class="dashboard-page">
+    <div class="page-head">
+      <div>
+        <p class="eyebrow">Overview</p>
+        <h1>Business dashboard</h1>
+      </div>
+      <a href="/dashboard/upgrade">Upgrade</a>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;">
-      <div class="card" style="padding:24px;">
-        <div style="color:var(--muted);font-size:0.85rem;margin-bottom:8px;">💰 Monthly Revenue</div>
-        <div style="font-family:var(--font-display);font-size:1.75rem;font-weight:700;">$24,800</div>
-        <div style="color:#4ade80;font-size:0.8rem;margin-top:4px;">↑ 12% vs last month</div>
-      </div>
-      <div class="card" style="padding:24px;">
-        <div style="color:var(--muted);font-size:0.85rem;margin-bottom:8px;">🏦 Cash on Hand</div>
-        <div style="font-family:var(--font-display);font-size:1.75rem;font-weight:700;">$11,240</div>
-        <div style="color:#4ade80;font-size:0.8rem;margin-top:4px;">↑ 3% vs last week</div>
-      </div>
-      <div class="card" style="padding:24px;">
-        <div style="color:var(--muted);font-size:0.85rem;margin-bottom:8px;">📉 Expenses (MTD)</div>
-        <div style="font-family:var(--font-display);font-size:1.75rem;font-weight:700;">$8,420</div>
-        <div style="color:#f87171;font-size:0.8rem;margin-top:4px;">↑ 5% vs last month</div>
-      </div>
-      <div class="card" style="padding:24px;">
-        <div style="color:var(--muted);font-size:0.85rem;margin-bottom:8px;">📄 Open Invoices</div>
-        <div style="font-family:var(--font-display);font-size:1.75rem;font-weight:700;">$6,300</div>
-        <div style="color:#f87171;font-size:0.8rem;margin-top:4px;">2 overdue</div>
-      </div>
+    <div class="kpi-grid">
+      <KPICard title="Monthly revenue" value="$84,200" delta="+8.4%" />
+      <KPICard title="Cash on hand" value="$46,880" delta="+3.2%" />
+      <KPICard title="Gross margin" value="58.1%" delta="+1.1%" />
+      <KPICard title="Runway" value="9.4 mo" delta="-0.3 mo" />
+    </div>
+
+    <div class="chart-grid">
+      <div class="panel"><RevenueChart client:load /></div>
+      <div class="panel"><CashFlowChart client:load /></div>
+    </div>
+
+    <div class="content-grid">
+      <div class="panel"><InsightCard client:load /></div>
+      <div class="panel"><ActivityFeed client:load /></div>
+      <div class="panel wide"><QuickActions client:load /></div>
     </div>
   </section>
-</MarketingLayout>
+</DashboardLayout>
+
+<style>
+  .dashboard-page { display: grid; gap: 1rem; }
+  .page-head { display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
+  .page-head a { padding: .8rem 1rem; border: 1px solid rgba(84,72,56,.18); border-radius: 999px; text-decoration: none; color: inherit; }
+  .kpi-grid, .chart-grid, .content-grid { display: grid; gap: 1rem; }
+  .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+  .chart-grid { grid-template-columns: 1fr 1fr; }
+  .content-grid { grid-template-columns: 1fr 1fr; }
+  .panel, .wide { border: 1px solid rgba(84,72,56,.14); border-radius: 18px; padding: 1rem; }
+  .wide { grid-column: 1 / -1; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; margin: 0; }
+  @media (max-width: 980px) { .kpi-grid, .chart-grid, .content-grid { grid-template-columns: 1fr; } }
+</style>

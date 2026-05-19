@@ -1,11 +1,23 @@
 ---
 import MarketingLayout from '../../layouts/MarketingLayout.astro';
-import Nav from '../../components/marketing/Nav.astro';
 ---
-<MarketingLayout title="scout">
-  <Nav />
-  <section class="container" style="padding:80px 24px">
-    <h1 style="font-family:var(--font-display);font-size:2.5rem;margin-bottom:14px">scout</h1>
-    <p style="color:var(--muted);max-width:720px">Feature page scaffold for scout. Brand palette, typography, and dark card system already applied.</p>
+
+<MarketingLayout title="Scout | Insight Hunter" description="Research, lead discovery, and opportunity scouting support for growth-minded teams.">
+  <section class="container section">
+    <span class="eyebrow">Scout</span>
+    <h1>Find opportunities faster.</h1>
+    <p>Scout is the research and discovery layer for teams that need cleaner prospecting, faster targeting, and better lead context.</p>
+    <div class="actions">
+      <a href="/scout">Open app homepage</a>
+      <a href="/auth/register">Get access</a>
+    </div>
   </section>
 </MarketingLayout>
+
+<style>
+  .container { max-width: 980px; margin: 0 auto; padding: 0 1.25rem; }
+  .section { padding: 4rem 0; }
+  .actions { display: flex; gap: .75rem; margin-top: 1.25rem; flex-wrap: wrap; }
+  .actions a { padding: .85rem 1.1rem; border: 1px solid rgba(84,72,56,.18); border-radius: 999px; text-decoration: none; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; }
+</style>

@@ -1,7 +1,23 @@
 ---
-import Layout from '../layouts/MarketingLayout.astro';
+import MarketingLayout from '../layouts/MarketingLayout.astro';
 ---
-<Layout title="Bizforma | Formation Wizard">
-  <h1>Business Formation Made Easy</h1>
-  <p>Automated entity determination, EIN filing, and compliance tracking.</p>
-</Layout>
+
+<MarketingLayout title="BizForma App | Insight Hunter" description="Homepage for BizForma and business formation workflow entry.">
+  <section class="container section app-home">
+    <span class="eyebrow">BizForma app</span>
+    <h1>Form the business with a real operating plan.</h1>
+    <p>This page is the standalone BizForma app homepage and can back `bizforma.insighthunter.app` routing cleanly.</p>
+    <div class="actions">
+      <a href="/auth/register">Start formation</a>
+      <a href="/dashboard/bizforma">Open BizForma dashboard</a>
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  .container { max-width: 980px; margin: 0 auto; padding: 0 1.25rem; }
+  .section { padding: 4rem 0; }
+  .actions { display: flex; gap: .75rem; margin-top: 1.25rem; flex-wrap: wrap; }
+  .actions a { padding: .85rem 1.1rem; border-radius: 999px; border: 1px solid rgba(84,72,56,.18); text-decoration: none; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; }
+</style>

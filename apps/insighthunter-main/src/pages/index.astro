@@ -1,349 +1,64 @@
 ---
 import MarketingLayout from '../layouts/MarketingLayout.astro';
-import Nav from '../components/marketing/Nav.astro';
-import HeroSlideshow from '../components/marketing/HeroSlideshow.astro';
+import Hero from '../components/marketing/Hero.astro';
 import FeatureGrid from '../components/marketing/FeatureGrid.astro';
-import CTABanner from '../components/marketing/CTABanner.astro';
-import Testimonials from '../components/marketing/Testimonials.astro';
 import PricingTable from '../components/marketing/PricingTable.astro';
-import AppCard from '../components/marketing/AppCard.astro';
+import Testimonials from '../components/marketing/Testimonials.astro';
+import CTABanner from '../components/marketing/CTABanner.astro';
 import { apps } from '../data/apps';
-import { tiers, addons } from '../data/pricing';
+
+const featuredApps = apps.slice(0, 6);
 ---
 
 <MarketingLayout
-  title="The Financial OS for Small Business"
-  description="Insight Hunter — the financial OS for small business. Dashboard, bookkeeping, AI forecasting, business formation, payroll, PBX and more. Start free."
+  title="Insight Hunter | Stop Flying Blind"
+  description="CFO-grade reporting, bookkeeping, forecasts, AI insights, and operator tools for small businesses."
 >
-  <Nav />
+  <Hero
+    eyebrow="Insight Hunter"
+    title="Stop flying blind."
+    subtitle="Get bookkeeping, cash-flow visibility, forecasting, AI CFO insights, and execution tools in one operating system."
+    primaryCta={{ href: '/pricing', label: 'View pricing' }}
+    secondaryCta={{ href: '/features', label: 'Explore apps' }}
+  />
 
-  <!-- ── Hero Slideshow (replaces static Hero) ── -->
-  <HeroSlideshow />
-
-  <!-- ── Stats strip ── -->
-  <div class="stats-strip">
-    <div class="container">
-      <div class="stats-row">
-        <div class="stat-item">
-          <span class="stat-num">$0</span>
-          <span class="stat-lbl">To start — always free tier</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-num">50</span>
-          <span class="stat-lbl">States for business formation</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-num">5</span>
-          <span class="stat-lbl">Plan tiers — pay only for what you need</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-num">9+</span>
-          <span class="stat-lbl">Business services in one place</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-num">1</span>
-          <span class="stat-lbl">Platform for your entire business stack</span>
-        </div>
-      </div>
+  <section class="container section">
+    <div class="section-copy">
+      <span class="eyebrow">Apps</span>
+      <h2>One platform, focused apps.</h2>
+      <p>Launch with the tools you need now, then expand into reporting, formation, payroll, phone, and web services as you grow.</p>
     </div>
-  </div>
 
-  <!-- ── Platform apps grid ── -->
-  <section class="section" id="features">
-    <div class="container">
-      <p class="section-eyebrow">Platform</p>
-      <h2 class="section-heading">
-        Everything your business needs<br />
-        <em>— finally in one place</em>
-      </h2>
-      <p class="section-sub">
-        Six core products that work together so you're never switching between five different tools.
-      </p>
-      <div class="apps-grid">
-        {apps.map(app => (
-          <AppCard
-            name={app.name}
-            tier={app.tier}
-            description={app.description}
-            href={app.href}
-            icon={app.icon}
-          />
-        ))}
-      </div>
+    <div class="app-grid">
+      {featuredApps.map((app) => (
+        <a class="app-card" href={`/${app.slug}`}>
+          <span class="app-tier">{app.tier}</span>
+          <h3>{app.name}</h3>
+          <p>{app.description}</p>
+          <span class="app-link">Open app home</span>
+        </a>
+      ))}
     </div>
   </section>
 
-  <!-- ── BizForma callout ── -->
-  <section class="section section--navy" id="bizforma">
-    <div class="container">
-      <p class="section-eyebrow">🏛️ BizForma — Business Formation</p>
-      <h2 class="section-heading">Form your LLC.<br /><em>Get 6 months free.</em></h2>
-
-      <div class="bizforma-layout">
-        <div class="bizforma-steps">
-          <p class="bizforma-intro">
-            The smartest way to start a business in America. We handle the paperwork — you keep running.
-          </p>
-          {[
-            { n: '1', h: 'Tell us about your business', p: 'Industry, state, structure. Our engine recommends the right entity type.' },
-            { n: '2', h: 'We file everything', p: 'Articles of Organization, EIN application, Registered Agent enrollment, Operating Agreement.' },
-            { n: '3', h: 'Your LLC is active', p: 'Your Insight Hunter account automatically upgrades to Standard for 6 months free.' },
-            { n: '4', h: 'Stay compliant forever', p: 'Annual report reminders, RA renewals, tax deadline alerts — all in your dashboard.' },
-          ].map(s => (
-            <div class="biz-step">
-              <div class="biz-step-num">{s.n}</div>
-              <div>
-                <h4>{s.h}</h4>
-                <p>{s.p}</p>
-              </div>
-            </div>
-          ))}
-          <a href="/features/bizforma" class="biz-more">Start Formation →</a>
-        </div>
-
-        <div class="bizforma-card card">
-          <p class="biz-card-label">Formation Fee</p>
-          <p class="biz-card-price">$149</p>
-          <p class="biz-card-sub">+ state filing fee · Includes 6 months Standard — $474 value</p>
-          <ul class="biz-card-list">
-            {[
-              'Entity type recommendation',
-              'Articles of Organization filing',
-              'EIN application',
-              'Operating Agreement template',
-              '1 year Registered Agent included',
-              'Compliance calendar setup',
-              '6 months Insight Standard FREE',
-              'Instant dashboard upgrade on payment',
-            ].map(f => <li>✓ {f}</li>)}
-          </ul>
-          <a href="/auth/register" class="btn btn-gold biz-card-cta">Start Now — $149 + state fee</a>
-          <p class="biz-card-note">State fees vary $35–$500 · passed through at cost</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Pricing ── -->
-  <section class="section" id="pricing">
-    <div class="container">
-      <p class="section-eyebrow">Pricing</p>
-      <h2 class="section-heading">Pay only for what you need</h2>
-      <p class="section-sub">
-        <a href="/pricing" class="gold-link">Full pricing + add-ons →</a>
-      </p>
-      <PricingTable tiers={tiers} addons={addons} />
-    </div>
-  </section>
-
-  <!-- ── Feature deep-dives ── -->
   <FeatureGrid />
-
-  <!-- ── Services marketplace ── -->
-  <section class="section section--navy" id="services">
-    <div class="container">
-      <p class="section-eyebrow">Services Marketplace</p>
-      <h2 class="section-heading">Every service your business needs</h2>
-      <p class="section-sub">
-        <a href="/dashboard/services" class="gold-link">View marketplace →</a>
-      </p>
-      <p class="services-tagline">Available now and coming soon — all accessible from your dashboard.</p>
-
-      <div class="services-grid">
-        {[
-          { icon: '🏛️', name: 'Business Formation',    desc: 'LLC/Corp filing in all 50 states · EIN · RA · 6 mo Standard free', status: 'available' },
-          { icon: '📞', name: 'Registered Agent',       desc: 'Annual $49/yr renewal · 1st year included with BizForma',            status: 'available' },
-          { icon: '⚖️', name: 'Notary Services',        desc: 'Remote online notarization for business documents',                   status: 'soon'      },
-          { icon: '™️', name: 'Trademark Registration', desc: 'USPTO search, filing and management',                                 status: 'soon'      },
-          { icon: '🌐', name: 'Domain Registration',    desc: 'Register domains at near cost — .com, .io, .app and more',            status: 'soon'      },
-          { icon: '🖥️', name: 'Website Creation',       desc: 'Professional business website built and deployed in days',            status: 'soon'      },
-          { icon: '⭐', name: 'Online Reputation Mgmt', desc: 'Monitor and manage Google, Yelp and social reviews',                  status: 'soon'      },
-          { icon: '🎨', name: 'Graphic Design',         desc: 'Logos, brand kits and social graphics — white-labeled',               status: 'soon'      },
-          { icon: '📱', name: 'Digital Marketing',      desc: 'SEO, social media and Google Ads for small businesses',               status: 'soon'      },
-        ].map(s => (
-          <div class="service-card card">
-            <span class="svc-icon">{s.icon}</span>
-            <p class="svc-name">{s.name}</p>
-            <p class="svc-desc">{s.desc}</p>
-            <span class={`svc-badge svc-badge--${s.status}`}>
-              {s.status === 'available' ? 'Available Now' : 'Coming Soon'}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Testimonials ── -->
   <Testimonials />
-
-  <!-- ── CTA banner ── -->
+  <PricingTable />
   <CTABanner
-    heading="Your business deserves better tools."
-    sub="Start free. Add what you need. Grow without switching platforms."
-    primaryLabel="Create Free Account"
-    primaryHref="/auth/register"
-    secondaryLabel="Start LLC Formation →"
-    secondaryHref="/features/bizforma"
-    footnote="No credit card · Free forever plan · 14-day trials on paid plans"
+    title="Start with one app. Grow into the full finance stack."
+    text="Use the app that solves today’s bottleneck, then unlock the rest of the platform when you are ready."
+    cta={{ href: '/auth/register', label: 'Create account' }}
   />
 </MarketingLayout>
 
 <style>
-/* All tokens come from MarketingLayout / globals.scss — no new variables needed */
-
-/* ── Stats strip ── */
-.stats-strip {
-  padding: 36px 0;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  background: var(--surface, #141414);
-}
-.stats-row {
-  display: flex; gap: 0; flex-wrap: wrap;
-  justify-content: center;
-}
-.stat-item {
-  flex: 1; min-width: 140px; max-width: 200px;
-  text-align: center; padding: 12px 16px;
-  border-right: 1px solid rgba(255,255,255,0.06);
-}
-.stat-item:last-child { border-right: none; }
-.stat-num {
-  display: block;
-  font-family: var(--font-display, sans-serif);
-  font-size: 2rem; font-weight: 700;
-  color: var(--gold, #C9A84C); line-height: 1;
-}
-.stat-lbl {
-  display: block; font-size: 0.78rem;
-  color: var(--muted, #999); margin-top: 4px;
-}
-
-/* ── Section layout helpers ── */
-.section {
-  padding: 96px 0;
-  background: var(--bg, #0d0d0d);
-}
-.section--navy {
-  background: var(--bg-navy, #141522);
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-.section-eyebrow {
-  text-align: center;
-  font-size: 12px; font-weight: 700;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--gold, #C9A84C); margin-bottom: 12px;
-}
-.section-heading {
-  text-align: center;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  line-height: 1.2; margin-bottom: 12px;
-}
-.section-heading em { color: var(--gold, #C9A84C); font-style: normal; }
-.section-sub {
-  text-align: center; color: var(--muted, #999);
-  font-size: 1rem; max-width: 560px;
-  margin: 0 auto 48px;
-}
-.gold-link { color: var(--gold, #C9A84C); font-weight: 600; }
-.gold-link:hover { text-decoration: underline; }
-
-/* ── Apps grid ── */
-.apps-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 18px;
-}
-
-/* ── BizForma section ── */
-.bizforma-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 56px; align-items: start;
-  margin-top: 48px;
-}
-.bizforma-intro {
-  color: var(--muted, #999); margin-bottom: 28px; font-size: 1rem;
-}
-.bizforma-steps { display: flex; flex-direction: column; gap: 0; }
-.biz-step {
-  display: flex; gap: 16px; align-items: flex-start;
-  padding: 16px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.biz-step:last-of-type { border-bottom: none; }
-.biz-step-num {
-  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-  background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.3);
-  color: var(--gold, #C9A84C); font-weight: 700; font-size: 0.85rem;
-  display: flex; align-items: center; justify-content: center;
-  margin-top: 2px;
-}
-.biz-step h4 { font-size: 0.95rem; margin-bottom: 4px; }
-.biz-step p  { font-size: 0.85rem; color: var(--muted, #999); }
-.biz-more {
-  display: inline-block; margin-top: 20px;
-  color: var(--gold, #C9A84C); font-weight: 700; font-size: 0.95rem;
-}
-.biz-more:hover { text-decoration: underline; }
-
-.bizforma-card { padding: 32px; }
-.biz-card-label {
-  font-size: 0.78rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--muted, #999); margin-bottom: 8px;
-}
-.biz-card-price {
-  font-family: var(--font-display, sans-serif);
-  font-size: 2.8rem; font-weight: 700;
-  color: var(--gold, #C9A84C); line-height: 1; margin-bottom: 4px;
-}
-.biz-card-sub { font-size: 0.82rem; color: var(--muted, #999); margin-bottom: 24px; }
-.biz-card-list {
-  list-style: none; display: flex; flex-direction: column;
-  gap: 9px; margin-bottom: 28px;
-}
-.biz-card-list li { font-size: 0.87rem; color: var(--muted, #999); }
-.biz-card-list li::before { content: none; } /* override any global li styles */
-.biz-card-cta {
-  display: block; text-align: center; width: 100%;
-  padding: 13px; border-radius: 8px; font-size: 0.95rem;
-}
-.biz-card-note {
-  font-size: 0.72rem; color: var(--muted, #999);
-  text-align: center; margin-top: 10px;
-}
-
-/* ── Services grid ── */
-.services-tagline {
-  text-align: center; color: var(--muted, #999);
-  font-size: 0.9rem; margin-bottom: 32px;
-  margin-top: -28px; /* reduce gap after the link */
-}
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 14px;
-}
-.service-card { padding: 20px; }
-.svc-icon { font-size: 1.4rem; display: block; margin-bottom: 10px; }
-.svc-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; }
-.svc-desc { font-size: 0.78rem; color: var(--muted, #999); line-height: 1.5; margin-bottom: 12px; }
-.svc-badge {
-  display: inline-block; font-size: 0.68rem; font-weight: 700;
-  padding: 2px 8px; border-radius: 100px; letter-spacing: 0.04em;
-}
-.svc-badge--available { background: rgba(63,207,142,0.1); color: #3FCF8E; }
-.svc-badge--soon      { background: rgba(255,255,255,0.06); color: var(--muted, #999); }
-
-/* ── Responsive ── */
-@media (max-width: 860px) {
-  .bizforma-layout { grid-template-columns: 1fr; gap: 40px; }
-}
-@media (max-width: 600px) {
-  .stats-row { flex-direction: column; align-items: center; }
-  .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); width: 100%; max-width: 100%; }
-  .stat-item:last-child { border-bottom: none; }
-}
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
+  .section { padding: 4rem 0; }
+  .section-copy { max-width: 760px; margin-bottom: 2rem; }
+  .eyebrow { display: inline-block; text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; margin-bottom: .75rem; }
+  .app-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+  .app-card { display: block; padding: 1.25rem; border: 1px solid rgba(84,72,56,.14); border-radius: 18px; text-decoration: none; color: inherit; background: rgba(255,255,255,.55); }
+  .app-card h3 { margin: .35rem 0 .5rem; }
+  .app-card p { margin: 0 0 .85rem; opacity: .8; }
+  .app-tier, .app-link { font-size: .85rem; opacity: .7; }
 </style>

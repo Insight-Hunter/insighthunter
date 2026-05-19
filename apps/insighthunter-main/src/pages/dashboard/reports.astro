@@ -1,9 +1,22 @@
 ---
-import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
 ---
-<MarketingLayout title="Reports">
-  <section class="container" style="padding:60px 24px">
-    <h1 style="font-family:var(--font-display);font-size:2rem;margin-bottom:12px">Reports</h1>
-    <p style="color:var(--muted)">Financial reports and export tools.</p>
+
+<DashboardLayout title="Reports">
+  <section class="dashboard-page">
+    <p class="eyebrow">Reports</p>
+    <h1>P&amp;L and cash reporting</h1>
+    <div class="grid">
+      <article class="panel"><h2>Profit &amp; loss</h2><p>Track revenue, direct costs, operating expense, and net income by month.</p></article>
+      <article class="panel"><h2>Cash movement</h2><p>Review inflows, outflows, and burn pressure before problems stack up.</p></article>
+      <article class="panel"><h2>Owner summary</h2><p>Generate simplified reporting views for founders and decision-makers.</p></article>
+    </div>
   </section>
-</MarketingLayout>
+</DashboardLayout>
+
+<style>
+  .dashboard-page { display: grid; gap: 1rem; }
+  .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .panel { border: 1px solid rgba(84,72,56,.14); border-radius: 18px; padding: 1rem; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; margin: 0; }
+</style>

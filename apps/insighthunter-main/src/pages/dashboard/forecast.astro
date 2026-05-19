@@ -1,15 +1,22 @@
 ---
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
-import TierGate from '../../components/dashboard/TierGate.astro';
-import CashFlowChart from '../../components/dashboard/CashFlowChart.svelte';
 ---
+
 <DashboardLayout title="Forecast">
-  <TierGate required="standard">
-    <div class="card">
-      <h3 style="font-family:var(--font-display);margin-bottom:var(--space-4);">Cash Flow Forecast</h3>
-      <p style="color:var(--color-text-muted);font-size:0.875rem;">6-month projection powered by your bookkeeping data. Ask the AI CFO for forecasting analysis.</p>
-      <a href="/dashboard/ai" class="btn btn--ghost btn--sm" style="margin-top:var(--space-4);">Ask AI for forecast →</a>
+  <section class="dashboard-page">
+    <p class="eyebrow">Forecast</p>
+    <h1>Cash flow forecasting</h1>
+    <div class="grid">
+      <article class="panel"><h2>Base case</h2><p>Project the next 13 weeks of expected inflows and outflows.</p></article>
+      <article class="panel"><h2>Stress case</h2><p>See what happens if revenue slips or key expenses rise.</p></article>
+      <article class="panel"><h2>Decision triggers</h2><p>Know when to cut spend, push collections, or add financing.</p></article>
     </div>
-    <CashFlowChart client:load />
-  </TierGate>
+  </section>
 </DashboardLayout>
+
+<style>
+  .dashboard-page { display: grid; gap: 1rem; }
+  .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .panel { border: 1px solid rgba(84,72,56,.14); border-radius: 18px; padding: 1rem; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; margin: 0; }
+</style>

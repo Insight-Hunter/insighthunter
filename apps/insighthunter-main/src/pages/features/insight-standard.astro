@@ -1,11 +1,23 @@
 ---
 import MarketingLayout from '../../layouts/MarketingLayout.astro';
-import Nav from '../../components/marketing/Nav.astro';
 ---
-<MarketingLayout title="insight-standard">
-  <Nav />
-  <section class="container" style="padding:80px 24px">
-    <h1 style="font-family:var(--font-display);font-size:2.5rem;margin-bottom:14px">insight-standard</h1>
-    <p style="color:var(--muted);max-width:720px">Feature page scaffold for insight-standard. Brand palette, typography, and dark card system already applied.</p>
+
+<MarketingLayout title="Insight Standard | Insight Hunter" description="A stronger operating layer for teams that need deeper visibility and more structure.">
+  <section class="container section">
+    <span class="eyebrow">Insight Standard</span>
+    <h1>Move from basic reporting to managed control.</h1>
+    <p>Insight Standard expands visibility, reporting discipline, and team coordination for businesses that are outgrowing lightweight tools.</p>
+    <div class="actions">
+      <a href="/insight-standard">Open app homepage</a>
+      <a href="/pricing">Compare plans</a>
+    </div>
   </section>
 </MarketingLayout>
+
+<style>
+  .container { max-width: 980px; margin: 0 auto; padding: 0 1.25rem; }
+  .section { padding: 4rem 0; }
+  .actions { display: flex; gap: .75rem; margin-top: 1.25rem; flex-wrap: wrap; }
+  .actions a { padding: .85rem 1.1rem; border: 1px solid rgba(84,72,56,.18); border-radius: 999px; text-decoration: none; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; }
+</style>

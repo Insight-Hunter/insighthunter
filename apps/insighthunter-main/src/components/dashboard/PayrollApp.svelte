@@ -67,7 +67,7 @@
               <td style="font-weight:500">{String(emp.first_name)} {String(emp.last_name)}</td>
               <td style="font-size:0.8125rem;color:var(--color-text-muted)">{String(emp.email)}</td>
               <td><span class="badge badge--sand" style="font-size:0.7rem">{String(emp.employment_type ?? '')}</span></td>
-              <td style="font-family:var(--font-mono);font-size:0.8125rem">{fmt(emp.pay_rate as number)} <span style="color:var(--color-text-muted)">/{String(emp.pay_type === 'hourly' ? 'hr' : 'yr')}</span></td>
+              <td style="font-family:var(--font-mono);font-size:0.8125rem">{fmt(emp.pay_rate as number)} <span style="color:var(--color-text-muted)">{'/' + (emp.pay_type === 'hourly' ? 'hr' : 'yr')}</span></td>
               <td><span class="badge badge--{emp.is_active ? 'green' : 'gray'}">{emp.is_active ? 'Active' : 'Inactive'}</span></td>
             </tr>
             {/each}

@@ -1,13 +1,42 @@
 ---
 import MarketingLayout from '../layouts/MarketingLayout.astro';
-import Nav from '../components/marketing/Nav.astro';
 ---
-<MarketingLayout title="About">
-  <Nav />
-  <section style="max-width:760px;margin:0 auto;padding:clamp(60px,6vw,120px) 24px;">
-    <h1 style="font-family:var(--font-display);font-size:2.5rem;font-style:italic;margin-bottom:24px;">The Auto-CFO for everyone.</h1>
-    <p style="font-size:1rem;color:var(--muted);margin-bottom:16px;">Insight Hunter was founded on the belief that every small business deserves the same financial clarity that Fortune 500 companies pay teams of analysts to produce.</p>
-    <p style="font-size:1rem;color:var(--muted);margin-bottom:16px;">We target 65M freelancers and 33M small firms in the U.S. who are underserved by bookkeeping software that stops at transaction data and never translates it into decisions.</p>
-    <p style="font-size:1rem;color:var(--muted);">Built on Cloudflare's edge infrastructure, Insight Hunter delivers sub-100ms dashboards globally with enterprise-grade security — at a price any small business can afford.</p>
+
+<MarketingLayout
+  title="About | Insight Hunter"
+  description="Insight Hunter gives small businesses CFO-level clarity, systems, and execution without enterprise overhead."
+>
+  <section class="container section split">
+    <div>
+      <span class="eyebrow">About</span>
+      <h1>Built for operators who need answers, not noise.</h1>
+      <p>Insight Hunter combines bookkeeping, analytics, planning, and execution tools so small businesses can run with more control and less guesswork.</p>
+      <p>The goal is simple: make enterprise-grade visibility accessible to founders, accountants, bookkeepers, and growing teams.</p>
+    </div>
+    <div class="panel">
+      <h2>What we optimize for</h2>
+      <ul>
+        <li>Clarity over dashboards for dashboard’s sake.</li>
+        <li>Actionable reporting over passive metrics.</li>
+        <li>Low-friction adoption for real small-business teams.</li>
+        <li>Modular tools instead of bloated all-in-one software.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="container section values">
+    <article class="panel"><h2>Finance-first</h2><p>P&amp;L, cash flow, forecasting, compliance, and reporting are core, not add-ons.</p></article>
+    <article class="panel"><h2>Operational</h2><p>Every product is meant to push decisions, tasks, and execution forward.</p></article>
+    <article class="panel"><h2>Expandable</h2><p>Teams can start with one app and grow into a complete operating stack.</p></article>
   </section>
 </MarketingLayout>
+
+<style>
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
+  .section { padding: 4rem 0; }
+  .split { display: grid; gap: 1.25rem; grid-template-columns: 1.3fr .9fr; }
+  .values { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); }
+  .panel { border: 1px solid rgba(84,72,56,.14); border-radius: 18px; padding: 1.25rem; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; }
+  @media (max-width: 840px) { .split { grid-template-columns: 1fr; } }
+</style>

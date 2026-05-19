@@ -1,9 +1,22 @@
 ---
-import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
 ---
-<MarketingLayout title="Bookkeeping Dashboard">
-  <section class="container" style="padding:60px 24px">
-    <h1 style="font-family:var(--font-display);font-size:2rem;margin-bottom:12px">Your Financial Health</h1>
-    <p style="color:var(--muted)">Transaction list, reconciliation status — authenticated dashboard.</p>
+
+<DashboardLayout title="Bookkeeping">
+  <section class="dashboard-page">
+    <p class="eyebrow">Bookkeeping</p>
+    <h1>Bookkeeping operations</h1>
+    <div class="grid">
+      <article class="panel"><h2>Close status</h2><p>Track what is reconciled, pending, or blocked for the current month.</p></article>
+      <article class="panel"><h2>Review queue</h2><p>Prioritize uncategorized activity, anomalies, and owner questions.</p></article>
+      <article class="panel"><h2>Reporting handoff</h2><p>Move closed books into management reporting without manual scramble.</p></article>
+    </div>
   </section>
-</MarketingLayout>
+</DashboardLayout>
+
+<style>
+  .dashboard-page { display: grid; gap: 1rem; }
+  .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .panel { border: 1px solid rgba(84,72,56,.14); border-radius: 18px; padding: 1rem; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; margin: 0; }
+</style>

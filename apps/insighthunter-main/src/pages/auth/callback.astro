@@ -1,20 +1,22 @@
 ---
-const code = Astro.url.searchParams.get('code');
-const next = Astro.url.searchParams.get('state') || '/dashboard';
-
-if (code) {
-  try {
-    const authUrl = import.meta.env.AUTH_WORKER_URL || 'https://auth.insighthunter.app';
-    const res = await fetch(`${authUrl}/oauth/callback`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code }),
-    });
-    if (res.ok) {
-      const body = await res.json() as { data: { token: string } };
-      Astro.cookies.set('ih_session', body.data.token, { path: '/', httpOnly: false, sameSite: 'lax', secure: true });
-    }
-  } catch {}
-}
-return Astro.redirect(next);
+import AuthLayout from '../../layouts/AuthLayout.astro';
 ---
+
+<AuthLayout title="Auth callback">
+  <section class="auth-page callback">
+    <p class="eyebrow">Authorization</p>
+    <h1>Signing you in…</h1>
+    <p>Please wait while your session is verified and your workspace is loaded.</p>
+  </section>
+</AuthLayout>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const redirect = params.get('redirect') || '/dashboard';
+  window.location.replace(redirect);
+</script>
+
+<style>
+  .callback { text-align: center; padding: 4rem 0; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; }
+</style>

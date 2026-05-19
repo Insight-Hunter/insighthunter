@@ -1,43 +1,24 @@
 ---
-import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import AuthLayout from '../../layouts/AuthLayout.astro';
+import RegisterForm from '../../components/auth/RegisterForm.svelte';
 ---
-<MarketingLayout title="Create Account">
-  <section style="display:flex;justify-content:center;align-items:center;min-height:80vh;padding:24px;">
-    <div class="card" style="padding:40px;width:100%;max-width:420px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
-        <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
-          <path d="M18 2C18 2 10 10 10 18C10 22.4 12.8 26 18 26C23.2 26 26 22.4 26 18C26 14 24 10 24 10C24 10 23 15 18 15C13 15 14 8 18 2Z" fill="#C9A84C"/>
-        </svg>
-        <span style="font-family:var(--font-display);font-weight:700;font-size:1.1rem;">Insight Hunter</span>
-      </div>
-      <h1 style="font-family:var(--font-display);font-size:1.75rem;margin-bottom:6px;">Create your account</h1>
-      <p style="color:var(--muted);margin-bottom:24px;font-size:0.9rem;">Start free — no credit card required.</p>
 
-      <form id="register-form" style="display:flex;flex-direction:column;gap:16px;">
-        <div>
-          <label style="font-size:0.875rem;font-weight:500;display:block;margin-bottom:6px;">Full Name</label>
-          <input type="text" name="name" required autocomplete="name" placeholder="Jane Smith"
-            style="width:100%;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.04);color:#fff;font-size:0.9rem;" />
-        </div>
-        <div>
-          <label style="font-size:0.875rem;font-weight:500;display:block;margin-bottom:6px;">Email</label>
-          <input type="email" name="email" required autocomplete="email" placeholder="you@company.com"
-            style="width:100%;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.04);color:#fff;font-size:0.9rem;" />
-        </div>
-        <div>
-          <label style="font-size:0.875rem;font-weight:500;display:block;margin-bottom:6px;">Password</label>
-          <input type="password" name="password" required autocomplete="new-password" placeholder="Min 8 characters"
-            style="width:100%;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.04);color:#fff;font-size:0.9rem;" />
-        </div>
-        <button type="submit" style="background:var(--gold);color:#000;font-weight:700;padding:12px;border-radius:8px;border:none;cursor:pointer;">
-          Create Account
-        </button>
-        <div id="error-msg" style="display:none;color:#f87171;font-size:0.875rem;text-align:center;"></div>
-      </form>
-
-      <div style="margin-top:16px;text-align:center;font-size:0.875rem;color:var(--muted);">
-        Already have an account? <a href="/auth/login" style="color:var(--gold);">Sign in</a>
-      </div>
+<AuthLayout title="Register">
+  <section class="auth-page">
+    <div class="auth-copy">
+      <p class="eyebrow">Register</p>
+      <h1>Create your Insight Hunter account.</h1>
+      <p>Start with one app, then expand into reporting, operations, and finance tools as needed.</p>
+    </div>
+    <div class="auth-panel">
+      <RegisterForm client:load />
     </div>
   </section>
-</MarketingLayout>
+</AuthLayout>
+
+<style>
+  .auth-page { display: grid; gap: 1.25rem; grid-template-columns: .95fr 1.05fr; align-items: start; }
+  .auth-panel { border: 1px solid rgba(84,72,56,.14); border-radius: 18px; padding: 1.25rem; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; }
+  @media (max-width: 860px) { .auth-page { grid-template-columns: 1fr; } }
+</style>

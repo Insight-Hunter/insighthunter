@@ -1,9 +1,22 @@
 ---
-import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
 ---
-<MarketingLayout title="AI Insights">
-  <section class="container" style="padding:60px 24px">
-    <h1 style="font-family:var(--font-display);font-size:2rem;margin-bottom:12px">Intelligent Forecasts</h1>
-    <p style="color:var(--muted)">Revenue, cash flow, and scenario analysis.</p>
+
+<DashboardLayout title="Insights">
+  <section class="dashboard-page">
+    <p class="eyebrow">Insights</p>
+    <h1>AI CFO insight feed</h1>
+    <div class="grid">
+      <article class="panel"><h2>Margin warnings</h2><p>Highlight shifts in profitability before they become normalized.</p></article>
+      <article class="panel"><h2>Cash pressure</h2><p>Surface upcoming shortfalls, collection risk, and spend timing issues.</p></article>
+      <article class="panel"><h2>Action queue</h2><p>Turn observations into follow-up actions for the team.</p></article>
+    </div>
   </section>
-</MarketingLayout>
+</DashboardLayout>
+
+<style>
+  .dashboard-page { display: grid; gap: 1rem; }
+  .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .panel { border: 1px solid rgba(84,72,56,.14); border-radius: 18px; padding: 1rem; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; margin: 0; }
+</style>
