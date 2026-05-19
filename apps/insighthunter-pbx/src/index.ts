@@ -190,7 +190,6 @@ app.get('/api/pbx/call-logs', async (c) => {
 // ── Voicemails ────────────────────────────────────────────────────────────────
 app.get('/api/pbx/voicemails', async (c) => {
   const unreadOnly = new URL(c.req.url).searchParams.get('unread') === '1';
-  const unreadOnly = new URL(c.req.url).searchParams.get('unread') === '1';
   const clause     = unreadOnly ? 'AND read_at IS NULL' : '';
 
   const query = `
