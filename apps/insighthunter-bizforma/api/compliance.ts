@@ -3,10 +3,15 @@ import type { AppBindings } from '../types/env';
 import { createComplianceEvent, generateBaselineCompliance, listComplianceEvents } from '../services/complianceService';
 
 const compliance = new Hono<AppBindings>();
+const safeListComplianceEvents =
+  typeof listComplianceEvents === 'function' ? listComplianceEvents : undefined;
 
 compliance.get('/:businessId', async (c) => {
   const auth = c.get('auth');
-  return c.json({ ok: true, events: await listComplianceEvents(c.env, auth.tenantId, c.req.param('businessId')) });
+  if (!safeListComplianceEvents) {
+    return c.json({ ok: false, error: 'listComplianceEvents is not available' }, 500);
+  }
+  return c.json({ ok: true, events: await safeListComplianceEvents(c.env, auth.tenantId, c.req.param('businessId')) });
 });
 
 compliance.post('/:businessId', async (c) => {
