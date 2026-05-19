@@ -245,7 +245,7 @@ export default function BusinessWizard({
       const stepData = wizardData[step.id] ?? {};
       const hasDraft = Object.values(stepData).some((value) => {
         if (typeof value === "string") return value.trim().length > 0;
-        return value !== undefined && value !== null && value !== "";
+        return value !== undefined && value !== null;
       });
 
       const isValid = step.validate ? step.validate(stepData, wizardData) : false;
