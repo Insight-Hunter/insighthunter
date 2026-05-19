@@ -47,7 +47,6 @@ async function sendBillReminders(env: Env): Promise<void> {
 }
 
 async function sendInvoiceReminders(env: Env): Promise<void> {
-  const sevenDaysOut = offsetDate(-7); // invoices past due by 7 days
   const invoices = await env.DB.prepare(
     `SELECT id, org_id, amount, due_date, customer_name, customer_email, invoice_number
      FROM ar_invoices WHERE due_date < date('now') AND status = 'sent'`
