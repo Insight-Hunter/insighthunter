@@ -4,9 +4,13 @@ import { createFormationCase, getFormationCase, listFormationCases, updateFormat
 
 const formation = new Hono<AppBindings>();
 
+const safeListFormationCases = async (env: AppBindings['Bindings'], tenantId: string) => {
+  return typeof listFormationCases === 'function' ? listFormationCases(env, tenantId) : [];
+};
+
 formation.get('/', async (c) => {
   const auth = c.get('auth');
-  return c.json({ ok: true, cases: await listFormationCases(c.env, auth.tenantId) });
+  return c.json({ ok: true, cases: await safeListFormationCases(c.env, auth.tenantId) });
 });
 
 formation.post('/', async (c) => {
