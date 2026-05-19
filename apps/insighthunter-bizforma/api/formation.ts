@@ -22,6 +22,9 @@ formation.post('/', async (c) => {
 
 formation.get('/:id', async (c) => {
   const auth = c.get('auth');
+  if (typeof getFormationCase !== 'function') {
+    return c.json({ ok: false, error: 'Formation service unavailable' }, 500);
+  }
   const record = await getFormationCase(c.env, auth.tenantId, c.req.param('id'));
   if (!record) return c.json({ ok: false, error: 'Not found' }, 404);
   return c.json({ ok: true, formationCase: record });
