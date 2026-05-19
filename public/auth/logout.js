@@ -1,4 +1,4 @@
-giut // public/auth/logout.js
+// public/auth/logout.js
 // Called by logout buttons: <a href="#" onclick="logout()">Log Out</a>
 
 async function logout() {
