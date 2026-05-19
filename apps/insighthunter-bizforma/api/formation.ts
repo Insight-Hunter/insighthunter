@@ -33,6 +33,9 @@ formation.get('/:id', async (c) => {
 formation.put('/:id', async (c) => {
   const auth = c.get('auth');
   const body = await c.req.json();
+  if (typeof updateFormationCase !== 'function') {
+    return c.json({ ok: false, error: 'Formation update is not available' }, 500);
+  }
   const record = await updateFormationCase(c.env, auth.tenantId, c.req.param('id'), body);
   if (!record) return c.json({ ok: false, error: 'Not found' }, 404);
   return c.json({ ok: true, formationCase: record });
