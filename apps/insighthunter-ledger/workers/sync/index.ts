@@ -154,7 +154,6 @@ async function syncToXero(
 
 // AES-GCM decryption for stored OAuth tokens
 async function decryptToken(encHex: string, keyHex: string): Promise<string> {
-  const enc = new TextEncoder();
   const keyBytes = hexToBytes(keyHex);
   const encBytes = hexToBytes(encHex);
   const iv = encBytes.slice(0, 12);
