@@ -30,6 +30,9 @@ app.use("*", cors({
 app.use("*", async (c, next) => {
   if (c.req.method === "OPTIONS") return next();
   try {
+    if (typeof validateSession !== "function") {
+      return c.json({ ok: false, error: "Unauthorized" }, 401);
+    }
     const user = await validateSession(c.req.raw, c.env);
     c.set("user" as never, user);
     return next();
