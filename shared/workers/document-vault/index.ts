@@ -53,6 +53,9 @@ export default {
     // Auth
     let user;
     try {
+      if (typeof validateSession !== "function") {
+        throw new Error("validateSession is not available");
+      }
       user = await validateSession(request, env);
     } catch {
       return unauthorizedJson();
