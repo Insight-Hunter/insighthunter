@@ -37,22 +37,6 @@ async function stripePost<T = Record<string, unknown>>(
   return JSON.parse(text);
 }
 
-async function stripeReq<T = Record<string, unknown>>(
-  method: string, path: string, key: string, params?: Record<string, string>,
-): Promise<T> {
-  const r = await fetch(`${STRIPE}${path}`, {
-    method,
-    headers: {
-      'Authorization': `Bearer ${key}`,
-      ...(params ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}),
-    },
-    ...(params ? { body: new URLSearchParams(params).toString() } : {}),
-  });
-  const text = await r.text();
-  if (!r.ok) throw new Error(`Stripe ${method} ${path} ${r.status}: ${text}`);
-  return JSON.parse(text);
-}
-
 async function reportMeterEvent(
   eventName: string, stripeCustomerId: string, value: number,
   secretKey: string, idempotencyKey: string,
