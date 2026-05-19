@@ -27,6 +27,11 @@ compliance.post('/:businessId', async (c) => {
 compliance.post('/:businessId/generate', async (c) => {
   const auth = c.get('auth');
   const body = await c.req.json();
+
+  if (typeof generateBaselineCompliance !== 'function') {
+    return c.json({ ok: false, error: 'Compliance baseline generator is not available' }, 500);
+  }
+
   const events = await generateBaselineCompliance(c.env, auth.tenantId, c.req.param('businessId'), body.stateCode);
   return c.json({ ok: true, events });
 });
