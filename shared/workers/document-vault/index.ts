@@ -4,7 +4,7 @@
 // All objects are keyed as: {orgId}/{category}/{year}/{filename}
 // Sensitive fields (bank info) are encrypted at rest using crypto.subtle AES-GCM.
 
-import { validateSession, unauthorizedJson } from "../../middleware/session-validator.ts";
+import { validateSession } from "../../middleware/session-validator.ts";
 import type { BaseEnv } from "../../types/index.ts";
 
 export interface Env extends BaseEnv {
@@ -58,7 +58,7 @@ export default {
       }
       user = await validateSession(request, env);
     } catch {
-      return unauthorizedJson();
+      return json({ ok: false, error: "Unauthorized" }, 401);
     }
 
     const { pathname } = url;
