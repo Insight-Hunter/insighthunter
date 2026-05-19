@@ -29,6 +29,10 @@ export async function savePayrollSetup(
     payload: Record<string, unknown>;
   },
 ) {
+  if (typeof upsertPayrollSetup !== "function") {
+    throw new TypeError("upsertPayrollSetup is not a function");
+  }
+
   await upsertPayrollSetup(env.DB, {
     id: input.id,
     tenantId: input.tenantId,
