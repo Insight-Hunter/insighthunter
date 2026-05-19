@@ -16,7 +16,7 @@ formation.get('/', async (c) => {
 formation.post('/', async (c) => {
   const auth = c.get('auth');
   const body = await c.req.json();
-  const record = await createFormationCase(c.env, auth.tenantId, body.businessId, body.intakeAnswers ?? {});
+  const record = await createFormationCase(c.env, auth.tenantId);
   return c.json({ ok: true, formationCase: record }, 201);
 });
 
