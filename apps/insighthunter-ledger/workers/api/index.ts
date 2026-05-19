@@ -4,7 +4,7 @@
 
 import { Hono } from "https://esm.sh/hono@4";
 import { cors } from "https://esm.sh/hono@4/cors";
-import { validateSession, unauthorizedJson } from "../../../../shared/middleware/session-validator.ts";
+import { validateSession } from "../../../../shared/middleware/session-validator.ts";
 
 export interface Env {
   DB: D1Database;
