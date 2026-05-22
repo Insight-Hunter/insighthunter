@@ -29,22 +29,69 @@ const { title, description = 'AI-powered financial insights for small businesses
 </html>
 
 <style is:global>
-<style is:global>
   :root {
-    --bg: #0d0d0d;
-    --bg-navy: #141522;
-    --surface: #141414;
-    --surface-alt: #1a1a1a;
-    --card: #1c1b19;
-    --gold: #C9A84C;
-    --white: #FFFFFF;
-    --muted: #999999;
+    /* ── Backgrounds: rich deep navy ───────────────────────────── */
+    --bg:          #070C1A;   /* was #0d0d0d  */
+    --bg-deep:     #04060F;   /* nav, footer  */
+    --bg-navy:     #0C1222;   /* was #141522  */
+    --surface:     #101828;   /* was #141414  */
+    --surface-alt: #141F32;   /* was #1a1a1a  */
+    --card:        #141F32;   /* was #1c1b19  */
+
+    /* ── Borders ───────────────────────────────────────────────── */
+    --border:      rgba(44, 66, 104, 0.55);
+    --border-dim:  rgba(28, 44, 72, 0.50);
+    --border-cyan: rgba(0, 184, 224, 0.22);
+    --border-gold: rgba(201, 168, 76, 0.20);
+
+    /* ── Gold — preserved exactly ──────────────────────────────── */
+    --gold:        #C9A84C;
+    --gold-light:  #E8C97A;
+    --gold-dim:    #8A6E28;
+
+    /* ── Cyan metallic accent ──────────────────────────────────── */
+    --cyan:        #22C8EF;   /* primary highlight       */
+    --cyan-bright: #4DD6F7;   /* glow / brightest        */
+    --cyan-deep:   #00B8E0;   /* borders / deeper        */
+    --cyan-text:   #7EE0F5;   /* readable on dark bg     */
+    --cyan-glow:   rgba(0, 200, 239, 0.16);
+    --cyan-glow-sm:rgba(0, 200, 239, 0.08);
+
+    /* ── Text ──────────────────────────────────────────────────── */
+    --white:  #EEF2FF;   /* cool-tinted white — was #FFFFFF */
+    --muted:  #7A8FAD;   /* blue-grey muted   — was #999999 */
+    --subtle: #4D6280;
+
+    /* ── Status ────────────────────────────────────────────────── */
+    --success: #3FCF8E;
+    --danger:  #E05252;
+    --warning: #F0B429;
+
+    /* ── Typography / radius (unchanged) ───────────────────────── */
     --font-display: 'General Sans', 'Inter', sans-serif;
-    --font-body: 'Satoshi', 'Inter', sans-serif;
-    --radius-card: 16px;
+    --font-body:    'Satoshi', 'Inter', sans-serif;
+    --radius-card:  16px;
+
+    /* ── Hero gradient helpers ──────────────────────────────────── */
+    --gradient-hero-1:
+      radial-gradient(ellipse 90% 55% at 50% -5%,  rgba(201,168,76,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse 55% 35% at 85% 90%,  rgba(0,200,239,0.08)  0%, transparent 55%),
+      linear-gradient(180deg, #0C1222 0%, #070C1A 100%);
+    --gradient-hero-2:
+      radial-gradient(ellipse 70% 50% at 50% 10%,  rgba(0,200,239,0.09)  0%, transparent 55%),
+      #0C1222;
+    --gradient-hero-3:
+      radial-gradient(ellipse 60% 45% at 65% 20%,  rgba(0,200,239,0.14)  0%, transparent 50%),
+      radial-gradient(ellipse 40% 30% at 15% 80%,  rgba(201,168,76,0.09) 0%, transparent 50%),
+      #070C1A;
+    --gradient-hero-4:
+      radial-gradient(ellipse 80% 50% at 30% 50%,  rgba(0,200,239,0.07)  0%, transparent 55%),
+      #0C1222;
   }
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
+
   body {
     background: var(--bg);
     color: var(--white);
@@ -53,12 +100,96 @@ const { title, description = 'AI-powered financial insights for small businesses
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
+
   h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 700; }
   a { color: inherit; text-decoration: none; }
   img { max-width: 100%; height: auto; }
   .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .btn { display: inline-block; padding: 12px 22px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+
+  /* ── Buttons ── */
+  .btn { display: inline-block; padding: 12px 22px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
   .btn-gold { background: var(--gold); color: #111; }
-  .btn-outline { border: 1px solid rgba(255,255,255,.18); }
-  .card { background: var(--card); border: 1px solid rgba(255,255,255,.07); border-radius: var(--radius-card); }
+  .btn-gold:hover { background: var(--gold-light); }
+  .btn-outline { border: 1px solid var(--border); color: var(--white); }
+  .btn-outline:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  /* ── Cards ── */
+  .card { background: var(--card); border: 1px solid var(--border-dim); border-radius: var(--radius-card); }
+  .card:hover,
+  .app-card:hover,
+  .feature-card:hover,
+  .service-card:hover,
+  .pmg-card:hover {
+    border-color: var(--border-cyan);
+    box-shadow: 0 0 0 1px var(--border-cyan), 0 4px 24px rgba(0,200,239,0.08);
+  }
+  .pricing-card.featured {
+    border-color: var(--cyan-deep);
+    background: linear-gradient(135deg, var(--card), rgba(0,184,224,0.05));
+    box-shadow: 0 0 0 1px var(--border-cyan), 0 8px 32px rgba(0,200,239,0.10);
+  }
+
+  /* ── Sections ── */
+  .section       { background: var(--bg); }
+  .section--navy { background: var(--bg-navy); }
+
+  /* ── Eyebrow labels → cyan ── */
+  .section-eyebrow, .hero-eyebrow {
+    color: var(--cyan-text);
+    border-color: var(--border-cyan);
+    background: rgba(0, 200, 239, 0.06);
+  }
+
+  /* ── Feature pills → cyan tint ── */
+  .fs-pill { background: rgba(0,200,239,0.06); border-color: var(--border-cyan); }
+  .fs-pill-icon { color: var(--cyan); }
+
+  /* ── Cyan stat/icon accents ── */
+  .ai-stat-val { color: var(--cyan); }
+  .ep-icon     { color: var(--cyan); }
+
+  /* ── Slide dot active ── */
+  .slide-dot.active {
+    background: var(--cyan) !important;
+    box-shadow: 0 0 8px rgba(0,200,239,0.55);
+  }
+  .slide-arrow:hover { background: rgba(0,200,239,0.12); border-color: var(--border-cyan); }
+
+  /* ── Nav ── */
+  .nav, nav { background: rgba(4,6,15,0.88); border-bottom-color: var(--border-dim); }
+
+  /* ── Stats strip — odd=gold, even=cyan ── */
+  .stats-strip { background: var(--surface); border-color: var(--border-dim); }
+  .stat-item:nth-child(odd)  .stat-num { color: var(--gold); }
+  .stat-item:nth-child(even) .stat-num { color: var(--cyan); }
+
+  /* ── BizForma step numbers ── */
+  .biz-step-num { background: rgba(0,200,239,0.08); border-color: var(--border-cyan); color: var(--cyan); }
+
+  /* ── Status dots ── */
+  .worker-dot, .status-dot { background: var(--cyan); box-shadow: 0 0 6px rgba(0,200,239,0.55); }
+
+  /* ── Footer ── */
+  footer { background: var(--bg-deep); border-color: var(--border-dim); }
+  .footer-bottom { border-color: var(--border-dim); }
+
+  /* ── Ghost button hover ── */
+  .btn-ghost-hero:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  /* ── Input focus ── */
+  .input:focus, .select:focus, .textarea:focus {
+    border-color: var(--cyan-deep);
+    box-shadow: 0 0 0 3px rgba(0,200,239,0.12);
+  }
+
+  /* ── Gold links always gold ── */
+  .gold-link, .app-link, .biz-more { color: var(--gold); }
+  .gold-link:hover, .app-link:hover { color: var(--gold-light); }
+
+  /* ── Selection + scrollbar ── */
+  ::selection { background: rgba(0,200,239,0.22); color: var(--white); }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-deep); }
+  ::-webkit-scrollbar-thumb { background: #1A2840; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--cyan-deep); }
 </style>

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 import MarketingLayout from '../../layouts/MarketingLayout.astro';
 import { apps } from '../../data/apps';
@@ -38,3 +39,46 @@ import { apps } from '../../data/apps';
   a { text-decoration: none; }
   .eyebrow, .meta { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; }
 </style>
+=======
+---
+// src/pages/features/index.astro
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import { apps } from '../../data/apps';
+---
+
+<MarketingLayout
+  title="Features | Insight Hunter"
+  description="Explore bookkeeping, BizForma, payroll, phone, reporting, and operator apps inside Insight Hunter."
+>
+  <section class="container section">
+    <span class="eyebrow">Features</span>
+    <h1>Apps built for real operating pressure.</h1>
+    <p class="lead">Each app solves a specific bottleneck, and each can stand alone as the homepage for its own subdomain experience.</p>
+
+    <div class="grid">
+      {apps.map((app) => (
+        <article class="card">
+          <span class="meta">{app.tier}</span>
+          <h2>{app.name}</h2>
+          <p>{app.description}</p>
+          <div class="card-actions">
+            <a href={`/features/${app.slug}`}>Feature page</a>
+            <a href={`/${app.slug}`}>App homepage</a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
+  .section { padding: 4rem 0; }
+  .lead { max-width: 760px; }
+  .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 2rem; }
+  .card { border: 1px solid rgba(84,72,56,.14); border-radius: 18px; padding: 1.25rem; }
+  .card-actions { display: flex; gap: .75rem; flex-wrap: wrap; margin-top: 1rem; }
+  a { text-decoration: none; }
+  .eyebrow, .meta { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; }
+</style>
+>>>>>>> b08e66966cade7aef77028f0114dbfdd38b2ab24
