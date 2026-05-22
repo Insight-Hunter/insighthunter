@@ -1,8 +1,8 @@
 import type { MiddlewareHandler } from 'astro';
-import { verifyJWT } from '@ih/auth-client/jwt';
+import { verifyJWT } from '@ih/auth-client';
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
-  const { pathname } = context.url;
+  const { pathname, search } = context.url;
 
   // Only protect /dashboard routes
   if (!pathname.startsWith('/dashboard')) return next();
@@ -12,16 +12,16 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const token = match?.[1];
 
   if (!token) {
-    return context.redirect(
-      `https://auth.insighthunter.app/login?redirect_uri=${encodeURIComponent(context.url.href)}`
-    );
+    const redirectTo = `/auth/login?next=${encodeURIComponent(pathname + search)}`;
+    return context.redirect(redirectTo);
   }
 
   const secret = (context.locals as any).runtime?.env?.JWT_SECRET || '';
   const payload = token ? await verifyJWT(token, secret) : null;
 
   if (!payload) {
-    return context.redirect(`https://auth.insighthunter.app/login?redirect_uri=${encodeURIComponent(context.url.href)}`);
+    const redirectTo = `/auth/login?next=${encodeURIComponent(pathname + search)}`;
+    return context.redirect(redirectTo);
   }
 
   (context.locals as any).session = {
