@@ -1,17 +1,4 @@
 ---
-<<<<<<< HEAD
-import MarketingLayout from '../../layouts/MarketingLayout.astro';
----
-
-<MarketingLayout title="Payroll | Insight Hunter" description="Payroll setup, employee onboarding, contractor visibility, and pay-cycle readiness in one workflow.">
-  <section class="container section">
-    <span class="eyebrow">Payroll</span>
-    <h1>Make payroll less fragile.</h1>
-    <p>Centralize payroll setup, onboarding details, and recurring pay-cycle readiness so deadlines and filings stop slipping through the cracks.</p>
-    <div class="actions">
-      <a href="/payroll">Open app homepage</a>
-      <a href="/auth/register">Start payroll setup</a>
-=======
 // src/pages/payroll.astro
 import MarketingLayout from '../layouts/MarketingLayout.astro';
 ---
@@ -24,7 +11,6 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
     <div class="actions">
       <a href="/auth/register">Start payroll onboarding</a>
       <a href="/dashboard">Open platform dashboard</a>
->>>>>>> b08e66966cade7aef77028f0114dbfdd38b2ab24
     </div>
   </section>
 </MarketingLayout>
@@ -33,10 +19,6 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
   .container { max-width: 980px; margin: 0 auto; padding: 0 1.25rem; }
   .section { padding: 4rem 0; }
   .actions { display: flex; gap: .75rem; margin-top: 1.25rem; flex-wrap: wrap; }
-<<<<<<< HEAD
-  .actions a { padding: .85rem 1.1rem; border: 1px solid rgba(84,72,56,.18); border-radius: 999px; text-decoration: none; }
-=======
   .actions a { padding: .85rem 1.1rem; border-radius: 999px; border: 1px solid rgba(84,72,56,.18); text-decoration: none; }
->>>>>>> b08e66966cade7aef77028f0114dbfdd38b2ab24
   .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; }
 </style>
