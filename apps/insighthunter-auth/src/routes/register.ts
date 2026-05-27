@@ -12,7 +12,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export const registerRoute = new Elysia()
   .post('/api/auth/register', async ({ body, set }) => {
-    const { firstName, lastName, email, password } = body;
+    const { firstName, lastName, email, password, setup_intent_id } = body;
 
     try {
       const existingUser = await db.query.users.findFirst({ where: (users, { eq }) => eq(users.email, email) });
@@ -21,11 +21,19 @@ export const registerRoute = new Elysia()
         return { error: 'User with this email already exists' };
       }
 
-      const hashedPassword = await new Argon2id().hash(password);
+      const setupIntent = await stripe.setupIntents.retrieve(setup_intent_id);
+      if (setupIntent.status !== 'succeeded') {
+        set.status = 400;
+        return { error: 'Payment verification failed. Please try again.' };
+      }
 
       const customer = await stripe.customers.create({
         email,
         name: `${firstName} ${lastName}`,
+        payment_method: setupIntent.payment_method as string,
+        invoice_settings: {
+          default_payment_method: setupIntent.payment_method as string,
+        },
       });
 
       if (!customer) {
@@ -33,6 +41,7 @@ export const registerRoute = new Elysia()
         return { error: 'Failed to create Stripe customer' };
       }
 
+      const hashedPassword = await new Argon2id().hash(password);
       const newUser = await db.insert(users).values({
         id: crypto.randomUUID(),
         firstName,
@@ -64,5 +73,6 @@ export const registerRoute = new Elysia()
       lastName: t.String(),
       email: t.String({ format: 'email' }),
       password: t.String(),
+      setup_intent_id: t.String(),
     }),
   });
