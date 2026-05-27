@@ -1,50 +1,57 @@
-import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
-import { AuthService } from '../services/authService';
-import { TokenService } from '../services/tokenService';
-import type { Env } from '../types/env';
 
-const login = new Hono<{ Bindings: Env }>();
+import { Elysia, t } from 'elysia';
+import { Argon2id } from 'oslo/password';
+import { db } from '../../db';
+import { users } from '../../db/schema';
+import { eq } from 'drizzle-orm';
+import { jwt } from '@elysiajs/jwt';
 
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
+export const loginRoute = new Elysia()
+  .use(
+    jwt({
+      name: 'jwt',
+      secret: process.env.JWT_SECRET || 'your-secret-key',
+    })
+  )
+  .post('/api/auth/login', async ({ body, set, jwt }) => {
+    const { email, password } = body;
 
-login.post('/', zValidator('json', loginSchema), async (c) => {
-  const { email, password } = c.req.valid('json');
+    try {
+      const user = await db.query.users.findFirst({
+        where: eq(users.email, email.toLowerCase()),
+      });
 
-  // Rate limiting
-  const rateLimitKey = `ratelimit:login:${email}`;
-  const attempts = parseInt((await c.env.IH_AUTH_KV.get(rateLimitKey)) || '0');
-  if (attempts >= 10) {
-    return c.json({ error: 'Too many attempts', code: 'RATE_LIMITED' }, 429);
-  }
+      if (!user || !user.hashedPassword) {
+        set.status = 401;
+        return { error: 'Invalid credentials' };
+      }
 
-  const authService = new AuthService(c.env);
-  const user = await authService.validateCredentials(email, password);
+      const isValidPassword = await new Argon2id().verify(user.hashedPassword, password);
 
-  if (!user) {
-    await c.env.IH_AUTH_KV.put(rateLimitKey, String(attempts + 1), { expirationTtl: 900 });
-    return c.json({ error: 'Invalid credentials', code: 'INVALID_CREDENTIALS' }, 401);
-  }
+      if (!isValidPassword) {
+        set.status = 401;
+        return { error: 'Invalid credentials' };
+      }
 
-  await c.env.IH_AUTH_KV.delete(rateLimitKey);
+      const token = await jwt.sign({
+        userId: user.id,
+        email: user.email,
+      });
 
-  const tokenService = new TokenService(c.env);
-  const { accessToken, refreshToken } = await tokenService.createTokenPair(user);
-
-  c.header('Set-Cookie', [
-    `ih_session=${accessToken}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=3600; Domain=.insighthunter.app`,
-    `ih_refresh=${refreshToken}; HttpOnly; Secure; SameSite=Lax; Path=/refresh; Max-Age=2592000; Domain=.insighthunter.app`,
-  ].join(', '));
-
-  return c.json({
-    success: true,
-    user: { userId: user.id, email: user.email, orgId: user.org_id, tier: user.tier },
-    accessToken,
+      set.status = 200;
+      return {
+        data: {
+          token: token,
+        },
+      };
+    } catch (error) {
+      console.error('Login error:', error);
+      set.status = 500;
+      return { error: 'An unexpected error occurred. Please try again.' };
+    }
+  }, {
+    body: t.Object({
+      email: t.String({ format: 'email' }),
+      password: t.String(),
+    }),
   });
-});
-
-export default login;

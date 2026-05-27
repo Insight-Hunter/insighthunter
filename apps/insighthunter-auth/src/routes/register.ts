@@ -1,53 +1,34 @@
-import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
-import { AuthService } from '../services/authService';
-import { OrgService } from '../services/orgService';
-import { TokenService } from '../services/tokenService';
-import type { Env } from '../types/env';
 
-const register = new Hono<{ Bindings: Env }>();
+import { Elysia, t } from 'elysia';
+import { Argon2id } from 'oslo/password';
+import { db } from '../../db';
+import { users } from '../../db/schema';
 
-const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8).max(128),
-  businessName: z.string().min(1).max(200),
-  tier: z.enum(['lite', 'standard', 'pro']).default('lite'),
-});
+export const registerRoute = new Elysia()
+  .post('/api/auth/register', async ({ body, set }) => {
+    const { firstName, lastName, email, password } = body;
 
-register.post('/', zValidator('json', registerSchema), async (c) => {
-  const body = c.req.valid('json');
+    try {
+      const hashedPassword = await new Argon2id().hash(password);
+      const newUser = await db.insert(users).values({ id: crypto.randomUUID(), firstName, lastName, email, hashedPassword }).returning();
 
-  const authService = new AuthService(c.env);
-  const existing = await authService.findUserByEmail(body.email);
-  if (existing) {
-    return c.json({ error: 'Email already registered', code: 'EMAIL_EXISTS' }, 409);
-  }
+      if (newUser.length === 0) {
+        set.status = 500;
+        return { error: 'Failed to create user' };
+      }
 
-  const orgService = new OrgService(c.env);
-  const { user, org } = await orgService.createOrgWithUser({
-    email: body.email,
-    password: body.password,
-    businessName: body.businessName,
-    tier: body.tier,
+      set.status = 201;
+      return { message: 'User created successfully' };
+    } catch (error) {
+      console.error('Registration error:', error);
+      set.status = 500;
+      return { error: 'An unexpected error occurred. Please try again.' };
+    }
+  }, {
+    body: t.Object({
+      firstName: t.String(),
+      lastName: t.String(),
+      email: t.String({ format: 'email' }),
+      password: t.String(),
+    }),
   });
-
-  const tokenService = new TokenService(c.env);
-  const { accessToken, refreshToken } = await tokenService.createTokenPair(user);
-
-  c.header('Set-Cookie', [
-    `ih_session=${accessToken}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=3600; Domain=.insighthunter.app`,
-    `ih_refresh=${refreshToken}; HttpOnly; Secure; SameSite=Lax; Path=/refresh; Max-Age=2592000; Domain=.insighthunter.app`,
-  ].join(', '));
-
-  // Enqueue welcome email
-  await c.env.IH_WELCOME_QUEUE.send({ userId: user.id, email: user.email, orgId: org.id, businessName: body.businessName });
-
-  return c.json({
-    success: true,
-    user: { userId: user.id, email: user.email, orgId: org.id, tier: body.tier },
-    accessToken,
-  }, 201);
-});
-
-export default register;
