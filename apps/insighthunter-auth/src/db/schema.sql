@@ -13,15 +13,16 @@ CREATE TABLE IF NOT EXISTS orgs (
 );
 
 CREATE TABLE IF NOT EXISTS users (
-  id             TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
-  email          TEXT NOT NULL UNIQUE,
-  name           TEXT NOT NULL,
-  password_hash  TEXT,
-  org_id         TEXT NOT NULL REFERENCES orgs(id),
-  role           TEXT NOT NULL DEFAULT 'owner',
-  email_verified INTEGER NOT NULL DEFAULT 0,
-  last_login     TEXT,
-  created_at     TEXT NOT NULL DEFAULT (datetime('now'))
+  id                 TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+  email              TEXT NOT NULL UNIQUE,
+  name               TEXT NOT NULL,
+  password_hash      TEXT,
+  org_id             TEXT NOT NULL REFERENCES orgs(id),
+  role               TEXT NOT NULL DEFAULT 'owner',
+  email_verified     INTEGER NOT NULL DEFAULT 0,
+  last_login         TEXT,
+  stripe_customer_id TEXT,
+  created_at         TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_org   ON users(org_id);

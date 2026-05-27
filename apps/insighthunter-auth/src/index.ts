@@ -1,7 +1,9 @@
+
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { AuthUser, JWTPayload } from '@ih/types';
 import { signJWT, verifyJWT, extractBearer, jwtToAuthUser } from '@ih/auth-client';
+import { paymentRoute } from './routes/payment';
 
 // ─── Env binding types ────────────────────────────────────────────────────────
 
@@ -398,5 +400,7 @@ app.patch('/auth/profile', async (c) => {
   const updated = await c.env.DB.prepare('SELECT id, email, name, role, org_id FROM users WHERE id = ?').bind(payload.sub).first();
   return c.json(updated);
 });
+
+app.route('/', paymentRoute);
 
 export default app;
