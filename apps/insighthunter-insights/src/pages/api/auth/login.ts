@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { getUser, createSession, setSessionCookie } from "@/lib/auth/session";
+import { getUser, createSession, setSessionCookie, verifyPassword } from "@/lib/auth/session";
 import type { Env, User } from "@/types";
 
 export const POST: APIRoute = async ({ request, locals }) => {
@@ -18,13 +18,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const user = await getUser(env.IH_SESSIONS, userId);
-    if (!user) {
+    if (!user || !user.hashedPassword) {
       return new Response(JSON.stringify({ message: "Invalid credentials." }), { status: 401 });
     }
 
-    // TODO: verify hashed password (e.g. using Web Crypto API / bcrypt WASM)
-    // const valid = await verifyPassword(password, user.passwordHash);
-    // if (!valid) return new Response(...401...);
+    const valid = await verifyPassword(password, user.hashedPassword);
+    if (!valid) {
+      return new Response(JSON.stringify({ message: "Invalid credentials." }), { status: 401 });
+    }
 
     const ttl   = parseInt(env.SESSION_EXPIRY ?? "604800");
     const token = await createSession(env.IH_SESSIONS, user, ttl);

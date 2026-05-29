@@ -12,6 +12,21 @@ export type DocumentCreateInput = {
   sizeBytes: number;
 };
 
+export function makeDocumentKey(formationCaseId: string, slug: string): string {
+  return `${formationCaseId}/${slug}-${crypto.randomUUID()}`;
+}
+
+export async function storeDocument(
+  env: Env,
+  key: string,
+  content: string,
+  contentType = 'text/html'
+) {
+  await env.DOCUMENTS.put(key, content, {
+    httpMetadata: { contentType },
+  });
+}
+
 export async function createDocumentRecord(env: Env, input: DocumentCreateInput) {
   const id = crypto.randomUUID();
   await env.DB.prepare(

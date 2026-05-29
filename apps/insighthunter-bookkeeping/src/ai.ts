@@ -1,9 +1,18 @@
 import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 
+type QueueItem = {
+  queueItemId: string;
+  accountId: string;
+  status: 'pending' | 'approved';
+  createdAt: string;
+  approvedAt?: string;
+};
+
 const app = new Hono();
+
+const queue = ((globalThis as any).BOOKKEEPING_QUEUE ??= []) as QueueItem[];
 
 const approveSchema = z.object({
   queueItemId: z.string(),
@@ -11,16 +20,23 @@ const approveSchema = z.object({
 });
 
 app.get('/queue', async (c) => {
-  // TODO: Implement the logic to fetch the queue from the database
-  return c.json([]);
+  return c.json(queue.filter((item) => item.status === 'pending'));
 });
 
 app.post('/approve', zValidator('json', approveSchema), async (c) => {
   const { queueItemId, accountId } = c.req.valid('json');
+  const item = queue.find(
+    (entry) => entry.queueItemId === queueItemId && entry.accountId === accountId
+  );
 
-  // TODO: Implement the logic to update the transaction in the database
+  if (!item) {
+    return c.json({ error: 'Queue item not found' }, 404);
+  }
 
-  return c.json({ success: true });
+  item.status = 'approved';
+  item.approvedAt = new Date().toISOString();
+
+  return c.json({ success: true, item });
 });
 
 export default app;

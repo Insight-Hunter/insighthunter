@@ -239,7 +239,7 @@ function AppInner() {
                   <StepComponent data={stepData} onChange={(d) => setStepData(activeStep, d)} />
                 ) : (
                   <div style={{ padding: 40, color: COLORS.gray5 }}>
-                    Step not found
+                    This step is not available. Please select another step from the navigation.
                   </div>
                 )}
               </motion.div>

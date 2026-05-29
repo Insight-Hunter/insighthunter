@@ -974,7 +974,7 @@ const [sidebarOpen, setSidebarOpen] = useState(true);
 
 const currentPhase = PHASES.find(p => p.id === activePhase);
 const currentStep = ALL_STEPS.find(s => s.id === activeStep);
-const StepComponent = STEP_COMPONENTS[activeStep] || (() => <div>Coming soon</div>);
+const StepComponent = STEP_COMPONENTS[activeStep] || (() => <div style={{ padding: 24, color: COLORS.gray5 }}>This step is not available yet.</div>);
 
 const stepData = formData[activeStep] || {};
 const setStepData = (d) => setFormData(prev => ({ …prev, [activeStep]: d }));

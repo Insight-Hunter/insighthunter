@@ -2,8 +2,30 @@ import type { Env } from './worker';
 import { setRegistry } from './registry';
 
 const TENANT_TEMPLATE_SCRIPT = `
-// Minimal bootstrap — real code uploaded separately
-export default { fetch: () => new Response('tenant-worker-placeholder') };
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+
+    if (url.pathname === "/health") {
+      return new Response(JSON.stringify({
+        status: "ok",
+        orgId: env.ORG_ID,
+        tier: env.ORG_TIER,
+      }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({
+      message: "Tenant worker active",
+      orgId: env.ORG_ID,
+      tier: env.ORG_TIER,
+      path: url.pathname,
+    }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
+};
 `;
 
 export async function provisionTenant(

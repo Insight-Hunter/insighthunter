@@ -1,10 +1,11 @@
 // ── Auth ─────────────────────────────────────────────────────────────────────
 export interface User {
-  id:        string;
-  email:     string;
-  name:      string;
-  tier:      "lite" | "standard" | "enterprise";
-  createdAt: string;
+  id:             string;
+  email:          string;
+  name:           string;
+  tier:           "lite" | "standard" | "enterprise";
+  createdAt:      string;
+  hashedPassword?: string;
 }
 
 export interface Session {

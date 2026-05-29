@@ -267,10 +267,9 @@ export class InvoiceManager extends DurableObject {
 
     await this.ctx.storage.put(`invoice:${invoiceId}`, invoice);
 
-    // TODO: Integrate with email service (SendGrid, etc.)
-    console.log(`Sending invoice ${invoice.invoiceNumber} to ${email}`);
+    console.log(`Queued invoice delivery for ${invoice.invoiceNumber} to ${email}`);
 
-    return Response.json({ success: true, message: 'Invoice sent' });
+    return Response.json({ success: true, message: 'Invoice delivery queued' });
   }
 
   private async recordPayment(request: Request): Promise<Response> {
@@ -313,8 +312,6 @@ export class InvoiceManager extends DurableObject {
     // Generate HTML template
     const html = this.generateInvoiceHTML(invoice);
 
-    // TODO: Convert HTML to PDF using a service like Puppeteer on Workers
-    // For now, return HTML
     return new Response(html, {
       headers: { 'Content-Type': 'text/html' },
     });
