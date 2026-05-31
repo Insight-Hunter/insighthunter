@@ -30,13 +30,11 @@ auth.post("/signup", async (c) => {
 
 // Inside auth.post("/signup", ...) — after D1 user/org rows are created:
 
-async function provisionTenantWorker(
+const provisionTenantWorker = async (
   env: Env,
   orgId: string,
   tier: string
-): 
-  
-  Promise<{ scriptName: string; kvNamespaceId: string }> {
+): Promise<{ scriptName: string; kvNamespaceId: string }> => {
   const scriptName = `tenant-${orgId}`;
 
   // Step A: Create a dedicated KV namespace for this tenant
@@ -90,7 +88,7 @@ async function provisionTenantWorker(
   );
 
   return { scriptName, kvNamespaceId };
-}
+};
 
   // --- 1. Check for existing user ---
   const existing = await c.env.DB.prepare(
