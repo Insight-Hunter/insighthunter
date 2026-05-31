@@ -90,6 +90,9 @@ const provisionTenantWorker = async (
   return { scriptName, kvNamespaceId };
 };
 
+// Trigger tenant provisioning after org/user records are created.
+await provisionTenantWorker(c.env, orgId, tier);
+
   // --- 1. Check for existing user ---
   const existing = await c.env.DB.prepare(
     "SELECT id FROM users WHERE email = ?"
