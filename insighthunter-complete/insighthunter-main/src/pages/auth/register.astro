@@ -1,0 +1,297 @@
+---
+export const prerender = false;
+import AuthLayout from '../../layouts/AuthLayout.astro';
+import { tiers } from '../../data/pricing';
+
+const plan = Astro.url.searchParams.get('plan') ?? 'lite';
+const selectedTier = tiers.find(t => t.id === plan) ?? tiers[0];
+---
+
+<AuthLayout title="Create Account">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>Create your account</h1>
+      <p>Get started with <strong class="plan-name">{selectedTier.name}</strong>
+        {selectedTier.price === 0
+          ? ' — free forever, no card required.'
+          : ` — ${selectedTier.price}/mo, cancel anytime.`}
+      </p>
+    </div>
+
+    <!-- Plan selector -->
+    <div class="plan-selector" role="radiogroup" aria-label="Select plan">
+      {tiers.map((tier) => (
+        <label class={`plan-option ${tier.id === plan ? 'selected' : ''}`} data-tier-id={tier.id}>
+          <input
+            type="radio"
+            name="plan"
+            value={tier.id}
+            checked={tier.id === plan}
+            class="plan-radio"
+          />
+          <span class="plan-option-name">{tier.name}</span>
+          <span class="plan-option-price">
+            {tier.price === 0 ? 'Free' : `$${tier.price}/mo`}
+          </span>
+        </label>
+      ))}
+    </div>
+
+    <div id="error-banner" class="error-banner" hidden>
+      <span id="error-text">Something went wrong. Please try again.</span>
+    </div>
+
+    <form id="register-form" class="auth-form" novalidate>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="first-name">First name</label>
+          <input class="form-input" type="text" id="first-name" name="firstName"
+            placeholder="Jane" autocomplete="given-name" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="last-name">Last name</label>
+          <input class="form-input" type="text" id="last-name" name="lastName"
+            placeholder="Smith" autocomplete="family-name" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="company">Company name</label>
+        <input class="form-input" type="text" id="company" name="company"
+          placeholder="Acme Corp" autocomplete="organization" required />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Work email</label>
+        <input class="form-input" type="email" id="email" name="email"
+          placeholder="jane@company.com" autocomplete="email" required />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-input" type="password" id="password" name="password"
+          placeholder="Min 8 characters" autocomplete="new-password" minlength="8" required />
+        <div class="password-strength" id="pw-strength" aria-live="polite"></div>
+      </div>
+
+      <div class="terms-check">
+        <label class="check-label">
+          <input type="checkbox" id="agree-terms" name="agreeTerms" required />
+          <span>
+            I agree to the
+            <a href="/terms" class="auth-link" target="_blank">Terms of Service</a>
+            and
+            <a href="/privacy" class="auth-link" target="_blank">Privacy Policy</a>
+          </span>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-gold submit-btn" id="submit-btn">
+        <span id="btn-text">
+          {selectedTier.price === 0 ? 'Create Free Account' : `Start ${selectedTier.name}`}
+        </span>
+        <span id="btn-loader" class="spinner" hidden aria-hidden="true"></span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already have an account?
+        <a href="/auth/login" class="auth-link">Sign in</a>
+      </p>
+    </div>
+  </div>
+</AuthLayout>
+
+<script>
+  const DISPATCH_URL = '/api/auth/register';
+
+  const form      = document.getElementById('register-form') as HTMLFormElement;
+  const btnText   = document.getElementById('btn-text') as HTMLElement;
+  const loader    = document.getElementById('btn-loader') as HTMLElement;
+  const errBanner = document.getElementById('error-banner') as HTMLElement;
+  const errText   = document.getElementById('error-text') as HTMLElement;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const pwInput   = document.getElementById('password') as HTMLInputElement;
+  const pwStr     = document.getElementById('pw-strength') as HTMLElement;
+
+  let selectedPlan = (document.querySelector('input[name="plan"]:checked') as HTMLInputElement)?.value ?? 'lite';
+
+  // Plan selector interaction
+  document.querySelectorAll<HTMLElement>('.plan-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.plan-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedPlan = opt.dataset.tierId ?? 'lite';
+    });
+  });
+
+  // Password strength
+  pwInput.addEventListener('input', () => {
+    const v = pwInput.value;
+    let score = 0;
+    if (v.length >= 8) score++;
+    if (/[A-Z]/.test(v)) score++;
+    if (/[0-9]/.test(v)) score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
+    const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+    const colors = ['', '#E05252', '#F0B429', '#22C8EF', '#3FCF8E'];
+    pwStr.textContent = v.length > 0 ? `Password strength: ${labels[score]}` : '';
+    pwStr.style.color = colors[score] ?? '';
+  });
+
+  function showError(msg: string) {
+    errText.textContent = msg;
+    errBanner.hidden = false;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errBanner.hidden = true;
+
+    const firstName  = (form.elements.namedItem('firstName') as HTMLInputElement).value.trim();
+    const lastName   = (form.elements.namedItem('lastName') as HTMLInputElement).value.trim();
+    const company    = (form.elements.namedItem('company') as HTMLInputElement).value.trim();
+    const email      = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
+    const password   = (form.elements.namedItem('password') as HTMLInputElement).value;
+    const agreeTerms = (form.elements.namedItem('agreeTerms') as HTMLInputElement).checked;
+
+    if (!firstName || !lastName || !company || !email || !password) {
+      showError('Please fill in all required fields.'); return;
+    }
+    if (password.length < 8) {
+      showError('Password must be at least 8 characters.'); return;
+    }
+    if (!agreeTerms) {
+      showError('You must agree to the Terms of Service and Privacy Policy.'); return;
+    }
+
+    submitBtn.disabled = true;
+    btnText.textContent = 'Creating account…';
+    loader.hidden = false;
+
+    try {
+      const res = await fetch(DISPATCH_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName, company, email, password, plan: selectedPlan }),
+      });
+
+      const data = await res.json() as { token?: string; error?: string };
+
+      if (!res.ok || !data.token) {
+        showError(data.error ?? 'Registration failed. Please try again.'); return;
+      }
+
+      localStorage.setItem('ih_access_token', data.token);
+      window.location.href = '/dashboard';
+    } catch {
+      showError('Network error — please try again.');
+    } finally {
+      submitBtn.disabled = false;
+      btnText.textContent = selectedPlan === 'lite' ? 'Create Free Account' : 'Create Account';
+      loader.hidden = true;
+    }
+  });
+</script>
+
+<style>
+  .auth-card {
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    z-index: 1;
+  }
+  .auth-header { text-align: center; margin-bottom: 24px; }
+  .auth-header h1 { font-size: 1.65rem; margin-bottom: 8px; }
+  .auth-header p  { color: var(--muted); font-size: 0.875rem; line-height: 1.6; }
+  .plan-name { color: var(--gold); font-style: normal; }
+
+  /* Plan selector */
+  .plan-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .plan-option {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 8px;
+    border: 1px solid var(--border-dim);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s;
+    text-align: center;
+  }
+  .plan-option.selected {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.06);
+  }
+  .plan-radio { display: none; }
+  .plan-option-name { font-size: 0.78rem; font-weight: 700; color: var(--white); }
+  .plan-option-price { font-size: 0.72rem; color: var(--muted); }
+
+  /* Error */
+  .error-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(224,82,82,0.08);
+    border: 1px solid rgba(224,82,82,0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 0.875rem;
+    color: #F87171;
+  }
+  .error-banner[hidden] { display: none; }
+
+  .auth-form { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+  .form-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .password-strength {
+    font-size: 0.78rem;
+    margin-top: 4px;
+    height: 16px;
+    transition: color 0.2s;
+  }
+
+  .terms-check { }
+  .check-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    cursor: pointer;
+    line-height: 1.5;
+  }
+  .check-label input { margin-top: 2px; accent-color: var(--gold); flex-shrink: 0; }
+
+  .submit-btn {
+    width: 100%; padding: 14px;
+    font-size: 0.975rem; margin-top: 4px;
+  }
+  .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none !important; }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  .spinner[hidden] { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .auth-footer { text-align: center; font-size: 0.875rem; color: var(--muted); }
+  .auth-link { color: var(--cyan-text); font-weight: 600; transition: color 0.18s; }
+  .auth-link:hover { color: var(--cyan); }
+
+  @media (max-width: 480px) {
+    .plan-selector { flex-direction: column; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>

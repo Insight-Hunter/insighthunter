@@ -3,15 +3,12 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ESNext"],
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "isolatedModules": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
     "types": ["@cloudflare/workers-types"]
   },
-  "include": ["src/**/*", "functions/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
