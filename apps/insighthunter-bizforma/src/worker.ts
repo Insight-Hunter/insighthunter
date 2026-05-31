@@ -1,20 +1,3 @@
-<<<<<<< HEAD
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import type { Env } from './types/env';
-
-const app = new Hono<{ Bindings: Env }>();
-
-app.use('*', cors({
-  origin: ['https://insighthunter.app'],
-  allowHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-  allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  credentials: true,
-}));
-
-app.get('/health', (c) => c.json({ status: 'ok' }));
-app.get('/', (c) => c.json({ app: 'ready' }));
-=======
 /**
  * BizForma - Business Formation App
  * Cloudflare Worker Backend
@@ -404,11 +387,7 @@ app.get("/api/deadlines", async (c) => {
 // ─── Export Summary ───────────────────────────────────────────────────────────
 app.post("/api/export", async (c) => {
   try {
-<<<<<<< HEAD
-    const { formData } = await c.req.json<{
-=======
     const { formData, sessionId } = await c.req.json<{
->>>>>>> 80e9ff9f4c6320f821152e2c4249d40a01aafc11
       formData: Record<string, unknown>;
       sessionId: string;
     }>();
@@ -455,6 +434,5 @@ app.get("*", async (c) => {
   // In production, Cloudflare Pages / Workers Assets handles this
   return c.text("BizForma API - visit /api/health", 200);
 });
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
 
 export default app;

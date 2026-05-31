@@ -6,7 +6,6 @@ import { api } from "../api";
 
 interface Props {
   firm: Firm;
-  currentUserId: string;
   navigate: (path: string) => void;
   children?: React.ReactNode;
 }
@@ -32,7 +31,7 @@ function ThemeToggle() {
   );
 }
 
-export function AdvisorShell({ firm, currentUserId, navigate, children }: Props) {
+export function AdvisorShell({ firm, navigate, children }: Props) {
   const [clients, setClients]       = useState<FirmClient[]>([]);
   const [alerts, setAlerts]         = useState<AdvisorAlert[]>([]);
   const [alertOpen, setAlertOpen]   = useState(false);

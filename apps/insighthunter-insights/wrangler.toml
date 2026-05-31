@@ -14,8 +14,15 @@ head_sampling_rate = 1
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-insights"
-database_id = "8d2b6a8d-3e2b-1c3b-4d2b-6a8d3e2b1c3b"
-
+database_id = "dbded017-25e8-4559-a351-cbaeea01e4b2"
+# ── Durable Objects ──────────────────────────────────────────────────────
+[durable_objects]
+bindings = [
+  { name = "CFO_AGENT", class_name = "CfoAgent" }
+]
+[[migrations]]
+tag = "v1"
+new_classes = ["CfoAgent"]
 # ── KV Namespaces ────────────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "USAGE"

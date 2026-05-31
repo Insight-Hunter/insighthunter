@@ -1,6 +1,6 @@
 
 import { Elysia, t } from 'elysia';
-import { Argon2id } from 'oslo/password';
+import { verifyPassword } from '../lib/password';
 import { db } from '../../db';
 import { users } from '../../db/schema';
 import { eq } from 'drizzle-orm';
@@ -26,7 +26,7 @@ export const loginRoute = new Elysia()
         return { error: 'Invalid credentials' };
       }
 
-      const isValidPassword = await new Argon2id().verify(user.hashedPassword, password);
+      const isValidPassword = await verifyPassword(password, user.hashedPassword);
 
       if (!isValidPassword) {
         set.status = 401;

@@ -1,14 +1,24 @@
 
 import { Elysia, t } from 'elysia';
-import { Argon2id } from 'oslo/password';
+import { hashPassword } from '../lib/password';
 import { db } from '../../db';
 import { users } from '../../db/schema';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-04-10',
-  typescript: true,
-});
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const stripe = stripeSecretKey
+  ? new Stripe(stripeSecretKey, {
+      apiVersion: '2024-04-10',
+      typescript: true,
+    })
+  : null;
+
+function requireStripe() {
+  if (!stripe) {
+    throw new Error('Missing STRIPE_SECRET_KEY');
+  }
+  return stripe;
+}
 
 export const registerRoute = new Elysia()
   .post('/api/auth/register', async ({ body, set }) => {
@@ -41,7 +51,7 @@ export const registerRoute = new Elysia()
         return { error: 'Failed to create Stripe customer' };
       }
 
-      const hashedPassword = await new Argon2id().hash(password);
+      const hashedPassword = await hashPassword(password);
       const newUser = await db.insert(users).values({
         id: crypto.randomUUID(),
         firstName,

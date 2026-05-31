@@ -39,11 +39,39 @@ export interface AdvisorAlert {
   created_at: number;
 }
 
-export interface ClientHealth {
+export type OverallHealth = 'healthy' | 'warning' | 'critical' | 'unknown';
+
+export interface BizFormaHealth {
   formation_status: string;
-  compliance_health: string;
-  payroll_status: string;
+  entity_type: string;
+  state?: string;
+  registered_agent?: string;
+  annual_report_due?: number;
+}
+
+export interface ComplianceHealth {
+  overall: OverallHealth;
+  open_tasks: number;
+  missing_docs: number;
+  next_deadline?: number;
+  next_deadline_type?: string;
+}
+
+export interface PayrollHealth {
+  status: string;
+  employee_count?: number;
+  next_payroll?: number;
+  last_payroll?: number;
+  setup_complete: boolean;
+}
+
+export interface ClientHealth {
+  overall: OverallHealth;
+  bizforma: BizFormaHealth;
+  compliance: ComplianceHealth;
+  payroll: PayrollHealth;
   ai_alert_count: number;
+  stitched_at?: number;
 }
 
 export interface ClientOverview {

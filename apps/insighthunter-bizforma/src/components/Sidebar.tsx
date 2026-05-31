@@ -3,8 +3,8 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PHASES, COLORS } from "../constants";
 import { ProgressBar, AppleButton } from "./ui";
-import { useForm } from "../context/FormContext";
-import { useExport } from "../hooks/useApi";
+import { useForm } from "../contract/FormContext";
+import { useExport } from "../../hooks/useApi";
 
 interface SidebarProps {
   activePhase: string;

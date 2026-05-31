@@ -1,26 +1,35 @@
 
-import { Elysia } from 'elysia';
 import Stripe from 'stripe';
+import type { Context } from 'hono';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-04-10',
-  typescript: true
-});
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const stripe = stripeSecretKey
+  ? new Stripe(stripeSecretKey, {
+      apiVersion: '2024-04-10',
+      typescript: true,
+    })
+  : null;
 
-export const paymentRoute = new Elysia({ prefix: '/api/auth/payment' })
-  .post('/setup-intent', async ({ set }) => {
-    try {
-      const setupIntent = await stripe.setupIntents.create({
-        usage: 'on_session',
-      });
+function requireStripe() {
+  if (!stripe) {
+    throw new Error('Missing STRIPE_SECRET_KEY');
+  }
+  return stripe;
+}
 
-      return {
-        clientSecret: setupIntent.client_secret,
-        stripePublicKey: process.env.STRIPE_PUBLIC_KEY,
-      };
-    } catch (error) {
-      console.error('Stripe setup intent error:', error);
-      set.status = 500;
-      return { error: 'Failed to create payment setup' };
-    }
-  });
+export async function createSetupIntentHandler(c: Context) {
+  try {
+    const setupIntent = await requireStripe().setupIntents.create({
+      usage: 'on_session',
+    });
+
+    return c.json({
+      clientSecret: setupIntent.client_secret,
+      stripePublicKey: process.env.STRIPE_PUBLIC_KEY,
+    });
+  } catch (error) {
+    console.error('Stripe setup intent error:', error);
+    c.status(500);
+    return c.json({ error: 'Failed to create payment setup' });
+  }
+}

@@ -87,4 +87,13 @@
                 <p class="transcript-pending">Transcription processing…</p>
               {/if}
               <div class="vm-actions">
-                <button class="btn btn--ghost btn--sm" on:click={() => remove(vm.id)}>🗑 
+                <button class="btn btn--ghost btn--sm" on:click={() => remove(vm.id)}>🗑</button>
+              </div>
+            </div>
+          {/if}
+        </li>
+      {/each}
+    </ul>
+  {/if}
+</div>
+

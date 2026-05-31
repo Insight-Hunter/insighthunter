@@ -1,6 +1,6 @@
 // src/hooks/useApi.ts
 import { useState, useCallback } from "react";
-import { API_BASE } from "../constants";
+import { API_BASE } from "../src/constants";
 import type {
   NameCheckResponse,
   DomainCheckResponse,
@@ -9,7 +9,7 @@ import type {
   ProgressResponse,
   FormData,
   Resource,
-} from "../types";
+} from "../src/types";
 
 // ─── Generic fetch helper ─────────────────────────────────────────────────────
 async function apiFetch<T>(

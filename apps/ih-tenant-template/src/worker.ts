@@ -1,12 +1,7 @@
-import { Hono } from 'hono';
-<<<<<<< HEAD
-const app = new Hono();
-app.get('/health', (c) => c.json({ status: 'ok', worker: 'tenant-template' }));
-app.get('/api/data/profile', (c) => c.json({ orgScoped: true }));
-=======
 import { cors } from 'hono/cors';
 import { tenantGuard } from './middleware/tenantGuard';
 import dataRoutes from './routes/data';
+import { Hono } from 'hono';
 
 export interface Env {
   ORG_ID: string;
@@ -37,5 +32,4 @@ app.get('/health', (c) =>
 app.notFound((c) => c.json({ error: 'Not found', code: 'NOT_FOUND' }, 404));
 app.onError((err, c) => c.json({ error: 'Internal error', code: 'INTERNAL_ERROR' }, 500));
 
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
 export default app;

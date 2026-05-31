@@ -11,8 +11,7 @@
   "dependencies": {
     "@ih/tier-config": "workspace:*",
     "@ih/types": "workspace:*",
-    "hono": "^4.7.4",
-    "oslo/password": "^1.0.0"
+    "hono": "^4.7.4"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250310.0",

@@ -7,7 +7,7 @@ enabled = true
 
 [[dispatch_namespaces]]
 binding = "DISPATCH_NS"
-namespace = "ih-apps"
+namespace = "insighthunter-tenants"
 
 [[kv_namespaces]]
 binding = "IH_REGISTRY"

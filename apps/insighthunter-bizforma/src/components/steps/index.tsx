@@ -6,7 +6,7 @@ import {
   SelectCard, MultiSelectCard, AppleButton, InfoCard, StatusBadge,
   ChecklistSection, ResourceLinks, StateSelect, SectionHeader,
 } from "../ui";
-import { useNameCheck, useDomainCheck, useDocGeneration } from "../../hooks/useApi";
+import { useNameCheck, useDomainCheck, useDocGeneration } from "../../../hooks/useApi";
 import type {
   StepComponentProps, IdeaData, MarketData, BusinessModelData, NameData,
   StructureData, StateRegData, EINData, LicensesData, RegisteredAgentData,

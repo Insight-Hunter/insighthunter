@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PHASES, ALL_STEPS, COLORS } from "./constants";
-import { FormProvider, useForm } from "./context/FormContext";
+import { FormProvider, useForm } from "./contract/FormContext";
 import { Sidebar } from "./components/Sidebar";
 import { TaxDeadlinesPanel } from "./components/TaxDeadlines";
 import { AppleButton } from "./components/ui";

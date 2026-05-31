@@ -9,7 +9,7 @@ import React, {
   type ReactNode,
 } from "react";
 import type { FormData, StepData } from "../types";
-import { useProgress } from "../hooks/useApi";
+import { useProgress } from "../../hooks/useApi";
 import { ALL_STEPS } from "../constants";
 
 // ─── Session ID ───────────────────────────────────────────────────────────────

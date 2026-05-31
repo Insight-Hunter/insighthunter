@@ -1,4 +1,4 @@
-name = "insighthunter-compliance"
+name = "ih-compliance-worker"
 main = "src/worker.ts"
 compatibility_date = "2025-04-01"
 

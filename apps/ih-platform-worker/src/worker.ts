@@ -1,14 +1,7 @@
-import { Hono } from 'hono';
-<<<<<<< HEAD
-
-const app = new Hono();
-app.post('/api/provision', async (c) => c.json({ success: true, message: 'Tenant provision endpoint scaffolded' }));
-app.all('/tenant/*', async (c) => c.json({ success: true, message: 'Dispatch namespace router scaffolded' }));
-app.get('/health', (c) => c.json({ status: 'ok', worker: 'ih-platform-worker' }));
-=======
 import { verifyJWT } from './middleware/jwtVerify';
 import { provisionTenant, deprovisionTenant } from './provisioning';
 import { getRegistry, setRegistry } from './registry';
+import { Hono } from 'hono';
 
 export interface Env {
   DISPATCH_NS: DispatchNamespace;
@@ -67,5 +60,4 @@ app.all('/tenant/*', verifyJWT, async (c) => {
 // Health check
 app.get('/health', (c) => c.json({ status: 'ok', service: 'ih-platform-worker' }));
 
->>>>>>> 67612b7d33a6889fca29e77e31214f4791cbb16f
 export default app;

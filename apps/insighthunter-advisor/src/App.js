@@ -22,6 +22,9 @@ export default function App() {
             .finally(() => setLoading(false));
         return () => window.removeEventListener('hashchange', onHash);
     }, []);
+    function navigate(path) {
+        window.location.hash = path;
+    }
     if (loading) {
         return (_jsx("div", { className: "app-loading", children: _jsx("div", { className: "spinner", "aria-label": "Loading" }) }));
     }
@@ -35,8 +38,8 @@ export default function App() {
             return _jsx(FirmSettings, { firmId: firm.id, currentUserId: DEMO_USER_ID });
         const clientMatch = route.match(/^client\/([^/]+)$/);
         if (clientMatch)
-            return _jsx(ClientOverviewCard, { firmId: firm.id, clientId: clientMatch[1] });
+            return _jsx(ClientOverviewCard, { firmId: firm.id, clientId: clientMatch[1], currentUserId: DEMO_USER_ID });
         return (_jsxs("div", { className: "dashboard-home", children: [_jsxs("h1", { children: ["Welcome back to ", _jsx("strong", { children: firm.name })] }), _jsx("p", { className: "text-muted", children: "Select a client from the sidebar or manage your firm settings." }), _jsx("div", { className: "quick-links", children: _jsxs("a", { href: "#settings", className: "quick-link-card", children: [_jsx("span", { className: "ql-icon", children: "\u2699\uFE0F" }), _jsx("span", { children: "Firm Settings" })] }) })] }));
     }
-    return (_jsx(AdvisorShell, { firm: firm, children: renderRoute() }));
+    return (_jsx(AdvisorShell, { firm: firm, navigate: navigate, children: renderRoute() }));
 }

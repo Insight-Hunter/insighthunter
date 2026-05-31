@@ -54,7 +54,7 @@
   <!-- Filter tabs -->
   <div class="filter-tabs">
     {#each ['all','inbound','outbound','missed'] as f}
-      <button class="filter-tab" class:filter-tab--active={filter === f} on:click={() => (filter = f as typeof filter)}>
+      <button class="filter-tab" class:filter-tab--active={filter === f} on:click={() => filter = f}>
         {f.charAt(0).toUpperCase() + f.slice(1)}
       </button>
     {/each}

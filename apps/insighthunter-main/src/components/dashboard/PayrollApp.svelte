@@ -12,7 +12,9 @@
   let showConfirm = $state(false);
   let submitting = $state(false);
 
-  const fmt = (n: number) => new Intl.NumberFormat('en-US', { style:'currency', currency:'USD' }).format(n ?? 0);
+  const fmt = (n: number | undefined) => new Intl.NumberFormat('en-US', { style:'currency', currency:'USD' }).format(n ?? 0);
+  const paySuffix = (type: unknown) => '/' + ((type as string) === 'hourly' ? 'hr' : 'yr');
+  const badgeClass = (active: unknown) => `badge badge--${(active as boolean) ? 'green' : 'gray'}`;
   const statusBadge: Record<string,string> = { DRAFT:'gray', PROCESSING:'yellow', COMPLETE:'green', FAILED:'red' };
 
   onMount(async () => {
@@ -67,8 +69,8 @@
               <td style="font-weight:500">{String(emp.first_name)} {String(emp.last_name)}</td>
               <td style="font-size:0.8125rem;color:var(--color-text-muted)">{String(emp.email)}</td>
               <td><span class="badge badge--sand" style="font-size:0.7rem">{String(emp.employment_type ?? '')}</span></td>
-              <td style="font-family:var(--font-mono);font-size:0.8125rem">{fmt(emp.pay_rate as number)} <span style="color:var(--color-text-muted)">{'/' + (emp.pay_type === 'hourly' ? 'hr' : 'yr')}</span></td>
-              <td><span class="badge badge--{emp.is_active ? 'green' : 'gray'}">{emp.is_active ? 'Active' : 'Inactive'}</span></td>
+              <td style="font-family:var(--font-mono);font-size:0.8125rem">{fmt(emp.pay_rate)} <span style="color:var(--color-text-muted)">{paySuffix(emp.pay_type)}</span></td>
+              <td><span class={badgeClass(emp.is_active)}>{emp.is_active ? 'Active' : 'Inactive'}</span></td>
             </tr>
             {/each}
           </tbody>
@@ -88,8 +90,8 @@
               <td style="font-size:0.8125rem">{String(run.period_start)} → {String(run.period_end)}</td>
               <td style="font-size:0.8125rem">{String(run.pay_date)}</td>
               <td><span class="badge badge--{statusBadge[String(run.status)] ?? 'gray'}">{String(run.status)}</span></td>
-              <td style="font-family:var(--font-mono)">{fmt(run.total_gross as number)}</td>
-              <td style="font-family:var(--font-mono);color:var(--color-success)">{fmt(run.total_net as number)}</td>
+              <td style="font-family:var(--font-mono)">{fmt(run.total_gross)}</td>
+              <td style="font-family:var(--font-mono);color:var(--color-success)">{fmt(run.total_net)}</td>
               <td><button class="btn btn--ghost btn--sm" onclick={() => selectRun(String(run.id))}>View →</button></td>
             </tr>
             {/each}
@@ -114,13 +116,13 @@
       <table class="table">
         <thead><tr><th>Employee</th><th style="text-align:right">Gross</th><th style="text-align:right">Fed Tax</th><th style="text-align:right">FICA</th><th style="text-align:right">Net Pay</th></tr></thead>
         <tbody>
-          {#each ((activeRun.line_items ?? []) as Record<string,unknown>[]) as line}
+          {#each (activeRun.line_items ?? []) as line}
           <tr>
             <td style="font-weight:500">{String(line.first_name)} {String(line.last_name)}</td>
-            <td style="text-align:right;font-family:var(--font-mono)">{fmt(line.gross_pay as number)}</td>
-            <td style="text-align:right;font-family:var(--font-mono);color:var(--color-danger)">{fmt(line.federal_income_tax as number)}</td>
-            <td style="text-align:right;font-family:var(--font-mono);color:var(--color-danger)">{fmt((line.social_security as number) + (line.medicare as number))}</td>
-            <td style="text-align:right;font-family:var(--font-mono);color:var(--color-success);font-weight:600">{fmt(line.net_pay as number)}</td>
+            <td style="text-align:right;font-family:var(--font-mono)">{fmt(line.gross_pay)}</td>
+            <td style="text-align:right;font-family:var(--font-mono);color:var(--color-danger)">{fmt(line.federal_income_tax)}</td>
+            <td style="text-align:right;font-family:var(--font-mono);color:var(--color-danger)">{fmt((line.social_security ?? 0) + (line.medicare ?? 0))}</td>
+            <td style="text-align:right;font-family:var(--font-mono);color:var(--color-success);font-weight:600">{fmt(line.net_pay)}</td>
           </tr>
           {/each}
         </tbody>
@@ -134,8 +136,8 @@
   <div class="modal" onclick={(e) => e.stopPropagation()}>
     <h3 class="modal__title">Confirm Payroll Submission</h3>
     <p style="font-size:0.875rem;color:var(--color-text-muted)">
-      This will queue payroll processing for <strong>{(activeRun?.line_items as unknown[])?.length ?? 0} employees</strong>.
-      Total net pay: <strong>{fmt(activeRun?.total_net as number)}</strong>. This cannot be undone.
+      This will queue payroll processing for <strong>{(activeRun?.line_items ?? [])?.length ?? 0} employees</strong>.
+      Total net pay: <strong>{fmt(activeRun?.total_net)}</strong>. This cannot be undone.
     </p>
     <div class="modal__actions">
       <button class="btn btn--ghost" onclick={() => showConfirm=false}>Cancel</button>

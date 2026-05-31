@@ -28,6 +28,10 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
+  function navigate(path: string) {
+    window.location.hash = path;
+  }
+
   if (loading) {
     return (
       <div className="app-loading">
@@ -50,7 +54,7 @@ export default function App() {
     if (route === 'settings') return <FirmSettings firmId={firm.id} currentUserId={DEMO_USER_ID} />;
 
     const clientMatch = route.match(/^client\/([^/]+)$/);
-    if (clientMatch) return <ClientOverviewCard firmId={firm.id} clientId={clientMatch[1]} />;
+    if (clientMatch) return <ClientOverviewCard firmId={firm.id} clientId={clientMatch[1]} currentUserId={DEMO_USER_ID} />;
 
     return (
       <div className="dashboard-home">
@@ -67,7 +71,7 @@ export default function App() {
   }
 
   return (
-    <AdvisorShell firm={firm}>
+    <AdvisorShell firm={firm} navigate={navigate}>
       {renderRoute()}
     </AdvisorShell>
   );

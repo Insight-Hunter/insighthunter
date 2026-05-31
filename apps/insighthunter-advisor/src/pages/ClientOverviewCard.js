@@ -9,7 +9,7 @@ const OVERALL_CONFIG = {
     unknown: { label: "Unknown", cls: "status-unknown", icon: "–" },
 };
 function fmtEpoch(ts) {
-    if (!ts)
+    if (ts == null)
         return "—";
     return new Date(ts * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }

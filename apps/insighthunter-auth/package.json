@@ -9,9 +9,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@elysiajs/jwt": "^1.4.2",
     "@ih/auth-client": "workspace:*",
     "@ih/types": "workspace:*",
-    "hono": "^4.7.4"
+    "elysia": "^1.4.28",
+    "hono": "^4.7.4",
+    "stripe": "^22.2.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250310.0",

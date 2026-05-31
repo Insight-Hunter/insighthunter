@@ -114,6 +114,26 @@
     markDirty();
   }
 
+  function handleDigitChange(id: string, event: Event) {
+    const target = event.target as HTMLSelectElement;
+    updateOption(id, { digit: target.value });
+  }
+
+  function handleLabelInput(id: string, event: Event) {
+    const target = event.target as HTMLInputElement;
+    updateOption(id, { label: target.value });
+  }
+
+  function handleActionChange(id: string, event: Event) {
+    const target = event.target as HTMLSelectElement;
+    updateOption(id, { action: target.value as ActionType, target: '' });
+  }
+
+  function handleTargetInput(id: string, event: Event) {
+    const target = event.target as HTMLInputElement;
+    updateOption(id, { target: target.value });
+  }
+
   // ─── Drag & Drop ─────────────────────────────────────────────────────────────
   function onDragStart(e: DragEvent, idx: number) {
     dragIndex = idx;
@@ -245,7 +265,7 @@
           <button
             class="view-btn"
             class:view-btn--active={viewMode === mode}
-            on:click={() => { viewMode = mode as ViewMode; if (mode === 'preview') startPreview(); else stopPreview(); }}
+            on:click={() => { viewMode = mode; if (mode === 'preview') startPreview(); else stopPreview(); }}
           >{label}</button>
         {/each}
       </div>
@@ -376,7 +396,7 @@
                 <select
                   class="select select--digit"
                   value={row.digit}
-                  on:change={(e) => updateOption(row._id, { digit: (e.target as HTMLSelectElement).value })}
+                  on:change={(e) => handleDigitChange(row._id, e)}
                   aria-label="Key"
                 >
                   <option value={row.digit}>{row.digit}</option>
@@ -394,7 +414,7 @@
                   value={row.label}
                   placeholder="Label (e.g. Sales)"
                   maxlength={40}
-                  on:input={(e) => updateOption(row._id, { label: (e.target as HTMLInputElement).value })}
+                  on:input={(e) => handleLabelInput(row._id, e)}
                   aria-label="Option label"
                 />
 
@@ -402,7 +422,7 @@
                 <select
                   class="select select--action"
                   value={row.action}
-                  on:change={(e) => updateOption(row._id, { action: (e.target as HTMLSelectElement).value as ActionType, target: '' })}
+                  on:change={(e) => handleActionChange(row._id, e)}
                   aria-label="Action type"
                 >
                   {#each Object.entries(ACTION_META) as [k, v]}
@@ -416,10 +436,10 @@
                     class="input input--target"
                     class:input--invalid={!!row.error}
                     value={row.target}
-                    placeholder={ACTION_META[row.action as ActionType].placeholder}
-                    on:input={(e) => updateOption(row._id, { target: (e.target as HTMLInputElement).value })}
+                    placeholder={ACTION_META[row.action].placeholder}
+                    on:input={(e) => handleTargetInput(row._id, e)}
                     aria-label="Target"
-                    title={ACTION_META[row.action as ActionType].hint}
+                    title={ACTION_META[row.action].hint}
                   />
                 {:else}
                   <span class="hangup-spacer">—</span>
@@ -474,8 +494,8 @@
                 <div class="flow-option-digit">[{opt.digit}]</div>
                 <div class="flow-option-label">{opt.label || '—'}</div>
                 <div class="flow-option-action">
-                  <span class="flow-action-icon">{ACTION_META[opt.action as ActionType]?.icon}</span>
-                  <span>{ACTION_META[opt.action as ActionType]?.label}{opt.target ? `: ${opt.target}` : ''}</span>
+                  <span class="flow-action-icon">{ACTION_META[opt.action]?.icon}</span>
+                  <span>{ACTION_META[opt.action]?.label}{opt.target ? `: ${opt.target}` : ''}</span>
                 </div>
               </div>
             {/each}
@@ -570,7 +590,7 @@
         {#each options as opt}
           <div class="summary-row">
             <span class="summary-digit">[{opt.digit}] {opt.label}</span>
-            <span class="summary-val">{ACTION_META[opt.action as ActionType]?.icon} {opt.target || opt.action}</span>
+            <span class="summary-val">{ACTION_META[opt.action]?.icon} {opt.target || opt.action}</span>
           </div>
         {/each}
       </div>

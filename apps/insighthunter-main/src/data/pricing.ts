@@ -54,3 +54,5 @@ export const addons = [
   { id: 'bizforma-extra', name: 'BizForma (extra filings)', price: 49 },
   { id: 'website-services', name: 'Website Services', price: 79 },
 ];
+
+export const pricingTiers = tiers;

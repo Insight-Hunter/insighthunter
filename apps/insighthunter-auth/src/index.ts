@@ -3,7 +3,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { AuthUser, JWTPayload } from '@ih/types';
 import { signJWT, verifyJWT, extractBearer, jwtToAuthUser } from '@ih/auth-client';
-import { paymentRoute } from './routes/payment';
+import { createSetupIntentHandler } from './routes/payment';
 
 // ─── Env binding types ────────────────────────────────────────────────────────
 
@@ -401,6 +401,6 @@ app.patch('/auth/profile', async (c) => {
   return c.json(updated);
 });
 
-app.route('/', paymentRoute);
+app.post('/auth/payment/setup-intent', createSetupIntentHandler);
 
 export default app;

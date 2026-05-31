@@ -12,6 +12,8 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "wrangler": "^4.92.0"
+  }
 }
-

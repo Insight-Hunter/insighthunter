@@ -1,7 +1,7 @@
 // src/components/TaxDeadlines.tsx
 import React, { useEffect } from "react";
 import { COLORS } from "../constants";
-import { useTaxDeadlines } from "../hooks/useApi";
+import { useTaxDeadlines } from "../../hooks/useApi";
 import { Badge, EmptyState } from "./ui";
 import type { TaxDeadline } from "../types";
 

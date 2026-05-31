@@ -1,4 +1,4 @@
-import { Argon2id } from "oslo/password";
+import { verifyPassword as verifyUserPassword } from "@/lib/password";
 import type { Session, User, Env } from "@/types";
 
 const SESSION_PREFIX = "session:";
@@ -57,12 +57,7 @@ export async function saveUser(
   await kv.put(`${USER_PREFIX}${user.id}`, JSON.stringify(user));
 }
 
-export async function verifyPassword(
-  password: string,
-  hashedPassword: string
-): Promise<boolean> {
-  return new Argon2id().verify(hashedPassword, password);
-}
+export const verifyPassword = verifyUserPassword;
 
 export function getSessionToken(request: Request): string | null {
   const cookie = request.headers.get("Cookie") ?? "";

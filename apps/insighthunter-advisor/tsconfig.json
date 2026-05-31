@@ -6,7 +6,7 @@
     "jsx": "react-jsx",
     "strict": true,
     "skipLibCheck": true,
-    "types": ["@cloudflare/workers-types"]
+    "types": ["vite/client", "@cloudflare/workers-types"]
   },
   "include": ["src"]
 }

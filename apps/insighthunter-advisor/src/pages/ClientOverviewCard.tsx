@@ -11,8 +11,8 @@ const OVERALL_CONFIG: Record<OverallHealth, { label: string; cls: string; icon: 
   unknown: { label: "Unknown",  cls: "status-unknown",  icon: "–" },
 };
 
-function fmtEpoch(ts: number | null): string {
-  if (!ts) return "—";
+function fmtEpoch(ts: number | undefined | null): string {
+  if (ts == null) return "—";
   return new Date(ts * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 

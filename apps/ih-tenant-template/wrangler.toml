@@ -11,12 +11,12 @@ zone_name = "insighthunter.app"
 
 [[kv_namespaces]]
 binding = "IH_TENANT_KV"
-id = "REPLACE_AT_PROVISION_TIME"
+id = "854e3cc47d3c4068a987978898ddf44d"
 
 [[d1_databases]]
 binding = "IH_TENANT_DB"
 database_name = "ih-tenant-TEMPLATE"
-database_id = "REPLACE_AT_PROVISION_TIME"
+database_id = "fea1df3a-8cde-4e22-b436-3ef4c9c7ac78"
 
 [[r2_buckets]]
 binding = "IH_DOCS"

@@ -5,7 +5,3 @@ const root = document.getElementById('root');
 if (!root)
     throw new Error('#root not found');
 createRoot(root).render(_jsx(App, {}));
-const root = document.getElementById('root');
-if (!root)
-    throw new Error('#root not found');
-createRoot(root).render(_jsx(App, {}));

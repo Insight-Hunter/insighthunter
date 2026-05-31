@@ -30,7 +30,7 @@ id = "af7391791e95423b82c1cd877c0992e3"
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-bizforma"
-database_id = "d1b2e3f4-3e4d-4c8d-9b1c-3e2d1b2e3f4d"
+database_id = "ab885914-020c-47fa-b269-ce15710d2ffb"
 
 # ── R2 Buckets ───────────────────────────────────────────────────────────
 [[r2_buckets]]

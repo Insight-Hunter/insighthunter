@@ -1,3 +1,4 @@
+export { CfoAgent } from './agents/CfoAgent';
 import { Hono } from 'hono';
 import type { AuthUser } from '@ih/types';
 import { TIER_LIMITS } from '@ih/tier-config';
