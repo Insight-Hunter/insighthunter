@@ -156,8 +156,6 @@ async function handleDownload(
 
   if (!doc) return json({ ok: false, error: "Document not found" }, 404);
 
-  // Generate 1-hour signed URL
-  const signedUrl = await env.DOCS.createMultipartUpload(doc.r2Key); // placeholder — use R2.createSignedUrl when available
   // For now, stream directly (Worker-side serving)
   const obj = await env.DOCS.get(doc.r2Key);
   if (!obj) return json({ ok: false, error: "File missing in storage" }, 404);
