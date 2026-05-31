@@ -36,6 +36,3 @@ dataset = "ih_page_views"
 PUBLIC_APP_URL = "https://insighthunter.app"
 AUTH_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
 
-[[dispatch_namespaces]]
-binding = "BIZFORMA"
-namespace = "platform.insighthunter.app"
