@@ -610,4 +610,21 @@ function track(env: Env, event: string, userId: string, firmId: string, meta: Re
   });
 }
 
-export default app;
+export default {
+  async fetch(request: Request, env: Env) {
+    return app.fetch(request, env as unknown as Record<string, unknown>);
+  },
+
+  async queue(batch: MessageBatch<any>, env: Env): Promise<void> {
+    for (const message of batch.messages) {
+      try {
+        // Minimal consumer: acknowledge messages to satisfy Wrangler.
+        // Real processing should be implemented by the notification service.
+        message.ack();
+      } catch (err) {
+        console.error('Advisor queue handler error', err);
+        message.retry();
+      }
+    }
+  },
+};

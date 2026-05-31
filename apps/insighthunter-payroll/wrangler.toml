@@ -10,13 +10,11 @@ compatibility_flags = ["nodejs_compat"]
 enabled = true
 head_sampling_rate = 1
 
-# ── D1 Database (temporarily removed for deploy) ─────────────────────────
-# Original D1 binding removed because the database_id was not found in the
-# Cloudflare account. Restore the block below once the D1 database exists.
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "insighthunter-payroll"
-# database_id = "6a8d3e2b-1c3b-4d2b-8d2b-6a8d3e2b1c3b"
+# ── D1 Database ─────────────────────────
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-payroll"
+database_id = "5d67e564-4604-4725-bee6-215894c19214"
 
 # ── R2 Buckets ───────────────────────────────────────────────────────────
 [[r2_buckets]]

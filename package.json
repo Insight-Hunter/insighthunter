@@ -7,13 +7,14 @@
     "build": "pnpm -r build",
     "dev": "pnpm -r --parallel dev",
     "lint": "pnpm -r lint",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "deploy": "bash scripts/deploy.sh"
   },
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "devDependencies": {
-    "wrangler": "^4.92.0"
+    "wrangler": "^4.95.0"
   }
 }
