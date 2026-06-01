@@ -1,0 +1,62 @@
+---
+export const prerender = false;
+import AuthLayout from '../../layouts/AuthLayout.astro';
+---
+<AuthLayout title="Sign In">
+  <div class="auth-card">
+    <div class="auth-header"><h1>Welcome back</h1><p>Sign in to your Insight Hunter account</p></div>
+    <div id="error-banner" class="error-banner" hidden><span id="error-text">Invalid email or password.</span></div>
+    <form id="login-form" class="auth-form" novalidate>
+      <div class="form-group"><label class="form-label" for="email">Email</label><input class="form-input" type="email" id="email" name="email" placeholder="you@company.com" autocomplete="email" required /></div>
+      <div class="form-group">
+        <div class="label-row"><label class="form-label" for="password">Password</label><a href="/auth/forgot-password" class="forgot-link">Forgot password?</a></div>
+        <input class="form-input" type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required />
+      </div>
+      <button type="submit" class="btn btn-gold submit-btn" id="submit-btn"><span id="btn-text">Sign In</span><span id="btn-loader" class="spinner" hidden></span></button>
+    </form>
+    <div class="divider">or</div>
+    <div class="auth-footer"><p>Don't have an account? <a href="/auth/register" class="auth-link">Create one free</a></p></div>
+  </div>
+</AuthLayout>
+<script>
+  const form=document.getElementById('login-form'); const btnText=document.getElementById('btn-text'); const loader=document.getElementById('btn-loader'); const errBanner=document.getElementById('error-banner'); const errText=document.getElementById('error-text'); const submitBtn=document.getElementById('submit-btn');
+  function showError(msg){errText.textContent=msg;errBanner.hidden=false}
+  form.addEventListener('submit', async(e)=>{
+    e.preventDefault(); errBanner.hidden=true;
+    const email=(form.elements.namedItem('email')).value.trim();
+    const password=(form.elements.namedItem('password')).value;
+    if(!email||!password){showError('Please fill in all fields.');return}
+    submitBtn.disabled=true; btnText.textContent='Signing in…'; loader.hidden=false;
+    try{
+      const res=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+      const data=await res.json();
+      if(!res.ok||!data.token){showError(data.error??'Invalid email or password.');return}
+      localStorage.setItem('ih_access_token',data.token);
+      const params=new URLSearchParams(window.location.search);
+      window.location.href=params.get('next')??'/dashboard';
+    }catch{showError('Network error — please try again.')}
+    finally{submitBtn.disabled=false;btnText.textContent='Sign In';loader.hidden=true}
+  });
+</script>
+<style>
+.auth-card{width:100%;max-width:420px;position:relative;z-index:1}
+.auth-header{text-align:center;margin-bottom:32px}
+.auth-header h1{font-size:1.75rem;margin-bottom:8px}
+.auth-header p{color:var(--muted);font-size:0.9rem}
+.error-banner{display:flex;align-items:center;gap:10px;background:rgba(224,82,82,0.08);border:1px solid rgba(224,82,82,0.3);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:0.875rem;color:#F87171}
+.error-banner[hidden]{display:none}
+.auth-form{display:flex;flex-direction:column;gap:18px;margin-bottom:20px}
+.label-row{display:flex;justify-content:space-between;align-items:center}
+.forgot-link{font-size:0.8rem;color:var(--cyan-text);transition:color 0.18s}
+.forgot-link:hover{color:var(--cyan)}
+.submit-btn{width:100%;padding:14px;font-size:0.975rem;margin-top:4px}
+.submit-btn:disabled{opacity:0.7;cursor:not-allowed}
+.spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,0.2);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite}
+.spinner[hidden]{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.divider{display:flex;align-items:center;gap:12px;color:var(--subtle);font-size:0.8rem;margin:20px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border-dim)}
+.auth-footer{text-align:center;font-size:0.875rem;color:var(--muted)}
+.auth-link{color:var(--cyan-text);font-weight:600;transition:color 0.18s}
+.auth-link:hover{color:var(--cyan)}
+</style>

@@ -1,22 +1,15 @@
-# wrangler.toml — Dispatch Cloudflare Worker Configuration
+# Generated from wrangler.jsonc by scripts/convert-wrangler.mjs
+# 2026-06-01T01:03:20.924Z
 
 name = "insighthunter-dispatch"
 main = "src/index.ts"
 compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
 
-# ── Observability ────────────────────────────────────────────────────────
 [observability]
 enabled = true
 head_sampling_rate = 1
 
-# ── Dispatch Namespace ───────────────────────────────────────────────────
-[[dispatch_namespaces]]
-binding = "DISPATCH"
-namespace = "insighthunter-tenants"
-outbound = { service = "insighthunter-auth", parameters = ["orgId"] }
-
-# ── Service Bindings ─────────────────────────────────────────────────────
 [[services]]
 binding = "AUTH_WORKER"
 service = "insighthunter-auth"
@@ -26,35 +19,40 @@ binding = "BOOKKEEPING_WORKER"
 service = "insighthunter-bookkeeping"
 
 [[services]]
-binding = "INSIGHTS_WORKER"
-service = "insighthunter-insights"
-
-[[services]]
-binding = "REPORTS_WORKER"
-service = "insighthunter-reports"
-
-[[services]]
-binding = "NOTIFICATIONS_WORKER"
-service = "insighthunter-notifications"
-
-[[services]]
 binding = "PAYROLL_WORKER"
 service = "insighthunter-payroll"
+
+[[services]]
+binding = "BIZFORMA_WORKER"
+service = "insighthunter-bizforma"
+
+# [[services]]
+# binding = "SCOUT_WORKER"
+# service = "insighthunter-scout"
 
 [[services]]
 binding = "PBX_WORKER"
 service = "insighthunter-pbx"
 
-# ── Analytics Engine ─────────────────────────────────────────────────────
-[[analytics_engine_datasets]]
-binding = "ANALYTICS"
-dataset = "insighthunter_events"
+[[services]]
+binding = "REPORT_WORKER"
+service = "insighthunter-report"
 
-# ── Routes ───────────────────────────────────────────────────────────────
-[[routes]]
-pattern = "insighthunter.app/api/*"
-zone_name = "insighthunter.app"
+kv_namespaces = [
+  { binding = "SESSIONS", id = "60e34ba310ca40c79edec05470c7a271", preview_id = "60e34ba310ca40c79edec05470c7a271" },
+  { binding = "RATE_LIMIT", id = "f75a15f1df8c42cdb2e623d8cb324a23", preview_id = "f75a15f1df8c42cdb2e623d8cb324a23" }
+]
 
-[[routes]]
-pattern = "*.insighthunter.app/*"
-zone_name = "insighthunter.app"
+d1_databases = [
+  { binding = "DB", database_name = "insighthunter-dispatch", database_id = "2a0331eb-4775-4ad2-9126-0560336486df" }
+]
+
+analytics_engine_datasets = [
+  { binding = "API_EVENTS", dataset = "ih_api_events" }
+]
+
+[vars]
+ENVIRONMENT = "production"
+ALLOWED_ORIGINS = "https://insighthunter.app,https://www.insighthunter.app"
+RATE_LIMIT_WINDOW_SECONDS = "60"
+RATE_LIMIT_MAX_REQUESTS = "120"

@@ -13,8 +13,13 @@ npx pnpm install --recursive
 echo "Building main application..."
 (cd apps/insighthunter-main && npx pnpm build)
 
+echo "Preparing Pages deployment assets..."
+cat > apps/insighthunter-main/dist/.assetsignore <<'EOF'
+_worker.js
+EOF
+
 echo "Deploying insighthunter (main frontend)..."
-(cd apps/insighthunter-main && npx wrangler pages deploy ../../dist)
+npx wrangler pages deploy apps/insighthunter-main/dist --project-name=insighthunter-main
 
 echo "Deploying workers..."
 for app_dir in apps/*; do
