@@ -1,0 +1,32 @@
+{
+  "name": "insighthunter-dispatch",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "services": [
+    { "binding": "AUTH_WORKER",        "service": "insighthunter-auth" },
+    { "binding": "BOOKKEEPING_WORKER", "service": "insighthunter-bookkeeping" },
+    { "binding": "PAYROLL_WORKER",     "service": "insighthunter-payroll" },
+    { "binding": "BIZFORMA_WORKER",    "service": "insighthunter-bizforma" },
+    { "binding": "SCOUT_WORKER",       "service": "insighthunter-scout" },
+    { "binding": "PBX_WORKER",         "service": "insighthunter-pbx" },
+    { "binding": "REPORT_WORKER",      "service": "insighthunter-report" }
+  ],
+  "kv_namespaces": [
+    { "binding": "SESSIONS",   "id": "REPLACE_WITH_YOUR_KV_ID",          "preview_id": "REPLACE_WITH_YOUR_KV_PREVIEW_ID" },
+    { "binding": "RATE_LIMIT", "id": "REPLACE_WITH_RATE_LIMIT_KV_ID",    "preview_id": "REPLACE_WITH_RATE_LIMIT_KV_PREVIEW_ID" }
+  ],
+  "d1_databases": [
+    { "binding": "DB", "database_name": "insighthunter-dispatch", "database_id": "REPLACE_WITH_D1_DATABASE_ID" }
+  ],
+  "analytics_engine_datasets": [
+    { "binding": "API_EVENTS", "dataset": "ih_api_events" }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production",
+    "ALLOWED_ORIGINS": "https://insighthunter.app,https://www.insighthunter.app",
+    "RATE_LIMIT_WINDOW_SECONDS": "60",
+    "RATE_LIMIT_MAX_REQUESTS": "120"
+  }
+}

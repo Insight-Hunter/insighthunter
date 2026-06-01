@@ -29,9 +29,11 @@ binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
 
 [[analytics_engine_datasets]]
-binding = "PAGE_REQUESTS"
+binding = "PAGE_VIEWS"
 dataset = "ih_page_views"
 
 [vars]
 PUBLIC_APP_URL = "https://insighthunter.app"
 AUTH_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
+DISPATCH_URL = "https://dispatch.insighthunter.app"
+AUTH_URL = "https://auth.insighthunter.app"

@@ -1,0 +1,21 @@
+{
+  "name": "insighthunter-main",
+  "pages_build_output_dir": "dist",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "services": [
+    { "binding": "DISPATCH_WORKER", "service": "insighthunter-dispatch" }
+  ],
+  "kv_namespaces": [
+    { "binding": "SESSIONS",  "id": "REPLACE_WITH_YOUR_KV_ID", "preview_id": "REPLACE_WITH_YOUR_KV_PREVIEW_ID" }
+  ],
+  "analytics_engine_datasets": [
+    { "binding": "PAGE_VIEWS", "dataset": "ih_page_views" }
+  ],
+  "vars": {
+    "PUBLIC_APP_URL": "https://insighthunter.app",
+    "DISPATCH_URL":   "https://dispatch.insighthunter.app",
+    "AUTH_URL":       "https://auth.insighthunter.app"
+  }
+}
