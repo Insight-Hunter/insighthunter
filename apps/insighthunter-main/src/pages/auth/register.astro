@@ -22,17 +22,9 @@ const selectedTier = tiers.find((t) => t.id === plan) ?? tiers[0];
     <div class="plan-selector" role="radiogroup" aria-label="Choose a plan">
       {tiers.map((tier) => (
         <label class={`plan-option ${tier.id === plan ? 'selected' : ''}`} data-tier-id={tier.id}>
-          <input
-            type="radio"
-            name="plan"
-            value={tier.id}
-            checked={tier.id === plan}
-            class="plan-radio"
-          />
+          <input type="radio" name="plan" value={tier.id} checked={tier.id === plan} class="plan-radio" />
           <span class="plan-option-name">{tier.name}</span>
-          <span class="plan-option-price">
-            {tier.price === 0 ? 'Free' : `$${tier.price}/mo`}
-          </span>
+          <span class="plan-option-price">{tier.price === 0 ? 'Free' : `$${tier.price}/mo`}</span>
         </label>
       ))}
     </div>
@@ -45,69 +37,27 @@ const selectedTier = tiers.find((t) => t.id === plan) ?? tiers[0];
       <div class="form-row">
         <div class="form-group">
           <label class="form-label" for="first-name">First name</label>
-          <input
-            class="form-input"
-            type="text"
-            id="first-name"
-            name="firstName"
-            placeholder="Jane"
-            autocomplete="given-name"
-            required
-          />
+          <input class="form-input" type="text" id="first-name" name="firstName" placeholder="Jane" autocomplete="given-name" required />
         </div>
-
         <div class="form-group">
           <label class="form-label" for="last-name">Last name</label>
-          <input
-            class="form-input"
-            type="text"
-            id="last-name"
-            name="lastName"
-            placeholder="Smith"
-            autocomplete="family-name"
-            required
-          />
+          <input class="form-input" type="text" id="last-name" name="lastName" placeholder="Smith" autocomplete="family-name" required />
         </div>
       </div>
 
       <div class="form-group">
         <label class="form-label" for="company">Company name</label>
-        <input
-          class="form-input"
-          type="text"
-          id="company"
-          name="company"
-          placeholder="Acme Corp"
-          autocomplete="organization"
-          required
-        />
+        <input class="form-input" type="text" id="company" name="company" placeholder="Acme Corp" autocomplete="organization" required />
       </div>
 
       <div class="form-group">
         <label class="form-label" for="email">Work email</label>
-        <input
-          class="form-input"
-          type="email"
-          id="email"
-          name="email"
-          placeholder="jane@company.com"
-          autocomplete="email"
-          required
-        />
+        <input class="form-input" type="email" id="email" name="email" placeholder="jane@company.com" autocomplete="email" required />
       </div>
 
       <div class="form-group">
         <label class="form-label" for="password">Password</label>
-        <input
-          class="form-input"
-          type="password"
-          id="password"
-          name="password"
-          placeholder="Min 8 characters"
-          autocomplete="new-password"
-          minlength="8"
-          required
-        />
+        <input class="form-input" type="password" id="password" name="password" placeholder="Min 8 characters" autocomplete="new-password" minlength="8" required />
         <div class="password-strength" id="pw-strength"></div>
       </div>
 
@@ -122,9 +72,7 @@ const selectedTier = tiers.find((t) => t.id === plan) ?? tiers[0];
       </label>
 
       <button type="submit" class="btn btn-gold submit-btn" id="submit-btn">
-        <span id="btn-text">
-          {selectedTier.price === 0 ? 'Create Free Account' : `Start ${selectedTier.name}`}
-        </span>
+        <span id="btn-text">{selectedTier.price === 0 ? 'Create Free Account' : `Start ${selectedTier.name}`}</span>
         <span id="btn-loader" class="spinner" hidden></span>
       </button>
     </form>
@@ -162,10 +110,7 @@ const selectedTier = tiers.find((t) => t.id === plan) ?? tiers[0];
       document.querySelectorAll('.plan-option').forEach((o) => o.classList.remove('selected'));
       opt.classList.add('selected');
       selectedPlan = opt.dataset.tierId ?? 'lite';
-
-      if (!submitBtn.disabled) {
-        btnText.textContent = getSubmitLabel(selectedPlan);
-      }
+      if (!submitBtn.disabled) btnText.textContent = getSubmitLabel(selectedPlan);
     });
   });
 
@@ -191,7 +136,6 @@ const selectedTier = tiers.find((t) => t.id === plan) ?? tiers[0];
 
   async function parseResponse(res) {
     const contentType = res.headers.get('content-type') ?? '';
-
     if (contentType.includes('application/json')) {
       try {
         return await res.json();
@@ -199,7 +143,6 @@ const selectedTier = tiers.find((t) => t.id === plan) ?? tiers[0];
         return {};
       }
     }
-
     const text = await res.text();
     return { error: text || `Request failed with status ${res.status}` };
   }
@@ -242,10 +185,8 @@ const selectedTier = tiers.find((t) => t.id === plan) ?? tiers[0];
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          name: `${firstName} ${lastName}`,
           firstName,
           lastName,
-          org_name: company,
           company,
           email,
           password,
@@ -260,7 +201,7 @@ const selectedTier = tiers.find((t) => t.id === plan) ?? tiers[0];
         return;
       }
 
-      const token = data.accessToken ?? data.token;
+      const token = data?.data?.token ?? data?.token ?? data?.accessToken;
 
       if (!token) {
         showError('Account created, but no session token was returned.');
