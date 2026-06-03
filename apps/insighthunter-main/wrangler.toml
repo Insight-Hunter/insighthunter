@@ -28,6 +28,9 @@ environment = "production"
 binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
 
+binding = RATE_LIMIT
+id = "f75a15f1df8c42cdb2e623d8cb324a23"
+
 [[analytics_engine_datasets]]
 binding = "PAGE_VIEWS"
 dataset = "ih_page_views"
