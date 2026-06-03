@@ -28,31 +28,31 @@
   --taupe-900: #{$taupe-900};
 
   // Semantic tokens
-  --color-bg:           var(--sand-50);
-  --color-bg-subtle:    var(--sand-100);
-  --color-surface:      #ffffff;
-  --color-border:       var(--sand-200);
-  --color-border-heavy: var(--sand-300);
+  --color-bg:           #041021;
+  --color-bg-subtle:    #08182E;
+  --color-surface:      #0F1E3B;
+  --color-border:       #3A5B85;
+  --color-border-heavy: #264267;
 
-  --color-text:         var(--taupe-800);
-  --color-text-muted:   var(--taupe-500);
-  --color-text-subtle:  var(--taupe-400);
-  --color-text-inverse: var(--sand-50);
+  --color-text:         #E8F3FF;
+  --color-text-muted:   #9AB8CE;
+  --color-text-subtle:  #7A96B7;
+  --color-text-inverse: #041021;
 
-  --color-primary:        var(--sand-600);
-  --color-primary-hover:  var(--sand-700);
-  --color-primary-light:  var(--sand-100);
+  --color-primary:        #5ED4FF;
+  --color-primary-hover:  #40B7EE;
+  --color-primary-light:  #A7F0FF;
 
-  --color-success:  #2a7c3f;
-  --color-warning:  #b45309;
-  --color-danger:   #be1b1b;
-  --color-info:     #1d4ed8;
-  --color-error:    var(--color-danger);
+  --color-success:  #60DEA3;
+  --color-warning:  #E8964E;
+  --color-danger:   #E34E24;
+  --color-info:     #3BB7FF;
+  --color-error:    #E34E24;
 
-  --color-sidebar-bg:    var(--taupe-800);
-  --color-sidebar-text:  var(--sand-200);
-  --color-sidebar-hover: var(--taupe-700);
-  --color-sidebar-active: var(--sand-600);
+  --color-sidebar-bg:    #08182E;
+  --color-sidebar-text:  #E8F3FF;
+  --color-sidebar-hover: #0F233E;
+  --color-sidebar-active: #5ED4FF;
 
   // Typography
   --font-display: 'Playfair Display', Georgia, serif;

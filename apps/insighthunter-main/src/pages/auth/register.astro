@@ -43,7 +43,7 @@ const selectedTier = tiers.find(t => t.id === plan) ?? tiers[0];
   const form=document.getElementById('register-form'); const btnText=document.getElementById('btn-text'); const loader=document.getElementById('btn-loader'); const errBanner=document.getElementById('error-banner'); const errText=document.getElementById('error-text'); const submitBtn=document.getElementById('submit-btn'); const pwInput=document.getElementById('password'); const pwStr=document.getElementById('pw-strength');
   let selectedPlan=document.querySelector('input[name="plan"]:checked')?.value??(('lite'));
   document.querySelectorAll('.plan-option').forEach(opt=>{opt.addEventListener('click',()=>{document.querySelectorAll('.plan-option').forEach(o=>o.classList.remove('selected'));opt.classList.add('selected');selectedPlan=opt.dataset.tierId??'lite'})});
-  pwInput.addEventListener('input',()=>{const v=pwInput.value;let s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;const labels=['','Weak','Fair','Good','Strong'];const colors=['','#E05252','#F0B429','#22C8EF','#3FCF8E'];pwStr.textContent=v.length>0?`Password strength: ${labels[s]}`:'';;pwStr.style.color=colors[s]??''});
+  pwInput.addEventListener('input',()=>{const v=pwInput.value;let s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;const labels=['','Weak','Fair','Good','Strong'];const colors=['','#E34E24','#E8964E','#5ED4FF','#60DEA3'];pwStr.textContent=v.length>0?`Password strength: ${labels[s]}`:'';;pwStr.style.color=colors[s]??''});
   function showError(msg){errText.textContent=msg;errBanner.hidden=false}
   form.addEventListener('submit',async(e)=>{
     e.preventDefault();errBanner.hidden=true;
@@ -75,7 +75,7 @@ const selectedTier = tiers.find(t => t.id === plan) ?? tiers[0];
 .plan-name{color:var(--gold);font-style:normal}
 .plan-selector{display:flex;gap:8px;margin-bottom:24px}
 .plan-option{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;border:1px solid var(--border-dim);border-radius:10px;cursor:pointer;transition:border-color 0.18s,background 0.18s;text-align:center}
-.plan-option.selected{border-color:var(--gold);background:rgba(201,168,76,0.06)}
+.plan-option.selected{border-color:var(--gold);background:rgba(227,78,36,0.08)}
 .plan-radio{display:none}
 .plan-option-name{font-size:0.78rem;font-weight:700;color:var(--white)}
 .plan-option-price{font-size:0.72rem;color:var(--muted)}

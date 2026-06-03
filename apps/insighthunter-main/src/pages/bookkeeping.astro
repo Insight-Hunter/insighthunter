@@ -73,8 +73,8 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
           <svg class="sparkline" viewBox="0 0 320 80" preserveAspectRatio="none">
             <defs>
               <linearGradient id="cashGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#C9A84C" stop-opacity="0.35"/>
-                <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+                <stop offset="0%" stop-color="#E34E24" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#E34E24" stop-opacity="0"/>
               </linearGradient>
             </defs>
             <!-- Area fill -->
@@ -84,9 +84,9 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
             <!-- Line -->
             <path class="spark-line"
               d="M0,60 C20,55 35,40 60,38 C85,36 100,50 120,42 C140,34 155,20 180,18 C205,16 220,30 245,22 C265,16 285,10 320,8"
-              fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round"/>
+              fill="none" stroke="#E34E24" stroke-width="2" stroke-linecap="round"/>
             <!-- Current dot -->
-            <circle class="spark-dot" cx="320" cy="8" r="4" fill="#C9A84C"/>
+            <circle class="spark-dot" cx="320" cy="8" r="4" fill="#E34E24"/>
           </svg>
           <div class="chart-labels" aria-hidden="true">
             <span>May 1</span><span>May 8</span><span>May 15</span><span>May 22</span><span>Today</span>
@@ -105,7 +105,7 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
             <span class="cat-icon" style="--hue: 200">🏢</span>
             <div class="cat-info">
               <span class="cat-name">Operations</span>
-              <div class="cat-bar-track" role="presentation"><div class="cat-bar-fill" style="width:72%; --accent:#C9A84C"></div></div>
+              <div class="cat-bar-track" role="presentation"><div class="cat-bar-fill" style="width:72%; --accent:#E34E24"></div></div>
             </div>
             <div class="cat-amounts">
               <span class="cat-value">$18,420</span>
@@ -290,9 +290,9 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
     --navy-600: #172340;
     --navy-500: #1E2E50;
     --navy-400: #263660;
-    --gold:     #C9A84C;
-    --gold-dim: rgba(201,168,76,0.18);
-    --gold-glow:rgba(201,168,76,0.08);
+    --gold:     #E34E24;
+    --gold-dim: rgba(227,78,36,0.18);
+    --gold-glow:rgba(227,78,36,0.08);
     --text-primary:   #F0EDE4;
     --text-secondary: #8A95A8;
     --text-tertiary:  #4F5B70;
@@ -695,7 +695,7 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
     transition: border-color 0.2s;
   }
   .search-input::placeholder { color: var(--text-tertiary); }
-  .search-input:focus { border-color: rgba(201,168,76,0.4); }
+  .search-input:focus { border-color: rgba(227,78,36,0.4); }
 
   /* Filter chips */
   .filter-chips {
@@ -725,7 +725,7 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
   }
   .chip.active {
     background: var(--gold-dim);
-    border-color: rgba(201,168,76,0.4);
+    border-color: rgba(227,78,36,0.4);
     color: var(--gold);
   }
 
@@ -812,8 +812,8 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
   /* ── AI insight card ────────────────────────────────────── */
   .ai-insight-card {
     position: relative;
-    background: linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(201,168,76,0.04) 100%);
-    border: 1px solid rgba(201,168,76,0.25);
+    background: linear-gradient(135deg, rgba(227,78,36,0.12) 0%, rgba(227,78,36,0.04) 100%);
+    border: 1px solid rgba(227,78,36,0.25);
     border-radius: var(--radius-xl);
     padding: 20px;
     margin-bottom: 16px;
@@ -833,7 +833,7 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
     right: -30px;
     width: 120px;
     height: 120px;
-    background: radial-gradient(circle, rgba(201,168,76,0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(227,78,36,0.15) 0%, transparent 70%);
     pointer-events: none;
   }
 
@@ -893,14 +893,14 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 20px rgba(201,168,76,0.45);
+    box-shadow: 0 4px 20px rgba(227,78,36,0.45);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     z-index: 200;
     -webkit-tap-highlight-color: transparent;
   }
   .fab:active {
     transform: scale(0.93);
-    box-shadow: 0 2px 10px rgba(201,168,76,0.3);
+    box-shadow: 0 2px 10px rgba(227,78,36,0.28);
   }
 
   .bottom-pad { height: 120px; }

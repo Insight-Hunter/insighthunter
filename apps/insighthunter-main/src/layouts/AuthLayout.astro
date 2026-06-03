@@ -16,8 +16,8 @@ const { title, description = 'Sign in to Insight Hunter' } = Astro.props;
 <header class="auth-nav">
   <a href="/" class="auth-logo">
     <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
-      <path d="M14 2C14 2 8 8 8 14C8 18.4 10.8 22 14 22C17.2 22 20 18.4 20 14C20 10 18 7 18 7C18 7 17 12 14 12C11 12 12 8 14 2Z" fill="#C9A84C"/>
-      <path d="M14 26L11 22H17L14 26Z" fill="#C9A84C"/>
+      <path d="M14 2C14 2 8 8 8 14C8 18.4 10.8 22 14 22C17.2 22 20 18.4 20 14C20 10 18 7 18 7C18 7 17 12 14 12C11 12 12 8 14 2Z" fill="#E34E24"/>
+      <path d="M14 26L11 22H17L14 26Z" fill="#E34E24"/>
     </svg>
     <span>Insight Hunter</span>
   </a>
@@ -29,7 +29,7 @@ const { title, description = 'Sign in to Insight Hunter' } = Astro.props;
 </body>
 </html>
 <style is:global>
-  :root{--bg:#0f172a;--bg-deep:#0b1120;--surface:#172a45;--surface-alt:#1f3b64;--card:#192a44;--border:rgba(148,169,204,0.28);--border-dim:rgba(95,120,157,0.40);--border-cyan:rgba(96,165,250,0.22);--gold:#f6c94d;--gold-light:#ffdc75;--cyan:#7dd3fc;--cyan-text:#c7e9ff;--white:#eff6ff;--muted:#a2b0d1;--subtle:#6d7c9d;--success:#7dd895;--danger:#f98f8e;--font-display:'General Sans','Inter',sans-serif;--font-body:'Satoshi','Inter',sans-serif;--radius-sm:8px;--radius-card:16px}
+  :root{--bg:#041021;--bg-deep:#020811;--surface:#102145;--surface-alt:#162C56;--card:#0F1E3B;--border:rgba(94,181,255,0.22);--border-dim:rgba(54,92,143,0.40);--border-cyan:rgba(94,212,255,0.22);--gold:#E34E24;--gold-light:#FFAD81;--cyan:#5ED4FF;--cyan-text:#B9EDFF;--white:#E8F3FF;--muted:#9AB8CE;--subtle:#6D829A;--success:#60DEA3;--danger:#E34E24;--font-display:'General Sans','Inter',sans-serif;--font-body:'Satoshi','Inter',sans-serif;--radius-sm:8px;--radius-card:16px}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--white);font-family:var(--font-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
   h1,h2,h3{font-family:var(--font-display);font-weight:700}
@@ -48,5 +48,5 @@ const { title, description = 'Sign in to Insight Hunter' } = Astro.props;
   .auth-nav{height:60px;display:flex;align-items:center;padding:0 24px;border-bottom:1px solid var(--border-dim);background:var(--bg-deep)}
   .auth-logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--white)}
   .auth-main{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:40px 24px;position:relative;overflow:hidden}
-  .auth-glow{position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(201,168,76,0.07) 0%,transparent 70%);pointer-events:none}
+  .auth-glow{position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(227,78,36,0.07) 0%,transparent 70%);pointer-events:none}
 </style>

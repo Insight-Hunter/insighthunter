@@ -68,7 +68,7 @@
   font-family: 'General Sans', 'Inter', sans-serif;
   font-weight: 700;
   font-size: 1rem;
-  color: #C9A84C;
+  color: var(--gold);
   min-height: 64px;
   display: flex;
   align-items: center;
@@ -92,7 +92,7 @@
   transition: background 0.15s, color 0.15s;
 }
 .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
-.nav-item.active { background: rgba(201,168,76,0.12); color: #C9A84C; }
+.nav-item.active { background: rgba(227,78,36,0.12); color: var(--gold); }
 .nav-icon { width: 20px; text-align: center; flex-shrink: 0; }
 .sidebar-footer {
   padding: 16px;
@@ -107,7 +107,7 @@
 .user-tier {
   font-size: 0.7rem;
   font-weight: 700;
-  color: #C9A84C;
+  color: var(--gold);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
