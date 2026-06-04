@@ -45,17 +45,17 @@ function Panel({
   return (
     <section
       style={{
-        background: "rgba(255,255,255,0.7)",
-        border: "1px solid rgba(15,23,42,0.08)",
+        background: "rgba(5,11,28,0.85)",
+        border: "1px solid rgba(94,212,255,0.10)",
         borderRadius: 20,
         padding: 24,
-        boxShadow: "0 18px 45px rgba(15,23,42,0.08)",
+        boxShadow: "0 18px 45px rgba(0,0,0,0.35)",
         backdropFilter: "blur(18px)",
       }}
     >
       <div style={{ marginBottom: 18 }}>
-        <h2 style={{ margin: 0, fontSize: 24, color: "#0f172a" }}>{title}</h2>
-        <p style={{ margin: "8px 0 0", color: "#475569" }}>{subtitle}</p>
+        <h2 style={{ margin: 0, fontSize: 24, color: "#E8F3FF" }}>{title}</h2>
+        <p style={{ margin: "8px 0 0", color: "#A8D7FF" }}>{subtitle}</p>
       </div>
       {children}
     </section>
@@ -80,8 +80,8 @@ function StatCard({
         border: "1px solid rgba(15,23,42,0.06)",
       }}
     >
-      <div style={{ fontSize: 13, color: "#475569", marginBottom: 8 }}>{label}</div>
-      <div style={{ fontSize: 28, fontWeight: 700, color: "#0f172a" }}>{value}</div>
+      <div style={{ fontSize: 13, color: "#A8D7FF", marginBottom: 8 }}>{label}</div>
+      <div style={{ fontSize: 28, fontWeight: 700, color: "#F8FAFF" }}>{value}</div>
     </div>
   );
 }
@@ -99,8 +99,8 @@ function App() {
       style={{
         minHeight: "100vh",
         background:
-          "radial-gradient(circle at top left, rgba(20,184,166,0.22), transparent 28%), radial-gradient(circle at top right, rgba(59,130,246,0.16), transparent 24%), linear-gradient(180deg, #eef6ff 0%, #f8fafc 52%, #f1f5f9 100%)",
-        color: "#0f172a",
+          "radial-gradient(circle at top left, rgba(94,212,255,0.22), transparent 28%), radial-gradient(circle at top right, rgba(64,183,238,0.16), transparent 24%), linear-gradient(180deg, #041021 0%, #070F23 52%, #0C1A39 100%)",
+        color: "#E8F3FF",
       }}
     >
       <div
@@ -119,18 +119,18 @@ function App() {
             marginBottom: 24,
             padding: 18,
             borderRadius: 22,
-            background: "rgba(255,255,255,0.72)",
-            border: "1px solid rgba(15,23,42,0.08)",
-            boxShadow: "0 12px 35px rgba(15,23,42,0.06)",
+            background: "rgba(8,15,34,0.88)",
+            border: "1px solid rgba(94,212,255,0.08)",
+            boxShadow: "0 12px 35px rgba(0,0,0,0.35)",
             backdropFilter: "blur(16px)",
           }}
         >
           <div>
-            <div style={{ fontSize: 13, letterSpacing: 1.5, color: "#0f766e", fontWeight: 700 }}>
+            <div style={{ fontSize: 13, letterSpacing: 1.5, color: "#40B7EE", fontWeight: 700 }}>
               INSIGHT HUNTER
             </div>
-            <h1 style={{ margin: "6px 0 4px", fontSize: 30 }}>BizForma</h1>
-            <p style={{ margin: 0, color: "#475569" }}>
+            <h1 style={{ margin: "6px 0 4px", fontSize: 30, color: "#E8F3FF" }}>BizForma</h1>
+            <p style={{ margin: 0, color: "#C8E6FF" }}>
               Business formation, compliance, payroll, documents, and AI guidance in one Cloudflare-native workspace.
             </p>
           </div>
@@ -142,9 +142,9 @@ function App() {
                 textDecoration: "none",
                 padding: "12px 16px",
                 borderRadius: 14,
-                color: "#0f172a",
-                background: "rgba(255,255,255,0.92)",
-                border: "1px solid rgba(15,23,42,0.08)",
+                color: "#E8F3FF",
+                background: "rgba(94,212,255,0.12)",
+                border: "1px solid rgba(94,212,255,0.12)",
                 fontWeight: 600,
               }}
             >
@@ -157,8 +157,8 @@ function App() {
                 padding: "12px 16px",
                 borderRadius: 14,
                 color: "#ffffff",
-                background: "linear-gradient(135deg, #0f766e, #0369a1)",
-                border: "1px solid rgba(15,23,42,0.04)",
+                background: "linear-gradient(135deg, #5ED4FF, #E34E24)",
+                border: "1px solid rgba(94,212,255,0.08)",
                 fontWeight: 700,
               }}
             >
@@ -176,16 +176,16 @@ function App() {
         >
           <aside
             style={{
-              background: "rgba(255,255,255,0.72)",
-              border: "1px solid rgba(15,23,42,0.08)",
+              background: "rgba(8,16,35,0.86)",
+              border: "1px solid rgba(94,212,255,0.08)",
               borderRadius: 22,
               padding: 16,
-              boxShadow: "0 12px 35px rgba(15,23,42,0.06)",
+              boxShadow: "0 12px 35px rgba(0,0,0,0.35)",
               backdropFilter: "blur(16px)",
               height: "fit-content",
             }}
           >
-            <div style={{ padding: "6px 8px 12px", color: "#475569", fontSize: 13 }}>
+            <div style={{ padding: "6px 8px 12px", color: "#A8D7FF", fontSize: 13 }}>
               Workspace
             </div>
 
@@ -204,13 +204,13 @@ function App() {
                         ? "1px solid rgba(13,148,136,0.28)"
                         : "1px solid rgba(15,23,42,0.06)",
                       background: isActive
-                        ? "linear-gradient(135deg, rgba(20,184,166,0.16), rgba(59,130,246,0.08))"
-                        : "rgba(255,255,255,0.78)",
+                        ? "linear-gradient(135deg, rgba(94,212,255,0.16), rgba(64,183,238,0.08))"
+                        : "rgba(255,255,255,0.08)",
                       cursor: "pointer",
                     }}
                   >
-                    <div style={{ fontWeight: 700, color: "#0f172a" }}>{item.label}</div>
-                    <div style={{ fontSize: 13, color: "#475569", marginTop: 4 }}>
+                    <div style={{ fontWeight: 700, color: "#E8F3FF" }}>{item.label}</div>
+                    <div style={{ fontSize: 13, color: "#A8D7FF", marginTop: 4 }}>
                       {item.blurb}
                     </div>
                   </button>
@@ -230,22 +230,22 @@ function App() {
                       gap: 14,
                     }}
                   >
-                    <StatCard label="Open formation cases" value="3" tone="rgba(20,184,166,0.10)" />
-                    <StatCard label="Upcoming deadlines" value="7" tone="rgba(59,130,246,0.10)" />
-                    <StatCard label="Vault documents" value="18" tone="rgba(168,85,247,0.10)" />
-                    <StatCard label="Pending tax tasks" value="5" tone="rgba(249,115,22,0.12)" />
+                    <StatCard label="Open formation cases" value="3" tone="rgba(94,212,255,0.10)" />
+                    <StatCard label="Upcoming deadlines" value="7" tone="rgba(64,183,238,0.10)" />
+                    <StatCard label="Vault documents" value="18" tone="rgba(94,212,255,0.10)" />
+                    <StatCard label="Pending tax tasks" value="5" tone="rgba(227,78,36,0.12)" />
                   </div>
 
                   <div
                     style={{
                       padding: 18,
                       borderRadius: 18,
-                      background: "rgba(255,255,255,0.75)",
-                      border: "1px solid rgba(15,23,42,0.06)",
+                      background: "rgba(5,11,28,0.85)",
+                      border: "1px solid rgba(94,212,255,0.08)",
                     }}
                   >
-                    <h3 style={{ marginTop: 0 }}>Recommended next actions</h3>
-                    <ul style={{ margin: 0, paddingLeft: 18, color: "#334155", lineHeight: 1.7 }}>
+                    <h3 style={{ marginTop: 0, color: "#E8F3FF" }}>Recommended next actions</h3>
+                    <ul style={{ margin: 0, paddingLeft: 18, color: "#C8E6FF", lineHeight: 1.7 }}>
                       <li>Finish the 11-step formation wizard for your new entity.</li>
                       <li>Connect document uploads to the R2 document vault.</li>
                       <li>Generate the first compliance calendar and renewal schedule.</li>

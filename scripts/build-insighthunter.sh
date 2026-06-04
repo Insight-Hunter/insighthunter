@@ -206,7 +206,7 @@ const { title = 'Insight Hunter' } = Astro.props;
     <link rel="preconnect" href="https://api.fontshare.com" />
     <link href="https://api.fontshare.com/v2/css?f[]=general-sans@700,500&f[]=satoshi@400,500&display=swap" rel="stylesheet" />
     <style>
-      :root{--bg:#0d0d0d;--bg-navy:#141522;--surface:#141414;--surface2:#1a1a1a;--card:#1c1b19;--gold:#C9A84C;--white:#fff;--muted:#999;--r:16px;--font-display:'General Sans','Inter',sans-serif;--font-body:'Satoshi','Inter',sans-serif}
+      :root{--bg:#0d0d0d;--bg-navy:#141522;--surface:#141414;--surface2:#1a1a1a;--card:#1c1b19;--gold:#E34E24;--white:#fff;--muted:#999;--r:16px;--font-display:'General Sans','Inter',sans-serif;--font-body:'Satoshi','Inter',sans-serif}
       *{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font-body);background:var(--bg);color:var(--white)}a{text-decoration:none;color:inherit}.container{max-width:1200px;margin:0 auto;padding:0 24px}
       .btn{display:inline-block;padding:14px 22px;border-radius:10px;font-weight:700}.btn-gold{background:var(--gold);color:#111}.btn-outline{border:1px solid rgba(255,255,255,.18)}
       .card{background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:var(--r)}
@@ -221,7 +221,7 @@ cat > apps/insighthunter-main/src/components/marketing/Nav.astro <<'EOF2'
 <nav style="position:sticky;top:0;background:rgba(13,13,13,.88);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06)">
   <div class="container" style="height:68px;display:flex;align-items:center;justify-content:space-between;gap:24px">
     <a href="/" style="display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700">
-      <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><path d="M20 4C20 4 12 12 12 20C12 25.5 15.6 30 20 30C24.4 30 28 25.5 28 20C28 15 26 11 26 11C26 11 25 16 20 16C15 16 17 10 20 4Z" fill="#C9A84C"/></svg>
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><path d="M20 4C20 4 12 12 12 20C12 25.5 15.6 30 20 30C24.4 30 28 25.5 28 20C28 15 26 11 26 11C26 11 25 16 20 16C15 16 17 10 20 4Z" fill="#E34E24"/></svg>
       <span>Insight Hunter</span>
     </a>
     <div style="display:flex;gap:20px;color:var(--muted)">
@@ -238,9 +238,9 @@ import Nav from '../components/marketing/Nav.astro';
 ---
 <MarketingLayout title="Insight Hunter — Stop Flying Blind">
   <Nav />
-  <section style="padding:96px 0;background:radial-gradient(circle at top, rgba(201,168,76,.08), transparent 40%), var(--bg-navy)">
+  <section style="padding:96px 0;background:radial-gradient(circle at top, rgba(227,78,36,.08), transparent 40%), var(--bg-navy)">
     <div class="container" style="text-align:center;max-width:860px">
-      <div style="display:inline-block;padding:8px 16px;border:1px solid rgba(201,168,76,.35);border-radius:999px;color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:18px">AI-Powered Financial Intelligence</div>
+      <div style="display:inline-block;padding:8px 16px;border:1px solid rgba(227,78,36,.35);border-radius:999px;color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:18px">AI-Powered Financial Intelligence</div>
       <h1 style="font-family:var(--font-display);font-size:clamp(2.5rem,6vw,4.8rem);line-height:1.08;margin-bottom:18px">Stop Flying Blind.<br /><span style="color:var(--gold)">Know Your Numbers.</span></h1>
       <p style="max-width:680px;margin:0 auto 28px;color:var(--muted);font-size:1.08rem">Bookkeeping, payroll, business formation, reporting, PBX, and AI CFO insights built Cloudflare-native for small businesses.</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><a class="btn btn-gold" href="/auth/register">Start Free</a><a class="btn btn-outline" href="/pricing">See Pricing</a></div>

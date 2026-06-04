@@ -126,10 +126,10 @@ EOF
 
 cat > insighthunter-main/public/favicon.svg << 'EOF'
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" fill="none">
-  <path d="M14 2C14 2 8 8 8 14C8 18.4 10.8 22 14 22C17.2 22 20 18.4 20 14C20 10 18 7 18 7C18 7 17 12 14 12C11 12 12 8 14 2Z" fill="#C9A84C"/>
-  <path d="M14 26L11 22H17L14 26Z" fill="#C9A84C"/>
-  <path d="M14 16L18 12" stroke="#C9A84C" stroke-width="2" stroke-linecap="round"/>
-  <path d="M16 12H18V14" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M14 2C14 2 8 8 8 14C8 18.4 10.8 22 14 22C17.2 22 20 18.4 20 14C20 10 18 7 18 7C18 7 17 12 14 12C11 12 12 8 14 2Z" fill="#E34E24"/>
+  <path d="M14 26L11 22H17L14 26Z" fill="#E34E24"/>
+  <path d="M14 16L18 12" stroke="#E34E24" stroke-width="2" stroke-linecap="round"/>
+  <path d="M16 12H18V14" stroke="#E34E24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 EOF
 
@@ -268,10 +268,10 @@ const fullTitle = title.includes('Insight Hunter') ? title : `${title} | Insight
   <div class="nav-inner">
     <a href="/" class="nav-logo" aria-label="Insight Hunter home">
       <svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-        <path d="M14 2C14 2 8 8 8 14C8 18.4 10.8 22 14 22C17.2 22 20 18.4 20 14C20 10 18 7 18 7C18 7 17 12 14 12C11 12 12 8 14 2Z" fill="#C9A84C"/>
-        <path d="M14 26L11 22H17L14 26Z" fill="#C9A84C"/>
-        <path d="M14 16L18 12" stroke="#C9A84C" stroke-width="2" stroke-linecap="round"/>
-        <path d="M16 12H18V14" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M14 2C14 2 8 8 8 14C8 18.4 10.8 22 14 22C17.2 22 20 18.4 20 14C20 10 18 7 18 7C18 7 17 12 14 12C11 12 12 8 14 2Z" fill="#E34E24"/>
+        <path d="M14 26L11 22H17L14 26Z" fill="#E34E24"/>
+        <path d="M14 16L18 12" stroke="#E34E24" stroke-width="2" stroke-linecap="round"/>
+        <path d="M16 12H18V14" stroke="#E34E24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <span>Insight Hunter</span>
     </a>
@@ -305,8 +305,8 @@ const fullTitle = title.includes('Insight Hunter') ? title : `${title} | Insight
     <div class="footer-brand">
       <a href="/" class="footer-logo">
         <svg width="22" height="22" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-          <path d="M14 2C14 2 8 8 8 14C8 18.4 10.8 22 14 22C17.2 22 20 18.4 20 14C20 10 18 7 18 7C18 7 17 12 14 12C11 12 12 8 14 2Z" fill="#C9A84C"/>
-          <path d="M14 26L11 22H17L14 26Z" fill="#C9A84C"/>
+          <path d="M14 2C14 2 8 8 8 14C8 18.4 10.8 22 14 22C17.2 22 20 18.4 20 14C20 10 18 7 18 7C18 7 17 12 14 12C11 12 12 8 14 2Z" fill="#E34E24"/>
+          <path d="M14 26L11 22H17L14 26Z" fill="#E34E24"/>
         </svg>
         <span>Insight Hunter</span>
       </a>
@@ -365,8 +365,8 @@ const fullTitle = title.includes('Insight Hunter') ? title : `${title} | Insight
     --bg:#070C1A; --bg-deep:#04060F; --bg-navy:#0C1222;
     --surface:#101828; --surface-alt:#141F32; --card:#141F32;
     --border:rgba(44,66,104,0.55); --border-dim:rgba(28,44,72,0.50);
-    --border-cyan:rgba(0,184,224,0.22); --border-gold:rgba(201,168,76,0.20);
-    --gold:#C9A84C; --gold-light:#E8C97A; --gold-dim:#8A6E28;
+    --border-cyan:rgba(0,184,224,0.22); --border-gold:rgba(227,78,36,0.20);
+    --gold:#E34E24; --gold-light:#F16B44; --gold-dim:#7A301F;
     --cyan:#22C8EF; --cyan-bright:#4DD6F7; --cyan-deep:#00B8E0;
     --cyan-text:#7EE0F5; --cyan-glow:rgba(0,200,239,0.16);
     --white:#EEF2FF; --muted:#7A8FAD; --subtle:#4D6280;
@@ -463,8 +463,8 @@ const { title, description = 'Sign in to Insight Hunter' } = Astro.props;
 <header class="auth-nav">
   <a href="/" class="auth-logo">
     <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
-      <path d="M14 2C14 2 8 8 8 14C8 18.4 10.8 22 14 22C17.2 22 20 18.4 20 14C20 10 18 7 18 7C18 7 17 12 14 12C11 12 12 8 14 2Z" fill="#C9A84C"/>
-      <path d="M14 26L11 22H17L14 26Z" fill="#C9A84C"/>
+      <path d="M14 2C14 2 8 8 8 14C8 18.4 10.8 22 14 22C17.2 22 20 18.4 20 14C20 10 18 7 18 7C18 7 17 12 14 12C11 12 12 8 14 2Z" fill="#E34E24"/>
+      <path d="M14 26L11 22H17L14 26Z" fill="#E34E24"/>
     </svg>
     <span>Insight Hunter</span>
   </a>
@@ -476,7 +476,7 @@ const { title, description = 'Sign in to Insight Hunter' } = Astro.props;
 </body>
 </html>
 <style is:global>
-  :root{--bg:#070C1A;--bg-deep:#04060F;--surface:#101828;--surface-alt:#141F32;--card:#141F32;--border:rgba(44,66,104,0.55);--border-dim:rgba(28,44,72,0.50);--border-cyan:rgba(0,184,224,0.22);--gold:#C9A84C;--gold-light:#E8C97A;--cyan:#22C8EF;--cyan-text:#7EE0F5;--white:#EEF2FF;--muted:#7A8FAD;--subtle:#4D6280;--success:#3FCF8E;--danger:#E05252;--font-display:'General Sans','Inter',sans-serif;--font-body:'Satoshi','Inter',sans-serif;--radius-sm:8px;--radius-card:16px}
+  :root{--bg:#070C1A;--bg-deep:#04060F;--surface:#101828;--surface-alt:#141F32;--card:#141F32;--border:rgba(44,66,104,0.55);--border-dim:rgba(28,44,72,0.50);--border-cyan:rgba(0,184,224,0.22);--gold:#E34E24;--gold-light:#F16B44;--cyan:#22C8EF;--cyan-text:#7EE0F5;--white:#EEF2FF;--muted:#7A8FAD;--subtle:#4D6280;--success:#3FCF8E;--danger:#E05252;--font-display:'General Sans','Inter',sans-serif;--font-body:'Satoshi','Inter',sans-serif;--radius-sm:8px;--radius-card:16px}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--white);font-family:var(--font-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
   h1,h2,h3{font-family:var(--font-display);font-weight:700}
@@ -495,7 +495,7 @@ const { title, description = 'Sign in to Insight Hunter' } = Astro.props;
   .auth-nav{height:60px;display:flex;align-items:center;padding:0 24px;border-bottom:1px solid var(--border-dim);background:var(--bg-deep)}
   .auth-logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--white)}
   .auth-main{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:40px 24px;position:relative;overflow:hidden}
-  .auth-glow{position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(201,168,76,0.07) 0%,transparent 70%);pointer-events:none}
+  .auth-glow{position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(227,78,36,0.07) 0%,transparent 70%);pointer-events:none}
 </style>
 ASTROEOF
 
@@ -538,7 +538,7 @@ cat > insighthunter-main/src/components/marketing/Hero.astro << 'ASTROEOF'
 <style>
 .hero{min-height:92vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:80px 0 60px;background:var(--bg-navy)}
 .hero-bg{position:absolute;inset:0;pointer-events:none}
-.hero-glow-gold{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:900px;height:500px;background:radial-gradient(ellipse,rgba(201,168,76,0.10) 0%,transparent 60%)}
+.hero-glow-gold{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:900px;height:500px;background:radial-gradient(ellipse,rgba(227,78,36,0.10) 0%,transparent 60%)}
 .hero-glow-cyan{position:absolute;bottom:-60px;right:-100px;width:600px;height:400px;background:radial-gradient(ellipse,rgba(0,200,239,0.07) 0%,transparent 65%)}
 .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(44,66,104,0.10) 1px,transparent 1px),linear-gradient(90deg,rgba(44,66,104,0.10) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse 80% 60% at 50% 50%,black 20%,transparent 80%)}
 .hero-inner{position:relative;text-align:center;display:flex;flex-direction:column;align-items:center}
@@ -657,7 +657,7 @@ const { title='Ready to know your numbers?', text='Join thousands of small busin
 </section>
 <style>
 .cta-banner{position:relative;background:var(--bg);text-align:center;overflow:hidden}
-.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:400px;background:radial-gradient(ellipse,rgba(201,168,76,0.10) 0%,transparent 65%);pointer-events:none}
+.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:400px;background:radial-gradient(ellipse,rgba(227,78,36,0.10) 0%,transparent 65%);pointer-events:none}
 .cta-inner{position:relative;max-width:640px}
 h2{font-size:clamp(1.8rem,4vw,2.4rem);margin-bottom:16px}
 p{color:var(--muted);font-size:1.05rem;margin-bottom:36px}
@@ -706,7 +706,7 @@ import { tiers, addons } from '../../data/pricing';
           <ul class="tier-features">
             {tier.features.map((f) => (
               <li class="tier-feature">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="rgba(201,168,76,0.3)" stroke-width="1"/><path d="M4.5 8L6.8 10.5L11.5 5.5" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="rgba(227,78,36,0.3)" stroke-width="1"/><path d="M4.5 8L6.8 10.5L11.5 5.5" stroke="#E34E24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 <span>{f}</span>
               </li>
             ))}
@@ -751,7 +751,7 @@ import { tiers, addons } from '../../data/pricing';
 .save-badge{background:rgba(63,207,142,0.15);color:#3FCF8E;font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px}
 .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:24px;margin-bottom:64px;align-items:start}
 .pricing-card{display:flex;flex-direction:column;gap:0;padding:32px;position:relative}
-.pricing-card--featured{border-color:var(--gold)!important;background:linear-gradient(140deg,#141F32 0%,rgba(0,184,224,0.04) 100%);box-shadow:0 0 0 1px rgba(201,168,76,0.25),0 8px 48px rgba(0,0,0,0.4);transform:scale(1.025)}
+.pricing-card--featured{border-color:var(--gold)!important;background:linear-gradient(140deg,#141F32 0%,rgba(0,184,224,0.04) 100%);box-shadow:0 0 0 1px rgba(227,78,36,0.25),0 8px 48px rgba(0,0,0,0.4);transform:scale(1.025)}
 .featured-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--gold);color:#111;font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;padding:4px 14px;border-radius:100px;white-space:nowrap}
 .tier-header{margin-bottom:20px}
 .tier-name{font-size:1.2rem;margin-bottom:6px}
@@ -1109,7 +1109,7 @@ const selectedTier = tiers.find(t => t.id === plan) ?? tiers[0];
 .plan-name{color:var(--gold);font-style:normal}
 .plan-selector{display:flex;gap:8px;margin-bottom:24px}
 .plan-option{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;border:1px solid var(--border-dim);border-radius:10px;cursor:pointer;transition:border-color 0.18s,background 0.18s;text-align:center}
-.plan-option.selected{border-color:var(--gold);background:rgba(201,168,76,0.06)}
+.plan-option.selected{border-color:var(--gold);background:rgba(227,78,36,0.06)}
 .plan-radio{display:none}
 .plan-option-name{font-size:0.78rem;font-weight:700;color:var(--white)}
 .plan-option-price{font-size:0.72rem;color:var(--muted)}

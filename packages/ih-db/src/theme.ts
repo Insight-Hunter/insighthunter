@@ -5,7 +5,7 @@ export const theme = {
     surface: '#141414',
     surfaceAlt: '#1a1a1a',
     surfaceCard: '#1c1b19',
-    gold: '#C9A84C',
+    gold: '#E34E24',
     white: '#FFFFFF',
     muted: '#999999',
     error: '#ef4444',

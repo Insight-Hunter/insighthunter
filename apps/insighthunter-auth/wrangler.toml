@@ -1,27 +1,22 @@
-# wrangler.toml — Auth Cloudflare Worker Configuration
-
 name = "insighthunter-auth"
 main = "src/index.ts"
 compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
 
-# ── Observability ────────────────────────────────────────────────────────
 [observability]
 enabled = true
 head_sampling_rate = 1
 
-# ── Routes ───────────────────────────────────────────────────────────────
 [[routes]]
-pattern = "auth.insighthunter.app/*"
+pattern = "auth.insighthunter.app"
 zone_name = "insighthunter.app"
+custom_domain = true
 
-# ── D1 Database ──────────────────────────────────────────────────────────
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-auth"
 database_id = "36b4a6b7-3509-4cd2-9cdc-7a35990affd5"
 
-# ── KV Namespaces ────────────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
@@ -30,15 +25,13 @@ id = "60e34ba310ca40c79edec05470c7a271"
 binding = "REFRESH_TOKENS"
 id = "ba8d224a437949969d990db3aef71a87"
 
-# ── Analytics Engine ─────────────────────────────────────────────────────
 [[analytics_engine_datasets]]
 binding = "AUTH_EVENTS"
 dataset = "ih_auth_events"
 
-# ── Environment Variables ────────────────────────────────────────────────
 [vars]
 ENVIRONMENT = "production"
 ACCESS_TOKEN_TTL = "3600"
 REFRESH_TOKEN_TTL = "2592000"
-
-# ── Secrets (set via wrangler secret put): JWT_SECRET ───────────────────
+APP_ORIGIN = "https://insighthunter.app"
+COOKIE_DOMAIN = "insighthunter.app"

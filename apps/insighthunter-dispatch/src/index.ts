@@ -10,11 +10,30 @@ export interface Env {
 
 interface JWTPayload { sub: string; org: string; email: string; tier: 'lite'|'standard'|'pro'; iat: number; exp: number; }
 
-const PUBLIC_ROUTES = [
-  { method:'POST', path:'/api/auth/login' }, { method:'POST', path:'/api/auth/register' },
-  { method:'POST', path:'/api/auth/refresh' }, { method:'POST', path:'/api/auth/forgot-password' },
-  { method:'GET',  path:'/api/health' }, { method:'GET', path:'/api/version' },
+const PUBLIC_ROUTE_PATTERNS = [
+  { method: 'POST', path: '/api/auth/login' },
+  { method: 'POST', path: '/api/auth/register' },
+  { method: 'POST', path: '/api/auth/refresh' },
+  { method: 'POST', path: '/api/auth/forgot-password' },
+  { method: 'GET', path: '/api/health' },
+  { method: 'GET', path: '/api/version' },
 ];
+
+function normalizePath(pathname: string): string {
+  if (!pathname) return '/';
+  const cleaned = pathname.replace(/\/+$/, '');
+  return cleaned || '/';
+}
+
+function isPublicRoute(method: string, pathname: string): boolean {
+  const normalizedMethod = method.toUpperCase();
+  const normalizedPath = normalizePath(pathname);
+
+  return PUBLIC_ROUTE_PATTERNS.some((route) => {
+    return route.method === normalizedMethod && normalizePath(route.path) === normalizedPath;
+  });
+}
+
 
 function getAllowedOrigins(env: Env) { return env.ALLOWED_ORIGINS.split(',').map(o => o.trim()); }
 
@@ -82,9 +101,7 @@ function getWorkerForPath(path: string, env: Env): Fetcher|null {
   return null;
 }
 
-function isPublicRoute(method: string, pathname: string): boolean {
-  return PUBLIC_ROUTES.some(r => r.method === method && pathname === r.path);
-}
+
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -133,8 +150,11 @@ export default {
       enrichedHeaders.set('X-IH-Tier', authenticatedUser.tier);
     }
 
-    const enrichedRequest = new Request(request.url, {
-      method: request.method, headers: enrichedHeaders,
+    const forwardUrl = new URL(request.url);
+    forwardUrl.pathname = forwardUrl.pathname.replace(/^\/api(?=\/|$)/, '') || '/';
+    const enrichedRequest = new Request(forwardUrl.toString(), {
+      method: request.method,
+      headers: enrichedHeaders,
       body: ['GET','HEAD','DELETE'].includes(request.method) ? undefined : request.body,
     });
 

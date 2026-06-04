@@ -3,7 +3,8 @@
 // Validates tokens issued by auth.insighthunter.app.
 
 import type { AuthUser, BaseEnv } from "../types/index.ts";
-
+import type { Context, Next } from 'hono';
+import type { Session, SessionValidationResult } from '../types';
 export class AuthError extends Error {
   status: number;
   constructor(message: string, status = 401) {
@@ -101,8 +102,7 @@ export function unauthorizedJson(message = "Unauthorized"): Response {
     status: 401,
     headers: { "content-type": "application/json; charset=utf-8" },
   });
-import type { Context, Next } from 'hono';
-import type { Session, SessionValidationResult } from '../types';
+
 
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
