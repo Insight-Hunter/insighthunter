@@ -11,7 +11,7 @@
     if (password.length < 8) { error = 'Password must be at least 8 characters'; return; }
     loading = true; error = '';
     try {
-      const res = await fetch('/api/auth/register', {
+      const res = await fetch('/https://auth.insighthunter.app/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, org_name, email, password }),

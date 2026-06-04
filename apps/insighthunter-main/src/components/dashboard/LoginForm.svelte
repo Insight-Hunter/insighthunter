@@ -8,7 +8,7 @@
     if (!email || !password) { error = 'Email and password are required'; return; }
     loading = true; error = '';
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/https://auth.insighthunter.app/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

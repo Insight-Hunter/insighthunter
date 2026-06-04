@@ -2,61 +2,207 @@
 export const prerender = false;
 import AuthLayout from '../../layouts/AuthLayout.astro';
 ---
-<AuthLayout title="Sign In">
-  <div class="auth-card">
-    <div class="auth-header"><h1>Welcome back</h1><p>Sign in to your Insight Hunter account</p></div>
-    <div id="error-banner" class="error-banner" hidden><span id="error-text">Invalid email or password.</span></div>
-    <form id="login-form" class="auth-form" novalidate>
-      <div class="form-group"><label class="form-label" for="email">Email</label><input class="form-input" type="email" id="email" name="email" placeholder="you@company.com" autocomplete="email" required /></div>
-      <div class="form-group">
-        <div class="label-row"><label class="form-label" for="password">Password</label><a href="/auth/forgot-password" class="forgot-link">Forgot password?</a></div>
-        <input class="form-input" type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required />
+
+<AuthLayout title="Sign in">
+  <section class="auth-page">
+    <div class="auth-copy">
+      <p class="eyebrow">Sign in</p>
+      <h1>Welcome back.</h1>
+      <p>Sign in to your Insight Hunter workspace to continue with dashboards, reporting, and operational insights.</p>
+    </div>
+
+    <div class="auth-panel">
+      <div id="error-banner" class="error-banner" hidden>
+        <span id="error-text">Invalid email or password.</span>
       </div>
-      <button type="submit" class="btn btn-gold submit-btn" id="submit-btn"><span id="btn-text">Sign In</span><span id="btn-loader" class="spinner" hidden></span></button>
-    </form>
-    <div class="divider">or</div>
-    <div class="auth-footer"><p>Don't have an account? <a href="/auth/register" class="auth-link">Create one free</a></p></div>
-  </div>
+
+      <form id="login-form" class="auth-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input
+            class="form-input"
+            type="email"
+            id="email"
+            name="email"
+            placeholder="you@company.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label class="form-label" for="password">Password</label>
+            <a href="/auth/forgot-password" class="forgot-link">Forgot password?</a>
+          </div>
+
+          <input
+            class="form-input"
+            type="password"
+            id="password"
+            name="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn btn-gold submit-btn" id="submit-btn">
+          <span id="btn-text">Sign in</span>
+          <span id="btn-loader" class="spinner" hidden></span>
+        </button>
+      </form>
+
+      <div class="divider">or</div>
+
+      <div class="auth-footer">
+        <p>Don&apos;t have an account? <a href="/auth/register" class="auth-link">Create one free</a></p>
+      </div>
+    </div>
+  </section>
 </AuthLayout>
+
 <script>
-  const form=document.getElementById('login-form'); const btnText=document.getElementById('btn-text'); const loader=document.getElementById('btn-loader'); const errBanner=document.getElementById('error-banner'); const errText=document.getElementById('error-text'); const submitBtn=document.getElementById('submit-btn');
-  function showError(msg){errText.textContent=msg;errBanner.hidden=false}
-  form.addEventListener('submit', async(e)=>{
-    e.preventDefault(); errBanner.hidden=true;
-    const email=(form.elements.namedItem('email')).value.trim();
-    const password=(form.elements.namedItem('password')).value;
-    if(!email||!password){showError('Please fill in all fields.');return}
-    submitBtn.disabled=true; btnText.textContent='Signing in…'; loader.hidden=false;
-    try{
-      const res=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
-      const data=await res.json();
-      if(!res.ok||!data.token){showError(data.error??'Invalid email or password.');return}
-      localStorage.setItem('ih_access_token',data.token);
-      const params=new URLSearchParams(window.location.search);
-      window.location.href=params.get('next')??'/dashboard';
-    }catch{showError('Network error — please try again.')}
-    finally{submitBtn.disabled=false;btnText.textContent='Sign In';loader.hidden=true}
+  const AUTH_BASE_URL = 'https://auth.insighthunter.app';
+
+  const form = document.getElementById('login-form');
+  const btnText = document.getElementById('btn-text');
+  const loader = document.getElementById('btn-loader');
+  const errBanner = document.getElementById('error-banner');
+  const errText = document.getElementById('error-text');
+  const submitBtn = document.getElementById('submit-btn');
+
+  function showError(message) {
+    errText.textContent = message;
+    errBanner.hidden = false;
+  }
+
+  function clearError() {
+    errText.textContent = '';
+    errBanner.hidden = true;
+  }
+
+  function setSubmitting(isSubmitting) {
+    submitBtn.disabled = isSubmitting;
+    btnText.textContent = isSubmitting ? 'Signing in…' : 'Sign in';
+    loader.hidden = !isSubmitting;
+    submitBtn.setAttribute('aria-busy', isSubmitting ? 'true' : 'false');
+  }
+
+  function getSafeRedirect(input) {
+    if (!input) return '/dashboard';
+
+    try {
+      const decoded = decodeURIComponent(input).trim();
+      if (!decoded.startsWith('/')) return '/dashboard';
+      if (decoded.startsWith('//')) return '/dashboard';
+      if (decoded.startsWith('/auth/')) return '/dashboard';
+      return decoded;
+    } catch {
+      return '/dashboard';
+    }
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearError();
+
+    const emailField = form.elements.namedItem('email');
+    const passwordField = form.elements.namedItem('password');
+
+    const email = emailField instanceof HTMLInputElement ? emailField.value.trim().toLowerCase() : '';
+    const password = passwordField instanceof HTMLInputElement ? passwordField.value : '';
+
+    if (!email || !password) {
+      showError('Please fill in all fields.');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const res = await fetch(`${AUTH_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      });
+
+      const raw = await res.text();
+      console.log('login status:', res.status);
+      console.log('login raw response:', raw);
+
+      let data = {};
+      try {
+        data = raw ? JSON.parse(raw) : {};
+      } catch {
+        data = { error: raw || `Login failed (${res.status})` };
+      }
+
+      if (!res.ok) {
+        showError(data?.error || data?.message || 'Invalid email or password.');
+        return;
+      }
+
+      const token = data?.token || data?.accessToken || data?.data?.token || null;
+
+      if (token) {
+        try {
+          localStorage.setItem('ih_access_token', token);
+        } catch {}
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const next = getSafeRedirect(params.get('next') || params.get('redirect'));
+      window.location.assign(`/auth/callback?redirect=${encodeURIComponent(next)}`);
+    } catch (error) {
+      console.error('Login failed:', error);
+      showError(error instanceof Error ? error.message : 'Network error — please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   });
 </script>
+
 <style>
-.auth-card{width:100%;max-width:420px;position:relative;z-index:1}
-.auth-header{text-align:center;margin-bottom:32px}
-.auth-header h1{font-size:1.75rem;margin-bottom:8px}
-.auth-header p{color:var(--muted);font-size:0.9rem}
-.error-banner{display:flex;align-items:center;gap:10px;background:rgba(224,82,82,0.08);border:1px solid rgba(224,82,82,0.3);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:0.875rem;color:#F87171}
-.error-banner[hidden]{display:none}
-.auth-form{display:flex;flex-direction:column;gap:18px;margin-bottom:20px}
-.label-row{display:flex;justify-content:space-between;align-items:center}
-.forgot-link{font-size:0.8rem;color:var(--cyan-text);transition:color 0.18s}
-.forgot-link:hover{color:var(--cyan)}
-.submit-btn{width:100%;padding:14px;font-size:0.975rem;margin-top:4px}
-.submit-btn:disabled{opacity:0.7;cursor:not-allowed}
-.spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,0.2);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite}
-.spinner[hidden]{display:none}
-@keyframes spin{to{transform:rotate(360deg)}}
-.divider{display:flex;align-items:center;gap:12px;color:var(--subtle);font-size:0.8rem;margin:20px 0}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border-dim)}
-.auth-footer{text-align:center;font-size:0.875rem;color:var(--muted)}
-.auth-link{color:var(--cyan-text);font-weight:600;transition:color 0.18s}
-.auth-link:hover{color:var(--cyan)}
+  .auth-page { display: grid; gap: 1.25rem; grid-template-columns: .95fr 1.05fr; align-items: start; }
+  .auth-copy { display: flex; flex-direction: column; gap: .85rem; }
+  .auth-copy h1 { font-size: clamp(2rem, 3vw, 2.9rem); line-height: 1.05; margin: 0; }
+  .auth-copy p:not(.eyebrow) { color: var(--muted); max-width: 40ch; line-height: 1.65; }
+  .auth-panel { border: 1px solid rgba(84,72,56,.14); border-radius: 18px; padding: 1.25rem; background: rgba(255,255,255,.02); }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; opacity: .7; }
+
+  .error-banner { display: flex; align-items: center; gap: 10px; background: rgba(224,82,82,0.08); border: 1px solid rgba(224,82,82,0.3); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.875rem; color: #F87171; }
+  .error-banner[hidden] { display: none; }
+
+  .auth-form { display: flex; flex-direction: column; gap: 18px; margin-bottom: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-label { font-size: 0.9rem; font-weight: 600; }
+  .form-input { width: 100%; border-radius: 10px; border: 1px solid var(--border-dim); background: rgba(255,255,255,.03); padding: 13px 14px; color: inherit; }
+  .form-input:focus { outline: none; border-color: var(--cyan-text); box-shadow: 0 0 0 3px rgba(94,212,255,.12); }
+
+  .label-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .forgot-link { font-size: 0.8rem; color: var(--cyan-text); transition: color 0.18s; }
+  .forgot-link:hover { color: var(--cyan); }
+
+  .submit-btn { width: 100%; padding: 14px; font-size: 0.975rem; margin-top: 4px; display: inline-flex; justify-content: center; align-items: center; gap: 10px; }
+  .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+  .spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  .spinner[hidden] { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .divider { display: flex; align-items: center; gap: 12px; color: var(--subtle); font-size: 0.8rem; margin: 20px 0; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border-dim); }
+
+  .auth-footer { text-align: center; font-size: 0.875rem; color: var(--muted); }
+  .auth-link { color: var(--cyan-text); font-weight: 600; transition: color 0.18s; }
+  .auth-link:hover { color: var(--cyan); }
+
+  @media (max-width: 860px) {
+    .auth-page { grid-template-columns: 1fr; }
+  }
 </style>

@@ -1,5 +1,22 @@
 ---
-// Clear session and redirect
+export const prerender = false;
+
 Astro.cookies.delete('ih_session', { path: '/' });
-return Astro.redirect('/auth/login');
 ---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content="0;url=/auth/login?logged_out=1" />
+    <title>Signing out…</title>
+  </head>
+  <body>
+    <script>
+      try {
+        localStorage.removeItem('ih_access_token');
+      } catch {}
+      window.location.replace('/auth/login?logged_out=1');
+    </script>
+    <p>Signing you out…</p>
+  </body>
+</html>
