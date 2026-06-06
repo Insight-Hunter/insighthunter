@@ -59,7 +59,7 @@ All compute runs at Cloudflare's edge — zero cold-start servers, no VMs, no co
 │   ├── insighthunter-dispatch/   # Event routing / fan-out
 │   ├── insighthunter-pbx/        # Cloud phone (PBX)
 │   ├── insighthunter-whitelabel/ # Partner white-label service
-│   ├── insighthunter-pro-services/ # Human-in-the-loop advisory
+│   ├── insighthunter-pro-services/ # CF Domain registration, hosting, web services
 │   ├── insighthunter-roadmap/    # Internal roadmap tracker
 │   ├── ih-platform-worker/       # Core tenant management worker
 │   └── ih-tenant-template/       # Bootstrap template for new tenants
