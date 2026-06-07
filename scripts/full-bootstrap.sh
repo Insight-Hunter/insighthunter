@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 APP_NAME="${APP_NAME:-insighthunter-dispatch}"
-TARGET_DIR="${TARGET_DIR:-./$APP_NAME}"
+TARGET_DIR="${TARGET_DIR:-.apps/$APP_NAME}"
 COMPAT_DATE="${COMPAT_DATE:-2025-03-07}"
 
 say() {

@@ -1,0 +1,60 @@
+name = "insighthunter-dispatch"
+main = "apps/insighthunter-dispatch/src/index.ts"
+compatibility_date = "2025-03-07"
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[[services]]
+binding = "AUTH_WORKER"
+service = "auth-worker"
+
+[[services]]
+binding = "BOOKKEEPING_WORKER"
+service = "bookkeeping-worker"
+
+[[services]]
+binding = "PAYROLL_WORKER"
+service = "payroll-worker"
+
+[[services]]
+binding = "BIZFORMA_WORKER"
+service = "bizforma-worker"
+
+[[services]]
+binding = "SCOUT_WORKER"
+service = "scout-worker"
+
+[[services]]
+binding = "PBX_WORKER"
+service = "pbx-worker"
+
+[[services]]
+binding = "REPORT_WORKER"
+service = "report-worker"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "60e34ba310ca40c79edec05470c7a271"
+preview_id = "60e34ba310ca40c79edec05470c7a271"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "f75a15f1df8c42cdb2e623d8cb324a23"
+preview_id = "f75a15f1df8c42cdb2e623d8cb324a23"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-dispatch"
+database_id = "2a0331eb-4775-4ad2-9126-0560336486df"
+
+[[analytics_engine_datasets]]
+binding = "API_EVENTS"
+dataset = "ih_api_events"
+
+[vars]
+ENVIRONMENT = "production"
+ALLOWED_ORIGINS = "https://insighthunter.app,https://www.insighthunter.app"
+RATE_LIMIT_WINDOW_SECONDS = "60"
+RATE_LIMIT_MAX_REQUESTS = "120"
