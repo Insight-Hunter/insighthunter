@@ -11,9 +11,9 @@ const PUBLIC_PATHS = new Set([
 ]);
 
 const API_PUBLIC = new Set([
-  "/api/auth/login",
-  "/api/auth/register",
-  "/api/auth/logout",
+  "/https://auth.insighthunter.app/auth/login",
+  "/https://auth.insighthunter.app/auth/register",
+  "/https://auth.insighthunter.app/auth/logout",
   "/api/qbo/callback",
 ]);
 

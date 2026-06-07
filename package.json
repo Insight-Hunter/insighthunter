@@ -1,8 +1,9 @@
 {
   "name": "insighthunter",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "packageManager": "pnpm@9.0.0",
+  "type": "module",
   "scripts": {
     "build": "pnpm -r build",
     "dev": "pnpm -r --parallel dev",
@@ -15,6 +16,9 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@types/node": "^25.9.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3",
     "wrangler": "^4.95.0"
   }
 }

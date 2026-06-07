@@ -48,8 +48,8 @@ deploy_worker() {
 
 echo "Deploying workers in required order..."
 
-deploy_worker "apps/ih-platform-worker"
-deploy_worker "apps/ih-tenant-template"
+deploy_worker "apps/insighthunter-platform-worker"
+deploy_worker "apps/insighthunter-tenant"
 
 deploy_worker "apps/insighthunter-advisor"
 deploy_worker "apps/insighthunter-bookkeeping"

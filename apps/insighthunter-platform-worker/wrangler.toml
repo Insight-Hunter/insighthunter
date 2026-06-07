@@ -1,4 +1,4 @@
-name = "ih-platform-worker"
+name = "insighthunter-platform-worker"
 main = "src/worker.ts"
 compatibility_date = "2025-04-01"
 

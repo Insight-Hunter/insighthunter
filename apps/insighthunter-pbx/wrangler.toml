@@ -1,4 +1,4 @@
-name = "ih-pbx-worker"
+name = "insighthunter-pbx"
 main = "src/worker.ts"
 compatibility_date = "2025-04-01"
 

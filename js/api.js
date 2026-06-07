@@ -5,13 +5,13 @@
 window.api = {
   // ── Auth ───────────────────────────────────────────────
   login: (email, password) =>
-    _post('/api/auth/login', { email, password }),
+    _post('/https://auth.insighthunter.app/auth/login', { email, password }),
   register: (email, password, name) =>
-    _post('/api/auth/register', { email, password, name }),
+    _post('/https://auth.insighthunter.app/auth/register', { email, password, name }),
   me: () =>
-    _get('/api/auth/me'),
+    _get('/https://auth.insighthunter.app/auth/me'),
   logout: () =>
-    _post('/api/auth/logout', {}),
+    _post('/https://auth.insighthunter.app/auth/logout', {}),
 
   // ── Bookkeeping ────────────────────────────────────────
   summary: (from, to) =>

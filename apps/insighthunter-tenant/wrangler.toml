@@ -1,4 +1,4 @@
-name = "tenant-template"
+name = "insighthunter-tenant"
 main = "src/worker.ts"
 compatibility_date = "2025-04-01"
 

@@ -3,7 +3,7 @@ giut // public/auth/logout.js
 
 async function logout() {
   try {
-    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    await fetch('/https://auth.insighthunter.app/auth/logout', { method: 'POST', credentials: 'include' });
   } finally {
     window.location.href = '/auth/login.html';
   }

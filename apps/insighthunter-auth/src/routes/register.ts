@@ -29,7 +29,7 @@ export const registerRoute = new Elysia()
     })
   )
   .post(
-    '/api/auth/register',
+    '/https://auth.insighthunter.app/auth/register',
     async ({ body, set, jwt }) => {
       const {
         firstName,

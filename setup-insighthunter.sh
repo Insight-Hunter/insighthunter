@@ -997,7 +997,7 @@ import AuthLayout from '../../layouts/AuthLayout.astro';
     if(!email||!password){showError('Please fill in all fields.');return}
     submitBtn.disabled=true; btnText.textContent='Signing in…'; loader.hidden=false;
     try{
-      const res=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+      const res=await fetch('/https://auth.insighthunter.app/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
       const data=await res.json();
       if(!res.ok||!data.token){showError(data.error??'Invalid email or password.');return}
       localStorage.setItem('ih_access_token',data.token);
@@ -1092,7 +1092,7 @@ const selectedTier = tiers.find(t => t.id === plan) ?? tiers[0];
     if(!agreeTerms){showError('You must agree to the Terms of Service.');return}
     submitBtn.disabled=true;btnText.textContent='Creating account…';loader.hidden=false;
     try{
-      const res=await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({firstName,lastName,company,email,password,plan:selectedPlan})});
+      const res=await fetch('/https://auth.insighthunter.app/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({firstName,lastName,company,email,password,plan:selectedPlan})});
       const data=await res.json();
       if(!res.ok||!data.token){showError(data.error??'Registration failed. Please try again.');return}
       localStorage.setItem('ih_access_token',data.token);
@@ -1242,8 +1242,8 @@ export interface Env {
 interface JWTPayload { sub: string; org: string; email: string; tier: 'lite'|'standard'|'pro'; iat: number; exp: number; }
 
 const PUBLIC_ROUTES = [
-  { method:'POST', path:'/api/auth/login' }, { method:'POST', path:'/api/auth/register' },
-  { method:'POST', path:'/api/auth/refresh' }, { method:'POST', path:'/api/auth/forgot-password' },
+  { method:'POST', path:'/https://auth.insighthunter.app/auth/login' }, { method:'POST', path:'/https://auth.insighthunter.app/auth/register' },
+  { method:'POST', path:'/https://auth.insighthunter.app/auth/refresh' }, { method:'POST', path:'/https://auth.insighthunter.app/auth/forgot-password' },
   { method:'GET',  path:'/api/health' }, { method:'GET', path:'/api/version' },
 ];
 

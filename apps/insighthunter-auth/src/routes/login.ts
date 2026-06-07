@@ -13,7 +13,7 @@ export const loginRoute = new Elysia()
     })
   )
   .post(
-    '/api/auth/login',
+    '/https://auth.insighthunter.app/auth/login',
     async ({ body, set, jwt }) => {
       const { email, password } = body;
 

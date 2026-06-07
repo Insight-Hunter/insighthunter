@@ -3,8 +3,8 @@
 ## Endpoints
 
 ### Auth
-- POST /api/auth/signup
-- POST /api/auth/login
+- POST /https://auth.insighthunter.app/auth/signup
+- POST /https://auth.insighthunter.app/auth/login
 
 ### Subscriptions  
 - POST /api/subscriptions/create

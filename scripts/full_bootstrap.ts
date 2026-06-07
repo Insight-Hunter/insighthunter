@@ -1,4 +1,3 @@
-
 export interface Env {
   AUTH_WORKER: Fetcher; BOOKKEEPING_WORKER: Fetcher; PAYROLL_WORKER: Fetcher;
   BIZFORMA_WORKER: Fetcher; SCOUT_WORKER: Fetcher; PBX_WORKER: Fetcher; REPORT_WORKER: Fetcher;
@@ -33,7 +32,6 @@ function isPublicRoute(method: string, pathname: string): boolean {
     return route.method === normalizedMethod && normalizePath(route.path) === normalizedPath;
   });
 }
-
 
 function getAllowedOrigins(env: Env) { return env.ALLOWED_ORIGINS.split(',').map(o => o.trim()); }
 
@@ -101,8 +99,6 @@ function getWorkerForPath(path: string, env: Env): Fetcher|null {
   return null;
 }
 
-
-
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const startMs = Date.now();
@@ -122,6 +118,7 @@ export default {
     const clientIP = request.headers.get('CF-Connecting-IP') ?? 'unknown';
     const { allowed, remaining } = await checkRateLimit(clientIP, env);
     if (!allowed) {
+      // FIX 1: Response.json takes the options block as the second parameter, headers must live inside it
       return addCors(Response.json({ error:'Rate limit exceeded. Please slow down and try again.' }, { status:429, headers:{ 'Retry-After': env.RATE_LIMIT_WINDOW_SECONDS ?? '60', 'X-RateLimit-Remaining':'0' } }), origin, env);
     }
 
@@ -162,12 +159,12 @@ export default {
     try {
       downstreamResponse = await targetWorker.fetch(enrichedRequest);
     } catch (err) {
-      console.error(`[dispatch] Downstream error on ${url.pathname}:`, err);
-      ctx.waitUntil(Promise.resolve(trackApiEvent(env, request.method, url.pathname, 502, authenticatedUser?.org ?? null, Date.now() - startMs)));
-      return addCors(Response.json({ error:'Upstream service error. Please try again shortly.' }, { status:502 }), origin, env);
+      console.error(`[dispatch] Downstream worker error: ${err}`);
+      return addCors(Response.json({ error: 'Downstream worker failed.' }, { status: 502 }), origin, env);
     }
 
-    ctx.waitUntil(Promise.resolve(trackApiEvent(env, request.method, url.pathname, downstreamResponse.status, authenticatedUser?.org ?? null, Date.now() - startMs)));
+    // FIX 2: Wrapped the ending block correctly, tracking analytics before returning the final response
+    trackApiEvent(env, request.method, url.pathname, downstreamResponse.status, authenticatedUser?.org ?? null, Date.now() - startMs);
     return addCors(downstreamResponse, origin, env);
-  },
-} satisfies ExportedHandler<Env>;
+  }
+};

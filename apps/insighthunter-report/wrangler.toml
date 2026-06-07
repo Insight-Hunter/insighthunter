@@ -1,13 +1,36 @@
-name = "ih-report-worker"
-main = "src/worker.ts"
-compatibility_date = "2025-04-01"
+# wrangler.toml — Reports Cloudflare Worker Configuration
 
+name = "insighthunter-reports"
+main = "src/index.ts"
+compatibility_date = "2025-03-07"
+compatibility_flags = ["nodejs_compat"]
+
+# ── Observability ────────────────────────────────────────────────────────
 [observability]
 enabled = true
+head_sampling_rate = 1
 
-routes = [{ pattern = "report.insighthunter.app/*", zone_name = "insighthunter.app" }]
+# ── Browser Rendering ──────────────────────────────────────────────────
+[browser]
+binding = "BROWSER"
 
+# ── R2 Buckets ───────────────────────────────────────────────────────────
+[[r2_buckets]]
+binding = "REPORTS"
+bucket_name = "insighthunter-reports"
+
+# ── D1 Databases ─────────────────────────────────────────────────────────
 [[d1_databases]]
 binding = "DB"
-database_name = "insighthunter-report"
-database_id = "57f706b1-82e6-4352-9952-75e9b38e39c7"
+database_name = "insighthunter-db"
+database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
+
+# ── Analytics Engine ─────────────────────────────────────────────────────
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "insighthunter_events"
+
+# ── Environment Variables ────────────────────────────────────────────────
+[vars]
+AUTH_WORKER_URL = "https://auth.insighthunter.app"
+APP_URL = "https://insighthunter.app"

@@ -1,5 +1,5 @@
 {
-  "name": "@ih/ih-scout-worker",
+  "name": "insighthunter-scout",
   "private": true,
   "version": "0.1.0",
   "type": "module",

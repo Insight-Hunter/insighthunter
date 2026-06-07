@@ -1,5 +1,4 @@
 import { Hono } from 'hono';
-import { cors } from 'hono/cors';
 import type { AuthUser, JWTPayload } from '@ih/types';
 import { signJWT, verifyJWT, extractBearer, jwtToAuthUser } from '@ih/auth-client';
 import { createSetupIntentHandler } from './routes/payment';
@@ -16,6 +15,30 @@ interface Env {
 
 type Bindings = { Bindings: Env };
 
+const ALLOWED_ORIGINS = new Set([
+  'https://insighthunter.app',
+  'https://www.insighthunter.app',
+  'https://app.insighthunter.app',
+  'https://lite.insighthunter.app',
+  'http://localhost:4321',
+  'http://127.0.0.1:4321',
+]);
+
+function buildCorsHeaders(origin?: string | null) {
+  const allowOrigin =
+    origin && ALLOWED_ORIGINS.has(origin)
+      ? origin
+      : 'https://insighthunter.app';
+
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type, Accept, X-Internal-Secret',
+    'Vary': 'Origin',
+  };
+}
+
 type UserTokenInput = {
   id: string;
   email: string;
@@ -28,31 +51,16 @@ type OrgTokenInput = {
   tier: string;
 };
 
-const ALLOWED_ORIGINS = /^https:\/\/([\w-]+\.)?insighthunter\.app$/;
-
 const app = new Hono<Bindings>();
 
-app.use(
-  '*',
-  cors({
-    origin: (origin) =>
-      origin && ALLOWED_ORIGINS.test(origin) ? origin : 'https://insighthunter.app',
-    allowHeaders: ['Authorization', 'Content-Type', 'X-Internal-Secret'],
-    allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-    credentials: true,
-  }),
-);
-
-app.options('*', (c) => {
-  const origin = c.req.header('Origin');
-  return c.body(null, 204, {
-    'Access-Control-Allow-Origin':
-      origin && ALLOWED_ORIGINS.test(origin) ? origin : 'https://insighthunter.app',
-    'Access-Control-Allow-Credentials': 'true',
-    'Access-Control-Allow-Headers': 'Authorization, Content-Type, X-Internal-Secret',
-    'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
-    Vary: 'Origin',
-  });
+app.use('*', async (c, next) => {
+  if (c.req.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: buildCorsHeaders(c.req.header('Origin')),
+    });
+  }
+  await next();
 });
 
 async function hashPassword(plain: string): Promise<string> {
@@ -157,22 +165,52 @@ function requireInternalSecret(c: any, secret: string): boolean {
 }
 
 async function requireAuth(c: any): Promise<JWTPayload | Response> {
+  const origin = c.req.header('Origin');
   const token = extractBearer(c.req.header('Authorization'));
 
   if (!token) {
-    return c.json({ error: 'No token provided', code: 'NO_TOKEN' }, 401);
+    return c.json(
+      { error: 'No token provided', code: 'NO_TOKEN' },
+      401,
+      buildCorsHeaders(origin),
+    );
   }
 
   try {
     return (await verifyJWT(token, c.env.JWT_SECRET)) as JWTPayload;
   } catch {
-    return c.json({ error: 'Invalid token', code: 'INVALID_TOKEN' }, 401);
+    return c.json(
+      { error: 'Invalid token', code: 'INVALID_TOKEN' },
+      401,
+      buildCorsHeaders(origin),
+    );
   }
 }
 
-app.get('/health', (c) => c.json({ status: 'ok', service: 'ih-auth' }));
+app.get('/health', (c) =>
+  c.json({ status: 'ok', service: 'ih-auth' }, 200, buildCorsHeaders(c.req.header('Origin'))),
+);
+
+for (const path of [
+  '/auth/register',
+  '/auth/login',
+  '/auth/refresh',
+  '/auth/logout',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+  '/auth/profile',
+  '/auth/payment/setup-intent',
+]) {
+  app.options(path, (c) =>
+    new Response(null, {
+      status: 204,
+      headers: buildCorsHeaders(c.req.header('Origin')),
+    }),
+  );
+}
 
 app.post('/auth/register', async (c) => {
+  const origin = c.req.header('Origin');
   const body = await c.req.json<{
     email: string;
     password: string;
@@ -181,13 +219,18 @@ app.post('/auth/register', async (c) => {
   }>();
 
   if (!body.email || !body.password || !body.name || !body.org_name) {
-    return c.json({ error: 'Missing required fields', code: 'MISSING_FIELDS' }, 400);
+    return c.json(
+      { error: 'Missing required fields', code: 'MISSING_FIELDS' },
+      400,
+      buildCorsHeaders(origin),
+    );
   }
 
   if (body.password.length < 8) {
     return c.json(
       { error: 'Password must be at least 8 characters', code: 'WEAK_PASSWORD' },
       400,
+      buildCorsHeaders(origin),
     );
   }
 
@@ -198,7 +241,11 @@ app.post('/auth/register', async (c) => {
     .first();
 
   if (existing) {
-    return c.json({ error: 'Email already registered', code: 'EMAIL_TAKEN' }, 409);
+    return c.json(
+      { error: 'Email already registered', code: 'EMAIL_TAKEN' },
+      409,
+      buildCorsHeaders(origin),
+    );
   }
 
   const orgId = crypto.randomUUID().replace(/-/g, '');
@@ -239,16 +286,19 @@ app.post('/auth/register', async (c) => {
       },
     },
     201,
+    buildCorsHeaders(origin),
   );
 });
 
 app.post('/auth/login', async (c) => {
+  const origin = c.req.header('Origin');
   const body = await c.req.json<{ email: string; password: string }>();
 
   if (!body.email || !body.password) {
     return c.json(
       { error: 'Email and password required', code: 'MISSING_FIELDS' },
       400,
+      buildCorsHeaders(origin),
     );
   }
 
@@ -272,13 +322,21 @@ app.post('/auth/login', async (c) => {
   }>();
 
   if (!row) {
-    return c.json({ error: 'Invalid credentials', code: 'INVALID_CREDENTIALS' }, 401);
+    return c.json(
+      { error: 'Invalid credentials', code: 'INVALID_CREDENTIALS' },
+      401,
+      buildCorsHeaders(origin),
+    );
   }
 
   const valid = await verifyPassword(body.password, row.password_hash);
 
   if (!valid) {
-    return c.json({ error: 'Invalid credentials', code: 'INVALID_CREDENTIALS' }, 401);
+    return c.json(
+      { error: 'Invalid credentials', code: 'INVALID_CREDENTIALS' },
+      401,
+      buildCorsHeaders(origin),
+    );
   }
 
   await c.env.DB.prepare(`UPDATE users SET last_login = datetime('now') WHERE id = ?`)
@@ -296,24 +354,33 @@ app.post('/auth/login', async (c) => {
     indexes: [row.org_id],
   });
 
-  return c.json({
-    ...tokens,
-    user: {
-      userId: row.id,
-      orgId: row.org_id,
-      email: row.email,
-      name: row.name,
-      tier: row.tier,
-      role: row.role,
+  return c.json(
+    {
+      ...tokens,
+      user: {
+        userId: row.id,
+        orgId: row.org_id,
+        email: row.email,
+        name: row.name,
+        tier: row.tier,
+        role: row.role,
+      },
     },
-  });
+    200,
+    buildCorsHeaders(origin),
+  );
 });
 
 app.post('/auth/refresh', async (c) => {
+  const origin = c.req.header('Origin');
   const { refresh_token } = await c.req.json<{ refresh_token: string }>();
 
   if (!refresh_token) {
-    return c.json({ error: 'refresh_token required', code: 'MISSING_TOKEN' }, 400);
+    return c.json(
+      { error: 'refresh_token required', code: 'MISSING_TOKEN' },
+      400,
+      buildCorsHeaders(origin),
+    );
   }
 
   const stored = await c.env.REFRESH_TOKENS.get(refresh_token);
@@ -322,6 +389,7 @@ app.post('/auth/refresh', async (c) => {
     return c.json(
       { error: 'Invalid or expired refresh token', code: 'INVALID_REFRESH' },
       401,
+      buildCorsHeaders(origin),
     );
   }
 
@@ -341,7 +409,11 @@ app.post('/auth/refresh', async (c) => {
   }>();
 
   if (!row) {
-    return c.json({ error: 'User not found', code: 'USER_NOT_FOUND' }, 404);
+    return c.json(
+      { error: 'User not found', code: 'USER_NOT_FOUND' },
+      404,
+      buildCorsHeaders(origin),
+    );
   }
 
   await c.env.REFRESH_TOKENS.delete(refresh_token);
@@ -352,22 +424,25 @@ app.post('/auth/refresh', async (c) => {
     c.env,
   );
 
-  return c.json(tokens);
+  return c.json(tokens, 200, buildCorsHeaders(origin));
 });
 
 app.post('/auth/logout', async (c) => {
+  const origin = c.req.header('Origin');
   const body = await c.req.json<{ refresh_token?: string }>();
 
   if (body.refresh_token) {
     await c.env.REFRESH_TOKENS.delete(body.refresh_token);
   }
 
-  return c.json({ message: 'Logged out' });
+  return c.json({ message: 'Logged out' }, 200, buildCorsHeaders(origin));
 });
 
 app.get('/auth/me', async (c) => {
   const auth = await requireAuth(c);
   if (auth instanceof Response) return auth;
+
+  const origin = c.req.header('Origin');
 
   const row = await c.env.DB.prepare(`
     SELECT u.id, u.email, u.name, u.role, u.created_at,
@@ -389,21 +464,35 @@ app.get('/auth/me', async (c) => {
   }>();
 
   if (!row) {
-    return c.json({ error: 'User not found', code: 'USER_NOT_FOUND' }, 404);
+    return c.json(
+      { error: 'User not found', code: 'USER_NOT_FOUND' },
+      404,
+      buildCorsHeaders(origin),
+    );
   }
 
-  return c.json({ user: row });
+  return c.json({ user: row }, 200, buildCorsHeaders(origin));
 });
 
 app.post('/auth/verify', async (c) => {
+  const origin = c.req.header('Origin');
+
   if (!requireInternalSecret(c, c.env.JWT_SECRET)) {
-    return c.json({ error: 'Forbidden', code: 'FORBIDDEN' }, 403);
+    return c.json(
+      { error: 'Forbidden', code: 'FORBIDDEN' },
+      403,
+      buildCorsHeaders(origin),
+    );
   }
 
   const { token } = await c.req.json<{ token: string }>();
 
   if (!token) {
-    return c.json({ error: 'token required', code: 'MISSING_TOKEN' }, 400);
+    return c.json(
+      { error: 'token required', code: 'MISSING_TOKEN' },
+      400,
+      buildCorsHeaders(origin),
+    );
   }
 
   try {
@@ -411,15 +500,25 @@ app.post('/auth/verify', async (c) => {
     const user = jwtToAuthUser(payload);
     (user as Record<string, unknown>).name =
       (payload as Record<string, unknown>).name ?? '';
-    return c.json(user);
+    return c.json(user, 200, buildCorsHeaders(origin));
   } catch {
-    return c.json({ error: 'Invalid or expired token', code: 'INVALID_TOKEN' }, 401);
+    return c.json(
+      { error: 'Invalid or expired token', code: 'INVALID_TOKEN' },
+      401,
+      buildCorsHeaders(origin),
+    );
   }
 });
 
 app.patch('/auth/org', async (c) => {
+  const origin = c.req.header('Origin');
+
   if (!requireInternalSecret(c, c.env.JWT_SECRET)) {
-    return c.json({ error: 'Forbidden', code: 'FORBIDDEN' }, 403);
+    return c.json(
+      { error: 'Forbidden', code: 'FORBIDDEN' },
+      403,
+      buildCorsHeaders(origin),
+    );
   }
 
   const { orgId, tier, worker_script } = await c.req.json<{
@@ -429,7 +528,11 @@ app.patch('/auth/org', async (c) => {
   }>();
 
   if (!orgId) {
-    return c.json({ error: 'orgId required', code: 'MISSING_ORG_ID' }, 400);
+    return c.json(
+      { error: 'orgId required', code: 'MISSING_ORG_ID' },
+      400,
+      buildCorsHeaders(origin),
+    );
   }
 
   const updates: string[] = [];
@@ -446,7 +549,11 @@ app.patch('/auth/org', async (c) => {
   }
 
   if (updates.length === 0) {
-    return c.json({ error: 'No fields to update', code: 'NO_CHANGES' }, 400);
+    return c.json(
+      { error: 'No fields to update', code: 'NO_CHANGES' },
+      400,
+      buildCorsHeaders(origin),
+    );
   }
 
   updates.push(`updated_at = datetime('now')`);
@@ -460,12 +567,18 @@ app.patch('/auth/org', async (c) => {
     .bind(orgId)
     .first();
 
-  return c.json(org);
+  return c.json(org, 200, buildCorsHeaders(origin));
 });
 
 app.get('/auth/org/:orgId', async (c) => {
+  const origin = c.req.header('Origin');
+
   if (!requireInternalSecret(c, c.env.JWT_SECRET)) {
-    return c.json({ error: 'Forbidden', code: 'FORBIDDEN' }, 403);
+    return c.json(
+      { error: 'Forbidden', code: 'FORBIDDEN' },
+      403,
+      buildCorsHeaders(origin),
+    );
   }
 
   const org = await c.env.DB.prepare('SELECT * FROM orgs WHERE id = ?')
@@ -473,13 +586,18 @@ app.get('/auth/org/:orgId', async (c) => {
     .first();
 
   if (!org) {
-    return c.json({ error: 'Org not found', code: 'ORG_NOT_FOUND' }, 404);
+    return c.json(
+      { error: 'Org not found', code: 'ORG_NOT_FOUND' },
+      404,
+      buildCorsHeaders(origin),
+    );
   }
 
-  return c.json(org);
+  return c.json(org, 200, buildCorsHeaders(origin));
 });
 
 app.post('/auth/forgot-password', async (c) => {
+  const origin = c.req.header('Origin');
   const { email } = await c.req.json<{ email: string }>();
   const normalizedEmail = email?.toLowerCase().trim();
 
@@ -501,17 +619,26 @@ app.post('/auth/forgot-password', async (c) => {
     console.log(`[PASSWORD RESET] token=${token} hash=${tokenHash} userId=${user.id}`);
   }
 
-  return c.json({ message: 'If that email exists, a reset link has been sent.' });
+  return c.json(
+    { message: 'If that email exists, a reset link has been sent.' },
+    200,
+    buildCorsHeaders(origin),
+  );
 });
 
 app.post('/auth/reset-password', async (c) => {
+  const origin = c.req.header('Origin');
   const { token, new_password } = await c.req.json<{
     token: string;
     new_password: string;
   }>();
 
   if (!token || !new_password || new_password.length < 8) {
-    return c.json({ error: 'Invalid request', code: 'INVALID_REQUEST' }, 400);
+    return c.json(
+      { error: 'Invalid request', code: 'INVALID_REQUEST' },
+      400,
+      buildCorsHeaders(origin),
+    );
   }
 
   const tokenHash = btoa(token).slice(0, 64);
@@ -531,6 +658,7 @@ app.post('/auth/reset-password', async (c) => {
     return c.json(
       { error: 'Invalid or expired reset token', code: 'INVALID_RESET_TOKEN' },
       400,
+      buildCorsHeaders(origin),
     );
   }
 
@@ -544,10 +672,15 @@ app.post('/auth/reset-password', async (c) => {
     c.env.DB.prepare('UPDATE password_resets SET used = 1 WHERE id = ?').bind(row.id),
   ]);
 
-  return c.json({ message: 'Password reset successful' });
+  return c.json(
+    { message: 'Password reset successful' },
+    200,
+    buildCorsHeaders(origin),
+  );
 });
 
 app.patch('/auth/profile', async (c) => {
+  const origin = c.req.header('Origin');
   const auth = await requireAuth(c);
   if (auth instanceof Response) return auth;
 
@@ -570,6 +703,7 @@ app.patch('/auth/profile', async (c) => {
       return c.json(
         { error: 'current_password required', code: 'MISSING_CURRENT_PW' },
         400,
+        buildCorsHeaders(origin),
       );
     }
 
@@ -581,6 +715,7 @@ app.patch('/auth/profile', async (c) => {
       return c.json(
         { error: 'Current password is incorrect', code: 'WRONG_PASSWORD' },
         400,
+        buildCorsHeaders(origin),
       );
     }
 
@@ -589,7 +724,11 @@ app.patch('/auth/profile', async (c) => {
   }
 
   if (updates.length === 0) {
-    return c.json({ error: 'No fields to update', code: 'NO_CHANGES' }, 400);
+    return c.json(
+      { error: 'No fields to update', code: 'NO_CHANGES' },
+      400,
+      buildCorsHeaders(origin),
+    );
   }
 
   values.push(auth.sub);
@@ -604,16 +743,22 @@ app.patch('/auth/profile', async (c) => {
     .bind(auth.sub)
     .first();
 
-  return c.json(updated);
+  return c.json(updated, 200, buildCorsHeaders(origin));
 });
 
 app.post('/auth/payment/setup-intent', createSetupIntentHandler);
 
-app.notFound((c) => c.json({ error: 'Not found', code: 'NOT_FOUND' }, 404));
+app.notFound((c) =>
+  c.json({ error: 'Not found', code: 'NOT_FOUND' }, 404, buildCorsHeaders(c.req.header('Origin'))),
+);
 
 app.onError((err, c) => {
   console.error(err);
-  return c.json({ error: 'Internal error', code: 'INTERNAL_ERROR' }, 500);
+  return c.json(
+    { error: 'Internal error', code: 'INTERNAL_ERROR' },
+    500,
+    buildCorsHeaders(c.req.header('Origin')),
+  );
 });
 
 export default app;

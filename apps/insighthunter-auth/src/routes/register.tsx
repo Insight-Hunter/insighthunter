@@ -32,7 +32,7 @@ const RegistrationForm = () => {
 
         const { firstName, lastName, email, password } = JSON.parse(registrationData);
         try {
-          const response = await fetch('/api/auth/register', {
+          const response = await fetch('/https://auth.insighthunter.app/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ firstName, lastName, email, password, setup_intent_id: setupIntent.id }),
@@ -165,7 +165,7 @@ const RegisterPage = () => {
   useEffect(() => {
     const fetchStripeSetup = async () => {
       try {
-        const response = await fetch('/api/auth/payment/setup-intent', { method: 'POST' });
+        const response = await fetch('/https://auth.insighthunter.app/auth/payment/setup-intent', { method: 'POST' });
         const data = await response.json();
         if (data.clientSecret && data.stripePublicKey) {
           setClientSecret(data.clientSecret);

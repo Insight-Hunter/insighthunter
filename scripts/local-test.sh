@@ -18,20 +18,20 @@ STATUS=$(curl -s -o /dev/null -w "%{http_code}" $BASE/health)
 [ "$STATUS" = "200" ] && pass "GET /health" || fail "GET /health ($STATUS)"
 
 # Register
-RES=$(curl -s -c /tmp/ih_cookies.txt -X POST $BASE/api/auth/register \
+RES=$(curl -s -c /tmp/ih_cookies.txt -X POST $BASE/https://auth.insighthunter.app/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"testpassword123","name":"Test User"}')
-echo $RES | grep -q '"ok":true' && pass "POST /api/auth/register" || fail "POST /api/auth/register: $RES"
+echo $RES | grep -q '"ok":true' && pass "POST /https://auth.insighthunter.app/auth/register" || fail "POST /https://auth.insighthunter.app/auth/register: $RES"
 
 # Login
-RES=$(curl -s -c /tmp/ih_cookies.txt -b /tmp/ih_cookies.txt -X POST $BASE/api/auth/login \
+RES=$(curl -s -c /tmp/ih_cookies.txt -b /tmp/ih_cookies.txt -X POST $BASE/https://auth.insighthunter.app/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"testpassword123"}')
-echo $RES | grep -q '"ok":true' && pass "POST /api/auth/login" || fail "POST /api/auth/login: $RES"
+echo $RES | grep -q '"ok":true' && pass "POST /https://auth.insighthunter.app/auth/login" || fail "POST /https://auth.insighthunter.app/auth/login: $RES"
 
 # /me
-RES=$(curl -s -b /tmp/ih_cookies.txt $BASE/api/auth/me)
-echo $RES | grep -q '"user"' && pass "GET /api/auth/me" || fail "GET /api/auth/me: $RES"
+RES=$(curl -s -b /tmp/ih_cookies.txt $BASE/https://auth.insighthunter.app/auth/me)
+echo $RES | grep -q '"user"' && pass "GET /https://auth.insighthunter.app/auth/me" || fail "GET /https://auth.insighthunter.app/auth/me: $RES"
 
 # Bookkeeping summary
 RES=$(curl -s -b /tmp/ih_cookies.txt "$BASE/api/bookkeeping/summary?from=2026-01-01&to=2026-03-31")

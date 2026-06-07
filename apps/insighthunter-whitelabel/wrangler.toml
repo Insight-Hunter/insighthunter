@@ -1,4 +1,4 @@
-name = "ih-whitelabel-worker"
+name = "insighthunter-whitelabel"
 main = "src/worker.ts"
 compatibility_date = "2025-04-01"
 

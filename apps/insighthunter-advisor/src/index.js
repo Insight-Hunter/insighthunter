@@ -509,4 +509,21 @@ function track(env, event, userId, firmId, meta) {
         indexes: [event],
     });
 }
-export default app;
+export default {
+    async fetch(request, env) {
+        return app.fetch(request, env);
+    },
+    async queue(batch, env) {
+        for (const message of batch.messages) {
+            try {
+                // Minimal consumer: acknowledge messages to satisfy Wrangler.
+                // Real processing should be implemented by the notification service.
+                message.ack();
+            }
+            catch (err) {
+                console.error('Advisor queue handler error', err);
+                message.retry();
+            }
+        }
+    },
+};
