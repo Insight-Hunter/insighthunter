@@ -29,10 +29,10 @@ id = "ba8d224a437949969d990db3aef71a87"
 binding = "AUTH_EVENTS"
 dataset = "ih_auth_events"
 
-# ── Cloudflare Email Service (native sending — no third-party API key needed) ──
+# ── Cloudflare Email Service (native — no third-party API key) ──
+# Correct syntax: use 'name' not 'binding', no allow_list field
 [[send_email]]
-binding = "EMAIL"
-allow_list = ["noreply@insighthunter.app"]
+name = "EMAIL"
 
 [vars]
 ENVIRONMENT = "production"
