@@ -1,5 +1,5 @@
 name = "insighthunter-dispatch"
-main = "apps/insighthunter-dispatch/src/index.ts"
+main = "./apps/insighthunter-dispatch/src/index.ts"
 compatibility_date = "2025-03-07"
 
 [observability]

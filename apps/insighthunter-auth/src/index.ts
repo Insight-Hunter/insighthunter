@@ -31,8 +31,12 @@ const PUBLIC_ROUTE_PATTERNS = [
   { method: "POST", path: "/api/auth/register" },
   { method: "POST", path: "/api/auth/refresh" },
   { method: "POST", path: "/api/auth/forgot-password" },
-  { method: "GET", path: "/api/health" },
-  { method: "GET", path: "/api/version" },
+  { method: "POST", path: "/api/auth/reset-password" },
+  // Direct hits to auth.insighthunter.app (no /api prefix)
+  { method: "POST", path: "/auth/forgot-password" },
+  { method: "POST", path: "/auth/reset-password" },
+  { method: "GET",  path: "/api/health" },
+  { method: "GET",  path: "/api/version" },
 ];
 
 function normalizePath(pathname: string): string {

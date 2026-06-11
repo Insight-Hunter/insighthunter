@@ -44,7 +44,7 @@
     </button>
   </div>
   <p style="margin-top:var(--space-6);text-align:center;font-size:0.875rem;color:var(--color-text-muted);">
-    Don't have an account? <a href="/auth/register">Create one →</a>
+    Don't have an account? <a href="https://auth.insighthunter.app/signup?plan=free">Create one →</a>
   </p>
 </div>
 <style>

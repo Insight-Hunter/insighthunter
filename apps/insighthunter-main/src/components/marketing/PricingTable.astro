@@ -1,5 +1,12 @@
 ---
 import { tiers, addons } from '../../data/pricing';
+
+const signupBaseUrl = 'https://auth.insighthunter.app/signup';
+const signupPlanIds = {
+  lite: 'free',
+  standard: 'standard',
+  pro: 'pro',
+};
 ---
 <section class="pricing section" id="pricing">
   <div class="container">
@@ -28,8 +35,10 @@ import { tiers, addons } from '../../data/pricing';
               {tier.annualPrice > 0 && <span class="price-billed" id={`billed-${tier.id}`}>billed monthly</span>}
             </div>
           </div>
-          <a href={`/auth/register?plan=${tier.id}`} class={`tier-cta btn ${tier.id==='standard'?'btn-gold':'btn-outline'}`}>
-            {tier.price === 0 ? 'Start Free — No Card Required' : `Get ${tier.name}`}
+          <a href={`${signupBaseUrl}?plan=${signupPlanIds[tier.id]}`} class={`tier-cta btn ${tier.id==='standard'?'btn-gold':'btn-outline'}`}>
+            {tier.id === 'lite' && 'Start Free — No Credit Card'}
+            {tier.id === 'standard' && 'Start Standard — $49/mo'}
+            {tier.id === 'pro' && 'Start Pro — $129/mo'}
           </a>
           <ul class="tier-features">
             {tier.features.map((f) => (

@@ -104,7 +104,7 @@
 <div class="divider">or</div>
 
 <div class="auth-footer">
-  <p>Don’t have an account? <a href="/auth/register" class="auth-link">Create one free</a></p>
+  <p>Don’t have an account? <a href="https://auth.insighthunter.app/signup?plan=free" class="auth-link">Create one free</a></p>
 </div>
 
 <style>

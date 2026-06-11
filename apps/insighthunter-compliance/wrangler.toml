@@ -1,6 +1,7 @@
 name = "insighthunter-compliance"
 main = "src/worker.ts"
 compatibility_date = "2025-04-01"
+preview_urls = false
 
 [observability]
 enabled = true

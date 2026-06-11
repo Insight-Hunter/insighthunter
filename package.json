@@ -2,6 +2,7 @@
   "name": "insighthunter",
   "version": "1.0.0",
   "private": true,
+  "rootDir": "./",
   "packageManager": "pnpm@9.0.0",
   "type": "module",
   "scripts": {
