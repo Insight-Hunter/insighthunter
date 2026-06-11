@@ -31,8 +31,7 @@ dataset = "ih_auth_events"
 
 # ── Cloudflare Email Service (native sending — no third-party API key needed) ──
 [[send_email]]
-binding = "EMAIL"
-allow_list = ["noreply@insighthunter.app"]
+name = "EMAIL"
 
 [vars]
 ENVIRONMENT = "production"
