@@ -29,9 +29,15 @@ id = "ba8d224a437949969d990db3aef71a87"
 binding = "AUTH_EVENTS"
 dataset = "ih_auth_events"
 
+# ── Cloudflare Email Service (native sending — no third-party API key needed) ──
+[[send_email]]
+binding = "EMAIL"
+allow_list = ["noreply@insighthunter.app"]
+
 [vars]
 ENVIRONMENT = "production"
 ACCESS_TOKEN_TTL = "3600"
 REFRESH_TOKEN_TTL = "2592000"
 APP_ORIGIN = "https://insighthunter.app"
+APP_URL = "https://app.insighthunter.app"
 COOKIE_DOMAIN = "insighthunter.app"
