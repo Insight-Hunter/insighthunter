@@ -46,3 +46,10 @@ dist/
 *.log
 .DS_Store
 worker-configuration.d.ts
+
+# Cleanup additions 2026-06-12
+wrangler.toml.bak
+.pnpm-store/
+**/.DS_Store
+attached_assets/
+.idx/
