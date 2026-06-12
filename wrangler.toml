@@ -58,3 +58,27 @@ ENVIRONMENT = "production"
 ALLOWED_ORIGINS = "https://insighthunter.app,https://www.insighthunter.app"
 RATE_LIMIT_WINDOW_SECONDS = "60"
 RATE_LIMIT_MAX_REQUESTS = "120"
+
+# apps/insighthunter-auth/wrangler.toml
+name = "insighthunter-auth"
+[[routes]]
+pattern = "insighthunter.app/auth/*"
+zone_name = "insighthunter.app"
+
+# apps/insighthunter-bookkeeping/wrangler.toml
+name = "insighthunter-bookkeeping"
+[[routes]]
+pattern = "insighthunter.app/app/bookkeeping/*"
+zone_name = "insighthunter.app"
+
+# apps/insighthunter-payroll/wrangler.toml
+name = "insighthunter-payroll"
+[[routes]]
+pattern = "insighthunter.app/app/payroll/*"
+zone_name = "insighthunter.app"
+
+# apps/insighthunter-main/wrangler.toml — catches everything else LAST
+name = "insighthunter-main"
+[[routes]]
+pattern = "insighthunter.app/*"
+zone_name = "insighthunter.app"
