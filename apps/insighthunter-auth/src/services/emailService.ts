@@ -5,8 +5,7 @@ import type { Env } from '../types/env';
 //
 // Requires in wrangler.toml:
 //   [[send_email]]
-//   binding = "EMAIL"
-//   allow_list = ["noreply@insighthunter.app"]
+//   name = "EMAIL"
 //
 // Requires in Cloudflare Dashboard:
 //   Email > Email Routing > Enable on insighthunter.app domain

@@ -30,7 +30,6 @@ binding = "AUTH_EVENTS"
 dataset = "ih_auth_events"
 
 # ── Cloudflare Email Service (native — no third-party API key) ──
-# Correct syntax: use 'name' not 'binding', no allow_list field
 [[send_email]]
 name = "EMAIL"
 
