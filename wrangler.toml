@@ -1,39 +1,56 @@
+# ROOT wrangler.toml — insighthunter-dispatch (API gateway / router)
+# This is the central dispatch Worker that routes all internal service calls.
+# Each app Worker has its OWN wrangler.toml for deployment.
+
 name = "insighthunter-dispatch"
 main = "./apps/insighthunter-dispatch/src/index.ts"
 compatibility_date = "2025-03-07"
+compatibility_flags = ["nodejs_compat"]
 
 [observability]
 enabled = true
 head_sampling_rate = 1
 
+# ── Custom Domain ──────────────────────────────────────────────
+[[routes]]
+pattern = "dispatch.insighthunter.app/*"
+zone_name = "insighthunter.app"
+custom_domain = true
+
+# ── Service Bindings (must match exact deployed Worker names) ──
 [[services]]
 binding = "AUTH_WORKER"
-service = "auth-worker"
+service = "insighthunter-auth"
 
 [[services]]
 binding = "BOOKKEEPING_WORKER"
-service = "bookkeeping-worker"
+service = "insighthunter-bookkeeping"
 
 [[services]]
 binding = "PAYROLL_WORKER"
-service = "payroll-worker"
+service = "insighthunter-payroll"
 
 [[services]]
 binding = "BIZFORMA_WORKER"
-service = "bizforma-worker"
+service = "insighthunter-bizforma"
 
 [[services]]
 binding = "SCOUT_WORKER"
-service = "scout-worker"
+service = "insighthunter-scout"
 
 [[services]]
 binding = "PBX_WORKER"
-service = "pbx-worker"
+service = "insighthunter-pbx"
 
 [[services]]
 binding = "REPORT_WORKER"
-service = "report-worker"
+service = "insighthunter-reports"
 
+[[services]]
+binding = "ADVISOR_WORKER"
+service = "insighthunter-advisor"
+
+# ── KV Namespaces ──────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
@@ -44,41 +61,20 @@ binding = "RATE_LIMIT"
 id = "f75a15f1df8c42cdb2e623d8cb324a23"
 preview_id = "f75a15f1df8c42cdb2e623d8cb324a23"
 
+# ── D1 Database ────────────────────────────────────────────────
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-dispatch"
 database_id = "2a0331eb-4775-4ad2-9126-0560336486df"
 
+# ── Analytics Engine ───────────────────────────────────────────
 [[analytics_engine_datasets]]
 binding = "API_EVENTS"
 dataset = "ih_api_events"
 
+# ── Environment Variables ──────────────────────────────────────
 [vars]
 ENVIRONMENT = "production"
-ALLOWED_ORIGINS = "https://insighthunter.app,https://www.insighthunter.app"
+ALLOWED_ORIGINS = "https://insighthunter.app,https://www.insighthunter.app,https://app.insighthunter.app"
 RATE_LIMIT_WINDOW_SECONDS = "60"
 RATE_LIMIT_MAX_REQUESTS = "120"
-
-# apps/insighthunter-auth/wrangler.toml
-name = "insighthunter-auth"
-[[routes]]
-pattern = "insighthunter.app/auth/*"
-zone_name = "insighthunter.app"
-
-# apps/insighthunter-bookkeeping/wrangler.toml
-name = "insighthunter-bookkeeping"
-[[routes]]
-pattern = "insighthunter.app/app/bookkeeping/*"
-zone_name = "insighthunter.app"
-
-# apps/insighthunter-payroll/wrangler.toml
-name = "insighthunter-payroll"
-[[routes]]
-pattern = "insighthunter.app/app/payroll/*"
-zone_name = "insighthunter.app"
-
-# apps/insighthunter-main/wrangler.toml — catches everything else LAST
-name = "insighthunter-main"
-[[routes]]
-pattern = "insighthunter.app/*"
-zone_name = "insighthunter.app"

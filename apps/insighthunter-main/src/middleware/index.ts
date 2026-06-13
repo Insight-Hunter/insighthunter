@@ -1,35 +1,13 @@
-import type { MiddlewareHandler } from 'astro';
-import { verifyJWT } from '@ih/auth-client';
+import { defineMiddleware } from 'astro/middleware';
 
-export const onRequest: MiddlewareHandler = async (context, next) => {
-  const { pathname, search } = context.url;
+export const onRequest = defineMiddleware(async ({ request, redirect }) => {
+  const url = new URL(request.url);
 
-  // Only protect /dashboard routes
-  if (!pathname.startsWith('/dashboard')) return next();
+  if (url.pathname.startsWith('/dashboard')) {
+    const cookie = request.headers.get('cookie') || '';
 
-  const cookies = context.request.headers.get('cookie') || '';
-  const match = cookies.match(/ih_session=([^;]+)/);
-  const token = match?.[1];
-
-  if (!token) {
-    const redirectTo = `/auth/login?next=${encodeURIComponent(pathname + search)}`;
-    return context.redirect(redirectTo);
+    if (!cookie.includes('token=')) {
+      return redirect('/auth/login');
+    }
   }
-
-  const secret = (context.locals as any).runtime?.env?.JWT_SECRET || '';
-  const payload = token ? await verifyJWT(token, secret) : null;
-
-  if (!payload) {
-    const redirectTo = `/auth/login?next=${encodeURIComponent(pathname + search)}`;
-    return context.redirect(redirectTo);
-  }
-
-  (context.locals as any).session = {
-    userId: payload.userId,
-    orgId: payload.orgId,
-    email: payload.email,
-    tier: payload.tier,
-  };
-
-  return next();
-};
+});

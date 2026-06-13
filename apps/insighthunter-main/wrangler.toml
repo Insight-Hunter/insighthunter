@@ -19,11 +19,6 @@ service = "insighthunter-dispatch"
 binding = "AUTH_WORKER"
 service = "insighthunter-auth"
 
-[[services]]
-binding = "AUTH"
-service = "insighthunter-auth"
-environment = "production"
-
 [[kv_namespaces]]
 binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
