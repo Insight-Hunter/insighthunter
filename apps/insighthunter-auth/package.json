@@ -2,23 +2,14 @@
   "name": "insighthunter-auth",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "dev": "wrangler dev src/index.ts",
+    "dev":    "wrangler dev",
     "deploy": "wrangler deploy",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@elysiajs/jwt": "^1.4.2",
-    "@ih/auth-client": "workspace:*",
-    "@ih/types": "workspace:*",
-    "elysia": "^1.4.28",
-    "hono": "^4.7.4",
-    "stripe": "^22.2.0"
+    "types":  "wrangler types"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250310.0",
-    "typescript": "^5.7.3",
-    "wrangler": "^4.76.0"
+    "@cloudflare/workers-types": "^4.20250525.0",
+    "typescript": "^5.4.5",
+    "wrangler": "^3.57.0"
   }
 }

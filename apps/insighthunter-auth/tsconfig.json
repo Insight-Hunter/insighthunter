@@ -1,21 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
+    "target": "ES2022",
+    "module": "ES2022",
     "moduleResolution": "bundler",
-    "lib": ["ESNext"],
-    "types": ["@cloudflare/workers-types"],
+    "lib": ["ES2022", "WebWorker"],
     "strict": true,
-    "noEmit": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "paths": {
-      "@/*": ["./src/*"],
-      "@routes/*": ["./src/routes/*"],
-      "@lib/*": ["./src/lib/*"],
-      "@types/*": ["./src/types/*"]
-    }
+    "skipLibCheck": true,
+    "types": ["@cloudflare/workers-types"]
   },
-  "include": ["./src/**/*.ts", "./tests/**/*.ts"]
+  "include": ["src/**/*.ts"]
 }

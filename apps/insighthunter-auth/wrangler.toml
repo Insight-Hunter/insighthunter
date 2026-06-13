@@ -1,16 +1,17 @@
-name = "insighthunter-auth"
-main = "src/index.ts"
-compatibility_date = "2025-03-07"
+name            = "insighthunter-auth"
+main            = "src/index.ts"
+compatibility_date = "2025-06-01"
 compatibility_flags = ["nodejs_compat"]
+
+# ── Routes ────────────────────────────────────────────────
+[[routes]]
+pattern  = "auth.insighthunter.app/*"
+zone_name = "insighthunter.app"
+custom_domain = true
 
 [observability]
 enabled = true
 head_sampling_rate = 1
-
-[[routes]]
-pattern = "auth.insighthunter.app"
-zone_name = "insighthunter.app"
-custom_domain = true
 
 [[d1_databases]]
 binding = "DB"
@@ -40,3 +41,5 @@ REFRESH_TOKEN_TTL = "2592000"
 APP_ORIGIN = "https://insighthunter.app"
 APP_URL = "https://app.insighthunter.app"
 COOKIE_DOMAIN = "insighthunter.app"
+TEAM_DOMAIN = "https://insighthunter.cloudflareaccess.com"
+POLICY_AUD  = "e677d6d97923267e3221ccd0294dcb747c9c15a047c48812242abe0eda7eb395"

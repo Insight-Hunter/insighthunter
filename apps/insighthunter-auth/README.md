@@ -1,57 +1,76 @@
 # insighthunter-auth
 
-Insight Hunter Auth Service — Cloudflare Worker
-JWT issuance · Session management · PBKDF2 password hashing · RBAC · Email verification
+Branded Cloudflare Access authentication Worker for `auth.insighthunter.app`.
 
-## Stack
-- **Runtime**: Cloudflare Workers (Hono router)
-- **DB**: D1 (users, sessions, roles, audit log)
-- **KV**: Session tokens, refresh JTIs, reset/verify tokens
-- **Hashing**: PBKDF2 via Web Crypto API (no bcrypt)
-- **JWT**: HS256 via Web Crypto API (no jsonwebtoken)
-- **Email**: MailChannels Send API
+## Architecture
 
-## Quick Start
+```
+User → auth.insighthunter.app
+         ↓
+  Cloudflare Access intercepts
+         ↓
+  Serves branded login page (#0F172A navy)
+         ↓
+  Access injects sign-in buttons (Google/GitHub/OTP)
+         ↓
+  POST /callback → validateAccessJWT → set ih_user cookie
+         ↓
+  Redirect → insighthunter-platform-worker.dmco.workers.dev/dashboard
+```
 
+## Setup
+
+### 1. Install dependencies
 ```bash
-cp .env.example .dev.vars
+npm install
+```
 
-# Create D1 database
-wrangler d1 create insighthunter-auth
+### 2. Set secrets
+```bash
+wrangler secret put TEAM_DOMAIN
+# → https://<your-team>.cloudflareaccess.com
 
-# Create KV namespaces
-wrangler kv:namespace create SESSIONS
-wrangler kv:namespace create TOKENS
+wrangler secret put POLICY_AUD
+# → AUD tag from Zero Trust → Access → Applications → your app → Configure
+```
 
-# Update IDs in wrangler.toml
+### 3. Configure Zero Trust
+- Go to Zero Trust → Access → Applications
+- Set Application domain: `auth.insighthunter.app`
+- Set Custom login page: `auth.insighthunter.app`
+- Copy the AUD tag → paste as POLICY_AUD secret
 
-# Run migrations
-npm run migrate:local
+### 4. DNS
+In Cloudflare DNS for insighthunter.app:
+```
+CNAME  auth  →  <your-team>.cloudflareaccess.com
+```
 
-# Set secrets
-wrangler secret put JWT_SECRET
-wrangler secret put REFRESH_SECRET
-wrangler secret put MAILCHANNELS_API_KEY
-
-# Dev
-npm run dev
-
-# Deploy
+### 5. Deploy
+```bash
 npm run deploy
+```
 
+## Brand Colors
+| Token               | Hex       | Usage                  |
+|---------------------|-----------|------------------------|
+| Primary Brand       | #0F172A   | Background (slate-900) |
+| Surface             | #1E293B   | Card (slate-800)       |
+| Accent              | #38BDF8   | CTAs, links (sky-400)  |
+| Accent Hover        | #0EA5E9   | Hover (sky-500)        |
+| Text Primary        | #F1F5F9   | Headings (slate-100)   |
+| Text Muted          | #94A3B8   | Body copy (slate-400)  |
+| Success             | #4ADE80   | Metrics (green-400)    |
+| Warning             | #FB923C   | Alerts (orange-400)    |
 
-Register/Login
-  → accessToken  (HS256 JWT, 1hr, verified by all services)
-  → refreshToken (HS256 JWT, 30d, rotated on use, JTI stored in KV)
-
-Service-to-service token validation:
-  GET /auth/verify
-  Authorization: Bearer <accessToken>
-  → { valid: true, payload: { sub, email, orgId, role, tier } }
-
-Security Notes
-•	Passwords hashed with PBKDF2-SHA256 (100k iterations) — no native bcrypt needed
-•	Refresh tokens use JTI rotation — old JTI revoked on every refresh
-•	Rate limiting per IP per route stored in KV
-•	Email enumeration prevented on forgot-password endpoint
-•	Audit log writes on login, failed login, register, role changes
+## Files
+```
+src/
+├── index.ts       — Main Worker fetch handler + /callback logic
+├── access.ts      — CF Access JWT validation + identity resolver
+├── login-page.ts  — Branded HTML login page generator
+└── types.ts       — Env interface + type definitions
+wrangler.toml      — Worker config + routes
+tsconfig.json      — TypeScript config
+package.json       — Dependencies
+```
