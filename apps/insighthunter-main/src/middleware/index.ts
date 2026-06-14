@@ -1,6 +1,6 @@
 import { defineMiddleware } from 'astro/middleware';
 
-export const onRequest = defineMiddleware(async ({ request, redirect }) => {
+export const onRequest = defineMiddleware(async ({ request, redirect }, next) => {
   const url = new URL(request.url);
 
   if (url.pathname.startsWith('/dashboard')) {
@@ -10,4 +10,6 @@ export const onRequest = defineMiddleware(async ({ request, redirect }) => {
       return redirect('/auth/login');
     }
   }
+
+  return next();
 });
