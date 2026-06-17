@@ -11,9 +11,32 @@ import AuthLayout from '../../layouts/AuthLayout.astro';
 </AuthLayout>
 
 <script>
+  // Prevent open-redirect: only allow relative paths or trusted origins.
+  const ALLOWED_ORIGINS = [
+    'https://insighthunter.app',
+    'https://auth.insighthunter.app',
+    'https://app.insighthunter.app',
+  ];
+
   const params = new URLSearchParams(window.location.search);
-  const redirect = params.get('redirect') || '/dashboard';
-  window.location.replace(redirect);
+  const rawRedirect = params.get('redirect') || '/dashboard';
+
+  let safeRedirect = '/dashboard';
+  try {
+    const url = new URL(rawRedirect, window.location.origin);
+    if (
+      url.origin === window.location.origin ||
+      ALLOWED_ORIGINS.includes(url.origin)
+    ) {
+      // Only carry the path+search, never the origin, to stay on insighthunter.app
+      safeRedirect = url.pathname + url.search;
+    }
+  } catch {
+    // rawRedirect was a relative path — use as-is if it starts with /
+    if (rawRedirect.startsWith('/')) safeRedirect = rawRedirect;
+  }
+
+  window.location.replace(safeRedirect);
 </script>
 
 <style>

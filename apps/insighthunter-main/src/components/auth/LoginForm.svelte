@@ -1,40 +1,40 @@
 <script>
+  // LoginForm.svelte — retained for legacy references, but login.astro is the
+  // primary login page. This component now delegates to the auth subdomain
+  // using credentials:include (HttpOnly cookie strategy — no localStorage).
+
   let email = '';
   let password = '';
   let error = '';
   let loading = false;
+
+  const AUTH_BASE_URL = 'https://auth.insighthunter.app';
 
   async function login() {
     error = '';
     loading = true;
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(`${AUTH_BASE_URL}/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      let data = {};
+      try { data = await res.json(); } catch {}
 
       if (!res.ok) {
-        error = data.message || 'Invalid login';
+        error = data?.error || data?.message || `Login failed (${res.status}).`;
         return;
       }
 
-      // ✅ store auth
-      localStorage.setItem('token', data.token);
-
-      // ✅ ALSO set cookie (needed for Astro SSR + middleware)
-      document.cookie = `token=${data.token}; path=/; SameSite=Lax`;
-
-      // ✅ redirect
+      // Session is managed via HttpOnly cookie set by auth.insighthunter.app.
+      // Do NOT store token in localStorage or set document.cookie manually.
       window.location.href = '/dashboard';
-
     } catch (err) {
-      error = 'Network error';
+      error = err instanceof Error ? err.message : 'Network error — please try again.';
     } finally {
       loading = false;
     }
@@ -46,6 +46,7 @@
     type="email"
     placeholder="Email"
     bind:value={email}
+    autocomplete="email"
     required
   />
 
@@ -53,14 +54,15 @@
     type="password"
     placeholder="Password"
     bind:value={password}
+    autocomplete="current-password"
     required
   />
 
   <button type="submit" disabled={loading}>
-    {loading ? 'Signing in...' : 'Sign In'}
+    {loading ? 'Signing in…' : 'Sign In'}
   </button>
 
   {#if error}
-    <p class="error">{error}</p>
+    <p class="error" role="alert">{error}</p>
   {/if}
 </form>
