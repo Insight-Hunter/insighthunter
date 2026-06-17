@@ -201,16 +201,16 @@ const JournalEntryForm: React.FC<Props> = ({ onClose }) => {
           <button
             className="bk-btn"
             onClick={onClose}
-            disabled={mutation.isLoading}
+            disabled={mutation.isPending}
           >
             Cancel
           </button>
           <button
             className="bk-btn bk-btn--primary"
             onClick={() => mutation.mutate()}
-            disabled={mutation.isLoading || !memo || lines.length === 0}
+            disabled={mutation.isPending || !memo || lines.length === 0}
           >
-            {mutation.isLoading ? "Saving…" : "Post entry"}
+            {mutation.isPending ? "Saving…" : "Post entry"}
           </button>
         </footer>
       </div>

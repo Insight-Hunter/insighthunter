@@ -111,16 +111,16 @@ const ImportBankCSV: React.FC = () => {
               <button
                 className="bk-btn"
                 onClick={() => setOpen(false)}
-                disabled={mutation.isLoading}
+                disabled={mutation.isPending}
               >
                 Cancel
               </button>
               <button
                 className="bk-btn bk-btn--primary"
                 onClick={() => mutation.mutate()}
-                disabled={rows.length === 0 || mutation.isLoading}
+                disabled={rows.length === 0 || mutation.isPending}
               >
-                {mutation.isLoading
+                {mutation.isPending
                   ? "Importing…"
                   : `Import ${rows.length} transactions`}
               </button>

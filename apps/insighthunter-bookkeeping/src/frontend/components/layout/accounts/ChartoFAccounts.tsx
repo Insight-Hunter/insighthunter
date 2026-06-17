@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useAccounts } from "../../hooks/useAccounts";
+import { useAccounts } from "../../../hooks/useAccounts";
 import AccountForm from "./AccountForm";
 
 const ChartOfAccounts: React.FC = () => {

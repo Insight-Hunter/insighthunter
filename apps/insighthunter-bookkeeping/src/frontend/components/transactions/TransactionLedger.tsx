@@ -3,7 +3,7 @@ import {
   useTransactions,
   useCreateTransaction,
 } from "../../hooks/useTransactions";
-import ImportBankCSV from "./ImportBankCSV";
+import ImportBankCSV from "../ImportBankCSV";
 
 const TransactionLedger: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string | undefined>();

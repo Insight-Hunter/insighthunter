@@ -1,13 +1,23 @@
 import React, { useState } from "react";
-import Papa from "papaparse";
+import Papa, { type ParseResult } from "papaparse";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useApiBase } from "../../hooks/useApi";
 
+type CsvRow = {
+  date?: string;
+  description?: string;
+  amount?: string;
+};
+
+type TransactionRow = {
+  date: string;
+  description: string;
+  amount: number;
+};
+
 const ImportBankCSV: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const [rows, setRows] = useState<
-    Array<{ date: string; description: string; amount: number }>
-  >([]);
+  const [rows, setRows] = useState<TransactionRow[]>([]);
   const { apiFetch } = useApiBase();
   const qc = useQueryClient();
 
@@ -15,6 +25,9 @@ const ImportBankCSV: React.FC = () => {
     mutationFn: () =>
       apiFetch("/transactions/bulk", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ transactions: rows }),
       }),
     onSuccess: () => {
@@ -25,22 +38,19 @@ const ImportBankCSV: React.FC = () => {
   });
 
   const onFile = (file: File) => {
-    Papa.parse(file, {
+    Papa.parse<CsvRow>(file, {
       header: true,
-      complete: (result) => {
-        const parsed: Array<{
-          date?: string;
-          description?: string;
-          amount?: string;
-        }> = result.data as any;
-        const mapped = parsed
+      skipEmptyLines: true,
+      complete: (result: ParseResult<CsvRow>) => {
+        const mapped = result.data
           .filter((r) => r.date && r.description && r.amount)
           .map((r) => ({
-            date: r.date!,
-            description: r.description!,
-            amount: parseFloat(r.amount!),
+            date: String(r.date).trim(),
+            description: String(r.description).trim(),
+            amount: parseFloat(String(r.amount).replace(/[$,]/g, "").trim()),
           }))
-          .filter((r) => Number.isFinite(r.amount));
+          .filter((r) => r.date && r.description && Number.isFinite(r.amount));
+
         setRows(mapped);
       },
     });
@@ -61,6 +71,7 @@ const ImportBankCSV: React.FC = () => {
             <header className="bk-modal-header">
               <h2>Import Bank CSV</h2>
             </header>
+
             <div className="bk-modal-body">
               <input
                 type="file"
@@ -71,11 +82,13 @@ const ImportBankCSV: React.FC = () => {
                     : null
                 }
               />
+
               {rows.length > 0 && (
                 <div className="bk-import-preview">
                   <p>
                     Previewing <strong>{rows.length}</strong> rows. First 5:
                   </p>
+
                   <table className="bk-table">
                     <thead>
                       <tr>
@@ -101,27 +114,30 @@ const ImportBankCSV: React.FC = () => {
                   </table>
                 </div>
               )}
+
               {mutation.isError && (
                 <div className="bk-alert bk-alert--error">
                   {(mutation.error as Error).message}
                 </div>
               )}
             </div>
+
             <footer className="bk-modal-footer">
               <button
                 className="bk-btn"
                 onClick={() => setOpen(false)}
-                disabled={mutation.isLoading}
+                disabled={mutation.isPending}
               >
                 Cancel
               </button>
+
               <button
                 className="bk-btn bk-btn--primary"
                 onClick={() => mutation.mutate()}
-                disabled={rows.length === 0 || mutation.isLoading}
+                disabled={rows.length === 0 || mutation.isPending}
               >
-                {mutation.isLoading
-                  ? "Importing…"
+                {mutation.isPending
+                  ? "Importing..."
                   : `Import ${rows.length} transactions`}
               </button>
             </footer>

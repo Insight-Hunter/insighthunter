@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useApiBase } from "../../hooks/useApi";
+import { useApiBase } from "../../../hooks/useApi";
 
 interface QueueItem {
   id: string;

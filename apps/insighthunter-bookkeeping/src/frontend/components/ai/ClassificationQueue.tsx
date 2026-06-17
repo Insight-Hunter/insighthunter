@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useApiBase } from "../../hooks/useApi";
-
 interface QueueItem {
   id: string;
   transaction_id: string;
@@ -17,11 +16,12 @@ const ClassificationQueue: React.FC = () => {
   const { apiFetch } = useApiBase();
   const qc = useQueryClient();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  const { data, isLoading, error, refetch } = useQuery<QueueItem[]>({
+  const { data, isLoading, error } = useQuery<QueueItem[]>({
     queryKey: ["ai-queue"],
-    queryFn: () => apiFetch("/ai/queue").catch(() => [] as QueueItem[]),
-  });
+    queryFn: async () => {
+      return await apiFetch("/ai/queue").catch(() => [] as QueueItem[]),
+  }
+);
 
   const approve = useMutation({
     mutationFn: (input: { queueItemId: string; accountId: string }) =>

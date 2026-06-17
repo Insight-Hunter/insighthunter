@@ -1,7 +1,7 @@
 import type { D1Database } from '@cloudflare/workers-types';
-import type { Transaction, CategoryRule } from '../types/accounting';
+import type { Transaction, CategoryRule } from '../../types/accounting';
 import * as q from '../db/queries';
-import { logger } from '../lib/logger';
+import { logger } from '../middleware/logger';
 
 export interface CategorizationResult {
   transactionId: string;

@@ -1,480 +1,255 @@
-export interface Env {
-  TEAM_DOMAIN: string;   // https://insighthunter.cloudflareaccess.com
-  POLICY_AUD: string;    // Access application AUD tag
-  ENVIRONMENT?: string;
-}
+// index.ts — InsightHunter Auth Worker
+// Cloudflare Access integration with session KV store.
+// All JWT logic delegated to access.ts — no duplication.
 
-interface AccessJWTPayload {
-  aud: string[];
-  email?: string;
-  name?: string;
-  sub: string;
-  iss: string;
-  iat?: number;
-  exp: number;
-  groups?: string[];
-}
+import { validateAccessJWT, getIdentity } from "./access";
+import type { Env } from "./types";
 
-interface CloudflareIdentity {
-  email: string;
-  name: string;
-  groups: string[];
-  user_uuid?: string;
-}
+// ── Constants ────────────────────────────────────────────────────────────────
 
-function decodeBase64Url(input: string): Uint8Array {
-  const normalized = input.replace(/-/g, "+").replace(/_/g, "/");
-  const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
-  const binary = atob(padded);
-  return Uint8Array.from(binary, (c) => c.charCodeAt(0));
-}
+const ALLOWED_REDIRECT_HOSTS = new Set([
+  "insighthunter.app",
+  "www.insighthunter.app",
+  "app.insighthunter.app",
+  "auth.insighthunter.app",
+]);
 
-function decodeJsonBase64Url<T>(input: string): T {
-  const bytes = decodeBase64Url(input);
-  const text = new TextDecoder().decode(bytes);
-  return JSON.parse(text) as T;
-}
+const DEFAULT_REDIRECT = "https://app.insighthunter.app/dashboard";
+const SESSION_TTL_SECONDS = 86_400; // 24 hours
 
-async function verifyAccessJWT(
-  token: string,
-  teamDomain: string,
-  policyAud: string,
-): Promise<AccessJWTPayload | null> {
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function sanitizeRedirect(input: string | null): string {
+  if (!input) return DEFAULT_REDIRECT;
   try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
-
-    const [headerB64, payloadB64, sigB64] = parts;
-    const header = decodeJsonBase64Url<{ kid: string; alg?: string }>(headerB64);
-
-    const certsResp = await fetch(`${teamDomain}/cdn-cgi/access/certs`, {
-      cf: { cacheTtl: 3600, cacheEverything: true },
-    } as RequestInit);
-
-    if (!certsResp.ok) return null;
-
-    const { keys } = await certsResp.json<{ keys: JsonWebKey[] }>();
-    const jwk = keys.find((k: any) => (k as any).kid === header.kid);
-    if (!jwk) return null;
-
-    const cryptoKey = await crypto.subtle.importKey(
-      "jwk",
-      jwk,
-      { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-      false,
-      ["verify"],
-    );
-
-    const valid = await crypto.subtle.verify(
-      "RSASSA-PKCS1-v1_5",
-      cryptoKey,
-      decodeBase64Url(sigB64),
-      new TextEncoder().encode(`${headerB64}.${payloadB64}`),
-    );
-
-    if (!valid) return null;
-
-    const payload = decodeJsonBase64Url<AccessJWTPayload>(payloadB64);
-    if (!payload?.sub) return null;
-    if (!payload?.aud?.includes(policyAud)) return null;
-    if (payload.iss !== teamDomain) return null;
-    if (payload.exp < Math.floor(Date.now() / 1000)) return null;
-
-    return payload;
-  } catch (err) {
-    console.error("[auth] Access JWT verification failed:", err);
-    return null;
+    const url = new URL(input);
+    if (url.protocol !== "https:") return DEFAULT_REDIRECT;
+    if (!ALLOWED_REDIRECT_HOSTS.has(url.hostname)) return DEFAULT_REDIRECT;
+    // Prevent header injection via redirect URL
+    return url.toString().replace(/[\r\n]/g, "");
+  } catch {
+    return DEFAULT_REDIRECT;
   }
 }
 
-async function getIdentity(
-  request: Request,
-  teamDomain: string,
-): Promise<CloudflareIdentity | null> {
-  try {
-    const res = await fetch(`${teamDomain}/cdn-cgi/access/get-identity`, {
-      headers: { Cookie: request.headers.get("Cookie") ?? "" },
-    });
-
-    if (!res.ok) return null;
-    return await res.json<CloudflareIdentity>();
-  } catch (err) {
-    console.error("[auth] getIdentity failed:", err);
-    return null;
-  }
-}
-
-function buildCookie(name: string, value: string, maxAgeSeconds = 86400): string {
+function buildSecureCookie(
+  name: string,
+  value: string,
+  domain: string,
+  maxAge = SESSION_TTL_SECONDS,
+): string {
   return [
     `${name}=${encodeURIComponent(value)}`,
     "Path=/",
     "HttpOnly",
     "Secure",
     "SameSite=Lax",
-    `Max-Age=${maxAgeSeconds}`,
+    `Max-Age=${maxAge}`,
+    `Domain=${domain}`,
   ].join("; ");
 }
 
-function sanitizeRedirect(input: string | null): string {
-  if (!input) {
-    return "https://insighthunter-platform-worker.dmco.workers.dev/dashboard";
-  }
-
-  try {
-    const url = new URL(input);
-
-    const allowedHosts = new Set([
-      "insighthunter-platform-worker.dmco.workers.dev",
-      "auth.insighthunter.app",
-      "insighthunter.app",
-      "www.insighthunter.app",
-    ]);
-
-    if (!allowedHosts.has(url.hostname)) {
-      return "https://insighthunter-platform-worker.dmco.workers.dev/dashboard";
-    }
-
-    return url.toString();
-  } catch {
-    return "https://insighthunter-platform-worker.dmco.workers.dev/dashboard";
-  }
+function generateSessionId(): string {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
+
+async function createSession(
+  kv: KVNamespace,
+  identity: { email: string; name: string; groups: string[]; user_uuid: string },
+  ttl: number,
+): Promise<string> {
+  const sessionId = generateSessionId();
+  await kv.put(
+    `session:${sessionId}`,
+    JSON.stringify({
+      email: identity.email,
+      name: identity.name,
+      groups: identity.groups,
+      user_uuid: identity.user_uuid,
+      createdAt: Date.now(),
+    }),
+    { expirationTtl: ttl },
+  );
+  return sessionId;
+}
+
+// ── Login Page HTML ──────────────────────────────────────────────────────────
 
 function loginPageHTML(redirect: string): string {
   const encodedRedirect = redirect ? encodeURIComponent(redirect) : "";
+  const nonce = generateSessionId().slice(0, 16);
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Sign in to InsightHunter">
+<meta name="description" content="Sign in to InsightHunter — AI-powered financial intelligence for small business">
+<meta name="robots" content="noindex, nofollow">
 <title>InsightHunter — Sign In</title>
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --color-bg: #0F172A;
-    --color-surface: #1E293B;
-    --color-surface-2: #253044;
-    --color-border: #334155;
-    --color-border-subtle: rgba(148, 163, 184, 0.12);
-    --color-primary: #38BDF8;
-    --color-primary-hover: #0EA5E9;
-    --color-primary-active: #0284C7;
-    --color-primary-dim: rgba(56, 189, 248, 0.08);
-    --color-primary-glow: rgba(56, 189, 248, 0.15);
-    --color-success: #4ADE80;
-    --color-warning: #FB923C;
-    --color-text: #F1F5F9;
-    --color-text-muted: #94A3B8;
-    --color-text-faint: #475569;
-    --font-body: 'Satoshi', 'Inter', system-ui, sans-serif;
-    --radius-md: 0.5rem;
-    --radius-lg: 0.75rem;
-    --radius-xl: 1rem;
-    --radius-full: 9999px;
-    --shadow-card:
-      0 0 0 1px rgba(148, 163, 184, 0.08),
-      0 4px 24px rgba(0, 0, 0, 0.40),
-      0 1px 2px rgba(0, 0, 0, 0.30);
-    --shadow-glow: 0 0 32px rgba(56, 189, 248, 0.08);
-    --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    --bg: #0F172A;
+    --surface: #1E293B;
+    --border: rgba(148,163,184,0.12);
+    --primary: #38BDF8;
+    --primary-hover: #0EA5E9;
+    --primary-dim: rgba(56,189,248,0.08);
+    --success: #4ADE80;
+    --text: #F1F5F9;
+    --text-muted: #94A3B8;
+    --text-faint: #475569;
+    --font: 'Satoshi','Inter',system-ui,sans-serif;
+    --r-md: 0.5rem;
+    --r-lg: 0.75rem;
+    --r-xl: 1rem;
+    --r-full: 9999px;
+    --shadow:
+      0 0 0 1px rgba(148,163,184,0.08),
+      0 4px 24px rgba(0,0,0,0.40),
+      0 1px 2px rgba(0,0,0,0.30);
+    --glow: 0 0 32px rgba(56,189,248,0.08);
+    --t: 180ms cubic-bezier(0.16,1,0.3,1);
   }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-size-adjust: none;
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-font-smoothing:antialiased;text-size-adjust:none}
+  body{
+    font-family:var(--font);
+    background:var(--bg);
+    color:var(--text);
+    min-height:100dvh;
+    display:grid;
+    place-items:center;
+    padding:1.5rem;
+    overflow-x:hidden;
   }
-
-  body {
-    font-family: var(--font-body);
-    background-color: var(--color-bg);
-    color: var(--color-text);
-    min-height: 100dvh;
-    display: grid;
-    place-items: center;
-    padding: 1.5rem;
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
+  body::before{
+    content:"";position:fixed;inset:0;
     background-image:
-      linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
-    background-size: 48px 48px;
-    pointer-events: none;
-    z-index: 0;
+      linear-gradient(rgba(56,189,248,0.025) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(56,189,248,0.025) 1px,transparent 1px);
+    background-size:48px 48px;
+    pointer-events:none;z-index:0;
   }
-
-  body::after {
-    content: "";
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -60%);
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.06) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
+  .brand-bar{position:fixed;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,#0284C7,#38BDF8,#7DD3FC);z-index:2}
+  .card{
+    position:relative;z-index:1;width:100%;max-width:420px;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--r-xl);padding:2.5rem 2rem;
+    box-shadow:var(--shadow),var(--glow);
   }
-
-  .brand-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--color-primary-active), var(--color-primary), #7DD3FC);
-    z-index: 2;
+  .logo{
+    display:flex;align-items:center;justify-content:center;
+    gap:.625rem;margin-bottom:2rem;text-decoration:none;
   }
-
-  .auth-card {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 420px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border-subtle);
-    border-radius: var(--radius-xl);
-    padding: 2.5rem 2rem;
-    box-shadow: var(--shadow-card), var(--shadow-glow);
+  .logo-mark{
+    width:38px;height:38px;border-radius:var(--r-md);
+    display:grid;place-items:center;
+    background:linear-gradient(135deg,#38BDF8 0%,#0284C7 100%);
+    box-shadow:0 0 16px rgba(56,189,248,0.3);flex-shrink:0;
   }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.625rem;
-    margin-bottom: 2rem;
-    text-decoration: none;
+  .logo-text{font-size:1.25rem;font-weight:700;letter-spacing:-.03em;color:var(--text)}
+  .logo-text span{color:var(--primary)}
+  .status-wrap{text-align:center;margin-bottom:1.25rem}
+  .status-badge{
+    display:inline-flex;align-items:center;gap:.375rem;
+    font-size:.75rem;font-weight:500;color:var(--success);
+    background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);
+    border-radius:var(--r-full);padding:.25rem .625rem;
   }
-
-  .logo-mark {
-    width: 38px;
-    height: 38px;
-    border-radius: var(--radius-md);
-    display: grid;
-    place-items: center;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-active) 100%);
-    box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
-    flex-shrink: 0;
+  .dot{
+    width:6px;height:6px;background:var(--success);
+    border-radius:50%;animation:pulse 2s ease-in-out infinite;
   }
-
-  .logo-text {
-    font-size: 1.25rem;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    color: var(--color-text);
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+  .auth-header{text-align:center;margin-bottom:1.5rem}
+  .auth-header h1{font-size:1.375rem;font-weight:600;letter-spacing:-.02em;margin-bottom:.5rem}
+  .auth-header p{font-size:.9375rem;line-height:1.6;color:var(--text-muted)}
+  .features{
+    display:flex;justify-content:center;gap:1rem;
+    flex-wrap:wrap;margin-bottom:1.5rem;
   }
-
-  .logo-text span {
-    color: var(--color-primary);
+  .feature-item{
+    display:flex;align-items:center;gap:.375rem;
+    font-size:.8125rem;color:var(--text-muted);
   }
-
-  .status-wrap {
-    text-align: center;
-    margin-bottom: 1.25rem;
+  .feature-item svg{color:var(--primary);flex-shrink:0}
+  /* Cloudflare Access renders its button inside this element */
+  #cf-access-login-form{width:100%;min-height:56px}
+  .access-fallback{
+    width:100%;padding:1rem 1.125rem;
+    border-radius:var(--r-lg);border:1px solid rgba(56,189,248,0.25);
+    background:var(--primary-dim);color:var(--text-muted);
+    text-align:center;font-size:.875rem;
   }
-
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--color-success);
-    background: rgba(74, 222, 128, 0.08);
-    border: 1px solid rgba(74, 222, 128, 0.2);
-    border-radius: var(--radius-full);
-    padding: 0.25rem 0.625rem;
+  .auth-footer{
+    margin-top:1.5rem;padding-top:1.25rem;
+    border-top:1px solid rgba(148,163,184,0.1);
+    text-align:center;font-size:.8125rem;
+    line-height:1.7;color:var(--text-faint);
   }
-
-  .status-dot {
-    width: 6px;
-    height: 6px;
-    background: var(--color-success);
-    border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
+  .auth-footer a{color:var(--text-muted);text-decoration:none;transition:color var(--t)}
+  .auth-footer a:hover{color:var(--primary)}
+  @media(max-width:480px){
+    body{padding:1rem;align-items:flex-start;padding-top:3rem}
+    .card{padding:2rem 1.5rem}
   }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(0.85); }
-  }
-
-  .auth-header {
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .auth-header h1 {
-    font-size: 1.375rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: var(--color-text);
-    margin-bottom: 0.5rem;
-  }
-
-  .auth-header p {
-    font-size: 0.9375rem;
-    line-height: 1.6;
-    color: var(--color-text-muted);
-  }
-
-  .features {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-  }
-
-  .feature-item {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    font-size: 0.8125rem;
-    color: var(--color-text-muted);
-  }
-
-  .feature-item svg {
-    color: var(--color-primary);
-    flex-shrink: 0;
-  }
-
-  #cf-access-login-form,
-  .cf-access-login-form {
-    width: 100%;
-    min-height: 56px;
-  }
-
-  .access-fallback {
-    width: 100%;
-    padding: 1rem 1.125rem;
-    border-radius: var(--radius-lg);
-    border: 1px solid rgba(56, 189, 248, 0.25);
-    background: var(--color-primary-dim);
-    color: var(--color-text-muted);
-    text-align: center;
-    font-size: 0.875rem;
-  }
-
-  .auth-footer {
-    margin-top: 1.5rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--color-border);
-    text-align: center;
-    font-size: 0.8125rem;
-    line-height: 1.7;
-    color: var(--color-text-faint);
-  }
-
-  .auth-footer a {
-    color: var(--color-text-muted);
-    text-decoration: none;
-    transition: color var(--transition);
-  }
-
-  .auth-footer a:hover {
-    color: var(--color-primary);
-  }
-
-  @media (max-width: 480px) {
-    body {
-      padding: 1rem;
-      align-items: flex-start;
-      padding-top: 3rem;
-    }
-
-    .auth-card {
-      padding: 2rem 1.5rem;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    * {
-      animation-duration: 0.01ms !important;
-      transition-duration: 0.01ms !important;
-    }
+  @media(prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms!important;transition-duration:.01ms!important}
   }
 </style>
 </head>
 <body>
   <div class="brand-bar" aria-hidden="true"></div>
-
-  <main class="auth-card" role="main">
+  <main class="card" role="main">
     <a href="https://insighthunter.app" class="logo" aria-label="InsightHunter home">
       <div class="logo-mark" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-             stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="m21 21-4.35-4.35"></path>
-          <path d="M11 8v6M8 11h6" stroke-width="2.2"></path>
+             stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+          <path d="M11 8v6M8 11h6" stroke-width="2.2"/>
         </svg>
       </div>
       <span class="logo-text">Insight<span>Hunter</span></span>
     </a>
-
     <div class="status-wrap">
-      <span class="status-badge">
-        <span class="status-dot" aria-hidden="true"></span>
+      <span class="status-badge" role="status" aria-live="polite">
+        <span class="dot" aria-hidden="true"></span>
         All systems operational
       </span>
     </div>
-
-    <section class="auth-header" aria-label="Sign in heading">
-      <h1>Welcome back</h1>
+    <section class="auth-header" aria-labelledby="signin-heading">
+      <h1 id="signin-heading">Welcome back</h1>
       <p>Sign in to access your financial intelligence platform.</p>
     </section>
-
     <section class="features" aria-label="Platform features">
-      <div class="feature-item">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-        Bookkeeping
-      </div>
-      <div class="feature-item">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-        Payroll
-      </div>
-      <div class="feature-item">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-        Analytics
-      </div>
-      <div class="feature-item">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-        Scout
-      </div>
+      ${["Bookkeeping","Payroll","Analytics","Scout"].map((f) =>
+        `<div class="feature-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>${f}</div>`).join("")}
     </section>
-
-    <div id="cf-access-login-form" role="region" aria-label="Sign in options">
-      <div class="access-fallback">Cloudflare Access sign-in options loading…</div>
+    <div id="cf-access-login-form" role="region" aria-label="Sign in with Cloudflare Access">
+      <div class="access-fallback">Cloudflare Access sign-in loading…</div>
     </div>
-
-    ${encodedRedirect ? `<input type="hidden" name="redirect" value="${encodedRedirect}">` : ""}
-
+    ${encodedRedirect
+      ? `<input type="hidden" name="redirect" value="${encodedRedirect}" data-nonce="${nonce}">`
+      : ""}
     <footer class="auth-footer">
       Protected by
-      <a href="https://www.cloudflare.com/zero-trust/" target="_blank" rel="noopener noreferrer">Cloudflare Zero Trust</a>
-      &nbsp;&middot;&nbsp;
+      <a href="https://www.cloudflare.com/zero-trust/" target="_blank" rel="noopener noreferrer">
+        Cloudflare Zero Trust</a>
+      &nbsp;·&nbsp;
       <a href="https://insighthunter.app/terms" target="_blank" rel="noopener noreferrer">Terms</a>
-      &nbsp;&middot;&nbsp;
+      &nbsp;·&nbsp;
       <a href="https://insighthunter.app/privacy" target="_blank" rel="noopener noreferrer">Privacy</a>
     </footer>
   </main>
@@ -482,54 +257,88 @@ function loginPageHTML(redirect: string): string {
 </html>`;
 }
 
+// ── Worker Export ────────────────────────────────────────────────────────────
+
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
+    // ── Health check ──────────────────────────────────────────────────────
     if (url.pathname === "/health") {
       return Response.json({
         status: "ok",
         service: "auth.insighthunter.app",
-        env: env.ENVIRONMENT ?? "production",
+        env: env.ENVIRONMENT,
+        ts: new Date().toISOString(),
       });
     }
 
+    // ── Access callback ───────────────────────────────────────────────────
     if (url.pathname === "/callback") {
       const token = request.headers.get("Cf-Access-Jwt-Assertion");
       if (!token) {
         return new Response("Missing Access JWT", { status: 401 });
       }
 
-      const accessPayload = await verifyAccessJWT(token, env.TEAM_DOMAIN, env.POLICY_AUD);
+      // Validate JWT using the unified access.ts module (no duplication)
+      const accessPayload = await validateAccessJWT(token, env.TEAM_DOMAIN, env.POLICY_AUD);
       if (!accessPayload) {
+        // Distinguish expired vs invalid for audit purposes
+        console.warn("[auth] /callback: invalid JWT from", request.headers.get("CF-Connecting-IP"));
         return new Response("Invalid or expired Access JWT", { status: 403 });
       }
 
+      // Fetch full identity (CF_Authorization cookie only — never leaks other cookies)
       const identity = await getIdentity(request, env.TEAM_DOMAIN);
       if (!identity) {
-        return new Response("Unauthorized", { status: 403 });
+        return new Response("Could not resolve identity", { status: 403 });
       }
+
+      // Create server-side session in KV
+      const sessionId = await createSession(
+        env.SESSIONS,
+        identity,
+        SESSION_TTL_SECONDS,
+      );
+
+      // Log auth event to Analytics Engine
+      ctx.waitUntil(
+        (async () => {
+          try {
+            env.AUTH_EVENTS.writeDataPoint({
+              blobs: [identity.email, identity.user_uuid, env.ENVIRONMENT],
+              doubles: [Date.now()],
+              indexes: ["login"],
+            });
+          } catch (e) {
+            console.error("[auth] Analytics write failed:", e);
+          }
+        })(),
+      );
 
       const redirectTo = sanitizeRedirect(url.searchParams.get("redirect"));
 
       const headers = new Headers();
       headers.set("Location", redirectTo);
-      headers.append("Set-Cookie", buildCookie("ih_user", identity.email, 86400));
-      headers.append("Set-Cookie", buildCookie("ih_name", identity.name || identity.email, 86400));
+      // Set session cookie — no raw PII in cookie value, just opaque session ID
+      headers.append(
+        "Set-Cookie",
+        buildSecureCookie("ih_session", sessionId, env.COOKIE_DOMAIN, SESSION_TTL_SECONDS),
+      );
 
-      return new Response(null, {
-        status: 302,
-        headers,
-      });
+      return new Response(null, { status: 302, headers });
     }
 
-    const redirect = url.searchParams.get("redirect") ?? "";
+    // ── Login page ────────────────────────────────────────────────────────
+    const redirect = sanitizeRedirect(url.searchParams.get("redirect") || null);
     return new Response(loginPageHTML(redirect), {
       headers: {
         "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "no-store",
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
       },
     });
   },
 } satisfies ExportedHandler<Env>;
-

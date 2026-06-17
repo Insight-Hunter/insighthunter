@@ -1,32 +1,21 @@
+// types.ts — Shared types for insighthunter-auth Worker
+
 export interface Env {
-  // Cloudflare Access
-  TEAM_DOMAIN: string;   // https://<team>.cloudflareaccess.com
-  POLICY_AUD: string;    // AUD tag from Zero Trust → Application
+  // Cloudflare Access — SECRETS (set via `wrangler secret put`)
+  TEAM_DOMAIN: string;    // https://insighthunter.cloudflareaccess.com
+  POLICY_AUD: string;     // AUD tag from Zero Trust → Application → Overview
 
-  // Downstream platform worker
-  PLATFORM_WORKER?: Fetcher;
+  // KV: session store
+  SESSIONS: KVNamespace;
 
-  // Session storage (optional, for server-side sessions)
-  SESSIONS?: KVNamespace;
+  // Analytics Engine: auth event logging
+  AUTH_EVENTS: AnalyticsEngineDataset;
 
-  ENVIRONMENT: string;
+  // Runtime environment
+  ENVIRONMENT: string;    // "production" | "staging"
+  APP_ORIGIN: string;     // https://insighthunter.app
+  COOKIE_DOMAIN: string;  // insighthunter.app
 }
 
-export interface AccessJWTPayload {
-  aud: string[];
-  email: string;
-  name?: string;
-  sub: string;
-  iss: string;
-  iat: number;
-  exp: number;
-  groups?: string[];
-}
-
-export interface CloudflareIdentity {
-  email: string;
-  name: string;
-  groups: string[];
-  user_uuid: string;
-  account_id?: string;
-}
+// Re-export from access.ts for convenience
+export type { AccessJWTPayload, CloudflareIdentity } from "./access";

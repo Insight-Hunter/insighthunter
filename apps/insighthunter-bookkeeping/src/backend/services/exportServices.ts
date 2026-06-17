@@ -1,5 +1,5 @@
-import type { Transaction } from '../types/accounting';
-import type { PLStatement, BalanceSheet, CashFlowStatement } from '../types/statements';
+import type { Transaction } from '../../types/accounting';
+import type { PLStatement, BalanceSheet, CashFlowStatement } from '../../types/statements';
 import { fromMinorUnits, formatCurrency } from '../lib/currencyUtils';
 
 export function transactionsToCSV(transactions: Transaction[]): string {

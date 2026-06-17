@@ -1,6 +1,6 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useApiBase } from "../../hooks/useApi";
+import { useApiBase } from "../../../hooks/useApi";
 
 const QBConnectButton: React.FC = () => {
   const { apiFetch } = useApiBase();

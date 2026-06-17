@@ -1,38 +1,45 @@
-name            = "insighthunter-auth"
-main            = "src/index.ts"
-compatibility_date = "2025-06-01"
-compatibility_flags = ["nodejs_compat"]
+# wrangler.toml — insighthunter-auth
+# ─────────────────────────────────────────────────────────────────────────────
+# SECRETS — never put in [vars]. Set via wrangler CLI:
+#   wrangler secret put TEAM_DOMAIN
+#   wrangler secret put POLICY_AUD
+# ─────────────────────────────────────────────────────────────────────────────
 
-# ── Routes ────────────────────────────────────────────────
+name               = "insighthunter-auth"
+main               = "src/index.ts"
+compatibility_date = "2025-06-01"
+# nodejs_compat intentionally omitted — worker uses only Web Crypto + Fetch
+
+# ── Routes ────────────────────────────────────────────────────────────────────
+
 [[routes]]
-pattern  = "auth.insighthunter.app/*"
-zone_name = "insighthunter.app"
+pattern       = "auth.insighthunter.app"
+zone_name     = "insighthunter.app"
 custom_domain = true
 
+# ── Observability ─────────────────────────────────────────────────────────────
+
 [observability]
-enabled = true
+enabled            = true
 head_sampling_rate = 1
 
-[[d1_databases]]
-binding = "DB"
-database_name = "insighthunter-auth"
-database_id = "36b4a6b7-3509-4cd2-9cdc-7a35990affd5"
+# ── KV: server-side session store ─────────────────────────────────────────────
 
 [[kv_namespaces]]
 binding = "SESSIONS"
-id = "60e34ba310ca40c79edec05470c7a271"
+id      = "60e34ba310ca40c79edec05470c7a271"
 
 [[kv_namespaces]]
 binding = "REFRESH_TOKENS"
 id = "ba8d224a437949969d990db3aef71a87"
 
+# ── Analytics Engine: auth event logging ──────────────────────────────────────
+
 [[analytics_engine_datasets]]
 binding = "AUTH_EVENTS"
 dataset = "ih_auth_events"
 
-# ── Cloudflare Email Service (native — no third-party API key) ──
-[[send_email]]
-name = "EMAIL"
+# ── Vars (non-secret runtime config only) ────────────────────────────────────
 
 [vars]
 ENVIRONMENT = "production"
@@ -41,5 +48,34 @@ REFRESH_TOKEN_TTL = "2592000"
 APP_ORIGIN = "https://insighthunter.app"
 APP_URL = "https://app.insighthunter.app"
 COOKIE_DOMAIN = "insighthunter.app"
-TEAM_DOMAIN = "https://insighthunter.cloudflareaccess.com"
-POLICY_AUD  = "e677d6d97923267e3221ccd0294dcb747c9c15a047c48812242abe0eda7eb395"
+
+# ── Cloudflare Email Service (native — no third-party API key) ──
+[[send_email]]
+name = "EMAIL"
+
+# ── Staging environment override ──────────────────────────────────────────────
+
+[env.staging]
+name = "insighthunter-auth-staging"
+
+[[env.staging.routes]]
+pattern       = "auth-staging.insighthunter.app/*"
+zone_name     = "insighthunter.app"
+custom_domain = true
+
+[[env.staging.kv_namespaces]]
+binding = "SESSIONS"
+id      = "60e34ba310ca40c79edec05470c7a271"
+
+[[env.staging.analytics_engine_datasets]]
+binding = "AUTH_EVENTS"
+dataset = "ih_auth_events_staging"
+
+[env.staging.vars]
+ENVIRONMENT   = "staging"
+APP_ORIGIN = "https://insighthunter.app"
+APP_URL = "https://app.insighthunter.app"
+COOKIE_DOMAIN = "insighthunter.app"
+
+
+

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useApiBase } from "../../hooks/useApi";
+import { useApiBase } from "../../../hooks/useApi";
 import JournalEntryForm from "./JournalEntryForm";
 
 interface JournalEntry {

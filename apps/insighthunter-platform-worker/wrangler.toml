@@ -20,6 +20,8 @@ database_id = "eb034589-7f38-4f1f-af73-259d762c6b35"
 
 [vars]
 CF_ACCOUNT_ID = "18c8e61a3669253dcfd0c7eec6be36a3"
+TEAM_DOMAIN = "https://insighthunter.cloudflareaccess.com"
+POLICY_AUD  = "e677d6d97923267e3221ccd0294dcb747c9c15a047c48812242abe0eda7eb395"
 
 # Secrets (set via: wrangler secret put JWT_SECRET, CF_API_TOKEN)
 # JWT_SECRET, CF_API_TOKEN

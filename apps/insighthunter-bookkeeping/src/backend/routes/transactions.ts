@@ -1,8 +1,8 @@
 import { Hono } from "hono";
-import type { Env } from "../types.js";
-import { authMiddleware } from "../middleware/auth.js";
-import { txVolumeCheck, incrementTxCount } from "../middleware/tier.js";
-import { trackEvent } from "../utils/analytics.js";
+import type { Env } from "../types";
+import { authMiddleware } from "../middleware/auth";
+import { txVolumeCheck, incrementTxCount } from "../middleware/tier";
+import { trackEvent } from "../utils/analytics";
 
 const transactions = new Hono<{ Bindings: Env }>();
 transactions.use("*", authMiddleware);

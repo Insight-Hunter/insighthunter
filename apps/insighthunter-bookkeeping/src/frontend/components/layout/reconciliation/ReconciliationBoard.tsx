@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useApiBase } from "../../hooks/useApi";
+import { useApiBase } from "../../../hooks/useApi";
 
 interface Session {
   id: string;
@@ -117,7 +117,7 @@ const ReconciliationBoard: React.FC = () => {
           <header className="bk-panel-header">
             <h2>Sessions</h2>
           </header>
-          {sessionsQuery.isLoading && <div>Loading…</div>}
+          {sessionsQuery.isPending && <div>Loading…</div>}
           {sessionsQuery.error && (
             <div className="bk-alert bk-alert--error">
               {(sessionsQuery.error as Error).message}
@@ -188,14 +188,14 @@ const ReconciliationBoard: React.FC = () => {
                 <div>Cleared items: {wsState.clearedCount}</div>
               </div>
 
-              {detailsQuery.isLoading && <div>Loading transactions…</div>}
+              {detailsQuery.isPending && <div>Loading transactions…</div>}
               {detailsQuery.error && (
                 <div className="bk-alert bk-alert--error">
                   {(detailsQuery.error as Error).message}
                 </div>
               )}
 
-              {!detailsQuery.isLoading && !detailsQuery.error && (
+              {!detailsQuery.isPending && !detailsQuery.error && (
                 <table className="bk-table bk-table--hover">
                   <thead>
                     <tr>

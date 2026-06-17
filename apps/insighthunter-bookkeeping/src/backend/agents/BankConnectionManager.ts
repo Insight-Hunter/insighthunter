@@ -2,7 +2,7 @@
 import { DurableObject } from 'cloudflare:workers';
 import { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode } from 'plaid';
 import type { BankConnection, BankTransaction, PlaidLinkToken } from '@/types';
-import type { Env } from '../index';
+import type { Env } from '../types';
 
 export class BankConnectionManager extends DurableObject<Env> {
   private plaidClient: PlaidApi;

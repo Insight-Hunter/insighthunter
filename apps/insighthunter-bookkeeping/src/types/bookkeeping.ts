@@ -1,64 +1,27 @@
 // src/types/bookkeeping.ts
-export interface Transaction {
-  id: string;
-  date: string;
-  description: string;
-  entries: JournalEntry[];
-  status: 'draft' | 'posted';
-  createdAt: string;
-  updatedAt?: string;
-  memo?: string;
-  tags?: string[];
-  source?: 'manual' | 'import' | 'bank' | 'quickbooks';
-  sourceId?: string;
-}
 
+export interface ReconciliationState {
+  sessionId: string;
+  orgId: string;
+  clearedTransactionIds: string[];
+  clearedTotal: number;
+}
 export interface JournalEntry {
-  accountId: string;
-  accountName: string;
-  type: 'debit' | 'credit';
-  amount: number;
-  memo?: string;
-}
-
-export interface Account {
-  id: string;
-  name: string;
-  type: AccountType;
-  subtype?: string;
-  description?: string;
-  balance?: number;
-  currency: string;
-  parentId?: string;
-  isActive: boolean;
-}
-
-export type AccountType =
-  | 'asset'
-  | 'liability'
-  | 'equity'
-  | 'revenue'
-  | 'expense'
-  | 'cost-of-goods-sold';
-
-export interface BalanceSheet {
-  assets: {
-    currentAssets: LineItem[];
-    fixedAssets: LineItem[];
-    total: number;
-  };
-  liabilities: {
-    currentLiabilities: LineItem[];
-    longTermLiabilities: LineItem[];
-    total: number;
-  };
-  equity: {
-    items: LineItem[];
-    total: number;
-  };
-  date: string;
-}
-
+    accountId: string;
+    accountName: string;
+    type: 'debit' | 'credit';
+    amount: number;
+    id: string;
+    orgId: string;
+    transactionId: string | null;
+    date: string;
+    reference: string | null;
+    memo: string | null;
+    lines: JournalLine[];
+    isBalanced: boolean;
+    createdBy: string;
+    createdAt: string;
+  }
 export interface ProfitLoss {
   revenue: LineItem[];
   costOfGoodsSold: LineItem[];

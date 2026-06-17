@@ -4,8 +4,9 @@ export enum AccountType {
     EQUITY = 'EQUITY',
     REVENUE = 'REVENUE',
     EXPENSE = 'EXPENSE',
+    COGS = 'cost-of-goods-sold',
   }
-  
+
   export enum AccountSubType {
     CASH = 'CASH',
     ACCOUNTS_RECEIVABLE = 'ACCOUNTS_RECEIVABLE',
@@ -38,8 +39,7 @@ export enum AccountType {
     UNMATCHED = 'UNMATCHED',
     MANUALLY_CLEARED = 'MANUALLY_CLEARED',
   }
-  
-  export interface Account {
+    export interface Account {
     id: string;
     orgId: string;
     code: string;
@@ -53,8 +53,7 @@ export enum AccountType {
     createdAt: string;
     updatedAt: string;
   }
-  
-  export interface Transaction {
+    export interface Transaction {
     id: string;
     orgId: string;
     date: string;
@@ -70,21 +69,7 @@ export enum AccountType {
     createdAt: string;
     updatedAt: string;
   }
-  
-  export interface JournalEntry {
-    id: string;
-    orgId: string;
-    transactionId: string | null;
-    date: string;
-    reference: string | null;
-    memo: string | null;
-    lines: JournalLine[];
-    isBalanced: boolean;
-    createdBy: string;
-    createdAt: string;
-  }
-  
-  export interface JournalLine {
+    export interface JournalLine {
     id: string;
     entryId: string;
     accountId: string;
@@ -93,7 +78,7 @@ export enum AccountType {
     memo: string | null;
     lineOrder: number;
   }
-  
+
   export interface Category {
     id: string;
     orgId: string;
@@ -129,4 +114,3 @@ export enum AccountType {
     reconciledBy: string | null;
     createdAt: string;
   }
-  

@@ -1,8 +1,8 @@
 import type { D1Database } from '@cloudflare/workers-types';
-import type { PLStatement, PLLineItem } from '../types/statements';
-import { AccountType, AccountSubType } from '../types/accounting';
+import type { PLStatement, PLLineItem } from '../../types/statements';
+import { AccountType, AccountSubType } from '../../types/accounting';
 import { getAccountBalances } from '../db/queries';
-import { netBalance } from '../lib/doubleEntry';
+import { netBalance } from '../utils/doubleEntry';
 
 export async function generatePL(
   db: D1Database,

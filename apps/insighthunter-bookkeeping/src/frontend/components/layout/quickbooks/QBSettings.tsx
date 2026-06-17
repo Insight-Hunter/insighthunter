@@ -1,6 +1,6 @@
 import React from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useApiBase } from "../../hooks/useApi";
+import { useApiBase } from "../../../hooks/useApi";
 import QBConnectButton from "./QBConnectButton";
 
 interface QBStatus {
@@ -41,7 +41,7 @@ const QBSettings: React.FC = () => {
       </header>
 
       <section className="bk-panel">
-        {statusQuery.isLoading && <div>Checking QuickBooks status…</div>}
+        {statusQuery.isPending && <div>Checking QuickBooks status…</div>}
         {statusQuery.error && (
           <div className="bk-alert bk-alert--error">
             {(statusQuery.error as Error).message}
@@ -62,14 +62,14 @@ const QBSettings: React.FC = () => {
                   <button
                     className="bk-btn bk-btn--secondary"
                     onClick={() => syncAccounts.mutate()}
-                    disabled={syncAccounts.isLoading}
+                    disabled={syncAccounts.isPending}
                   >
-                    {syncAccounts.isLoading ? "Syncing…" : "Sync accounts"}
+                    {syncAccounts.isPending ? "Syncing…" : "Sync accounts"}
                   </button>
                   <button
                     className="bk-btn"
                     onClick={() => disconnect.mutate()}
-                    disabled={disconnect.isLoading}
+                    disabled={disconnect.isPending}
                   >
                     Disconnect
                   </button>

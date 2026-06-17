@@ -97,16 +97,16 @@ const AccountForm: React.FC<Props> = ({ onClose }) => {
           <button
             className="bk-btn"
             onClick={onClose}
-            disabled={mutation.isLoading}
+            disabled={mutation.isPending}
           >
             Cancel
           </button>
           <button
             className="bk-btn bk-btn--primary"
             onClick={() => mutation.mutate()}
-            disabled={mutation.isLoading || !name || !code}
+            disabled={mutation.isPending || !name || !code}
           >
-            {mutation.isLoading ? "Saving…" : "Save account"}
+            {mutation.isPending ? "Saving…" : "Save account"}
           </button>
         </footer>
       </div>
