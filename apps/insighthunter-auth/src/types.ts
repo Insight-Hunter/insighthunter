@@ -24,5 +24,27 @@ export interface Env {
   COOKIE_DOMAIN: string;  // insighthunter.app
 }
 
+// Cloudflare Email binding type
+export interface SendEmail {
+  send(message: EmailMessage): Promise<void>;
+}
+
+export interface EmailMessage {
+  from: { email: string; name?: string };
+  to: Array<{ email: string; name?: string }>;
+  subject: string;
+  content: Array<{ type: string; value: string }>;
+}
+
+// Pending registration stored in KV under key `pending:{token}`
+export interface PendingRegistration {
+  email: string;
+  name: string;
+  org_name: string;
+  plan: string;
+  passwordHash: string; // hex-encoded SHA-256 of pepper+password
+  createdAt: number;
+}
+
 // Re-export from access.ts for convenience
 export type { AccessJWTPayload, CloudflareIdentity } from "./access";

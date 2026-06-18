@@ -75,7 +75,6 @@ export default {
       );
 
       const redirectTo = sanitizeRedirect(url.searchParams.get("redirect"));
-
       const headers = new Headers();
       headers.set("Location", redirectTo);
       headers.append(

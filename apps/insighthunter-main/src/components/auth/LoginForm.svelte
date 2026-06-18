@@ -9,32 +9,29 @@
     loading = true;
 
     try {
-      const res = await fetch('/api/auth/login', {
+      // FIX: was '/api/auth/login' (local, non-existent endpoint).
+      // Now targets auth subdomain with credentials:include for HttpOnly cookie flow.
+      const res = await fetch('https://auth.insighthunter.app/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        error = data.message || 'Invalid login';
+        error = data.message || 'Invalid email or password';
         return;
       }
 
-      // ✅ store auth
-      localStorage.setItem('token', data.token);
+      // FIX: removed localStorage.setItem — tokens must NOT be in localStorage (XSS risk)
+      // FIX: removed manual document.cookie set — auth subdomain sets HttpOnly cookie via Set-Cookie
 
-      // ✅ ALSO set cookie (needed for Astro SSR + middleware)
-      document.cookie = `token=${data.token}; path=/; SameSite=Lax`;
-
-      // ✅ redirect
       window.location.href = '/dashboard';
 
     } catch (err) {
-      error = 'Network error';
+      error = 'Network error — please try again';
     } finally {
       loading = false;
     }
@@ -42,24 +39,11 @@
 </script>
 
 <form on:submit|preventDefault={login}>
-  <input
-    type="email"
-    placeholder="Email"
-    bind:value={email}
-    required
-  />
-
-  <input
-    type="password"
-    placeholder="Password"
-    bind:value={password}
-    required
-  />
-
+  <input type="email" placeholder="Email" bind:value={email} required />
+  <input type="password" placeholder="Password" bind:value={password} required />
   <button type="submit" disabled={loading}>
     {loading ? 'Signing in...' : 'Sign In'}
   </button>
-
   {#if error}
     <p class="error">{error}</p>
   {/if}
