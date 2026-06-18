@@ -1,9 +1,10 @@
 ---
 import { tiers, addons } from '../../data/pricing';
 
-const signupBaseUrl = 'https://auth.insighthunter.app/signup';
+// FIX: route to on-site /auth/register (was: https://auth.insighthunter.app/signup which 404s)
+const signupBaseUrl = '/auth/register';
 const signupPlanIds = {
-  lite: 'free',
+  lite: 'lite',
   standard: 'standard',
   pro: 'pro',
 };

@@ -1,18 +1,161 @@
 ---
-import LoginForm from '../../components/auth/LoginForm.svelte';
+export const prerender = false;
+import AuthLayout from '../../layouts/AuthLayout.astro';
+
+const registered = Astro.url.searchParams.get('registered') === '1';
+const prefillEmail = Astro.url.searchParams.get('email') ?? '';
 ---
 
-<html lang="en">
-  <head>
-    <title>Login | InsightHunter</title>
-  </head>
+<AuthLayout title="Sign In">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>Sign in to your account</h1>
+      <p>Welcome back. Enter your credentials to continue.</p>
+    </div>
 
-  <body>
-    <section class="auth-container">
-      <h1>Sign In</h1>
+    {registered && (
+      <div class="success-banner">
+        Account created — please sign in to get started.
+      </div>
+    )}
 
-      <!-- ✅ CRITICAL: hydration -->
-      <LoginForm client:load />
-    </section>
-  </body>
-</html>
+    <div id="error-banner" class="error-banner" hidden>
+      <span id="error-text">Something went wrong.</span>
+    </div>
+
+    <form id="login-form" class="auth-form" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input
+          class="form-input"
+          type="email"
+          id="email"
+          name="email"
+          placeholder="jane@company.com"
+          autocomplete="email"
+          value={prefillEmail}
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input
+          class="form-input"
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Your password"
+          autocomplete="current-password"
+          required
+        />
+      </div>
+
+      <div class="form-meta">
+        <a href="/auth/forgot-password" class="auth-link forgot-link">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn btn-gold submit-btn" id="submit-btn">
+        <span id="btn-text">Sign In</span>
+        <span id="btn-loader" class="spinner" hidden></span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Don't have an account? <a href="/auth/register" class="auth-link">Create one free</a></p>
+    </div>
+  </div>
+</AuthLayout>
+
+<script>
+  const AUTH_BASE_URL = 'https://auth.insighthunter.app';
+
+  const form = document.getElementById('login-form');
+  const btnText = document.getElementById('btn-text');
+  const loader = document.getElementById('btn-loader');
+  const errBanner = document.getElementById('error-banner');
+  const errText = document.getElementById('error-text');
+  const submitBtn = document.getElementById('submit-btn');
+
+  function showError(msg) {
+    errText.textContent = msg;
+    errBanner.hidden = false;
+  }
+
+  function clearError() {
+    errText.textContent = '';
+    errBanner.hidden = true;
+  }
+
+  function setSubmitting(isSubmitting) {
+    submitBtn.disabled = isSubmitting;
+    loader.hidden = !isSubmitting;
+    btnText.textContent = isSubmitting ? 'Signing in…' : 'Sign In';
+    submitBtn.setAttribute('aria-busy', isSubmitting ? 'true' : 'false');
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearError();
+
+    const emailField = form.elements.namedItem('email');
+    const passwordField = form.elements.namedItem('password');
+    const email = emailField instanceof HTMLInputElement ? emailField.value.trim().toLowerCase() : '';
+    const password = passwordField instanceof HTMLInputElement ? passwordField.value : '';
+
+    if (!email || !password) {
+      showError('Please enter your email and password.');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const res = await fetch(`${AUTH_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      });
+
+      const raw = await res.text();
+      let data = {};
+      try { data = JSON.parse(raw); } catch {}
+
+      if (!res.ok) {
+        showError(data?.error || data?.message || `Login failed (${res.status}).`);
+        return;
+      }
+
+      window.location.href = '/dashboard';
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Network error — please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  });
+</script>
+
+<style>
+  .auth-card{width:100%;max-width:440px;position:relative;z-index:1}
+  .auth-header{text-align:center;margin-bottom:28px}
+  .auth-header h1{font-size:1.65rem;margin-bottom:8px}
+  .auth-header p{color:var(--muted);font-size:0.875rem;line-height:1.6}
+  .success-banner{background:rgba(63,207,142,0.10);border:1px solid rgba(63,207,142,0.30);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:0.875rem;color:#3FCF8E;text-align:center}
+  .error-banner{display:flex;align-items:center;gap:10px;background:rgba(224,82,82,0.08);border:1px solid rgba(224,82,82,0.3);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:0.875rem;color:#F87171}
+  .error-banner[hidden]{display:none}
+  .auth-form{display:flex;flex-direction:column;gap:16px;margin-bottom:20px}
+  .form-meta{display:flex;justify-content:flex-end;margin-top:-8px}
+  .forgot-link{font-size:0.82rem}
+  .submit-btn{width:100%;padding:14px;font-size:0.975rem;margin-top:4px}
+  .submit-btn:disabled{opacity:0.7;cursor:not-allowed}
+  .spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,0.2);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite}
+  .spinner[hidden]{display:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .auth-footer{text-align:center;font-size:0.875rem;color:var(--muted)}
+  .auth-link{color:var(--cyan-text);font-weight:600;transition:color 0.18s}
+  .auth-link:hover{color:var(--cyan)}
+</style>
