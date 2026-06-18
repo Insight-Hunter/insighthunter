@@ -1,5 +1,5 @@
 {
-  "name": "@ih/auth-client",
+  "name": "insighthunter-auth",
   "version": "0.1.0",
   "type": "module",
   "exports": {
