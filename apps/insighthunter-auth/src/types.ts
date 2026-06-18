@@ -1,19 +1,26 @@
 // types.ts — Shared types for insighthunter-auth Worker
 
 export interface Env {
-  // Cloudflare Access — SECRETS (set via `wrangler secret put`)
+  // ── Cloudflare Access secrets (set via `wrangler secret put`) ──────────────
   TEAM_DOMAIN: string;    // https://insighthunter.cloudflareaccess.com
   POLICY_AUD: string;     // AUD tag from Zero Trust → Application → Overview
 
-  // KV: session store
+  // ── Email+Password auth secrets ────────────────────────────────────────────
+  PASSWORD_PEPPER: string; // Random pepper mixed into every password hash
+
+  // ── KV: session + registration state store ────────────────────────────────
   SESSIONS: KVNamespace;
 
-  // Analytics Engine: auth event logging
+  // ── Cloudflare Email (native send_email binding) ───────────────────────────
+  EMAIL: SendEmail;
+
+  // ── Analytics Engine: auth event logging ─────────────────────────────────
   AUTH_EVENTS: AnalyticsEngineDataset;
 
-  // Runtime environment
+  // ── Runtime config (non-secret vars) ──────────────────────────────────────
   ENVIRONMENT: string;    // "production" | "staging"
   APP_ORIGIN: string;     // https://insighthunter.app
+  APP_URL: string;        // https://app.insighthunter.app
   COOKIE_DOMAIN: string;  // insighthunter.app
 }
 
