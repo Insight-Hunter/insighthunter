@@ -1,6 +1,6 @@
 ---
 export interface Props { title?: string; text?: string; cta?: { href: string; label: string }; }
-// FIX: was https://auth.insighthunter.app/signup?plan=free — /signup route does not exist on auth subdomain
+// FIX: was 'https://auth.insighthunter.app/signup?plan=free' — /signup route does not exist.
 const { title='Ready to know your numbers?', text='Join thousands of small businesses running smarter with Insight Hunter.', cta={ href:'/auth/register?plan=lite', label:'Start Free — No Credit Card' } } = Astro.props;
 ---
 <section class="cta-banner section">
