@@ -15,5 +15,10 @@ export default defineConfig({
   ],
   vite: {
     ssr: { noExternal: ['svelte'] },
+    resolve: {
+      alias: {
+        '@ih/auth-client': '../../apps/insighthunter-auth/src/index.ts',
+      },
+    },
   },
 });

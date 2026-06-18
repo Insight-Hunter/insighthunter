@@ -10,7 +10,10 @@
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "types": ["@cloudflare/workers-types"]
+    "types": ["@cloudflare/workers-types"],
+    "paths": {
+      "@ih/auth-client": ["../../apps/insighthunter-auth/src/index.ts"]
+    }
   },
   "include": ["src/**/*","functions/**/*"],
   "exclude": ["node_modules","dist"]
