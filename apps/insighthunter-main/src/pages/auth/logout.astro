@@ -1,22 +1,21 @@
 ---
 export const prerender = false;
-
+// Clear the HttpOnly session cookie server-side
 Astro.cookies.delete('ih_session', { path: '/' });
 ---
 
+<!-- FIX: removed localStorage.removeItem('ih_access_token') — tokens live in HttpOnly cookies only -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="refresh" content="0;url=/auth/login?logged_out=1" />
-    <title>Signing out…</title>
+    <title>Signing out… | Insight Hunter</title>
   </head>
   <body>
     <script>
-      try {
-        localStorage.removeItem('ih_access_token');
-      } catch {}
+      // No localStorage access — auth tokens are HttpOnly cookies set by auth.insighthunter.app
       window.location.replace('/auth/login?logged_out=1');
     </script>
-    <p>Signing you out…</p>
+    <p style="font-family:sans-serif;text-align:center;padding:4rem;color:#888">Signing you out…</p>
   </body>
 </html>
