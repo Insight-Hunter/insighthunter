@@ -1,30 +1,24 @@
 name = "insighthunter-platform-worker"
-main = "src/worker.ts"
-compatibility_date = "2025-04-01"
+main = "src/index.ts"
+compatibility_date = "2026-06-20"
+compatibility_flags = ["nodejs_compat"]
 
 [observability]
 enabled = true
-
-[[dispatch_namespaces]]
-binding = "DISPATCH_NS"
-namespace = "insighthunter-tenants"
-
-[[kv_namespaces]]
-binding = "IH_REGISTRY"
-id = "894edb7e9e5a4f00b191aec4ae0716c4"
+head_sampling_rate = 1
 
 [[d1_databases]]
-binding = "IH_PLATFORM_DB"
-database_name = "ih-platform-db"
-database_id = "eb034589-7f38-4f1f-af73-259d762c6b35"
+binding = "DB"
+database_name = "insighthunter-dispatch"
+database_id = "2a0331eb-4775-4ad2-9126-0560336486df"
+
+[[analytics_engine_datasets]]
+binding = "PLATFORM_EVENTS"
+dataset = "ih_platform_events"
 
 [vars]
-CF_ACCOUNT_ID = "18c8e61a3669253dcfd0c7eec6be36a3"
-TEAM_DOMAIN = "https://insighthunter.cloudflareaccess.com"
-POLICY_AUD  = "e677d6d97923267e3221ccd0294dcb747c9c15a047c48812242abe0eda7eb395"
-
-# Secrets (set via: wrangler secret put JWT_SECRET, CF_API_TOKEN)
-# JWT_SECRET, CF_API_TOKEN
-
-[triggers]
-crons = []
+ENVIRONMENT = "production"
+CLOUDFLARE_ACCOUNT_ID = "REPLACE_WITH_ACCOUNT_ID"
+TENANT_SCRIPT_NAME = "insighthunter-tenant"
+TENANT_BASE_DOMAIN = "tenant.insighthunter.app"
+DISPATCH_NAMESPACE = "insighthunter-tenants"

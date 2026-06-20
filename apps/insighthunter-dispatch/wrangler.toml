@@ -1,6 +1,6 @@
 name = "insighthunter-dispatch"
 main = "src/index.ts"
-compatibility_date = "2025-03-07"
+compatibility_date = "2026-06-20"
 compatibility_flags = ["nodejs_compat"]
 
 [observability]
@@ -12,28 +12,8 @@ binding = "AUTH_WORKER"
 service = "insighthunter-auth"
 
 [[services]]
-binding = "BOOKKEEPING_WORKER"
-service = "insighthunter-bookkeeping"
-
-[[services]]
-binding = "PAYROLL_WORKER"
-service = "insighthunter-payroll"
-
-[[services]]
-binding = "BIZFORMA_WORKER"
-service = "insighthunter-bizforma"
-
-[[services]]
-binding = "SCOUT_WORKER"
-service = "ih-scout-worker"
-
-[[services]]
-binding = "PBX_WORKER"
-service = "ih-pbx-worker"
-
-[[services]]
-binding = "REPORT_WORKER"
-service = "ih-report-worker"
+binding = "PLATFORM_WORKER"
+service = "insighthunter-platform-worker"
 
 [[kv_namespaces]]
 binding = "SESSIONS"
@@ -56,6 +36,10 @@ dataset = "ih_api_events"
 
 [vars]
 ENVIRONMENT = "production"
-ALLOWED_ORIGINS = "https://insighthunter.app,https://www.insighthunter.app"
+ALLOWED_ORIGINS = "https://insighthunter.app,https://www.insighthunter.app,https://auth.insighthunter.app"
 RATE_LIMIT_WINDOW_SECONDS = "60"
 RATE_LIMIT_MAX_REQUESTS = "120"
+PLATFORM_API_BASE = "https://platform.insighthunter.app"
+TENANT_BASE_DOMAIN = "tenant.insighthunter.app"
+AUTH_URL = "https://auth.insighthunter.app"
+PUBLIC_APP_URL = "https://insighthunter.app"

@@ -1,17 +1,19 @@
-interface Env {
-  DISPATCH_WORKER: Fetcher;
-}
+export const onRequest = async (context: any) => {
+  const request = context.request as Request;
+  const env = context.env;
+  const url = new URL(request.url);
+  const proxied = new URL(`/api/${context.params.path ?? ""}${url.search}`, env.DISPATCH_URL);
 
-export const onRequest: PagesFunction<Env> = async ({ request, env, params }) => {
-  if (!env.DISPATCH_WORKER) {
-    return Response.json({ error: 'Dispatch worker not configured' }, { status: 503 });
-  }
-  const path = (params.path as string[] | undefined)?.join('/') ?? '';
-  console.log(`[Pages API Proxy] ${request.method} /api/${path}`);
-  try {
-    return await env.DISPATCH_WORKER.fetch(request);
-  } catch (err) {
-    console.error('[Pages API Proxy] Dispatch error:', err);
-    return Response.json({ error: 'Service temporarily unavailable' }, { status: 502 });
-  }
+  const headers = new Headers(request.headers);
+  headers.set("X-Forwarded-Host", url.host);
+  headers.set("X-Forwarded-Proto", url.protocol.replace(":", ""));
+
+  return env.DISPATCH_WORKER.fetch(
+    new Request(proxied.toString(), {
+      method: request.method,
+      headers,
+      body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
+      redirect: "manual"
+    })
+  );
 };

@@ -1,10 +1,11 @@
 name = "insighthunter-main"
 pages_build_output_dir = "dist"
-compatibility_date = "2026-04-12"
+compatibility_date = "2026-06-20"
 compatibility_flags = ["nodejs_compat"]
 
 [observability]
 enabled = true
+head_sampling_rate = 1
 
 [[d1_databases]]
 binding = "DB"
@@ -22,10 +23,12 @@ service = "insighthunter-auth"
 [[kv_namespaces]]
 binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
+preview_id = "60e34ba310ca40c79edec05470c7a271"
 
 [[kv_namespaces]]
 binding = "RATE_LIMIT"
 id = "f75a15f1df8c42cdb2e623d8cb324a23"
+preview_id = "f75a15f1df8c42cdb2e623d8cb324a23"
 
 [[analytics_engine_datasets]]
 binding = "PAGE_VIEWS"
@@ -33,6 +36,5 @@ dataset = "ih_page_views"
 
 [vars]
 PUBLIC_APP_URL = "https://insighthunter.app"
-AUTH_SECRET = "5afde2d9ba897193d88ba038ed3edd03870ccae6338077cec5c50e333c9de777"
 DISPATCH_URL = "https://dispatch.insighthunter.app"
 AUTH_URL = "https://auth.insighthunter.app"
