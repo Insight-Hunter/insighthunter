@@ -1,0 +1,41 @@
+{
+  "name": "insighthunter-dispatch",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "kv_namespaces": [
+    { "binding": "SESSIONS", "id": "REPLACE_SESSIONS_KV_ID" },
+    { "binding": "RATE_LIMIT", "id": "REPLACE_RATE_LIMIT_KV_ID" }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter",
+      "database_id": "REPLACE_D1_DATABASE_ID"
+    }
+  ],
+  "analytics_engine_datasets": [
+    {
+      "binding": "API_EVENTS",
+      "dataset": "api_events"
+    }
+  ],
+  "services": [
+    { "binding": "AUTH_WORKER", "service": "auth-worker" },
+    { "binding": "BOOKKEEPING_WORKER", "service": "bookkeeping-worker" },
+    { "binding": "PAYROLL_WORKER", "service": "payroll-worker" },
+    { "binding": "BIZFORMA_WORKER", "service": "bizforma-worker" },
+    { "binding": "SCOUT_WORKER", "service": "scout-worker" },
+    { "binding": "PBX_WORKER", "service": "pbx-worker" },
+    { "binding": "REPORT_WORKER", "service": "report-worker" }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production",
+    "ALLOWED_ORIGINS": "https://insighthunter.app,https://bizforma.insighthunter.app,https://auth.insighthunter.app",
+    "RATE_LIMIT_WINDOW_SECONDS": "60",
+    "RATE_LIMIT_MAX_REQUESTS": "120"
+  }
+}

@@ -15,11 +15,9 @@ export interface Env {
   RATE_LIMIT_WINDOW_SECONDS: string;
   RATE_LIMIT_MAX_REQUESTS: string;
   JWT_SECRET?: string;
-  TEAM_DOMAIN: string;   // https://<team>.cloudflareaccess.com
-  POLICY_AUD: string;    // Access app AUD tag
 }
 
-interface AppJWTPayload {
+interface JWTPayload {
   sub: string;
   org: string;
   email: string;
@@ -28,30 +26,13 @@ interface AppJWTPayload {
   exp: number;
 }
 
-interface AccessJWTPayload {
-  aud: string[];
-  email?: string;
-  sub: string;
-  iss: string;
-  iat?: number;
-  exp: number;
-}
-
-type AuthContext =
-  | { type: "app"; user: AppJWTPayload }
-  | { type: "access"; user: AccessJWTPayload }
-  | null;
-
 const PUBLIC_ROUTE_PATTERNS = [
   { method: "POST", path: "/api/auth/login" },
   { method: "POST", path: "/api/auth/register" },
   { method: "POST", path: "/api/auth/refresh" },
   { method: "POST", path: "/api/auth/forgot-password" },
-  { method: "POST", path: "/api/auth/reset-password" },
-  { method: "POST", path: "/auth/forgot-password" },
-  { method: "POST", path: "/auth/reset-password" },
   { method: "GET", path: "/api/health" },
-  { method: "GET", path: "/api/version" },
+  { method: "GET", path: "/api/version" }
 ];
 
 function normalizePath(pathname: string): string {
@@ -83,11 +64,10 @@ function corsHeaders(origin: string | null, env: Env): Record<string, string> {
   return {
     "Access-Control-Allow-Origin": isAllowed ? origin : allowed[0] ?? "*",
     "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers":
-      "Content-Type, Authorization, X-IH-Org, Cf-Access-Jwt-Assertion",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-IH-Org",
     "Access-Control-Allow-Credentials": "true",
     "Access-Control-Max-Age": "86400",
-    Vary: "Origin",
+    "Vary": "Origin"
   };
 }
 
@@ -100,13 +80,13 @@ function addCors(response: Response, origin: string | null, env: Env): Response 
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
-    headers,
+    headers
   });
 }
 
 async function checkRateLimit(
   ip: string,
-  env: Env,
+  env: Env
 ): Promise<{ allowed: boolean; remaining: number }> {
   const windowSec = Number.parseInt(env.RATE_LIMIT_WINDOW_SECONDS ?? "60", 10);
   const maxReqs = Number.parseInt(env.RATE_LIMIT_MAX_REQUESTS ?? "120", 10);
@@ -122,7 +102,7 @@ async function checkRateLimit(
     }
 
     await env.RATE_LIMIT.put(key, String(count + 1), {
-      expirationTtl: windowSec * 2,
+      expirationTtl: windowSec * 2
     });
 
     return { allowed: true, remaining: maxReqs - count - 1 };
@@ -144,7 +124,7 @@ function decodeJsonBase64Url<T>(input: string): T {
   return JSON.parse(text) as T;
 }
 
-async function verifyAppJWT(token: string, secret: string): Promise<AppJWTPayload | null> {
+async function verifyJWT(token: string, secret: string): Promise<JWTPayload | null> {
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return null;
@@ -157,19 +137,19 @@ async function verifyAppJWT(token: string, secret: string): Promise<AppJWTPayloa
       enc.encode(secret),
       { name: "HMAC", hash: "SHA-256" },
       false,
-      ["verify"],
+      ["verify"]
     );
 
     const valid = await crypto.subtle.verify(
       "HMAC",
       cryptoKey,
       decodeBase64Url(sigB64),
-      enc.encode(`${headerB64}.${payloadB64}`),
+      enc.encode(`${headerB64}.${payloadB64}`)
     );
 
     if (!valid) return null;
 
-    const payload = decodeJsonBase64Url<AppJWTPayload>(payloadB64);
+    const payload = decodeJsonBase64Url<JWTPayload>(payloadB64);
     if (!payload?.sub || !payload?.org || !payload?.email || !payload?.tier) return null;
     if (payload.exp < Math.floor(Date.now() / 1000)) return null;
 
@@ -179,95 +159,27 @@ async function verifyAppJWT(token: string, secret: string): Promise<AppJWTPayloa
   }
 }
 
-async function verifyAccessJWT(
-  token: string,
-  teamDomain: string,
-  policyAud: string,
-): Promise<AccessJWTPayload | null> {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
-
-    const [headerB64, payloadB64, sigB64] = parts;
-    const header = decodeJsonBase64Url<{ kid: string; alg?: string }>(headerB64);
-
-    const certsResp = await fetch(`${teamDomain}/cdn-cgi/access/certs`, {
-      cf: { cacheTtl: 3600, cacheEverything: true },
-    } as RequestInit);
-
-    if (!certsResp.ok) return null;
-
-    const { keys } = await certsResp.json<{ keys: JsonWebKey[] }>();
-    const jwk = keys.find((k: any) => (k as any).kid === header.kid);
-    if (!jwk) return null;
-
-    const cryptoKey = await crypto.subtle.importKey(
-      "jwk",
-      jwk,
-      { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-      false,
-      ["verify"],
-    );
-
-    const valid = await crypto.subtle.verify(
-      "RSASSA-PKCS1-v1_5",
-      cryptoKey,
-      decodeBase64Url(sigB64),
-      new TextEncoder().encode(`${headerB64}.${payloadB64}`),
-    );
-
-    if (!valid) return null;
-
-    const payload = decodeJsonBase64Url<AccessJWTPayload>(payloadB64);
-    if (!payload?.sub || !payload?.aud?.includes(policyAud)) return null;
-    if (payload.iss !== teamDomain) return null;
-    if (payload.exp < Math.floor(Date.now() / 1000)) return null;
-
-    return payload;
-  } catch {
-    return null;
-  }
-}
-
-async function authenticateRequest(request: Request, env: Env): Promise<AuthContext> {
-  const authHeader = request.headers.get("Authorization") ?? "";
-  const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
-
-  if (bearer && env.JWT_SECRET) {
-    const appUser = await verifyAppJWT(bearer, env.JWT_SECRET);
-    if (appUser) return { type: "app", user: appUser };
-  }
-
-  const accessToken = request.headers.get("Cf-Access-Jwt-Assertion");
-  if (accessToken) {
-    const accessUser = await verifyAccessJWT(accessToken, env.TEAM_DOMAIN, env.POLICY_AUD);
-    if (accessUser) return { type: "access", user: accessUser };
-  }
-
-  return null;
-}
-
 function trackApiEvent(
   env: Env,
   method: string,
   path: string,
   status: number,
   orgId: string | null,
-  latencyMs: number,
+  latencyMs: number
 ): void {
   try {
     env.API_EVENTS.writeDataPoint({
       doubles: [status, latencyMs],
       blobs: [method, path, env.ENVIRONMENT],
-      indexes: [orgId ?? "anonymous"],
+      indexes: [orgId ?? "anonymous"]
     });
   } catch {
-    // ignore analytics failures
+    // no-op
   }
 }
 
 function getWorkerForPath(path: string, env: Env): Fetcher | null {
-  const n = path.replace(/^\/api(?=\/|$)/, "") || "/";
+  const n = path.replace(/^\/api/, "");
 
   if (n.startsWith("/auth")) return env.AUTH_WORKER;
   if (n.startsWith("/bookkeeping")) return env.BOOKKEEPING_WORKER;
@@ -281,7 +193,7 @@ function getWorkerForPath(path: string, env: Env): Fetcher | null {
 }
 
 export default {
-  async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const startMs = Date.now();
     const url = new URL(request.url);
     const origin = request.headers.get("Origin");
@@ -289,7 +201,7 @@ export default {
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
-        headers: corsHeaders(origin, env),
+        headers: corsHeaders(origin, env)
       });
     }
 
@@ -298,10 +210,10 @@ export default {
         Response.json({
           status: "ok",
           service: "insighthunter-dispatch",
-          env: env.ENVIRONMENT,
+          env: env.ENVIRONMENT
         }),
         origin,
-        env,
+        env
       );
     }
 
@@ -309,10 +221,10 @@ export default {
       return addCors(
         Response.json({
           version: "1.0.0",
-          build: new Date().toISOString().split("T")[0],
+          build: new Date().toISOString().split("T")[0]
         }),
         origin,
-        env,
+        env
       );
     }
 
@@ -327,25 +239,48 @@ export default {
             status: 429,
             headers: {
               "Retry-After": env.RATE_LIMIT_WINDOW_SECONDS ?? "60",
-              "X-RateLimit-Remaining": "0",
-            },
-          },
+              "X-RateLimit-Remaining": "0"
+            }
+          }
         ),
         origin,
-        env,
+        env
       );
     }
 
-    let auth: AuthContext = null;
+    let authenticatedUser: JWTPayload | null = null;
 
     if (!isPublicRoute(request.method, url.pathname)) {
-      auth = await authenticateRequest(request, env);
+      const authHeader = request.headers.get("Authorization") ?? "";
+      const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
 
-      if (!auth) {
+      if (!token) {
         return addCors(
           Response.json({ error: "Authentication required." }, { status: 401 }),
           origin,
-          env,
+          env
+        );
+      }
+
+      const secret = env.JWT_SECRET ?? "";
+      if (!secret) {
+        console.error("[dispatch] JWT_SECRET not configured");
+        return addCors(
+          Response.json({ error: "Server configuration error." }, { status: 500 }),
+          origin,
+          env
+        );
+      }
+
+      authenticatedUser = await verifyJWT(token, secret);
+      if (!authenticatedUser) {
+        return addCors(
+          Response.json(
+            { error: "Invalid or expired token. Please sign in again." },
+            { status: 401 }
+          ),
+          origin,
+          env
         );
       }
     }
@@ -355,7 +290,7 @@ export default {
       return addCors(
         Response.json({ error: `No route found for ${url.pathname}` }, { status: 404 }),
         origin,
-        env,
+        env
       );
     }
 
@@ -364,18 +299,11 @@ export default {
     enrichedHeaders.set("X-IH-Dispatch-At", new Date().toISOString());
     enrichedHeaders.set("X-RateLimit-Remaining", String(remaining));
 
-    if (auth?.type === "app") {
-      enrichedHeaders.set("X-IH-Auth-Type", "app");
-      enrichedHeaders.set("X-IH-User", auth.user.sub);
-      enrichedHeaders.set("X-IH-Org", auth.user.org);
-      enrichedHeaders.set("X-IH-Email", auth.user.email);
-      enrichedHeaders.set("X-IH-Tier", auth.user.tier);
-    }
-
-    if (auth?.type === "access") {
-      enrichedHeaders.set("X-IH-Auth-Type", "access");
-      enrichedHeaders.set("X-IH-User", auth.user.sub);
-      enrichedHeaders.set("X-IH-Email", auth.user.email ?? "");
+    if (authenticatedUser) {
+      enrichedHeaders.set("X-IH-User", authenticatedUser.sub);
+      enrichedHeaders.set("X-IH-Org", authenticatedUser.org);
+      enrichedHeaders.set("X-IH-Email", authenticatedUser.email);
+      enrichedHeaders.set("X-IH-Tier", authenticatedUser.tier);
     }
 
     const forwardUrl = new URL(request.url);
@@ -385,15 +313,15 @@ export default {
     if (["GET", "HEAD"].includes(request.method.toUpperCase())) {
       enrichedRequest = new Request(forwardUrl.toString(), {
         method: request.method,
-        headers: enrichedHeaders,
+        headers: enrichedHeaders
       });
     } else {
       enrichedRequest = new Request(forwardUrl.toString(), {
         method: request.method,
         headers: enrichedHeaders,
         body: request.body,
-        // @ts-expect-error Cloudflare runtime supports streaming body pass-through.
-        duplex: "half",
+        // @ts-expect-error request streaming support in modern runtimes
+        duplex: "half"
       });
     }
 
@@ -405,7 +333,7 @@ export default {
       return addCors(
         Response.json({ error: "Downstream worker failed." }, { status: 502 }),
         origin,
-        env,
+        env
       );
     }
 
@@ -414,10 +342,10 @@ export default {
       request.method,
       url.pathname,
       downstreamResponse.status,
-      auth?.type === "app" ? auth.user.org : null,
-      Date.now() - startMs,
+      authenticatedUser?.org ?? null,
+      Date.now() - startMs
     );
 
     return addCors(downstreamResponse, origin, env);
-  },
+  }
 } satisfies ExportedHandler<Env>;

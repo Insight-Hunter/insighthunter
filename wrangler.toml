@@ -13,7 +13,7 @@ head_sampling_rate = 1
 
 # ── Custom Domain ──────────────────────────────────────────────
 [[routes]]
-pattern = "dispatch.insighthunter.app/*"
+pattern = "workers.insighthunter.app/*"
 zone_name = "insighthunter.app"
 custom_domain = true
 
