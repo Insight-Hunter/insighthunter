@@ -1,6 +1,9 @@
 ---
 import AuthLayout from '../../layouts/AuthLayout.astro';
 import LoginForm from '../../components/auth/LoginForm.svelte';
+
+// FIX: was bare <html> with no AuthLayout — inconsistent vs all other auth pages.
+// Added ?registered=1 and ?logged_out=1 banner support.
 ---
 
 <AuthLayout title="Sign In | Insight Hunter">
@@ -10,8 +13,7 @@ import LoginForm from '../../components/auth/LoginForm.svelte';
         <h1>Welcome back</h1>
         <p>Sign in to your Insight Hunter account</p>
       </div>
-
-      <!-- Success: arrived from registration -->
+      
       <div id="registered-banner" class="notice-banner notice-success" style="display:none">
         ✅ Account created! Sign in to get started.
       </div>
