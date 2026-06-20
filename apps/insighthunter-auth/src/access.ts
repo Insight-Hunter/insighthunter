@@ -21,11 +21,15 @@ export interface CloudflareIdentity {
   account_id?: string;
 }
 
-function decodeBase64Url(input: string): Uint8Array {
+function decodeBase64Url(input: string): ArrayBuffer {
   const normalized = input.replace(/-/g, "+").replace(/_/g, "/");
   const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
   const binary = atob(padded);
-  return Uint8Array.from(binary, (c) => c.charCodeAt(0));
+  const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+  return bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  ) as ArrayBuffer;
 }
 
 function decodeJsonBase64Url<T>(input: string): T {

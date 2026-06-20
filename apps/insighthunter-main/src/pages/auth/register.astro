@@ -1,4 +1,3 @@
----
 export const prerender = false;
 import AuthLayout from '../../layouts/AuthLayout.astro';
 import { tiers } from '../../data/pricing';
@@ -58,7 +57,7 @@ const selectedTier = tiers.find((t) => t.id === plan) ?? tiers[0];
       <div class="form-group">
         <label class="form-label" for="password">Password</label>
         <input class="form-input" type="password" id="password" name="password" placeholder="Min 8 characters" autocomplete="new-password" minlength="8" required />
-        <div class="password-strength" id="pw-strength"></div>
+        <div class="password-strength" id="pw-strength" aria-live="polite"></div>
       </div>
 
       <label class="check-label">
@@ -84,59 +83,86 @@ const selectedTier = tiers.find((t) => t.id === plan) ?? tiers[0];
 </AuthLayout>
 
 <script>
+  // ─── Constants ───────────────────────────────────────────────────────────────
   const AUTH_BASE_URL = 'https://auth.insighthunter.app';
+  const APP_BASE_URL  = 'https://insighthunter.app';
 
-  const form = document.getElementById('register-form');
-  const btnText = document.getElementById('btn-text');
-  const loader = document.getElementById('btn-loader');
-  const errBanner = document.getElementById('error-banner');
-  const errText = document.getElementById('error-text');
-  const submitBtn = document.getElementById('submit-btn');
-  const pwInput = document.getElementById('password');
-  const pwStr = document.getElementById('pw-strength');
+  // ─── DOM refs ────────────────────────────────────────────────────────────────
+  const form      = document.getElementById('register-form') as HTMLFormElement | null;
+  const btnText   = document.getElementById('btn-text')     as HTMLSpanElement | null;
+  const loader    = document.getElementById('btn-loader')   as HTMLSpanElement | null;
+  const errBanner = document.getElementById('error-banner') as HTMLDivElement  | null;
+  const errText   = document.getElementById('error-text')   as HTMLSpanElement | null;
+  const submitBtn = document.getElementById('submit-btn')   as HTMLButtonElement | null;
+  const pwInput   = document.getElementById('password')     as HTMLInputElement  | null;
+  const pwStr     = document.getElementById('pw-strength')  as HTMLDivElement   | null;
 
-  let selectedPlan = document.querySelector('input[name="plan"]:checked')?.value ?? 'lite';
+  let selectedPlan: string =
+    (document.querySelector('input[name="plan"]:checked') as HTMLInputElement)?.value ?? 'lite';
 
-  function getSubmitLabel(plan) {
-    return plan === 'lite'
-      ? 'Create Free Account'
-      : plan === 'standard'
-        ? 'Start Insight Standard'
-        : plan === 'pro'
-          ? 'Start Insight Pro'
-          : 'Create Account';
-  }
-
-  function showError(msg) {
-    errText.textContent = msg;
-    errBanner.hidden = false;
-  }
-
-  function clearError() {
-    errText.textContent = '';
-    errBanner.hidden = true;
-  }
-
-  function setSubmitting(isSubmitting) {
-    submitBtn.disabled = isSubmitting;
-    loader.hidden = !isSubmitting;
-    btnText.textContent = isSubmitting ? 'Creating account…' : getSubmitLabel(selectedPlan);
-    submitBtn.setAttribute('aria-busy', isSubmitting ? 'true' : 'false');
-  }
-
-  function getJsonSafe(text) {
-    if (!text) return {};
-    try {
-      return JSON.parse(text);
-    } catch {
-      return null;
+  // ─── Helpers ─────────────────────────────────────────────────────────────────
+  function getSubmitLabel(plan: string): string {
+    switch (plan) {
+      case 'lite':     return 'Create Free Account';
+      case 'standard': return 'Start Insight Standard';
+      case 'pro':      return 'Start Insight Pro';
+      default:         return 'Create Account';
     }
   }
 
-  document.querySelectorAll('.plan-option').forEach((opt) => {
+  function showError(msg: string): void {
+    if (errText)   errText.textContent   = msg;
+    if (errBanner) errBanner.hidden      = false;
+  }
+
+  function clearError(): void {
+    if (errText)   errText.textContent   = '';
+    if (errBanner) errBanner.hidden      = true;
+  }
+
+  function setSubmitting(isSubmitting: boolean): void {
+    if (!submitBtn || !loader || !btnText) return;
+    submitBtn.disabled = isSubmitting;
+    loader.hidden      = !isSubmitting;
+    btnText.textContent = isSubmitting
+      ? 'Creating account…'
+      : getSubmitLabel(selectedPlan);
+    submitBtn.setAttribute('aria-busy', String(isSubmitting));
+  }
+
+  function safeParseJson(text: string): Record<string, unknown> | null {
+    if (!text) return {};
+    try   { return JSON.parse(text); }
+    catch { return null; }
+  }
+
+  /**
+   * Validate a redirect URL to prevent open redirect attacks.
+   * Only allows relative paths or URLs on our own origins.
+   */
+  function sanitizeRedirect(raw: string | null): string {
+    if (!raw) return '/dashboard';
+    const ALLOWED_ORIGINS = [APP_BASE_URL, AUTH_BASE_URL];
+    try {
+      const url = new URL(raw, window.location.origin);
+      if (
+        url.origin === window.location.origin ||
+        ALLOWED_ORIGINS.includes(url.origin)
+      ) {
+        return url.pathname + url.search;
+      }
+    } catch {
+      // not a valid URL — treat as relative path
+      if (raw.startsWith('/')) return raw;
+    }
+    return '/dashboard';
+  }
+
+  // ─── Plan selector ───────────────────────────────────────────────────────────
+  document.querySelectorAll<HTMLElement>('.plan-option').forEach((opt) => {
     opt.addEventListener('click', () => {
       const tierId = opt.dataset.tierId ?? 'lite';
-      const radio = opt.querySelector('input[type="radio"]');
+      const radio  = opt.querySelector<HTMLInputElement>('input[type="radio"]');
 
       document.querySelectorAll('.plan-option').forEach((o) => o.classList.remove('selected'));
       opt.classList.add('selected');
@@ -144,135 +170,102 @@ const selectedTier = tiers.find((t) => t.id === plan) ?? tiers[0];
       if (radio) radio.checked = true;
       selectedPlan = tierId;
 
-      if (!submitBtn.disabled) {
+      if (submitBtn && !submitBtn.disabled && btnText) {
         btnText.textContent = getSubmitLabel(selectedPlan);
       }
     });
   });
 
+  // ─── Password strength meter ─────────────────────────────────────────────────
   pwInput?.addEventListener('input', () => {
-    const v = pwInput.value;
-    let s = 0;
-    if (v.length >= 8) s++;
-    if (/[A-Z]/.test(v)) s++;
-    if (/[0-9]/.test(v)) s++;
-    if (/[^A-Za-z0-9]/.test(v)) s++;
+    if (!pwStr) return;
+    const v = (pwInput as HTMLInputElement).value;
+    let score = 0;
+    if (v.length >= 8)          score++;
+    if (/[A-Z]/.test(v))        score++;
+    if (/[0-9]/.test(v))        score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
 
     const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
     const colors = ['', '#E34E24', '#E8964E', '#5ED4FF', '#60DEA3'];
 
-    pwStr.textContent = v.length > 0 ? `Password strength: ${labels[s]}` : '';
-    pwStr.style.color = colors[s] ?? '';
+    pwStr.textContent  = v.length > 0 ? `Password strength: ${labels[score]}` : '';
+    pwStr.style.color  = colors[score] ?? '';
   });
 
+  // ─── Form submit ─────────────────────────────────────────────────────────────
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearError();
 
-    const firstNameField = form.elements.namedItem('firstName');
-    const lastNameField = form.elements.namedItem('lastName');
-    const companyField = form.elements.namedItem('company');
-    const emailField = form.elements.namedItem('email');
-    const passwordField = form.elements.namedItem('password');
-    const agreeTermsField = form.elements.namedItem('agreeTerms');
+    // Collect fields
+    const get = (name: string) =>
+      (form.elements.namedItem(name) as HTMLInputElement | null)?.value.trim() ?? '';
+    const getChecked = (name: string) =>
+      (form.elements.namedItem(name) as HTMLInputElement | null)?.checked ?? false;
 
-    const firstName = firstNameField instanceof HTMLInputElement ? firstNameField.value.trim() : '';
-    const lastName = lastNameField instanceof HTMLInputElement ? lastNameField.value.trim() : '';
-    const company = companyField instanceof HTMLInputElement ? companyField.value.trim() : '';
-    const email = emailField instanceof HTMLInputElement ? emailField.value.trim().toLowerCase() : '';
-    const password = passwordField instanceof HTMLInputElement ? passwordField.value : '';
-    const agreeTerms = agreeTermsField instanceof HTMLInputElement ? agreeTermsField.checked : false;
+    const firstName  = get('firstName');
+    const lastName   = get('lastName');
+    const company    = get('company');
+    const email      = get('email');
+    const password   = get('password');
+    const agreeTerms = getChecked('agreeTerms');
 
-    if (!firstName || !lastName || !company || !email || !password) {
-      showError('Please fill in all required fields.');
-      return;
-    }
-
-    if (password.length < 8) {
-      showError('Password must be at least 8 characters.');
-      return;
-    }
-
-    if (!agreeTerms) {
-      showError('You must agree to the Terms of Service.');
-      return;
-    }
+    // ── Client-side validation ──────────────────────────────────────────────
+    if (!firstName || !lastName) { showError('Please enter your full name.');        return; }
+    if (!company)                 { showError('Please enter your company name.');     return; }
+    if (!email || !email.includes('@')) { showError('Please enter a valid email.'); return; }
+    if (password.length < 8)      { showError('Password must be at least 8 characters.'); return; }
+    if (!agreeTerms)              { showError('Please agree to the Terms of Service.'); return; }
 
     setSubmitting(true);
 
     try {
-      const payload = {
-        email,
-        password,
-        name: `${firstName} ${lastName}`.trim(),
-        org_name: company,
-        plan: selectedPlan,
-      };
-
       const res = await fetch(`${AUTH_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          // Explicitly send Origin so the Worker can CORS-validate
+          'X-Requested-With': 'XMLHttpRequest',
         },
+        // Use HttpOnly cookies for token storage — NOT localStorage
         credentials: 'include',
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          company,
+          email,
+          password,
+          plan: selectedPlan,
+        }),
       });
 
-      const raw = await res.text();
-      console.log('register status:', res.status);
-      console.log('register raw response:', raw);
-
-      const parsed = getJsonSafe(raw);
-      const data = parsed && typeof parsed === 'object' ? parsed : {};
-      const message =
-        data?.error ||
-        data?.message ||
-        data?.details ||
-        (raw && !parsed ? raw : '') ||
-        `Registration failed (${res.status}).`;
+      const raw  = await res.text();
+      const data = safeParseJson(raw);
 
       if (!res.ok) {
-        showError(message);
+        const msg =
+          (data && typeof data.error   === 'string' && data.error)   ||
+          (data && typeof data.message === 'string' && data.message) ||
+          `Registration failed (${res.status}). Please try again.`;
+        showError(msg);
+        setSubmitting(false);
         return;
       }
 
-      window.location.href = '/auth/login?registered=1&email=' + encodeURIComponent(email);
-    } catch (error) {
-      console.error('Registration failed:', error);
-      showError(error instanceof Error ? error.message : 'Network error — please try again.');
-    } finally {
+      // ── Success: server sets HttpOnly session cookie ──────────────────────
+      // Redirect to email-verification holding page (or dashboard for auto-verify)
+      const redirectTarget =
+        (data && typeof data.redirect === 'string')
+          ? sanitizeRedirect(data.redirect)
+          : '/auth/verify-email';
+
+      window.location.href = redirectTarget;
+
+    } catch (err) {
+      console.error('[register] fetch error:', err);
+      showError('Network error — please check your connection and try again.');
       setSubmitting(false);
     }
   });
 </script>
-
-<style>
-  .auth-card{width:100%;max-width:480px;position:relative;z-index:1}
-  .auth-header{text-align:center;margin-bottom:24px}
-  .auth-header h1{font-size:1.65rem;margin-bottom:8px}
-  .auth-header p{color:var(--muted);font-size:0.875rem;line-height:1.6}
-  .plan-name{color:var(--gold);font-style:normal}
-  .plan-selector{display:flex;gap:8px;margin-bottom:24px}
-  .plan-option{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;border:1px solid var(--border-dim);border-radius:10px;cursor:pointer;transition:border-color 0.18s,background 0.18s;text-align:center}
-  .plan-option.selected{border-color:var(--gold);background:rgba(227,78,36,0.08)}
-  .plan-radio{display:none}
-  .plan-option-name{font-size:0.78rem;font-weight:700;color:var(--white)}
-  .plan-option-price{font-size:0.72rem;color:var(--muted)}
-  .error-banner{display:flex;align-items:center;gap:10px;background:rgba(224,82,82,0.08);border:1px solid rgba(224,82,82,0.3);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:0.875rem;color:#F87171}
-  .error-banner[hidden]{display:none}
-  .auth-form{display:flex;flex-direction:column;gap:16px;margin-bottom:20px}
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .password-strength{font-size:0.78rem;margin-top:4px;height:16px;transition:color 0.2s}
-  .check-label{display:flex;align-items:flex-start;gap:10px;font-size:0.82rem;color:var(--muted);cursor:pointer;line-height:1.5}
-  .check-label input{margin-top:2px;accent-color:var(--gold);flex-shrink:0}
-  .submit-btn{width:100%;padding:14px;font-size:0.975rem;margin-top:4px}
-  .submit-btn:disabled{opacity:0.7;cursor:not-allowed}
-  .spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,0.2);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite}
-  .spinner[hidden]{display:none}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .auth-footer{text-align:center;font-size:0.875rem;color:var(--muted)}
-  .auth-link{color:var(--cyan-text);font-weight:600;transition:color 0.18s}
-  .auth-link:hover{color:var(--cyan)}
-  @media(max-width:480px){.plan-selector{flex-direction:column}.form-row{grid-template-columns:1fr}}
-</style>
