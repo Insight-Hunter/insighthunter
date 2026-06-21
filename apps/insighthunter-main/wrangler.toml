@@ -3,10 +3,6 @@ pages_build_output_dir = "dist"
 compatibility_date = "2026-06-20"
 compatibility_flags = ["nodejs_compat"]
 
-[observability]
-enabled = true
-head_sampling_rate = 1
-
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-main"
@@ -36,5 +32,5 @@ dataset = "ih_page_views"
 
 [vars]
 PUBLIC_APP_URL = "https://insighthunter.app"
-DISPATCH_URL = "https://dispatch.insighthunter.app"
+DISPATCH_URL = "https://workers.insighthunter.app"
 AUTH_URL = "https://auth.insighthunter.app"
