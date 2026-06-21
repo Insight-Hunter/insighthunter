@@ -1,4 +1,5 @@
 ---
+
 export const prerender = true;
 import MarketingLayout from '../layouts/MarketingLayout.astro';
 import Hero from '../components/marketing/Hero.astro';
@@ -8,7 +9,9 @@ import Testimonials from '../components/marketing/Testimonials.astro';
 import CTABanner from '../components/marketing/CTABanner.astro';
 import { apps } from '../data/apps';
 const featuredApps = apps.slice(0, 6);
+
 ---
+
 <MarketingLayout title="Insight Hunter | Stop Flying Blind" description="CFO-grade reporting, bookkeeping, forecasts, AI insights, and operator tools for small businesses.">
   <Hero />
   <section class="section" id="apps">
@@ -36,8 +39,9 @@ const featuredApps = apps.slice(0, 6);
   <FeatureGrid />
   <Testimonials />
   <PricingTable />
-  <CTABanner title="Start with one app. Grow into the full finance stack." text="Use the app that solves today's bottleneck, then unlock the rest of the platform when you are ready." cta={{ href:'https://auth.insighthunter.app/signup?plan=free', label:'Create Free Account' }} />
+  <CTABanner title="Start with one app. Grow into the full finance stack." text="Use the app that solves today's bottleneck, then unlock the rest of the platform when you are ready." cta={{ href:'/auth/register?plan=lite', label:'Create Free Account' }} />
 </MarketingLayout>
+
 <style>
 .app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
 .app-card{display:flex;flex-direction:column;gap:8px;padding:24px;text-decoration:none}
