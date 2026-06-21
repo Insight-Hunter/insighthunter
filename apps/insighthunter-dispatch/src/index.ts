@@ -1,6 +1,11 @@
 export interface Env {
   AUTH_WORKER: Fetcher;
-  PLATFORM_WORKER: Fetcher;
+  BOOKKEEPING_WORKER: Fetcher;
+  PAYROLL_WORKER: Fetcher;
+  BIZFORMA_WORKER: Fetcher;
+  SCOUT_WORKER: Fetcher;
+  PBX_WORKER: Fetcher;
+  REPORT_WORKER: Fetcher;
   SESSIONS: KVNamespace;
   RATE_LIMIT: KVNamespace;
   DB: D1Database;
@@ -9,200 +14,338 @@ export interface Env {
   ALLOWED_ORIGINS: string;
   RATE_LIMIT_WINDOW_SECONDS: string;
   RATE_LIMIT_MAX_REQUESTS: string;
-  PLATFORM_API_BASE: string;
-  TENANT_BASE_DOMAIN: string;
-  AUTH_URL: string;
-  PUBLIC_APP_URL: string;
   JWT_SECRET?: string;
 }
 
-type Tier = "lite" | "standard" | "pro" | "enterprise";
-
-interface SessionClaims {
+interface JWTPayload {
   sub: string;
   org: string;
   email: string;
-  tier: Tier;
+  tier: "lite" | "standard" | "pro";
+  iat: number;
   exp: number;
 }
 
-interface TenantWorkerRow {
-  org_id: string;
-  tenant_id: string;
-  worker_name: string;
-  worker_url: string;
-  status: "pending" | "active" | "suspended" | "failed";
-  subscription_status: "inactive" | "trialing" | "active" | "past_due" | "canceled";
-}
-
-const PUBLIC_ROUTES = new Set([
-  "GET:/api/health",
-  "GET:/api/version",
-  "POST:/api/auth/login",
-  "POST:/api/auth/register",
-  "POST:/api/auth/refresh",
-  "POST:/api/auth/forgot-password"
-]);
+const PUBLIC_ROUTE_PATTERNS = [
+  { method: "POST", path: "/api/auth/login" },
+  { method: "POST", path: "/api/auth/register" },
+  { method: "POST", path: "/api/auth/refresh" },
+  { method: "POST", path: "/api/auth/forgot-password" },
+  { method: "GET", path: "/api/health" },
+  { method: "GET", path: "/api/version" }
+];
 
 function normalizePath(pathname: string): string {
+  if (!pathname) return "/";
   const cleaned = pathname.replace(/\/+$/, "");
   return cleaned || "/";
 }
 
 function isPublicRoute(method: string, pathname: string): boolean {
-  return PUBLIC_ROUTES.has(`${method.toUpperCase()}:${normalizePath(pathname)}`);
+  const normalizedMethod = method.toUpperCase();
+  const normalizedPath = normalizePath(pathname);
+
+  return PUBLIC_ROUTE_PATTERNS.some((route) => {
+    return route.method === normalizedMethod && normalizePath(route.path) === normalizedPath;
+  });
 }
 
 function getAllowedOrigins(env: Env): string[] {
-  return env.ALLOWED_ORIGINS.split(",").map((v) => v.trim()).filter(Boolean);
+  return (env.ALLOWED_ORIGINS || "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
 }
 
-function corsHeaders(origin: string | null, env: Env): HeadersInit {
+function corsHeaders(origin: string | null, env: Env): Record<string, string> {
   const allowed = getAllowedOrigins(env);
-  const allowOrigin = origin && allowed.includes(origin) ? origin : allowed[0] ?? "*";
+  const isAllowed = !!origin && (allowed.includes(origin) || env.ENVIRONMENT !== "production");
 
   return {
-    "Access-Control-Allow-Origin": allowOrigin,
-    "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-IH-Org, X-IH-Tenant",
+    "Access-Control-Allow-Origin": isAllowed ? origin : allowed[0] ?? "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-IH-Org",
     "Access-Control-Allow-Credentials": "true",
     "Access-Control-Max-Age": "86400",
-    Vary: "Origin"
+    "Vary": "Origin"
   };
 }
 
-function withCors(res: Response, origin: string | null, env: Env): Response {
-  const headers = new Headers(res.headers);
-  const extra = corsHeaders(origin, env);
-  for (const [k, v] of Object.entries(extra)) headers.set(k, v as string);
-  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
-}
+function addCors(response: Response, origin: string | null, env: Env): Response {
+  const headers = new Headers(response.headers);
+  for (const [k, v] of Object.entries(corsHeaders(origin, env))) {
+    headers.set(k, v);
+  }
 
-async function verifySession(req: Request, env: Env): Promise<SessionClaims | null> {
-  const auth = req.headers.get("Authorization");
-  if (!auth?.startsWith("Bearer ")) return null;
-
-  const verifyReq = new Request("https://auth.internal/verify", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token: auth.slice("Bearer ".length) })
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
   });
-
-  const verifyRes = await env.AUTH_WORKER.fetch(verifyReq);
-  if (!verifyRes.ok) return null;
-  return (await verifyRes.json()) as SessionClaims;
 }
 
-async function lookupTenant(orgId: string, env: Env): Promise<TenantWorkerRow | null> {
-  const result = await env.DB.prepare(
-    `SELECT
-       tw.org_id,
-       tw.tenant_id,
-       tw.worker_name,
-       tw.worker_url,
-       tw.status,
-       COALESCE(s.status, 'inactive') AS subscription_status
-     FROM tenant_workers tw
-     LEFT JOIN subscriptions s ON s.org_id = tw.org_id
-     WHERE tw.org_id = ?
-     LIMIT 1`
-  ).bind(orgId).first<TenantWorkerRow>();
+async function checkRateLimit(
+  ip: string,
+  env: Env
+): Promise<{ allowed: boolean; remaining: number }> {
+  const windowSec = Number.parseInt(env.RATE_LIMIT_WINDOW_SECONDS ?? "60", 10);
+  const maxReqs = Number.parseInt(env.RATE_LIMIT_MAX_REQUESTS ?? "120", 10);
+  const windowStart = Math.floor(Date.now() / 1000 / windowSec) * windowSec;
+  const key = `rl:${ip}:${windowStart}`;
 
-  return result ?? null;
+  try {
+    const raw = await env.RATE_LIMIT.get(key);
+    const count = raw ? Number.parseInt(raw, 10) : 0;
+
+    if (count >= maxReqs) {
+      return { allowed: false, remaining: 0 };
+    }
+
+    await env.RATE_LIMIT.put(key, String(count + 1), {
+      expirationTtl: windowSec * 2
+    });
+
+    return { allowed: true, remaining: maxReqs - count - 1 };
+  } catch {
+    return { allowed: true, remaining: maxReqs };
+  }
 }
 
-async function createProvisioningJob(orgId: string, tier: Tier, env: Env): Promise<string> {
-  const jobId = crypto.randomUUID();
-
-  await env.DB.prepare(
-    `INSERT INTO provisioning_jobs (
-      id, org_id, requested_tier, status, created_at, updated_at
-    ) VALUES (?, ?, ?, 'queued', unixepoch(), unixepoch())`
-  ).bind(jobId, orgId, tier).run();
-
-  await env.PLATFORM_WORKER.fetch(
-    new Request("https://platform.internal/api/provision", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ jobId, orgId, tier })
-    })
-  );
-
-  return jobId;
+function decodeBase64Url(input: string): Uint8Array {
+  const normalized = input.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
+  const binary = atob(padded);
+  return Uint8Array.from(binary, (c) => c.charCodeAt(0));
 }
 
-async function proxyToTenant(req: Request, tenant: TenantWorkerRow, claims: SessionClaims): Promise<Response> {
-  const url = new URL(req.url);
-  const upstream = new URL(url.pathname + url.search, tenant.worker_url);
+function decodeJsonBase64Url<T>(input: string): T {
+  const bytes = decodeBase64Url(input);
+  const text = new TextDecoder().decode(bytes);
+  return JSON.parse(text) as T;
+}
 
-  const headers = new Headers(req.headers);
-  headers.set("X-IH-Org", claims.org);
-  headers.set("X-IH-Tenant", tenant.tenant_id);
-  headers.set("X-IH-Tier", claims.tier);
-  headers.set("X-IH-User", claims.sub);
+async function verifyJWT(token: string, secret: string): Promise<JWTPayload | null> {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
 
-  return fetch(new Request(upstream.toString(), {
-    method: req.method,
-    headers,
-    body: req.method === "GET" || req.method === "HEAD" ? undefined : req.body,
-    redirect: "manual"
-  }));
+    const [headerB64, payloadB64, sigB64] = parts;
+    const enc = new TextEncoder();
+
+    const cryptoKey = await crypto.subtle.importKey(
+      "raw",
+      enc.encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["verify"]
+    );
+
+    const valid = await crypto.subtle.verify(
+      "HMAC",
+      cryptoKey,
+      decodeBase64Url(sigB64),
+      enc.encode(`${headerB64}.${payloadB64}`)
+    );
+
+    if (!valid) return null;
+
+    const payload = decodeJsonBase64Url<JWTPayload>(payloadB64);
+    if (!payload?.sub || !payload?.org || !payload?.email || !payload?.tier) return null;
+    if (payload.exp < Math.floor(Date.now() / 1000)) return null;
+
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+function trackApiEvent(
+  env: Env,
+  method: string,
+  path: string,
+  status: number,
+  orgId: string | null,
+  latencyMs: number
+): void {
+  try {
+    env.API_EVENTS.writeDataPoint({
+      doubles: [status, latencyMs],
+      blobs: [method, path, env.ENVIRONMENT],
+      indexes: [orgId ?? "anonymous"]
+    });
+  } catch {
+    // no-op
+  }
+}
+
+function getWorkerForPath(path: string, env: Env): Fetcher | null {
+  const n = path.replace(/^\/api/, "");
+
+  if (n.startsWith("/auth")) return env.AUTH_WORKER;
+  if (n.startsWith("/bookkeeping")) return env.BOOKKEEPING_WORKER;
+  if (n.startsWith("/payroll")) return env.PAYROLL_WORKER;
+  if (n.startsWith("/bizforma")) return env.BIZFORMA_WORKER;
+  if (n.startsWith("/scout")) return env.SCOUT_WORKER;
+  if (n.startsWith("/pbx")) return env.PBX_WORKER;
+  if (n.startsWith("/report")) return env.REPORT_WORKER;
+
+  return null;
 }
 
 export default {
-  async fetch(req: Request, env: Env): Promise<Response> {
-    const origin = req.headers.get("Origin");
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const startMs = Date.now();
+    const url = new URL(request.url);
+    const origin = request.headers.get("Origin");
 
-    if (req.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: corsHeaders(origin, env) });
-    }
-
-    const url = new URL(req.url);
-    const path = normalizePath(url.pathname);
-
-    if (path === "/api/health") {
-      return withCors(Response.json({ ok: true, service: "dispatch" }), origin, env);
-    }
-
-    if (path === "/api/version") {
-      return withCors(Response.json({ service: "insighthunter-dispatch", mode: "workers-for-platforms" }), origin, env);
-    }
-
-    if (path.startsWith("/api/auth/")) {
-      return withCors(await env.AUTH_WORKER.fetch(req), origin, env);
-    }
-
-    const start = Date.now();
-    const claims = await verifySession(req, env);
-    if (!claims) {
-      return withCors(Response.json({ error: "Unauthorized" }, { status: 401 }), origin, env);
-    }
-
-    const tenant = await lookupTenant(claims.org, env);
-
-    if (!tenant) {
-      const jobId = await createProvisioningJob(claims.org, claims.tier, env);
-      return withCors(Response.json({ error: "Tenant provisioning in progress", jobId, status: "queued" }, { status: 202 }), origin, env);
-    }
-
-    if (tenant.subscription_status !== "active" && tenant.subscription_status !== "trialing") {
-      return withCors(Response.json({ error: "Subscription required" }, { status: 403 }), origin, env);
-    }
-
-    if (tenant.status !== "active") {
-      return withCors(Response.json({ error: "Tenant not ready", status: tenant.status }, { status: 409 }), origin, env);
-    }
-
-    const upstream = await proxyToTenant(req, tenant, claims);
-
-    try {
-      env.API_EVENTS.writeDataPoint({
-        blobs: [req.method, path, env.ENVIRONMENT],
-        doubles: [upstream.status, Date.now() - start],
-        indexes: [claims.org]
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders(origin, env)
       });
-    } catch {}
+    }
 
-    return withCors(upstream, origin, env);
+    if (url.pathname === "/api/health") {
+      return addCors(
+        Response.json({
+          status: "ok",
+          service: "insighthunter-dispatch",
+          env: env.ENVIRONMENT
+        }),
+        origin,
+        env
+      );
+    }
+
+    if (url.pathname === "/api/version") {
+      return addCors(
+        Response.json({
+          version: "1.0.0",
+          build: new Date().toISOString().split("T")[0]
+        }),
+        origin,
+        env
+      );
+    }
+
+    const clientIP = request.headers.get("CF-Connecting-IP") ?? "unknown";
+    const { allowed, remaining } = await checkRateLimit(clientIP, env);
+
+    if (!allowed) {
+      return addCors(
+        Response.json(
+          { error: "Rate limit exceeded. Please slow down and try again." },
+          {
+            status: 429,
+            headers: {
+              "Retry-After": env.RATE_LIMIT_WINDOW_SECONDS ?? "60",
+              "X-RateLimit-Remaining": "0"
+            }
+          }
+        ),
+        origin,
+        env
+      );
+    }
+
+    let authenticatedUser: JWTPayload | null = null;
+
+    if (!isPublicRoute(request.method, url.pathname)) {
+      const authHeader = request.headers.get("Authorization") ?? "";
+      const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+      if (!token) {
+        return addCors(
+          Response.json({ error: "Authentication required." }, { status: 401 }),
+          origin,
+          env
+        );
+      }
+
+      const secret = env.JWT_SECRET ?? "";
+      if (!secret) {
+        console.error("[dispatch] JWT_SECRET not configured");
+        return addCors(
+          Response.json({ error: "Server configuration error." }, { status: 500 }),
+          origin,
+          env
+        );
+      }
+
+      authenticatedUser = await verifyJWT(token, secret);
+      if (!authenticatedUser) {
+        return addCors(
+          Response.json(
+            { error: "Invalid or expired token. Please sign in again." },
+            { status: 401 }
+          ),
+          origin,
+          env
+        );
+      }
+    }
+
+    const targetWorker = getWorkerForPath(url.pathname, env);
+    if (!targetWorker) {
+      return addCors(
+        Response.json({ error: `No route found for ${url.pathname}` }, { status: 404 }),
+        origin,
+        env
+      );
+    }
+
+    const enrichedHeaders = new Headers(request.headers);
+    enrichedHeaders.set("X-IH-Request-ID", crypto.randomUUID());
+    enrichedHeaders.set("X-IH-Dispatch-At", new Date().toISOString());
+    enrichedHeaders.set("X-RateLimit-Remaining", String(remaining));
+
+    if (authenticatedUser) {
+      enrichedHeaders.set("X-IH-User", authenticatedUser.sub);
+      enrichedHeaders.set("X-IH-Org", authenticatedUser.org);
+      enrichedHeaders.set("X-IH-Email", authenticatedUser.email);
+      enrichedHeaders.set("X-IH-Tier", authenticatedUser.tier);
+    }
+
+    const forwardUrl = new URL(request.url);
+    forwardUrl.pathname = forwardUrl.pathname.replace(/^\/api(?=\/|$)/, "") || "/";
+
+    let enrichedRequest: Request;
+    if (["GET", "HEAD"].includes(request.method.toUpperCase())) {
+      enrichedRequest = new Request(forwardUrl.toString(), {
+        method: request.method,
+        headers: enrichedHeaders
+      });
+    } else {
+      enrichedRequest = new Request(forwardUrl.toString(), {
+        method: request.method,
+        headers: enrichedHeaders,
+        body: request.body,
+        // @ts-expect-error request streaming support in modern runtimes
+        duplex: "half"
+      });
+    }
+
+    let downstreamResponse: Response;
+    try {
+      downstreamResponse = await targetWorker.fetch(enrichedRequest);
+    } catch (err) {
+      console.error("[dispatch] Downstream worker error:", err);
+      return addCors(
+        Response.json({ error: "Downstream worker failed." }, { status: 502 }),
+        origin,
+        env
+      );
+    }
+
+    trackApiEvent(
+      env,
+      request.method,
+      url.pathname,
+      downstreamResponse.status,
+      authenticatedUser?.org ?? null,
+      Date.now() - startMs
+    );
+
+    return addCors(downstreamResponse, origin, env);
   }
-};
+} satisfies ExportedHandler<Env>;

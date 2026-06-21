@@ -1,3 +1,5 @@
+import * from "index.ts"
+
 export default {
   async fetch(req: Request, env: Env) {
     try {
