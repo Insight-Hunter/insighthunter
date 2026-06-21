@@ -1,3 +1,5 @@
+
+
 export interface Env {
   DB: D1Database;
   PLATFORM_EVENTS: AnalyticsEngineDataset;
@@ -20,7 +22,9 @@ function slugify(input: string): string {
 }
 
 async function resolveOrgSlug(orgId: string, env: Env): Promise<string> {
-  const row = await env.DB.prepare(`SELECT slug FROM orgs WHERE id = ? LIMIT 1`).bind(orgId).first<{ slug: string }>();
+  const row = await env.DB.prepare("SELECT slug FROM orgs WHERE id = ? LIMIT 1")
+    .bind(orgId)
+    .first<{ slug: string }>();
   return row?.slug ?? orgId.toLowerCase();
 }
 
@@ -29,7 +33,9 @@ async function updateJob(jobId: string, status: string, errorMessage: string | n
     `UPDATE provisioning_jobs
      SET status = ?, error_message = ?, updated_at = unixepoch()
      WHERE id = ?`
-  ).bind(status, errorMessage, jobId).run();
+  )
+    .bind(status, errorMessage, jobId)
+    .run();
 }
 
 async function upsertTenant(orgId: string, slug: string, env: Env) {
@@ -47,14 +53,16 @@ async function upsertTenant(orgId: string, slug: string, env: Env) {
        status = 'active',
        dispatch_namespace = excluded.dispatch_namespace,
        updated_at = unixepoch()`
-  ).bind(
-    crypto.randomUUID(),
-    orgId,
-    tenantId,
-    workerName,
-    workerUrl,
-    env.DISPATCH_NAMESPACE
-  ).run();
+  )
+    .bind(
+      crypto.randomUUID(),
+      orgId,
+      tenantId,
+      workerName,
+      workerUrl,
+      env.DISPATCH_NAMESPACE
+    )
+    .run();
 
   return { tenantId, workerName, workerUrl };
 }

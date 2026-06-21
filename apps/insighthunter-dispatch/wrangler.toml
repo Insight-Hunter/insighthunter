@@ -3,10 +3,6 @@ main = "src/index.ts"
 compatibility_date = "2026-06-20"
 compatibility_flags = ["nodejs_compat"]
 
-[observability]
-enabled = true
-head_sampling_rate = 1
-
 [[services]]
 binding = "AUTH_WORKER"
 service = "insighthunter-auth"
@@ -14,6 +10,30 @@ service = "insighthunter-auth"
 [[services]]
 binding = "PLATFORM_WORKER"
 service = "insighthunter-platform-worker"
+
+[[services]]
+binding = "BOOKKEEPING_WORKER" 
+service = "insighthunter-bookkeeping"
+
+[[services]]
+binding = "PAYROLL_WORKER"
+service = "insighthunter-payroll"
+
+[[services]]
+binding = "BIZFORMA_WORKER"
+service = "insighthunter-bizforma"
+
+[[services]]
+binding = "SCOUT_WORKER"
+service = "insighthunter-scout"
+
+[[services]]
+binding = "PBX_WORKER"
+service = "insighthunter-pbx"
+
+[[services]]
+binding = "REPORT_WORKER"
+service = "insighthunter-report"
 
 [[kv_namespaces]]
 binding = "SESSIONS"
