@@ -1,40 +1,26 @@
 {
-  "name": "bizforma",
-  "version": "1.1.0",
-  "description": "BizForma — Complete Business Formation App by InsightHunter",
+  "name": "insighthunter-bizforma",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run dev:worker\" \"npm run dev:ui\"",
-    "dev:worker": "wrangler dev --port 8787",
-    "dev:ui": "vite --port 5173",
+    "dev": "vite",
     "build": "vite build",
-    "build:worker": "wrangler deploy --dry-run",
-    "deploy": "npm run build && wrangler deploy",
-    "db:create": "wrangler d1 create bizforma",
-    "db:migrate": "wrangler d1 execute bizforma --file=schema.sql",
-    "db:migrate:local": "wrangler d1 execute bizforma --local --file=schema.sql",
-    "kv:create": "wrangler kv namespace create BIZFORMA_KV",
-    "setup": "npm run db:create && npm run kv:create && npm run db:migrate",
-    "test": "vitest run",
-    "lint": "eslint src --ext .ts,.tsx",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
-    "@ih/tier-config": "workspace:*",
-    "@ih/types": "workspace:*",
-    "hono": "^4.7.4",
-    "framer-motion": "^11.0.0",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0"
+    "hono": "^4.5.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250310.0",
-    "typescript": "^5.7.3",
-    "wrangler": "^4.76.0",
-    "@vitejs/plugin-react": "^4.3.0",
-    "concurrently": "^9.0.0",
-    "vite": "^5.4.0",
-    "vitest": "^2.1.0"
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.10",
+    "wrangler": "^3.91.0"
   }
 }
