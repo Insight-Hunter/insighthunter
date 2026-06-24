@@ -1,306 +1,325 @@
-// src/App.tsx
-import React, { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { PHASES, ALL_STEPS, COLORS } from "./constants";
-import { FormProvider, useForm } from "./contract/FormContext";
-import { Sidebar } from "./components/Sidebar";
-import { TaxDeadlinesPanel } from "./components/TaxDeadlines";
-import { AppleButton } from "./components/ui";
-import {
-  IdeaStep, MarketStep, BusinessModelStep, NameStep, StructureStep,
-  StateRegStep, EINStep, LicensesStep, RegisteredAgentStep, OperatingStep,
-  BankStep, AccountingStep, FedTaxStep, StateTaxStep, PayrollStep, FundingStep,
-  DomainStep, WebsiteStep, SEOStep, SocialStep, BrandingStep, MarketingStep,
-  LaunchChecklistStep,
-} from "./components/steps";
-import type { StepData } from "./types";
+import React, { useEffect, useMemo, useState } from 'react';
 
-// ─── Step Component Registry ──────────────────────────────────────────────────
-const STEP_COMPONENTS: Record<string, React.ComponentType<{ data: StepData; onChange: (d: StepData) => void }>> = {
-  idea:             IdeaStep,
-  market:           MarketStep,
-  model:            BusinessModelStep,
-  name:             NameStep,
-  structure:        StructureStep,
-  state_reg:        StateRegStep,
-  ein:              EINStep,
-  licenses:         LicensesStep,
-  registered_agent: RegisteredAgentStep,
-  operating:        OperatingStep,
-  bank:             BankStep,
-  accounting:       AccountingStep,
-  fed_tax:          FedTaxStep,
-  state_tax:        StateTaxStep,
-  payroll:          PayrollStep,
-  funding:          FundingStep,
-  domain:           DomainStep,
-  website:          WebsiteStep,
-  seo:              SEOStep,
-  social:           SocialStep,
-  branding:         BrandingStep,
-  marketing:        MarketingStep,
-  launch_plan:      LaunchChecklistStep,
+type DashboardSummary = {
+  orgId: string;
+  summary: {
+    totalCases: number;
+    completeCases: number;
+    activeCases: number;
+  };
 };
 
-// ─── Tab Types ────────────────────────────────────────────────────────────────
-type Tab = "steps" | "deadlines";
+type FormationCase = {
+  id: string;
+  org_id: string;
+  user_id: string;
+  status: string;
+  entity_type: string | null;
+  business_name: string | null;
+  state: string | null;
+  created_at: string;
+  updated_at: string;
+};
 
-// ─── Inner App (needs FormContext) ────────────────────────────────────────────
-function AppInner() {
-  const [activePhase, setActivePhase] = useState<string>(PHASES[0].id);
-  const [activeStep, setActiveStep]   = useState<string>(ALL_STEPS[0].id);
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
-  const [activeTab, setActiveTab]     = useState<Tab>("steps");
+type AuthUser = {
+  userId: string;
+  orgId: string;
+  email: string;
+  name: string;
+  tier: string;
+  role: string;
+};
 
-  const { getStepData, setStepData } = useForm();
+declare global {
+  interface Window {
+    __BIZFORMA_CONFIG__?: {
+      appBaseUrl: string;
+      authBaseUrl: string;
+    };
+  }
+}
 
-  const currIdx    = ALL_STEPS.findIndex((s) => s.id === activeStep);
-  const currPhase  = PHASES.find((p) => p.id === activePhase);
-  const currStep   = ALL_STEPS[currIdx];
+const entityOptions = [
+  'SOLE_PROP',
+  'LLC',
+  'S_CORP',
+  'C_CORP',
+  'PARTNERSHIP',
+  'NONPROFIT',
+];
 
-  const goToStep = useCallback((stepId: string) => {
-    setActiveStep(stepId);
-    const phase = PHASES.find((p) => p.steps.some((s) => s.id === stepId));
-    if (phase) setActivePhase(phase.id);
+export function App() {
+  const config = useMemo(
+    () =>
+      window.__BIZFORMA_CONFIG__ ?? {
+        appBaseUrl: 'https://bizforma.insighthunter.app',
+        authBaseUrl: 'https://auth.insighthunter.app',
+      },
+    [],
+  );
+
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
+  const [cases, setCases] = useState<FormationCase[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [formState, setFormState] = useState({
+    business_name: '',
+    entity_type: 'LLC',
+    state: 'GA',
+  });
+
+  useEffect(() => {
+    void loadApp();
   }, []);
 
-  const goNext = () => {
-    if (currIdx < ALL_STEPS.length - 1) goToStep(ALL_STEPS[currIdx + 1].id);
-  };
-  const goPrev = () => {
-    if (currIdx > 0) goToStep(ALL_STEPS[currIdx - 1].id);
-  };
+  async function loadApp() {
+    try {
+      const [meRes, dashboardRes, casesRes] = await Promise.all([
+        fetch('/api/me', { credentials: 'include' }),
+        fetch('/api/dashboard', { credentials: 'include' }),
+        fetch('/api/cases', { credentials: 'include' }),
+      ]);
 
-  const StepComponent = STEP_COMPONENTS[activeStep];
-  const stepData = getStepData(activeStep);
+      if (meRes.status === 401) {
+        setLoading(false);
+        return;
+      }
 
-  // Dot-nav window around current step
-  const dotStart = Math.max(0, currIdx - 2);
-  const dotEnd   = Math.min(ALL_STEPS.length, currIdx + 3);
+      const meData = await meRes.json();
+      const dashboardData = await dashboardRes.json();
+      const casesData = await casesRes.json();
+
+      setUser(meData.user);
+      setDashboard(dashboardData);
+      setCases(casesData.items ?? []);
+    } catch {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function createCase() {
+    const response = await fetch('/api/cases', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(formState),
+    });
+
+    if (!response.ok) return;
+
+    const created = (await response.json()) as FormationCase;
+    setCases((prev) => [created, ...prev]);
+    setDashboard((prev) =>
+      prev
+        ? {
+            ...prev,
+            summary: {
+              ...prev.summary,
+              totalCases: prev.summary.totalCases + 1,
+              activeCases: prev.summary.activeCases + 1,
+            },
+          }
+        : prev,
+    );
+  }
+
+  if (loading) {
+    return <div className="screen center">Loading BizForma…</div>;
+  }
+
+  if (!user) {
+    return (
+      <div className="screen">
+        <div className="hero-card">
+          <div className="eyebrow">Insight Hunter · BizForma</div>
+          <h1>Entity formation and compliance without blind spots.</h1>
+          <p className="lead">
+            BizForma centralizes formation, EIN prep, compliance tracking, and
+            customer onboarding while identity stays trusted at auth.insighthunter.app.
+          </p>
+          <div className="button-row">
+            <a className="btn btn-primary" href="/auth/signup">
+              Create account
+            </a>
+            <a className="btn btn-secondary" href="/auth/login">
+              Sign in
+            </a>
+          </div>
+          <div className="meta-grid">
+            <div className="meta-card">
+              <strong>Cloudflare-native</strong>
+              <span>D1, R2, KV, Durable Objects, Queues, Workflows.</span>
+            </div>
+            <div className="meta-card">
+              <strong>Shared SaaS core</strong>
+              <span>Tenant-aware v1 with clean enterprise upgrade path.</span>
+            </div>
+            <div className="meta-card">
+              <strong>Enterprise-ready</strong>
+              <span>Workers for Platforms remains available later for isolated tenant workers.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        height: "100vh",
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif",
-        backgroundColor: COLORS.bg,
-        overflow: "hidden",
-      }}
-    >
-      {/* Sidebar */}
-      <AnimatePresence initial={false}>
-        {sidebarOpen && (
-          <motion.div
-            initial={{ width: 0, opacity: 0 }}
-            animate={{ width: 272, opacity: 1 }}
-            exit={{ width: 0, opacity: 0 }}
-            transition={{ type: "spring", damping: 28, stiffness: 220 }}
-            style={{ overflow: "hidden", flexShrink: 0 }}
-          >
-            <Sidebar
-              activePhase={activePhase}
-              activeStep={activeStep}
-              onPhaseChange={setActivePhase}
-              onStepChange={goToStep}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Main Area */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
-        {/* Top Bar */}
-        <div
-          style={{
-            height: 52,
-            borderBottom: `1px solid ${COLORS.sep}`,
-            backgroundColor: COLORS.surface,
-            display: "flex",
-            alignItems: "center",
-            padding: "0 20px",
-            gap: 12,
-            flexShrink: 0,
-          }}
-        >
-          {/* Sidebar toggle */}
-          <button
-            onClick={() => setSidebarOpen((o) => !o)}
-            aria-label="Toggle sidebar"
-            style={{
-              width: 32,
-              height: 32,
-              border: "none",
-              background: COLORS.fill,
-              borderRadius: 8,
-              cursor: "pointer",
-              fontSize: 14,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            ☰
-          </button>
-
-          {/* Tab switcher */}
-          <div style={{ display: "flex", gap: 2, backgroundColor: COLORS.fill, borderRadius: 8, padding: 2 }}>
-            {(["steps", "deadlines"] as Tab[]).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                style={{
-                  padding: "5px 14px",
-                  fontSize: 13,
-                  fontWeight: activeTab === tab ? 600 : 400,
-                  border: "none",
-                  borderRadius: 6,
-                  backgroundColor: activeTab === tab ? COLORS.surface : "transparent",
-                  color: activeTab === tab ? COLORS.gray1 : COLORS.gray5,
-                  cursor: "pointer",
-                  fontFamily: "inherit",
-                  transition: "all 0.15s",
-                  boxShadow: activeTab === tab ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-                }}
-              >
-                {tab === "steps" ? "📋 Steps" : "📅 Tax Deadlines"}
-              </button>
-            ))}
-          </div>
-
-          {/* Breadcrumb */}
-          {activeTab === "steps" && (
-            <div
-              style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                minWidth: 0,
-                overflow: "hidden",
-              }}
-            >
-              <span style={{ fontSize: 13, color: COLORS.gray5, flexShrink: 0 }}>
-                {currPhase?.label}
-              </span>
-              <span style={{ color: COLORS.sep, flexShrink: 0 }}>›</span>
-              <span
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: COLORS.gray1,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {currStep?.label}
-              </span>
-            </div>
-          )}
-
-          <div
-            style={{
-              fontSize: 12,
-              color: COLORS.gray5,
-              flexShrink: 0,
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            {activeTab === "steps" ? `Step ${currIdx + 1} / ${ALL_STEPS.length}` : ""}
-          </div>
+    <div className="screen app-shell">
+      <aside className="sidebar">
+        <div>
+          <div className="eyebrow">BizForma</div>
+          <h2>Insight Hunter</h2>
         </div>
+        <nav className="nav-list">
+          <a href="#overview">Overview</a>
+          <a href="#formation">Formation</a>
+          <a href="#compliance">Compliance</a>
+          <a href="#documents">Documents</a>
+          <a href="#advisor">Advisor</a>
+        </nav>
+        <div className="profile-card">
+          <strong>{user.name}</strong>
+          <span>{user.email}</span>
+          <span>
+            {user.role} · {user.tier}
+          </span>
+        </div>
+      </aside>
 
-        {/* Content */}
-        <div style={{ flex: 1, overflowY: "auto" }}>
-          <AnimatePresence mode="wait">
-            {activeTab === "deadlines" ? (
-              <motion.div
-                key="deadlines"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.18 }}
-                style={{ maxWidth: 720, margin: "0 auto", padding: "0 24px 60px" }}
+      <main className="content">
+        <section className="topbar">
+          <div>
+            <div className="eyebrow">Organization</div>
+            <h1>{dashboard?.orgId}</h1>
+          </div>
+          <div className="button-row">
+            <a className="btn btn-secondary" href={config.authBaseUrl} target="_blank" rel="noreferrer">
+              Auth portal
+            </a>
+            <button className="btn btn-primary" onClick={createCase}>
+              Quick create
+            </button>
+          </div>
+        </section>
+
+        <section className="stats-grid" id="overview">
+          <StatCard label="Formation cases" value={String(dashboard?.summary.totalCases ?? 0)} />
+          <StatCard label="Active cases" value={String(dashboard?.summary.activeCases ?? 0)} />
+          <StatCard label="Completed" value={String(dashboard?.summary.completeCases ?? 0)} />
+        </section>
+
+        <section className="workspace-grid" id="formation">
+          <div className="panel">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">New case</div>
+                <h3>Create a formation workflow</h3>
+              </div>
+            </div>
+
+            <label>
+              Business name
+              <input
+                value={formState.business_name}
+                onChange={(e) =>
+                  setFormState((prev) => ({ ...prev, business_name: e.target.value }))
+                }
+                placeholder="Peachtree Advisory LLC"
+              />
+            </label>
+
+            <label>
+              Entity type
+              <select
+                value={formState.entity_type}
+                onChange={(e) =>
+                  setFormState((prev) => ({ ...prev, entity_type: e.target.value }))
+                }
               >
-                <TaxDeadlinesPanel />
-              </motion.div>
-            ) : (
-              <motion.div
-                key={activeStep}
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -14 }}
-                transition={{ duration: 0.18 }}
-                style={{ maxWidth: 720, margin: "0 auto", padding: "0 24px 60px" }}
-              >
-                {StepComponent ? (
-                  <StepComponent data={stepData} onChange={(d) => setStepData(activeStep, d)} />
-                ) : (
-                  <div style={{ padding: 40, color: COLORS.gray5 }}>
-                    This step is not available. Please select another step from the navigation.
+                {entityOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              State
+              <input
+                value={formState.state}
+                onChange={(e) =>
+                  setFormState((prev) => ({ ...prev, state: e.target.value.toUpperCase() }))
+                }
+                placeholder="GA"
+                maxLength={2}
+              />
+            </label>
+
+            <button className="btn btn-primary full" onClick={createCase}>
+              Create formation case
+            </button>
+          </div>
+
+          <div className="panel">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">Pipeline</div>
+                <h3>Recent formation cases</h3>
+              </div>
+            </div>
+
+            <div className="case-list">
+              {cases.length === 0 ? (
+                <div className="empty-card">No cases yet. Create your first one now.</div>
+              ) : (
+                cases.map((item) => (
+                  <div className="case-card" key={item.id}>
+                    <div>
+                      <strong>{item.business_name || 'Untitled business'}</strong>
+                      <div className="case-meta">
+                        {item.entity_type || 'Entity TBD'} · {item.state || 'State TBD'}
+                      </div>
+                    </div>
+                    <span className="status-pill">{item.status}</span>
                   </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Navigation Footer */}
-        {activeTab === "steps" && (
-          <div
-            style={{
-              borderTop: `1px solid ${COLORS.sep}`,
-              backgroundColor: COLORS.surface,
-              padding: "10px 24px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexShrink: 0,
-            }}
-          >
-            <AppleButton variant="secondary" onClick={goPrev} disabled={currIdx === 0}>
-              ← Back
-            </AppleButton>
-
-            {/* Dot indicators */}
-            <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
-              {ALL_STEPS.slice(dotStart, dotEnd).map((s, i) => (
-                <div
-                  key={s.id}
-                  onClick={() => goToStep(s.id)}
-                  style={{
-                    width: s.id === activeStep ? 20 : 6,
-                    height: 6,
-                    borderRadius: 3,
-                    backgroundColor: s.id === activeStep ? COLORS.blue : COLORS.sep,
-                    cursor: "pointer",
-                    transition: "all 0.25s ease",
-                  }}
-                />
-              ))}
+                ))
+              )}
             </div>
-
-            <AppleButton
-              variant="primary"
-              onClick={goNext}
-              disabled={currIdx === ALL_STEPS.length - 1}
-            >
-              {currIdx === ALL_STEPS.length - 1 ? "🎉 Done!" : "Next →"}
-            </AppleButton>
           </div>
-        )}
-      </div>
+        </section>
+
+        <section className="workspace-grid" id="compliance">
+          <div className="panel">
+            <div className="eyebrow">Compliance</div>
+            <h3>Recurring obligations</h3>
+            <p>
+              Track annual reports, BOI filing, renewals, and internal deadlines with
+              tenant-aware records in D1 and future queue-based reminders.
+            </p>
+          </div>
+          <div className="panel">
+            <div className="eyebrow">Documents</div>
+            <h3>R2-backed vault</h3>
+            <p>
+              Store formation docs, tax setup materials, and organization files with
+              access mediated by your centralized auth layer.
+            </p>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
 
-// ─── Root Export ──────────────────────────────────────────────────────────────
-export default function App() {
+function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <FormProvider>
-      <AppInner />
-    </FormProvider>
+    <div className="stat-card">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
   );
 }
