@@ -1,70 +1,84 @@
-// functions/api/[[path]].ts
 interface Env {
-  AUTH_WORKER: Fetcher;
-  PBX_WORKER: Fetcher;
-  BIZFORMA_WORKER: Fetcher;
-  BOOKKEEPING_WORKER: Fetcher;
-  PAYROLL_WORKER: Fetcher;
-  SCOUT_WORKER: Fetcher;
+  DISPATCH_WORKER: Fetcher;
+  DISPATCH_URL?: string;
 }
 
-const WORKER_MAP: Record<string, keyof Env> = {
-  '/api/auth': 'AUTH_WORKER',
-  '/api/pbx': 'PBX_WORKER',
-  '/api/bizforma': 'BIZFORMA_WORKER',
-  '/api/bookkeeping': 'BOOKKEEPING_WORKER',
-  '/api/payroll': 'PAYROLL_WORKER',
-  '/api/scout': 'SCOUT_WORKER',
-};
+type PagesFunction = (context: {
+  request: Request;
+  env: Env;
+  params: { path?: string };
+}) => Promise<Response>;
 
-export const onRequest: PagesFunction<Env> = async (ctx) => {
-  const url = new URL(ctx.request.url);
-  const pathname = url.pathname;
+const HOP_BY_HOP_HEADERS = new Set([
+  'connection',
+  'keep-alive',
+  'proxy-authenticate',
+  'proxy-authorization',
+  'te',
+  'trailer',
+  'transfer-encoding',
+  'upgrade',
+  'host',
+]);
 
-  // Find matching worker
-  const workerKey = Object.keys(WORKER_MAP).find(prefix =>
-    pathname.startsWith(prefix)
-  ) as keyof typeof WORKER_MAP | undefined;
+function buildProxyUrl(requestUrl: URL, pathParam?: string, fallbackOrigin?: string) {
+  const cleanPath = pathParam ? `/${pathParam.replace(/^\/+/, '')}` : '';
+  const target = new URL(`/api${cleanPath}${requestUrl.search}`, fallbackOrigin ?? requestUrl.origin);
+  return target;
+}
 
-  if (!workerKey) {
-    return new Response(JSON.stringify({ error: 'Unknown API route' }), {
-      status: 404,
-      headers: { 'Content-Type': 'application/json' },
-    });
+function cloneHeaders(source: Headers, requestUrl: URL) {
+  const headers = new Headers();
+
+  source.forEach((value, key) => {
+    if (!HOP_BY_HOP_HEADERS.has(key.toLowerCase())) {
+      headers.set(key, value);
+    }
+  });
+
+  headers.set('x-forwarded-host', requestUrl.host);
+  headers.set('x-forwarded-proto', requestUrl.protocol.replace(':', ''));
+  headers.set('x-forwarded-path', requestUrl.pathname);
+
+  const existingFor = source.get('x-forwarded-for');
+  if (!existingFor) {
+    headers.set('x-forwarded-for', '0.0.0.0');
   }
 
-  const binding = WORKER_MAP[workerKey] as keyof Env;
-  const worker = ctx.env[binding] as Fetcher | undefined;
+  return headers;
+}
 
-  if (!worker) {
-    return new Response(JSON.stringify({ error: `Worker binding ${binding} not configured` }), {
-      status: 503,
-      headers: { 'Content-Type': 'application/json' },
-    });
+export const onRequest: PagesFunction = async (context) => {
+  const requestUrl = new URL(context.request.url);
+  const proxyUrl = buildProxyUrl(requestUrl, context.params.path, context.env.DISPATCH_URL);
+
+  const method = context.request.method.toUpperCase();
+  const headers = cloneHeaders(context.request.headers, requestUrl);
+
+  const init: RequestInit = {
+    method,
+    headers,
+    redirect: 'manual',
+  };
+
+  if (method !== 'GET' && method !== 'HEAD') {
+    init.body = context.request.body;
   }
 
-  // Strip the prefix for sub-workers that expect /api/* paths
-  // e.g. /api/pbx/extensions → /api/extensions
-  const subPath = pathname.replace(workerKey, '/api');
-  const targetUrl = `https://internal${subPath}${url.search}`;
-
-  // Forward all headers; do NOT pass body on GET/HEAD
-  const isBodyless = ['GET', 'HEAD'].includes(ctx.request.method);
-  const forwardReq = new Request(targetUrl, {
-    method: ctx.request.method,
-    headers: ctx.request.headers,
-    body: isBodyless ? null : ctx.request.body,
-    // Required to stream body properly
-    duplex: isBodyless ? undefined : 'half',
-  } as RequestInit);
+  const proxiedRequest = new Request(proxyUrl.toString(), init);
 
   try {
-    return await worker.fetch(forwardReq);
-  } catch (err) {
-    console.error(`Worker proxy error [${binding}]:`, err);
-    return new Response(JSON.stringify({ error: 'Upstream worker error' }), {
-      status: 502,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return await context.env.DISPATCH_WORKER.fetch(proxiedRequest);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown dispatch proxy failure';
+
+    return Response.json(
+      {
+        error: 'Upstream service unavailable',
+        code: 'DISPATCH_PROXY_ERROR',
+        detail: message,
+      },
+      { status: 502 },
+    );
   }
 };
