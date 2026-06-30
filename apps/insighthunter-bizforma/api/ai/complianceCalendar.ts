@@ -1,1 +1,0 @@
-import { Hono } from "hono"; export const complianceCalendarAiApi = new Hono(); complianceCalendarAiApi.post("/", async (c) => c.json({ calendar: [{ title: "Annual report", month: "January" }, { title: "Estimated taxes", month: "Quarterly" }] }));

@@ -1,1 +1,0 @@
-import { Hono } from "hono"; export const nameSuggestionsApi = new Hono(); nameSuggestionsApi.post("/", async (c) => { const body = await c.req.json<any>(); return c.json({ suggestions: [`${body.industry || "Insight"} Labs`, `${body.industry || "Insight"} Works`, `${body.industry || "Insight"} Co`] }); });
