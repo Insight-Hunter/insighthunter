@@ -1,4 +1,2 @@
-export * from './bindings.js';
-export * from './env.js';
-export * from './features.js';
-export * from './metadata.js';
+export interface AppConfig { appName: string; authUrl: string; }
+export const defaultConfig: AppConfig = { appName: "InsightHunter", authUrl: "https://auth.insighthunter.app" };

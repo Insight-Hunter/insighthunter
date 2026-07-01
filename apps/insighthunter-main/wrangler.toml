@@ -1,0 +1,7 @@
+name = "insighthunter-main"
+main = "src/index.ts"
+compatibility_date = "2026-06-30"
+
+[vars]
+APP_NAME = "InsightHunter"
+AUTH_URL = "https://auth.insighthunter.app"

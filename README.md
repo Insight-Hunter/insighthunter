@@ -1,49 +1,11 @@
-# InsightHunter
+# InsightHunter Monorepo Pack
 
-AI-powered Financial Operating System for modern small businesses.
+This pack bootstraps a Cloudflare-first InsightHunter monorepo.
 
-## Tech Stack
-
-- Cloudflare Workers
-- D1
-- KV
-- R2
-- Vectorize
-- Workers AI
-- Astro
-- Svelte
-- TypeScript
-- Turborepo
-
-## Requirements
-
-- Node.js 22+
-- pnpm 10+
-
-## Install
-
+## Quick start
 ```bash
-pnpm install
+cd /Users/jamesmichaelhunterturner
+mkdir -p insighthunter
+cd insighthunter
+bash scripts/setup-monorepo.sh
 ```
-
-## Development
-
-```bash
-pnpm dev
-```
-
-## Build
-
-```bash
-pnpm build
-```
-
-## Test
-
-```bash
-pnpm test
-```
-
-## License
-
-MIT

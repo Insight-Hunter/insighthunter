@@ -1,5 +1,5 @@
 {
-  "name": "@insighthunter/config",
+  "name": "@insighthunter/testing",
   "private": true,
   "type": "module",
   "exports": { ".": "./src/index.ts" },

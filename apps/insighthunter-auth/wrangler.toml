@@ -1,0 +1,6 @@
+name = "insighthunter-auth"
+main = "src/index.ts"
+compatibility_date = "2026-06-30"
+
+[vars]
+ACCESS_AUD = "replace-me"

@@ -1,0 +1,6 @@
+name = "insighthunter-dispatch"
+main = "src/index.ts"
+compatibility_date = "2026-06-30"
+
+[vars]
+MAIN_URL = "https://insighthunter.app"
