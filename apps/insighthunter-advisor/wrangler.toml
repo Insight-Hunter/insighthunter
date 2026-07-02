@@ -1,0 +1,7 @@
+name = "insighthunter-advisor"
+main = "src/index.ts"
+compatibility_date = "2026-07-01"
+
+[vars]
+AUTH_URL = "https://auth.insighthunter.app"
+LEDGER_URL = "https://ledger.insighthunter.app"
