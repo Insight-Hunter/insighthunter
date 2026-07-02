@@ -1,5 +1,5 @@
-# ADR-0001: Cloudflare-first platform
+# ADR 0001
 
-Status: Accepted
+Status: accepted.
 
-InsightHunter uses Cloudflare Workers, D1, KV, R2, Queues, Workflows, Durable Objects, and Access as the primary platform stack.
+Cloudflare is the primary execution and infrastructure platform.

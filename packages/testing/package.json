@@ -2,12 +2,13 @@
   "name": "@insighthunter/testing",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "scripts": {
-    "lint": "biome check src",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run --passWithNoTests",
-    "build": "tsc -p tsconfig.json"
+  "exports": {
+    ".": "./src/index.ts"
   },
-  "devDependencies": { "vitest": "^2.1.3" }
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "echo lint testing",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
 }

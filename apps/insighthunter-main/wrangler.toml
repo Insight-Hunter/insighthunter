@@ -1,7 +1,11 @@
 name = "insighthunter-main"
 main = "src/index.ts"
-compatibility_date = "2026-06-30"
+compatibility_date = "2026-07-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
 
 [vars]
-APP_NAME = "InsightHunter"
-AUTH_URL = "https://auth.insighthunter.app"
+APP_NAME = "insighthunter-main"
+ENVIRONMENT = "development"

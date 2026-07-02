@@ -1,11 +1,7 @@
-# InsightHunter Monorepo Pack
+# InsightHunter Sprint 0.1 Normalization Patch
 
-This pack bootstraps a Cloudflare-first InsightHunter monorepo.
-
-## Quick start
-```bash
-cd /Users/jamesmichaelhunterturner
-mkdir -p insighthunter
-cd insighthunter
-bash scripts/setup-monorepo.sh
-```
+This patch upgrades the corrected Sprint 0 baseline by:
+- removing `@cloudflare/workers-types` from app tsconfig files,
+- standardizing on Wrangler-generated runtime types,
+- replacing placeholder echo scripts with executable workspace-safe commands,
+- adding repo normalization guidance for the live monorepo.

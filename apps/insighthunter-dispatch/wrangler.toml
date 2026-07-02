@@ -1,6 +1,11 @@
 name = "insighthunter-dispatch"
 main = "src/index.ts"
-compatibility_date = "2026-06-30"
+compatibility_date = "2026-07-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
 
 [vars]
-MAIN_URL = "https://insighthunter.app"
+APP_NAME = "insighthunter-dispatch"
+ENVIRONMENT = "development"
