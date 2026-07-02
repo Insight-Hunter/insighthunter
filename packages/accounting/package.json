@@ -1,0 +1,14 @@
+{
+  "name": "@insighthunter/accounting",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "lint": "biome check src tests",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": { "@insighthunter/kernel": "workspace:*" },
+  "devDependencies": { "vitest": "^2.1.3" }
+}

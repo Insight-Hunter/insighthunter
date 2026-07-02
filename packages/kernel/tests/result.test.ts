@@ -1,17 +1,22 @@
-import test from "node:test";
-import assert from "node:assert/strict";
-import { Result } from "../src/primitives/Result.js";
+import { describe, expect, it } from "vitest";
+import { Result } from "../src/index";
 
-test("Result.ok maps successfully", () => {
-  const result = Result.ok(2).map((value) => value * 3);
+describe("Result", () => {
+  it("creates success with ok()", () => {
+    const result = Result.ok(123);
+    expect(result.isOk()).toBe(true);
+    expect(result.value).toBe(123);
+  });
 
-  assert.equal(result.isOk(), true);
-  assert.equal(result.value, 6);
-});
+  it("maps success value", () => {
+    const result = Result.ok(2).map((value) => value * 3);
+    expect(result.isOk()).toBe(true);
+    expect(result.value).toBe(6);
+  });
 
-test("Result.fail preserves error", () => {
-  const result = Result.fail<number, Error>(new Error("boom"));
-
-  assert.equal(result.isFail(), true);
-  assert.equal(result.error.message, "boom");
+  it("preserves error on fail()", () => {
+    const result = Result.fail<number, Error>(new Error("boom"));
+    expect(result.isFail()).toBe(true);
+    expect(result.error.message).toBe("boom");
+  });
 });

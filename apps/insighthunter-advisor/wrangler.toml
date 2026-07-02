@@ -9,3 +9,5 @@ enabled = true
 [vars]
 APP_NAME = "insighthunter-advisor"
 ENVIRONMENT = "development"
+AUTH_URL = "https://auth.insighthunter.app"
+LEDGER_URL = "https://ledger.insighthunter.app"

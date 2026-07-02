@@ -8,19 +8,7 @@ importers:
 
   .: {}
 
-  apps/insighthunter-advisor: {}
-
-  apps/insighthunter-auth: {}
-
-  apps/insighthunter-bizforma: {}
-
-  apps/insighthunter-dispatch: {}
-
   apps/insighthunter-finops: {}
-
-  apps/insighthunter-ledger: {}
-
-  apps/insighthunter-main: {}
 
   packages/kernel:
     devDependencies:
@@ -36,6 +24,138 @@ importers:
       typescript:
         specifier: ^5.9.2
         version: 5.9.3
+
+  apps/insighthunter-auth:
+    dependencies:
+      hono:
+        specifier: ^4.6.10
+        version: 4.12.27
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20260620.0
+        version: 4.20260629.1
+      vitest:
+        specifier: ^2.1.3
+        version: 2.1.9
+      wrangler:
+        specifier: ^4.21.0
+        version: 4.105.0(@cloudflare/workers-types@4.20260629.1)
+
+  apps/insighthunter-dispatch:
+    dependencies:
+      hono:
+        specifier: ^4.6.10
+        version: 4.12.27
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20260620.0
+        version: 4.20260629.1
+      vitest:
+        specifier: ^2.1.3
+        version: 2.1.9
+      wrangler:
+        specifier: ^4.21.0
+        version: 4.105.0(@cloudflare/workers-types@4.20260629.1)
+
+  apps/insighthunter-main:
+    dependencies:
+      hono:
+        specifier: ^4.6.10
+        version: 4.12.27
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20260620.0
+        version: 4.20260629.1
+      vitest:
+        specifier: ^2.1.3
+        version: 2.1.9
+      wrangler:
+        specifier: ^4.21.0
+        version: 4.105.0(@cloudflare/workers-types@4.20260629.1)
+
+  apps/insighthunter-bizforma:
+    dependencies:
+      hono:
+        specifier: ^4.6.10
+        version: 4.12.27
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20260620.0
+        version: 4.20260629.1
+      vitest:
+        specifier: ^2.1.3
+        version: 2.1.9
+      wrangler:
+        specifier: ^4.21.0
+        version: 4.105.0(@cloudflare/workers-types@4.20260629.1)
+
+  apps/insighthunter-ledger:
+    dependencies:
+      hono:
+        specifier: ^4.6.10
+        version: 4.12.27
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20260620.0
+        version: 4.20260629.1
+      vitest:
+        specifier: ^2.1.3
+        version: 2.1.9
+      wrangler:
+        specifier: ^4.21.0
+        version: 4.105.0(@cloudflare/workers-types@4.20260629.1)
+
+  apps/insighthunter-advisor:
+    dependencies:
+      hono:
+        specifier: ^4.6.10
+        version: 4.12.27
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20260620.0
+        version: 4.20260629.1
+      vitest:
+        specifier: ^2.1.3
+        version: 2.1.9
+      wrangler:
+        specifier: ^4.21.0
+        version: 4.105.0(@cloudflare/workers-types@4.20260629.1)
+
+  packages/config:
+    devDependencies:
+      vitest:
+        specifier: ^2.1.3
+        version: 2.1.9
+
+  packages/events:
+    devDependencies:
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.1.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.6
+
+  packages/logger:
+    devDependencies:
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.1.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.6
+
+  packages/testing:
+    devDependencies:
+      vitest:
+        specifier: ^2.1.3
+        version: 2.1.9
+
+  packages/types:
+    devDependencies:
+      vitest:
+        specifier: ^2.1.3
+        version: 2.1.9
 
 packages:
 

@@ -9,3 +9,4 @@ enabled = true
 [vars]
 APP_NAME = "insighthunter-ledger"
 ENVIRONMENT = "development"
+DB_NAME = "insighthunter-ledger"

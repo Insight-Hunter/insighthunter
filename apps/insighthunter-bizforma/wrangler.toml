@@ -9,3 +9,5 @@ enabled = true
 [vars]
 APP_NAME = "insighthunter-bizforma"
 ENVIRONMENT = "development"
+AUTH_URL = "https://auth.insighthunter.app"
+APP_URL = "https://bizforma.insighthunter.app"
