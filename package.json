@@ -1,29 +1,11 @@
 {
   "name": "insighthunter",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "packageManager": "pnpm@10.15.0",
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "test": "turbo test",
-    "lint": "turbo lint",
-    "typecheck": "turbo run typecheck",
-    "check": "pnpm typecheck && pnpm lint && pnpm test",
-    "format": "prettier --write .",
-    "cf:types": "pnpm -r --filter './apps/*' run cf:types",
-    "clean": "turbo clean && find . -name '*.tsbuildinfo' -delete && find . -name '.DS_Store' -delete"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^19.4.0",
-    "@commitlint/config-conventional": "^19.4.0",
-    "@types/node": "^24.3.0",
-    "husky": "^9.1.4",
-    "lint-staged": "^15.2.10",
-    "prettier": "^3.6.2",
-    "turbo": "^2.5.6",
-    "typescript": "^5.9.2",
-    "vitest": "^2.1.3",
-    "wrangler": "^4.25.1"
+    "test": "pnpm --filter @insighthunter/kernel test",
+    "typecheck": "pnpm --filter @insighthunter/kernel typecheck",
+    "build": "pnpm --filter @insighthunter/kernel build"
   }
 }

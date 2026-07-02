@@ -1,7 +1,11 @@
-# InsightHunter Sprint 0.1 Normalization Patch
+# InsightHunter Sprint 1 Kernel
 
-This patch upgrades the corrected Sprint 0 baseline by:
-- removing `@cloudflare/workers-types` from app tsconfig files,
-- standardizing on Wrangler-generated runtime types,
-- replacing placeholder echo scripts with executable workspace-safe commands,
-- adding repo normalization guidance for the live monorepo.
+This archive provides the Sprint 1 kernel foundation for the real InsightHunter monorepo.
+
+## Includes
+- Kernel package with DDD primitives.
+- Accounting-adjacent value objects in the kernel layer.
+- Domain event contracts.
+- Repository and unit of work interfaces.
+- Specifications.
+- Vitest tests.
