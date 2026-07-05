@@ -1,0 +1,16 @@
+name = "insighthunter-bookkeeping"
+main = "src/index.ts"
+compatibility_date = "2026-07-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[vars]
+APP_NAME = "insighthunter-bookkeeping"
+ENVIRONMENT = "development"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-ledger"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"

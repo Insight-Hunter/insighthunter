@@ -1,18 +1,23 @@
 {
   "compilerOptions": {
-    "target": "ES2023",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "target": "ES2022",
+    "module": "NodeNext",
+    "ignoreDeprecations": "6.0",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
     "strict": true,
     "noImplicitOverride": true,
-    "noImplicitReturns": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-    "skipLibCheck": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "useUnknownInCatchVariables": true,
+    "verbatimModuleSyntax": true,
     "declaration": true,
+    "declarationMap": true,
     "sourceMap": true,
     "isolatedModules": true,
-    "esModuleInterop": true,
-    "lib": ["ES2023", "DOM"]
+    "esModuleInterop": false,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
   }
 }

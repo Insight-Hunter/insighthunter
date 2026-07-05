@@ -10,10 +10,7 @@ export function stringifyJson(value: unknown): string {
 
 export function parseJson<T>(value: string): T {
   return JSON.parse(value, (_, currentValue) => {
-    if (
-      typeof currentValue === "string" &&
-      currentValue.startsWith(BIGINT_PREFIX)
-    ) {
+    if (typeof currentValue === "string" && currentValue.startsWith(BIGINT_PREFIX)) {
       return BigInt(currentValue.slice(BIGINT_PREFIX.length));
     }
 

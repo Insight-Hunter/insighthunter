@@ -22,10 +22,7 @@ export class DomainError extends Error {
 }
 
 export class InvariantViolationError extends DomainError {
-  constructor(
-    message: string,
-    metadata: Readonly<Record<string, unknown>> = {},
-  ) {
+  constructor(message: string, metadata: Readonly<Record<string, unknown>> = {}) {
     super({
       code: "domain.invariant_violation",
       message,

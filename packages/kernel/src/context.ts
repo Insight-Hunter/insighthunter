@@ -16,20 +16,11 @@ export interface CreateRequestContextInput {
   readonly traceId?: string;
 }
 
-export function createRequestContext(
-  input: CreateRequestContextInput = {},
-): RequestContext {
-  const headerValue = (name: string): string | null =>
-    input.request?.headers.get(name) ?? null;
-  const requestId =
-    input.requestId ?? headerValue("x-request-id") ?? crypto.randomUUID();
-  const traceId =
-    input.traceId ??
-    headerValue("cf-ray") ??
-    headerValue("traceparent") ??
-    undefined;
-  const organizationId =
-    input.organizationId ?? headerValue("x-organization-id") ?? undefined;
+export function createRequestContext(input: CreateRequestContextInput = {}): RequestContext {
+  const headerValue = (name: string): string | null => input.request?.headers.get(name) ?? null;
+  const requestId = input.requestId ?? headerValue("x-request-id") ?? crypto.randomUUID();
+  const traceId = input.traceId ?? headerValue("cf-ray") ?? headerValue("traceparent") ?? undefined;
+  const organizationId = input.organizationId ?? headerValue("x-organization-id") ?? undefined;
   const actorId = input.actorId ?? headerValue("x-user-id") ?? undefined;
   const cf = getCloudflareRequestMetadata(input.request);
   const context: RequestContext = {
@@ -37,11 +28,7 @@ export function createRequestContext(
   };
 
   if (organizationId !== undefined) {
-    returnWith(
-      context,
-      "organizationId",
-      createEntityId("organization", organizationId),
-    );
+    returnWith(context, "organizationId", createEntityId("organization", organizationId));
   }
 
   if (actorId !== undefined) {

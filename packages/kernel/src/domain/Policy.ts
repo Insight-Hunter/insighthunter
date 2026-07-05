@@ -1,4 +1,4 @@
-import { Result } from "../primitives/Result.js";
+import type { Result } from "../primitives/Result.js";
 
 export interface Policy<TSubject, TError = Error> {
   readonly name: string;

@@ -1,5 +1,5 @@
-import test from "node:test";
 import assert from "node:assert/strict";
+import test from "node:test";
 import { TypedId } from "../src/identity/TypedId.js";
 
 test("TypedId equality requires same kind and same raw value", () => {

@@ -1,11 +1,30 @@
-# InsightHunter Sprint 1 Kernel
+# InsightHunter
 
-This archive provides the Sprint 1 kernel foundation for the real InsightHunter monorepo.
+Production-oriented monorepo for InsightHunter applications and shared platform packages.
 
-## Includes
-- Kernel package with DDD primitives.
-- Accounting-adjacent value objects in the kernel layer.
-- Domain event contracts.
-- Repository and unit of work interfaces.
-- Specifications.
-- Vitest tests.
+## Workspace
+
+- `apps/*` — deployable applications and Workers.
+- `packages/*` — shared domain, platform, SDK, and UI packages.
+- `infrastructure/*` — IaC, deployment, and environment automation.
+
+## Standards
+
+- Strict TypeScript.
+- No `any`.
+- Domain logic independent of infrastructure.
+- Constructor injection and immutable domain primitives.
+- CI-gated lint, typecheck, test, and build.
+
+## Commands
+
+- `pnpm install`
+- `pnpm dev`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
+- `pnpm build`
+
+## Current focus
+
+Sprint 1.1 establishes a hardened kernel package and workspace-level delivery controls.

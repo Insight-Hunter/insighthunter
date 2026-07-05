@@ -1,4 +1,4 @@
-import { TypedId } from "../identity/TypedId.js";
+import type { TypedId } from "../identity/TypedId.js";
 
 export abstract class Entity<TId extends TypedId<string>, TProps extends object> {
   protected readonly _id: TId;

@@ -9,4 +9,12 @@ enabled = true
 [vars]
 APP_NAME = "insighthunter-ledger"
 ENVIRONMENT = "development"
-DB_NAME = "insighthunter-ledger"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-ledger"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+
+[routes]
+pattern = "ledger.insighthunter.app/*"
+zone_name = "insighthunter.app"

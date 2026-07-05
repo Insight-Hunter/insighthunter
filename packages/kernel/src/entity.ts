@@ -18,10 +18,10 @@ export abstract class Entity<TId extends string, TProps extends object> {
   }
 }
 
-export abstract class AggregateRoot<
-  TId extends string,
-  TProps extends object,
-> extends Entity<TId, TProps> {
+export abstract class AggregateRoot<TId extends string, TProps extends object> extends Entity<
+  TId,
+  TProps
+> {
   private readonly events: DomainEvent[] = [];
 
   protected record(event: DomainEvent): void {

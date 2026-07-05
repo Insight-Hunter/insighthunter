@@ -1,91 +1,87 @@
-/* deployment.md */
+<!-- DEPLOYMENT.md -->
 
-This document explains how to deploy the InsightHunter Web App and backend.
+# Deployment
 
-------------------------------------------------------------
-Frontend Deployment (Cloudflare Pages)
-------------------------------------------------------------
-The static web app is deployed to Cloudflare Pages.
+All applications run as Cloudflare Workers. The static marketing shell is
+served by `insighthunter-main`. API traffic is routed through
+`insighthunter-gateway`.
 
-Automatic Deployment:
-Triggered by GitHub Actions when changes are pushed to main.
+---
 
-Manual Deployment:
-1. Open Cloudflare Dashboard
-2. Go to Pages
-3. Select project: insighthunter-web
-4. Deploy from folder: apps/insighthunter-web/public
+## Automated deployment (GitHub Actions)
 
-------------------------------------------------------------
-Backend Deployment (Cloudflare Workers)
-------------------------------------------------------------
-The backend Worker is located in:
+The `deploy.yml` workflow fires on every push to `main` after CI passes.
+It runs `wrangler deploy` for each Worker in dependency order:
 
-packages/core-worker/
+1. `insighthunter-auth`
+2. `insighthunter-ledger`
+3. `insighthunter-finops`
+4. `insighthunter-advisor`
+5. `insighthunter-bizforma`
+6. `insighthunter-dispatch`
+7. `insighthunter-gateway`
+8. `insighthunter-main`
 
-To publish backend changes:
+---
 
-cd packages/core-worker
-npx wrangler publish
+## Manual deployment
 
-This deploys:
-- API routes
-- Compliance logic
-- Bookkeeping logic
-- Report generation
-- Durable Object bindings
+```bash
+cd apps/<app-name>
+pnpm build          # dry-run validation
+wrangler deploy     # push to Cloudflare
+```
 
-------------------------------------------------------------
-CDN Cache Purge
-------------------------------------------------------------
-Automatic:
-GitHub Actions triggers a purge after deployment.
+---
 
-Manual:
+## Database migrations
+
+D1 migrations live in `packages/database/migrations/`.
+
+Apply with:
+
+```bash
+wrangler d1 execute insighthunter-ledger --file packages/database/migrations/0003_accounting_core.sql
+wrangler d1 execute insighthunter-main   --file packages/database/migrations/0004_onboarding.sql
+```
+
+---
+
+## Environment variables / secrets
+
+Set secrets per Worker via Wrangler:
+
+```bash
+wrangler secret put JWT_SECRET           --name insighthunter-auth
+wrangler secret put CLOUDFLARE_API_TOKEN --name insighthunter-gateway
+```
+
+Variables that are not sensitive are declared under `[vars]` in each
+`wrangler.toml`.
+
+Required secrets per service:
+
+| Worker                  | Secret            |
+|-------------------------|-------------------|
+| insighthunter-auth      | JWT_SECRET        |
+| insighthunter-gateway   | CF_API_TOKEN      |
+| insighthunter-ledger    | (none — uses D1)  |
+| insighthunter-main      | (none — uses D1)  |
+
+---
+
+## CDN cache purge
+
+```bash
 curl -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" \
   -H "Authorization: Bearer $CF_API_TOKEN" \
   --data '{"purge_everything":true}'
+```
 
-------------------------------------------------------------
-Environment Variables
-------------------------------------------------------------
-Set in Cloudflare Dashboard:
+---
 
-CF_ACCOUNT_ID
-CF_API_TOKEN
-CF_ZONE_ID
+## Access policy
 
-These are required for:
-- GitHub Actions deployments
-- CDN purge automation
-- Worker publishing
+Cloudflare Access protects internal routes.
 
-------------------------------------------------------------
-Authentication
-------------------------------------------------------------
-InsightHunter uses Cloudflare Access.
-
-Access Policy:
-Allow emails from:
-*@insighthunter.app
-
-------------------------------------------------------------
-Deployment Summary
-------------------------------------------------------------
-Frontend:
-- Cloudflare Pages
-- Static hosting
-- CDN optimized
-
-Backend:
-- Cloudflare Workers
-- Durable Objects
-- R2 storage
-
-CI/CD:
-- GitHub Actions
-- Auto deploy
-- Auto purge
-- Auto publish
-
-This deployment pipeline ensures fast, reliable, zero‑downtime updates across the entire platform.
+Allow list: `*@insighthunter.app`

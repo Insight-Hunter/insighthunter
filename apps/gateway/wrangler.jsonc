@@ -1,0 +1,19 @@
+{
+  "name": "insighthunter-gateway",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-02",
+  "observability": {
+    "enabled": true
+  },
+  "services": [
+    { "binding": "AUTH",     "service": "insighthunter-auth" },
+    { "binding": "LEDGER",   "service": "insighthunter-ledger" },
+    { "binding": "FINOPS",   "service": "insighthunter-finops" },
+    { "binding": "ADVISOR",  "service": "insighthunter-advisor" },
+    { "binding": "BIZFORMA", "service": "insighthunter-bizforma" },
+    { "binding": "DISPATCH", "service": "insighthunter-dispatch" }
+  ],
+  "routes": [
+    { "pattern": "api.insighthunter.app/*", "zone_name": "insighthunter.app" }
+  ]
+}

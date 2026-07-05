@@ -1,8 +1,11 @@
-import { describe, expect, it } from 'vitest';
-import { SystemClock } from '../src/services/Clock.js';
+import assert from "node:assert/strict";
+import test from "node:test";
 
-describe('SystemClock', () => {
-  it('returns a date', () => {
-    expect(new SystemClock().now()).toBeInstanceOf(Date);
-  });
+import { SystemClock } from "../src/core/clock.js";
+
+test("SystemClock returns a Date", () => {
+  const clock = new SystemClock();
+  const now = clock.now();
+
+  assert.equal(now instanceof Date, true);
 });

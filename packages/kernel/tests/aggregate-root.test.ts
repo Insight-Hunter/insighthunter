@@ -1,27 +1,35 @@
-import { describe, expect, it } from 'vitest';
-import { AggregateRoot } from '../src/domain/AggregateRoot.js';
-import type { DomainEvent } from '../src/events/DomainEvent.js';
+import assert from "node:assert/strict";
+import test from "node:test";
 
-class TestAggregate extends AggregateRoot<string> {
-  constructor() {
-    super('agg-1');
+import { AggregateRoot } from "../src/core/aggregate-root.js";
+import type { DomainEvent } from "../src/core/domain-event.js";
+import { EntityId } from "../src/core/entity-id.js";
+
+class DemoAggregate extends AggregateRoot {
+  public constructor(id: EntityId) {
+    super(id);
   }
 
-  recordSomething(): void {
-    const event: DomainEvent = {
-      name: 'something.recorded',
-      occurredAt: new Date('2026-01-01T00:00:00Z'),
-      payload: { ok: true },
+  public recordEvent(): void {
+    const event = {
+      aggregateId: this.id,
+      occurredAt: new Date(),
+      eventName: "demo.recorded",
+      payload: { status: "ok" },
     };
-    this.addEvent(event);
+
+    this.addDomainEvent(event);
   }
 }
+test("AggregateRoot pulls and clears events", () => {
+  const aggregate = new DemoAggregate(EntityId.create("agg-1"));
 
-describe('AggregateRoot', () => {
-  it('stores and clears events', () => {
-    const aggregate = new TestAggregate();
-    aggregate.recordSomething();
-    expect(aggregate.pullEvents()).toHaveLength(1);
-    expect(aggregate.pullEvents()).toHaveLength(0);
-  });
+  aggregate.recordEvent();
+
+  const firstPull = aggregate.pullDomainEvents();
+  const secondPull = aggregate.pullDomainEvents();
+
+  assert.equal(firstPull.length, 1);
+  assert.equal(firstPull[0]?.eventName, "demo.recorded");
+  assert.equal(secondPull.length, 0);
 });

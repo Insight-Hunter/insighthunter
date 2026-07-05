@@ -1,12 +1,31 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
-    "build": { "dependsOn": ["^build"], "outputs": ["dist/**"] },
-    "dev": { "cache": false, "persistent": true },
-    "lint": {},
-    "test": { "dependsOn": ["build"] },
-    "typecheck": { "dependsOn": ["cf:types", "^typecheck"] },
-    "cf:types": { "cache": false },
-    "clean": { "cache": false }
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
+    },
+    "check": {
+      "dependsOn": ["lint", "typecheck"],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "build": {
+      "dependsOn": ["lint", "typecheck", "^build"],
+      "outputs": ["dist/**", ".wrangler/**"]
+    },
+    "clean": {
+      "cache": false
+    }
   }
 }

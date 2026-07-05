@@ -13,21 +13,15 @@ export class Result<TValue, TError = Error> {
     return new Result<TValue, TError>(true, value);
   }
 
-  public static fail<TValue = never, TError = Error>(
-    error: TError,
-  ): Result<TValue, TError> {
+  public static fail<TValue = never, TError = Error>(error: TError): Result<TValue, TError> {
     return new Result<TValue, TError>(false, undefined, error);
   }
 
-  public static try<TValue>(
-    fn: () => TValue,
-  ): Result<TValue, Error> {
+  public static try<TValue>(fn: () => TValue): Result<TValue, Error> {
     try {
       return Result.ok(fn());
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error : new Error("Unknown error."),
-      );
+      return Result.fail(error instanceof Error ? error : new Error("Unknown error."));
     }
   }
 
@@ -87,9 +81,7 @@ export class Result<TValue, TError = Error> {
       throw mapper(this.error);
     }
 
-    throw this.error instanceof Error
-      ? this.error
-      : new Error("Result failed.");
+    throw this.error instanceof Error ? this.error : new Error("Result failed.");
   }
 
   public tap(effect: (value: TValue) => void): Result<TValue, TError> {

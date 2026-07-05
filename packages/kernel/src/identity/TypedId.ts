@@ -14,10 +14,7 @@ export class TypedId<TName extends string> extends UniqueId {
     this.kind = kind;
   }
 
-  public static create<TName extends string>(
-    kind: TName,
-    value?: string,
-  ): TypedId<TName> {
+  public static create<TName extends string>(kind: TName, value?: string): TypedId<TName> {
     return new TypedId(kind, value);
   }
 

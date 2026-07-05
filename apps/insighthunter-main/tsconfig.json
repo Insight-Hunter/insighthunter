@@ -3,7 +3,8 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "types": ["./worker-configuration.d.ts"]
+    "types": ["@cloudflare/workers-types"]
   },
-  "include": ["src", "worker-configuration.d.ts"]
+  "files": ["../../worker-configuration.d.ts"],
+  "include": ["src/**/*.ts"]
 }

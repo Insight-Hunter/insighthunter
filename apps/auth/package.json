@@ -1,0 +1,17 @@
+{
+  "name": "@insighthunter/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run",
+    "lint": "biome check src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "check": "pnpm lint && pnpm typecheck"
+  },
+  "dependencies": {
+    "@insighthunter/kernel": "workspace:*",
+    "hono": "^4.6.10"
+  }
+}

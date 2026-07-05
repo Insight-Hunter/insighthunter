@@ -48,9 +48,7 @@ class Address extends ValueObject<{
 describe("@insighthunter/kernel", () => {
   it("brands entity IDs and rejects empty values", () => {
     expect(createEntityId("organization", " org-123 ")).toBe("org-123");
-    expect(() => createEntityId("organization", " ")).toThrow(
-      "organization id cannot be empty",
-    );
+    expect(() => createEntityId("organization", " ")).toThrow("organization id cannot be empty");
   });
 
   it("records and pulls aggregate domain events", () => {
@@ -85,19 +83,13 @@ describe("@insighthunter/kernel", () => {
     await repository.save(customer);
 
     expect(await repository.get("customer-1")).toBe(customer);
-    await expect(
-      repository.getOrThrow("missing", "Customer"),
-    ).rejects.toMatchObject({
+    await expect(repository.getOrThrow("missing", "Customer")).rejects.toMatchObject({
       code: "domain.not_found",
     });
   });
 
   it("models explicit use-case results", async () => {
-    const useCase = defineUseCase<
-      { readonly enabled: boolean },
-      string,
-      string
-    >(async (input) => {
+    const useCase = defineUseCase<{ readonly enabled: boolean }, string, string>(async (input) => {
       if (!input.enabled) {
         return err("disabled");
       }

@@ -14,10 +14,7 @@ export abstract class ValueObject<TProps extends object> {
   }
 }
 
-export function assertInvariant(
-  condition: boolean,
-  message: string,
-): asserts condition {
+export function assertInvariant(condition: boolean, message: string): asserts condition {
   if (!condition) {
     throw new InvariantViolationError(message);
   }

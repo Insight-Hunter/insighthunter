@@ -1,9 +1,6 @@
 import type { EntityId } from "./ids.js";
 
-export interface DomainEvent<
-  TPayload = unknown,
-  TType extends string = string,
-> {
+export interface DomainEvent<TPayload = unknown, TType extends string = string> {
   readonly id: EntityId<"event">;
   readonly type: TType;
   readonly aggregateId: string;

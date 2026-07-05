@@ -1,6 +1,6 @@
-import { ValueObject } from '../domain/ValueObject.js';
+import { ValueObject } from "../domain/ValueObject.js";
 
-const SUPPORTED = new Set(['USD', 'EUR', 'GBP', 'CAD']);
+const SUPPORTED = new Set(["USD", "EUR", "GBP", "CAD"]);
 
 export class Currency extends ValueObject<{ code: string }> {
   private constructor(code: string) {

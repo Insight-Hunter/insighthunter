@@ -1,8 +1,8 @@
-import { ValueObject } from '../domain/ValueObject.js';
+import { ValueObject } from "../domain/ValueObject.js";
 export declare class Currency extends ValueObject<{
-    code: string;
+  code: string;
 }> {
-    private constructor();
-    static create(code: string): Currency;
-    get code(): string;
+  private constructor();
+  static create(code: string): Currency;
+  get code(): string;
 }

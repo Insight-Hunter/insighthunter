@@ -1,4 +1,4 @@
-name = "insighthunter-auth"
+name = "insighthunter-scout"
 main = "src/index.ts"
 compatibility_date = "2026-07-01"
 compatibility_flags = ["nodejs_compat"]
@@ -7,5 +7,5 @@ compatibility_flags = ["nodejs_compat"]
 enabled = true
 
 [vars]
-APP_NAME = "insighthunter-auth"
+APP_NAME = "insighthunter-scout"
 ENVIRONMENT = "development"

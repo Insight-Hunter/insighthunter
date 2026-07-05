@@ -1,7 +1,7 @@
-import test from "node:test";
 import assert from "node:assert/strict";
-import { DomainEventBus } from "../src/events/DomainEventBus.js";
+import test from "node:test";
 import type { DomainEvent } from "../src/events/DomainEvent.js";
+import { DomainEventBus } from "../src/events/DomainEventBus.js";
 
 test("DomainEventBus publishes to subscribers", async () => {
   const bus = new DomainEventBus();

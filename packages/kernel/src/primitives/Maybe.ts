@@ -18,9 +18,7 @@ export class Maybe<T> {
   }
 
   public static fromNullable<T>(value: T | null | undefined): Maybe<T> {
-    return value === null || value === undefined
-      ? Maybe.none<T>()
-      : Maybe.some<T>(value);
+    return value === null || value === undefined ? Maybe.none<T>() : Maybe.some<T>(value);
   }
 
   public isSome(): boolean {
@@ -43,9 +41,7 @@ export class Maybe<T> {
     some: (value: T) => U;
     none: () => U;
   }): U {
-    return this.isSome()
-      ? handlers.some(this.value as T)
-      : handlers.none();
+    return this.isSome() ? handlers.some(this.value as T) : handlers.none();
   }
 
   public getOrElse(fallback: T): T {

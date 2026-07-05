@@ -9,3 +9,8 @@ enabled = true
 [vars]
 APP_NAME = "insighthunter-dispatch"
 ENVIRONMENT = "development"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-dispatch"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"

@@ -18,15 +18,11 @@ export function err<TError>(error: TError): Err<TError> {
   return { ok: false, error };
 }
 
-export function isOk<TValue, TError>(
-  result: Result<TValue, TError>,
-): result is Ok<TValue> {
+export function isOk<TValue, TError>(result: Result<TValue, TError>): result is Ok<TValue> {
   return result.ok;
 }
 
-export function isErr<TValue, TError>(
-  result: Result<TValue, TError>,
-): result is Err<TError> {
+export function isErr<TValue, TError>(result: Result<TValue, TError>): result is Err<TError> {
   return !result.ok;
 }
 

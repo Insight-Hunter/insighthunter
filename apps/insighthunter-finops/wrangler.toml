@@ -10,3 +10,8 @@ enabled = true
 APP_NAME = "insighthunter-finops"
 ENVIRONMENT = "development"
 LEDGER_URL = "https://ledger.insighthunter.app"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-ledger"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"

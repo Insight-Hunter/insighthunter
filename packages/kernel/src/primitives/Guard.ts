@@ -13,10 +13,7 @@ export class Guard {
     return Result.ok(value);
   }
 
-  public static againstEmptyString(
-    value: string,
-    name: string,
-  ): Result<string, ValidationError> {
+  public static againstEmptyString(value: string, name: string): Result<string, ValidationError> {
     if (value.trim().length === 0) {
       return Result.fail(new ValidationError(`${name} cannot be empty.`, { name }));
     }
@@ -49,9 +46,7 @@ export class Guard {
     message: string,
     details?: Readonly<Record<string, unknown>>,
   ): Result<true, ValidationError> {
-    return condition
-      ? Result.fail(new ValidationError(message, details))
-      : Result.ok(true);
+    return condition ? Result.fail(new ValidationError(message, details)) : Result.ok(true);
   }
 
   public static all(

@@ -16,27 +16,18 @@ export interface D1PreparedStatementLike {
 
 export interface D1DatabaseLike {
   prepare(query: string): D1PreparedStatementLike;
-  batch<T = unknown>(
-    statements: readonly D1PreparedStatementLike[],
-  ): Promise<T[]>;
+  batch<T = unknown>(statements: readonly D1PreparedStatementLike[]): Promise<T[]>;
 }
 
 export interface KVNamespaceLike {
   get(key: string): Promise<string | null>;
-  put(
-    key: string,
-    value: string,
-    options?: Record<string, unknown>,
-  ): Promise<void>;
+  put(key: string, value: string, options?: Record<string, unknown>): Promise<void>;
   delete(key: string): Promise<void>;
 }
 
 export interface R2BucketLike {
   get(key: string): Promise<unknown | null>;
-  put(
-    key: string,
-    value: ReadableStream | ArrayBuffer | string,
-  ): Promise<unknown>;
+  put(key: string, value: ReadableStream | ArrayBuffer | string): Promise<unknown>;
   delete(key: string): Promise<void>;
 }
 
@@ -49,9 +40,7 @@ export interface CloudflareBindings {
   readonly [binding: string]: unknown;
 }
 
-export interface KernelRuntime<
-  TEnv extends CloudflareBindings = CloudflareBindings,
-> {
+export interface KernelRuntime<TEnv extends CloudflareBindings = CloudflareBindings> {
   readonly env: TEnv;
   readonly ctx?: CloudflareExecutionContext;
   readonly requestContext: RequestContext;
@@ -74,8 +63,7 @@ export function createKernelRuntime<TEnv extends CloudflareBindings>(
 ): KernelRuntime<TEnv> {
   const runtime: KernelRuntime<TEnv> = {
     env: input.env,
-    requestContext:
-      input.requestContext ?? createContextFromRequest(input.request),
+    requestContext: input.requestContext ?? createContextFromRequest(input.request),
     clock: input.clock ?? new SystemClock(),
     ids: input.ids ?? new CryptoIdGenerator(),
     waitUntil(promise: Promise<unknown>): void {
@@ -90,9 +78,7 @@ export function createKernelRuntime<TEnv extends CloudflareBindings>(
   return runtime;
 }
 
-function createContextFromRequest(
-  request: Request | undefined,
-): RequestContext {
+function createContextFromRequest(request: Request | undefined): RequestContext {
   if (request === undefined) {
     return createRequestContext();
   }

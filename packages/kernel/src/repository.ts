@@ -10,10 +10,8 @@ export interface ListRepository<TEntity> {
   list(): Promise<readonly TEntity[]>;
 }
 
-export class InMemoryRepository<
-  TEntity extends { readonly id: TId },
-  TId extends string,
-> implements Repository<TEntity, TId>, ListRepository<TEntity>
+export class InMemoryRepository<TEntity extends { readonly id: TId }, TId extends string>
+  implements Repository<TEntity, TId>, ListRepository<TEntity>
 {
   private readonly entities = new Map<TId, TEntity>();
 
