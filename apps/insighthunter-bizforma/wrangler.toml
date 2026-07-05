@@ -11,3 +11,7 @@ APP_NAME = "insighthunter-bizforma"
 ENVIRONMENT = "development"
 AUTH_URL = "https://auth.insighthunter.app"
 APP_URL = "https://bizforma.insighthunter.app"
+
+[[migrations]]
+tag = "v2-remove-durable-objects"
+deleted_classes = ["ComplianceAgent", "FormationAgent"]

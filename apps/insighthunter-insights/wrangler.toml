@@ -9,3 +9,7 @@ enabled = true
 [vars]
 APP_NAME = "insighthunter-insights"
 ENVIRONMENT = "development"
+
+[[migrations]]
+tag = "v2-remove-durable-objects"
+deleted_classes = ["CfoAgent"]

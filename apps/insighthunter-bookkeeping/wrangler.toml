@@ -10,6 +10,10 @@ enabled = true
 APP_NAME = "insighthunter-bookkeeping"
 ENVIRONMENT = "development"
 
+[[migrations]]
+tag = "v2-remove-durable-objects"
+deleted_classes = ["BankConnectionManager", "BookkeepingLedger", "InvoiceManager", "SubscriptionManager"]
+
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-ledger"

@@ -15,6 +15,6 @@ binding = "DB"
 database_name = "insighthunter-main"
 database_id = "04854880-81f5-4c02-b555-905a34492b92"
 
-[routes]
+[[routes]]
 pattern = "insighthunter.app/*"
 zone_name = "insighthunter.app"
