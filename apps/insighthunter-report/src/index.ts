@@ -1,5 +1,5 @@
-import { Hono } from "hono";
 import type { D1Database } from "@cloudflare/workers-types";
+import { Hono } from "hono";
 
 export interface Env {
   DB: D1Database;
@@ -23,7 +23,9 @@ app.get("/trial-balance", async (c) => {
     WHERE je.organization_id = ?
     GROUP BY a.id, a.code, a.name, a.type
     ORDER BY a.code
-  `).bind(orgId).all();
+  `)
+    .bind(orgId)
+    .all();
   return c.json({ items: results });
 });
 

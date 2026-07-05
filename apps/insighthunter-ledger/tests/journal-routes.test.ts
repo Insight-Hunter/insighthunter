@@ -11,9 +11,9 @@ describe("ledger journal routes", () => {
         organizationId: "org1",
         lines: [
           { accountId: "cash", debit: 50, credit: 0 },
-          { accountId: "revenue", debit: 0, credit: 50 }
-        ]
-      })
+          { accountId: "revenue", debit: 0, credit: 50 },
+        ],
+      }),
     });
     const res = await ledgerApp.fetch(req);
     const json = await res.json();

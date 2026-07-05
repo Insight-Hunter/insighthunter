@@ -1,5 +1,5 @@
-import { Hono } from "hono";
 import type { D1Database } from "@cloudflare/workers-types";
+import { Hono } from "hono";
 
 export interface Env {
   DB: D1Database;
@@ -13,7 +13,9 @@ app.get("/settings", async (c) => {
   if (!orgId) return c.json({ error: "x-organization-id header required" }, 400);
   const row = await c.env.DB.prepare(
     "SELECT id, name, owner_email, status FROM tenants WHERE id = ?",
-  ).bind(orgId).first();
+  )
+    .bind(orgId)
+    .first();
   if (!row) return c.json({ error: "Tenant not found" }, 404);
   return c.json(row);
 });

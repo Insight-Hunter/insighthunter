@@ -13,7 +13,7 @@ ENVIRONMENT = "development"
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-main"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "04854880-81f5-4c02-b555-905a34492b92"
 
 [routes]
 pattern = "insighthunter.app/*"

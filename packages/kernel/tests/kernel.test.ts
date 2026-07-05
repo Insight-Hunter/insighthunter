@@ -1,38 +1,20 @@
-import { describe, expect, it, vi } from "vitest";
-import {
-  AggregateRoot,
-  FixedClock,
-  InMemoryRepository,
-  ValueObject,
-  createDomainEvent,
-  createEntityId,
-  createKernelRuntime,
-  createRequestContext,
-  defineUseCase,
-  err,
-  isErr,
-  isOk,
-  ok,
-  unwrap,
-} from "../src/index.js";
+import { describe, expect, it } from "vitest";
+import type { DomainEvent } from "../src/core/domain-event.js";
+import { EntityId } from "../src/core/entity-id.js";
+import { AggregateRoot, Result, ValueObject } from "../src/index.js";
 
-interface CustomerProps {
-  readonly name: string;
-}
+class Customer extends AggregateRoot {
+  public readonly name: string;
 
-class Customer extends AggregateRoot<string, CustomerProps> {
-  static create(id: string, name: string): Customer {
-    const customer = new Customer(id, { name });
-    customer.record(
-      createDomainEvent({
-        type: "customer.created",
-        aggregateId: id,
-        organizationId: "org-1",
-        occurredAt: "2026-07-01T00:00:00.000Z",
-        payload: { name },
-      }),
-    );
-    return customer;
+  public constructor(name: string) {
+    super();
+    this.name = name;
+    this.addDomainEvent({
+      eventName: "customer.created",
+      aggregateId: this.id,
+      occurredAt: new Date(),
+      payload: { name },
+    } satisfies DomainEvent<{ name: string }>);
   }
 }
 
@@ -40,27 +22,20 @@ class Address extends ValueObject<{
   readonly city: string;
   readonly line1: string;
 }> {
-  static create(line1: string, city: string): Address {
+  public static create(line1: string, city: string): Address {
     return new Address({ city, line1 });
   }
 }
 
 describe("@insighthunter/kernel", () => {
-  it("brands entity IDs and rejects empty values", () => {
-    expect(createEntityId("organization", " org-123 ")).toBe("org-123");
-    expect(() => createEntityId("organization", " ")).toThrow("organization id cannot be empty");
-  });
-
   it("records and pulls aggregate domain events", () => {
-    const customer = Customer.create("customer-1", "Acme");
-
-    expect(customer.peekDomainEvents()).toHaveLength(1);
+    const customer = new Customer("Acme");
 
     const events = customer.pullDomainEvents();
 
     expect(events).toHaveLength(1);
-    expect(events[0]?.type).toBe("customer.created");
-    expect(customer.peekDomainEvents()).toHaveLength(0);
+    expect(events[0]?.eventName).toBe("customer.created");
+    expect(customer.pullDomainEvents()).toHaveLength(0);
   });
 
   it("compares value objects by stable property values", () => {
@@ -76,62 +51,20 @@ describe("@insighthunter/kernel", () => {
     ).toBe(false);
   });
 
-  it("stores aggregates in an in-memory repository", async () => {
-    const repository = new InMemoryRepository<Customer, string>();
-    const customer = Customer.create("customer-1", "Acme");
-
-    await repository.save(customer);
-
-    expect(await repository.get("customer-1")).toBe(customer);
-    await expect(repository.getOrThrow("missing", "Customer")).rejects.toMatchObject({
-      code: "domain.not_found",
-    });
+  it("EntityId generates stable identity", () => {
+    const id = EntityId.create("fixed-id");
+    expect(id.value).toBe("fixed-id");
+    expect(id.equals(EntityId.create("fixed-id"))).toBe(true);
+    expect(id.equals(EntityId.create("other-id"))).toBe(false);
   });
 
-  it("models explicit use-case results", async () => {
-    const useCase = defineUseCase<{ readonly enabled: boolean }, string, string>(async (input) => {
-      if (!input.enabled) {
-        return err("disabled");
-      }
+  it("Result.ok holds a value and Result.fail holds an error", () => {
+    const ok = Result.ok("hello");
+    expect(ok.isSuccess).toBe(true);
+    expect(ok.value).toBe("hello");
 
-      return ok("ready");
-    });
-
-    const context = createRequestContext({ requestId: "request-1" });
-    const result = await useCase.execute({ enabled: true }, context);
-    const failed = await useCase.execute({ enabled: false }, context);
-
-    expect(isOk(result)).toBe(true);
-    expect(unwrap(result)).toBe("ready");
-    expect(isErr(failed)).toBe(true);
-  });
-
-  it("creates Cloudflare-native runtime context from request headers", () => {
-    const waitUntil = vi.fn();
-    const request = new Request("https://example.com", {
-      headers: {
-        "cf-ray": "ray-1",
-        "x-organization-id": "org-1",
-        "x-request-id": "request-1",
-        "x-user-id": "user-1",
-      },
-    });
-    const clock = new FixedClock(new Date("2026-07-01T00:00:00.000Z"));
-    const runtime = createKernelRuntime({
-      env: {},
-      ctx: { waitUntil },
-      request,
-      clock,
-    });
-    const promise = Promise.resolve();
-
-    runtime.waitUntil(promise);
-
-    expect(runtime.requestContext.requestId).toBe("request-1");
-    expect(runtime.requestContext.organizationId).toBe("org-1");
-    expect(runtime.requestContext.actorId).toBe("user-1");
-    expect(runtime.requestContext.traceId).toBe("ray-1");
-    expect(runtime.clock.nowIso()).toBe("2026-07-01T00:00:00.000Z");
-    expect(waitUntil).toHaveBeenCalledWith(promise);
+    const fail = Result.fail(new Error("oops"));
+    expect(fail.isFailure).toBe(true);
+    expect(fail.error.message).toBe("oops");
   });
 });

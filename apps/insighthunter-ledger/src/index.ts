@@ -1,5 +1,5 @@
-import { Hono } from "hono";
 import type { D1Database } from "@cloudflare/workers-types";
+import { Hono } from "hono";
 import { accountsRoutes } from "./routes-accounts.js";
 import { journalRoutes } from "./routes-journals.js";
 

@@ -13,13 +13,14 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "lint": "biome check 'src/**/*.ts' 'tests/**/*.ts'",
+    "lint": "biome check src tests",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check": "pnpm lint && pnpm typecheck",
     "test": "node --test --import tsx"
   },
   "devDependencies": {
-    "tsx": "^4.19.1"
+    "tsx": "^4.19.1",
+    "vitest": "^2.1.3"
   }
 }
 

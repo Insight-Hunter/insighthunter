@@ -1,5 +1,5 @@
-import { Hono } from "hono";
 import type { D1Database } from "@cloudflare/workers-types";
+import { Hono } from "hono";
 
 export interface Env {
   DB: D1Database;
@@ -52,11 +52,7 @@ app.post("/tenants", async (c) => {
  */
 app.patch("/tenants/:id/suspend", async (c) => {
   const { id } = c.req.param();
-  await c.env.DB.prepare(
-    "UPDATE tenants SET status = 'suspended' WHERE id = ?",
-  )
-    .bind(id)
-    .run();
+  await c.env.DB.prepare("UPDATE tenants SET status = 'suspended' WHERE id = ?").bind(id).run();
 
   return c.json({ suspended: true, id });
 });

@@ -38,11 +38,11 @@ export class DomainEventBus {
       event,
       metadata: {
         eventId: metadata?.eventId ?? randomUUID(),
-        correlationId: metadata?.correlationId,
-        causationId: metadata?.causationId,
-        tenantId: metadata?.tenantId,
-        actorId: metadata?.actorId,
         schemaVersion: metadata?.schemaVersion ?? 1,
+        ...(metadata?.correlationId !== undefined && { correlationId: metadata.correlationId }),
+        ...(metadata?.causationId !== undefined && { causationId: metadata.causationId }),
+        ...(metadata?.tenantId !== undefined && { tenantId: metadata.tenantId }),
+        ...(metadata?.actorId !== undefined && { actorId: metadata.actorId }),
       },
     };
 

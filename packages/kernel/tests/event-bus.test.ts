@@ -20,7 +20,7 @@ test("DomainEventBus publishes to subscribers", async () => {
     payload: { email: "user@example.com" },
   };
 
-  await bus.publish(event);
+  await bus.publish<DomainEvent<{ email: string }>>(event);
   unsubscribe();
 
   assert.equal(received, true);

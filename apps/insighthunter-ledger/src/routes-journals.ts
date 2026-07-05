@@ -1,6 +1,6 @@
-import { Hono } from "hono";
 import { isBalanced } from "@insighthunter/accounting";
 import type { JournalEntry } from "@insighthunter/accounting";
+import { Hono } from "hono";
 import type { Env } from "./index.js";
 
 export const journalRoutes = new Hono<{ Bindings: Env }>();
@@ -35,14 +35,7 @@ journalRoutes.post("/journals/post", async (c) => {
 
   for (const line of entry.lines) {
     await stmt
-      .bind(
-        crypto.randomUUID(),
-        id,
-        line.accountId,
-        line.debit,
-        line.credit,
-        line.memo ?? null,
-      )
+      .bind(crypto.randomUUID(), id, line.accountId, line.debit, line.credit, line.memo ?? null)
       .run();
   }
 

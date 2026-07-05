@@ -11,9 +11,7 @@ export interface Env {
 
 const app = new Hono<{ Bindings: Env }>();
 
-app.get("/health", (c) =>
-  c.json({ service: "gateway", ok: true }),
-);
+app.get("/health", (c) => c.json({ service: "gateway", ok: true }));
 
 /** Verify the caller is authenticated via the auth service. */
 async function authenticate(

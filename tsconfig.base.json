@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "NodeNext",
-    "ignoreDeprecations": "6.0",
     "moduleResolution": "NodeNext",
     "lib": ["ES2022"],
     "strict": true,
@@ -16,7 +15,6 @@
     "declarationMap": true,
     "sourceMap": true,
     "isolatedModules": true,
-    "esModuleInterop": false,
     "skipLibCheck": true,
     "resolveJsonModule": true
   }

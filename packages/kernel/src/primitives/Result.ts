@@ -1,6 +1,6 @@
 export class Result<TValue, TError = Error> {
-  private readonly _value?: TValue;
-  private readonly _error?: TError;
+  private readonly _value: TValue | undefined;
+  private readonly _error: TError | undefined;
   private readonly _isOk: boolean;
 
   private constructor(isOk: boolean, value?: TValue, error?: TError) {

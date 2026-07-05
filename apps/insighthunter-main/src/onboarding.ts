@@ -8,6 +8,6 @@ export async function submitOnboarding(payload: OnboardingPayload): Promise<Resp
   return fetch("/api/onboard", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 }

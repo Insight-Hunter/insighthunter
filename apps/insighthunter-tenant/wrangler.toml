@@ -13,4 +13,4 @@ ENVIRONMENT = "development"
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-dispatch"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "2a0331eb-4775-4ad2-9126-0560336486df"

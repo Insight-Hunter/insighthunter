@@ -2,8 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist",
-    "types": ["./worker-configuration.d.ts"]
+    "outDir": "dist"
   },
-  "include": ["src", "worker-configuration.d.ts"]
+  "include": ["src"]
 }

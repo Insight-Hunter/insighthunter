@@ -1,5 +1,5 @@
-import { Hono } from "hono";
 import type { D1Database } from "@cloudflare/workers-types";
+import { Hono } from "hono";
 
 export interface Env {
   DB: D1Database;
@@ -15,7 +15,9 @@ app.get("/chart-of-accounts", async (c) => {
   if (!orgId) return c.json({ error: "x-organization-id header required" }, 400);
   const { results } = await c.env.DB.prepare(
     "SELECT id, code, name, type, archived FROM accounts WHERE organization_id = ? ORDER BY code",
-  ).bind(orgId).all();
+  )
+    .bind(orgId)
+    .all();
   return c.json({ items: results });
 });
 

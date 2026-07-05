@@ -6,7 +6,8 @@ import type { DomainEvent } from "../src/core/domain-event.js";
 import { EntityId } from "../src/core/entity-id.js";
 
 class DemoAggregate extends AggregateRoot {
-  public constructor(id: EntityId) {
+  // biome-ignore lint/complexity/noUselessConstructor: exposes protected base constructor as public
+  public constructor(id?: EntityId) {
     super(id);
   }
 

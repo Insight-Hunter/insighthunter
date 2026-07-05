@@ -93,7 +93,21 @@ importers:
         specifier: ^4.21.0
         version: 4.107.0(@cloudflare/workers-types@4.20260702.1)
 
-  apps/insighthunter-dispatch: {}
+  apps/insighthunter-dispatch:
+    dependencies:
+      hono:
+        specifier: ^4.6.10
+        version: 4.12.27
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20260620.0
+        version: 4.20260702.1
+      vitest:
+        specifier: ^2.1.3
+        version: 2.1.9(@types/node@25.9.4)
+      wrangler:
+        specifier: ^4.21.0
+        version: 4.107.0(@cloudflare/workers-types@4.20260702.1)
 
   apps/insighthunter-finops:
     dependencies:
@@ -129,6 +143,9 @@ importers:
 
   apps/insighthunter-ledger:
     dependencies:
+      '@insighthunter/accounting':
+        specifier: workspace:*
+        version: link:../../packages/accounting
       hono:
         specifier: ^4.6.10
         version: 4.12.27
@@ -272,6 +289,9 @@ importers:
       tsx:
         specifier: ^4.19.1
         version: 4.22.4
+      vitest:
+        specifier: ^2.1.3
+        version: 2.1.9(@types/node@25.9.4)
 
 packages:
 

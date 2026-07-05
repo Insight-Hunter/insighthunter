@@ -3,7 +3,12 @@ import test from "node:test";
 import { Entity } from "../src/domain/Entity.js";
 import { TypedId } from "../src/identity/TypedId.js";
 
-class User extends Entity<TypedId<"UserId">, { email: string }> {}
+class User extends Entity<TypedId<"UserId">, { email: string }> {
+  // biome-ignore lint/complexity/noUselessConstructor: exposes protected base constructor as public
+  public constructor(id: TypedId<"UserId">, props: { email: string }) {
+    super(id, props);
+  }
+}
 
 test("Entity equality is identity based", () => {
   const id = TypedId.create("UserId", "user-1");

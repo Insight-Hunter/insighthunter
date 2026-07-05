@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { CompositeSpecification } from "../src/domain/Specification.js";
+import { AbstractSpecification } from "../src/domain/Specification.js";
 
-class GreaterThanFive extends CompositeSpecification<number> {
+class GreaterThanFive extends AbstractSpecification<number> {
   isSatisfiedBy(candidate: number): boolean {
     return candidate > 5;
   }
 }
 
-class EvenNumber extends CompositeSpecification<number> {
+class EvenNumber extends AbstractSpecification<number> {
   isSatisfiedBy(candidate: number): boolean {
     return candidate % 2 === 0;
   }

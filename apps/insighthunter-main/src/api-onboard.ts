@@ -10,6 +10,6 @@ export function createOrganizationRecord(name: string, ownerEmail: string): Orga
     id: crypto.randomUUID(),
     name,
     ownerEmail,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
   };
 }

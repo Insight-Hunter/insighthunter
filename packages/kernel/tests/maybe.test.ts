@@ -3,7 +3,7 @@ import { Maybe } from "../src/primitives/Maybe.js";
 
 describe("Maybe", () => {
   it("tracks presence", () => {
-    expect(Maybe.some("x").hasValue).toBe(true);
-    expect(Maybe.none<string>().hasValue).toBe(false);
+    expect(Maybe.some("x").isSome()).toBe(true);
+    expect(Maybe.none<string>().isSome()).toBe(false);
   });
 });

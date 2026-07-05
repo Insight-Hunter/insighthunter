@@ -13,30 +13,45 @@ export class DomainError extends Error {
     super(message, options?.cause ? { cause: options.cause } : undefined);
     this.name = new.target.name;
     this.code = options?.code ?? "DOMAIN_ERROR";
-    this.details = options?.details;
+    if (options?.details !== undefined) {
+      this.details = options.details;
+    }
   }
 }
 
 export class ValidationError extends DomainError {
   public constructor(message: string, details?: Readonly<Record<string, unknown>>) {
-    super(message, { code: "VALIDATION_ERROR", details });
+    super(
+      message,
+      details !== undefined ? { code: "VALIDATION_ERROR", details } : { code: "VALIDATION_ERROR" },
+    );
   }
 }
 
 export class InvariantViolationError extends DomainError {
   public constructor(message: string, details?: Readonly<Record<string, unknown>>) {
-    super(message, { code: "INVARIANT_VIOLATION", details });
+    super(
+      message,
+      details !== undefined
+        ? { code: "INVARIANT_VIOLATION", details }
+        : { code: "INVARIANT_VIOLATION" },
+    );
   }
 }
 
 export class NotFoundError extends DomainError {
   public constructor(message: string, details?: Readonly<Record<string, unknown>>) {
-    super(message, { code: "NOT_FOUND", details });
+    super(message, details !== undefined ? { code: "NOT_FOUND", details } : { code: "NOT_FOUND" });
   }
 }
 
 export class ConcurrencyError extends DomainError {
   public constructor(message: string, details?: Readonly<Record<string, unknown>>) {
-    super(message, { code: "CONCURRENCY_ERROR", details });
+    super(
+      message,
+      details !== undefined
+        ? { code: "CONCURRENCY_ERROR", details }
+        : { code: "CONCURRENCY_ERROR" },
+    );
   }
 }

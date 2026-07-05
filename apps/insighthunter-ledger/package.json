@@ -10,7 +10,10 @@
     "test": "vitest run --passWithNoTests",
     "cf:types": "wrangler types"
   },
-  "dependencies": { "hono": "^4.6.10" },
+  "dependencies": {
+    "@insighthunter/accounting": "workspace:*",
+    "hono": "^4.6.10"
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260620.0",
     "vitest": "^2.1.3",
