@@ -14,4 +14,11 @@
     { "binding": "DISPATCH", "service": "insighthunter-dispatch" }
   ],
   "routes": [{ "pattern": "api.insighthunter.app/*", "zone_name": "insighthunter.app" }]
-}
+
+  },
+  "vars": {
+    "APP_NAME": "insighthunter-gateway",
+    "AUTH_BASE_URL": "https://auth.insighthunter.app",
+    "GATEWAY_BASE_URL": "https://gateway.insighthunter.app"
+  }
+
