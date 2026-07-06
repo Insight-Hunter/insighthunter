@@ -1,21 +1,19 @@
 name = "insighthunter-main"
 main = "src/index.ts"
-compatibility_date = "2026-07-01"
-compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir ="dist"
+compatibility_date = "2026-07-05"
 
 [observability]
 enabled = true
 
-[vars]
-APP_NAME = "insighthunter-main"
-ENVIRONMENT = "development"
-
 [[d1_databases]]
 binding = "DB"
-database_name = "insighthunter-main"
-database_id = "04854880-81f5-4c02-b555-905a34492b92"
+database_name = "insighthunter_main"
+database_id = "REPLACE_WITH_MAIN_DB_ID"
 
-[[routes]]
-pattern = "insighthunter.app/*"
-zone_name = "insighthunter.app"
+[vars]
+APP_NAME = "insighthunter-main"
+MAIN_BASE_URL = "https://insighthunter.app"
+AUTH_BASE_URL = "https://auth.insighthunter.app"
+GATEWAY_BASE_URL = "https://gateway.insighthunter.app"
+CHECKOUT_BASE_URL = "https://checkout.insighthunter.app/session"
+BILLING_PROVIDER_SECRET = "REPLACE_WITH_SECRET_REF"

@@ -1,15 +1,15 @@
 name = "insighthunter-auth"
 main = "src/index.ts"
-compatibility_date = "2026-07-01"
-compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2026-07-05"
 
 [observability]
 enabled = true
 
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter_auth"
+database_id = "REPLACE_WITH_AUTH_DB_ID"
+
 [vars]
 APP_NAME = "insighthunter-auth"
-ENVIRONMENT = "development"
-
-[[kv_namespaces]]
-binding = "SESSIONS"
-id = "60e34ba310ca40c79edec05470c7a271"
+SESSION_TTL_SECONDS = "604800"

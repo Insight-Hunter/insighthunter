@@ -1,0 +1,11 @@
+name = "insighthunter-gateway"
+main = "src/index.ts"
+compatibility_date = "2026-07-05"
+
+[observability]
+enabled = true
+
+[vars]
+APP_NAME = "insighthunter-gateway"
+AUTH_BASE_URL = "https://auth.insighthunter.app"
+GATEWAY_BASE_URL = "https://gateway.insighthunter.app"

@@ -6,12 +6,13 @@
   "scripts": {
     "dev": "wrangler dev",
     "build": "wrangler deploy --dry-run",
-    "lint": "biome check src",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "check": "pnpm lint && pnpm typecheck"
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@insighthunter/kernel": "workspace:*",
+    "@insighthunter/auth-shared": "workspace:*",
     "hono": "^4.6.10"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250701.0"
   }
 }

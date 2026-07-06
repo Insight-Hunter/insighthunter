@@ -1,101 +1,87 @@
 import { Hono } from "hono";
+import { extractAuthToken, extractSessionToken, getLoginRedirectUrl, isProbablyBrowserRequest } from "@insighthunter/auth-shared";
 
-export interface Env {
-  AUTH: Fetcher;
-  LEDGER: Fetcher;
-  FINOPS: Fetcher;
-  ADVISOR: Fetcher;
-  BIZFORMA: Fetcher;
-  DISPATCH: Fetcher;
+type SessionResponse = {
+  ok: boolean;
+  session?: {
+    token: string;
+    user: {
+      subject: string;
+      email?: string;
+      orgId?: string;
+    };
+    expiresAt: string;
+  };
+};
+
+type Env = {
+  Bindings: {
+    APP_NAME: string;
+    AUTH_BASE_URL: string;
+    GATEWAY_BASE_URL: string;
+  };
+  Variables: {
+    authUser: {
+      subject: string;
+      email?: string;
+      orgId?: string;
+    };
+    authToken: string;
+  };
+};
+
+const app = new Hono<Env>();
+
+async function requireAuth(c: any, next: () => Promise<void>) {
+  const token = extractAuthToken(c.req.raw) ?? extractSessionToken(c.req.raw);
+
+  if (!token) {
+    if (isProbablyBrowserRequest(c.req.raw)) {
+      return c.redirect(getLoginRedirectUrl(c.env.AUTH_BASE_URL, c.env.GATEWAY_BASE_URL), 302);
+    }
+
+    return c.json({ error: "unauthorized" }, 401);
+  }
+
+  const response = await fetch(`${c.env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}`);
+
+  if (!response.ok) {
+    return c.json({ error: "invalid_session" }, 401);
+  }
+
+  const data = (await response.json()) as SessionResponse;
+
+  if (!data.ok || !data.session) {
+    return c.json({ error: "invalid_session" }, 401);
+  }
+
+  c.set("authUser", data.session.user);
+  c.set("authToken", token);
+
+  await next();
 }
 
-const app = new Hono<{ Bindings: Env }>();
+app.get("/health", (c) => c.json({ ok: true, service: c.env.APP_NAME }));
 
-app.get("/health", (c) => c.json({ service: "gateway", ok: true }));
-
-/** Verify the caller is authenticated via the auth service. */
-async function authenticate(
-  headers: Headers,
-  auth: Fetcher,
-): Promise<{ ok: boolean; status: number; body: unknown }> {
-  const verifyHeaders = new Headers(headers);
-  const res = await auth.fetch(
-    new Request("https://insighthunter-auth/verify", {
-      method: "POST",
-      headers: verifyHeaders,
-    }),
-  );
-  const body = await res.json();
-  return { ok: res.ok, status: res.status, body };
-}
-
-// ─── Auth passthrough ────────────────────────────────────────────────────────
-app.all("/api/auth/*", async (c) => {
-  const url = new URL(c.req.url);
-  url.hostname = "insighthunter-auth";
-  const res = await c.env.AUTH.fetch(new Request(url.toString(), c.req.raw));
-  return new Response(res.body, res);
+app.get("/me", requireAuth, (c) => {
+  return c.json({
+    ok: true,
+    user: c.get("authUser")
+  });
 });
 
-// ─── Ledger ──────────────────────────────────────────────────────────────────
-app.all("/api/ledger/*", async (c) => {
-  const auth = await authenticate(c.req.raw.headers, c.env.AUTH);
-  if (!auth.ok) return c.json(auth.body, auth.status as 401 | 403);
+app.get("/handoff", requireAuth, (c) => {
+  const appName = c.req.query("app") ?? "main";
+  const baseMap: Record<string, string> = {
+    main: "https://insighthunter.app/dashboard",
+    bizforma: "https://bizforma.insighthunter.app/"
+  };
 
-  const url = new URL(c.req.url);
-  // strip /api/ledger prefix → /api/...
-  url.pathname = url.pathname.replace(/^\/api\/ledger/, "/api");
-  url.hostname = "insighthunter-ledger";
-  const res = await c.env.LEDGER.fetch(new Request(url.toString(), c.req.raw));
-  return new Response(res.body, res);
-});
+  const redirectTarget = baseMap[appName] ?? baseMap.main;
+  const url = new URL(redirectTarget);
+  url.searchParams.set("from", "gateway");
 
-// ─── FinOps ───────────────────────────────────────────────────────────────────
-app.all("/api/finops/*", async (c) => {
-  const auth = await authenticate(c.req.raw.headers, c.env.AUTH);
-  if (!auth.ok) return c.json(auth.body, auth.status as 401 | 403);
-
-  const url = new URL(c.req.url);
-  url.pathname = url.pathname.replace(/^\/api\/finops/, "");
-  url.hostname = "insighthunter-finops";
-  const res = await c.env.FINOPS.fetch(new Request(url.toString(), c.req.raw));
-  return new Response(res.body, res);
-});
-
-// ─── Advisor ──────────────────────────────────────────────────────────────────
-app.all("/api/advisor/*", async (c) => {
-  const auth = await authenticate(c.req.raw.headers, c.env.AUTH);
-  if (!auth.ok) return c.json(auth.body, auth.status as 401 | 403);
-
-  const url = new URL(c.req.url);
-  url.pathname = url.pathname.replace(/^\/api\/advisor/, "");
-  url.hostname = "insighthunter-advisor";
-  const res = await c.env.ADVISOR.fetch(new Request(url.toString(), c.req.raw));
-  return new Response(res.body, res);
-});
-
-// ─── BizForma ─────────────────────────────────────────────────────────────────
-app.all("/api/bizforma/*", async (c) => {
-  const auth = await authenticate(c.req.raw.headers, c.env.AUTH);
-  if (!auth.ok) return c.json(auth.body, auth.status as 401 | 403);
-
-  const url = new URL(c.req.url);
-  url.pathname = url.pathname.replace(/^\/api\/bizforma/, "");
-  url.hostname = "insighthunter-bizforma";
-  const res = await c.env.BIZFORMA.fetch(new Request(url.toString(), c.req.raw));
-  return new Response(res.body, res);
-});
-
-// ─── Dispatch / Tenant ────────────────────────────────────────────────────────
-app.all("/api/dispatch/*", async (c) => {
-  const auth = await authenticate(c.req.raw.headers, c.env.AUTH);
-  if (!auth.ok) return c.json(auth.body, auth.status as 401 | 403);
-
-  const url = new URL(c.req.url);
-  url.pathname = url.pathname.replace(/^\/api\/dispatch/, "");
-  url.hostname = "insighthunter-dispatch";
-  const res = await c.env.DISPATCH.fetch(new Request(url.toString(), c.req.raw));
-  return new Response(res.body, res);
+  return c.redirect(url.toString(), 302);
 });
 
 export default app;

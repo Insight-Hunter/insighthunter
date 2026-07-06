@@ -26,21 +26,29 @@ importers:
 
   apps/auth:
     dependencies:
-      '@insighthunter/kernel':
+      '@insighthunter/auth-shared':
         specifier: workspace:*
-        version: link:../../packages/kernel
+        version: link:../../packages/auth-shared
       hono:
         specifier: ^4.6.10
         version: 4.12.27
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20250701.0
+        version: 4.20260702.1
 
   apps/gateway:
     dependencies:
-      '@insighthunter/kernel':
+      '@insighthunter/auth-shared':
         specifier: workspace:*
-        version: link:../../packages/kernel
+        version: link:../../packages/auth-shared
       hono:
         specifier: ^4.6.10
         version: 4.12.27
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20250701.0
+        version: 4.20260702.1
 
   apps/insighthunter-advisor:
     dependencies:
@@ -160,7 +168,18 @@ importers:
         specifier: ^4.21.0
         version: 4.107.0(@cloudflare/workers-types@4.20260702.1)
 
-  apps/insighthunter-main: {}
+  apps/insighthunter-main:
+    dependencies:
+      '@insighthunter/auth-shared':
+        specifier: workspace:*
+        version: link:../../packages/auth-shared
+      hono:
+        specifier: ^4.6.10
+        version: 4.12.27
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20250701.0
+        version: 4.20260702.1
 
   apps/insighthunter-notifications:
     dependencies:
@@ -283,6 +302,8 @@ importers:
       vitest:
         specifier: ^2.1.3
         version: 2.1.9(@types/node@25.9.4)
+
+  packages/auth-shared: {}
 
   packages/kernel:
     devDependencies:
