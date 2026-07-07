@@ -7,3 +7,4 @@ coverage
 .DS_Store
 .vscode/settings.json
 .dev.vars
+apps/insighthunter-main/.dev.vars.example
