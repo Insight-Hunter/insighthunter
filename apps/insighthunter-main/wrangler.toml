@@ -1,3 +1,4 @@
+# apps/insighthunter-main/wrangler.toml
 name = "insighthunter-main"
 main = "src/index.ts"
 compatibility_date = "2026-07-05"
@@ -5,15 +6,39 @@ compatibility_date = "2026-07-05"
 [observability]
 enabled = true
 
+# ── D1 Database ───────────────────────────────────────────────────────────────
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter_main"
-database_id = "REPLACE_WITH_MAIN_DB_ID"
+database_id = "04854880-81f5-4c02-b555-905a34492b92"
 
+# ── KV Namespace (rate limiting) ──────────────────────────────────────────────
+# Create with: wrangler kv namespace create "RATE_LIMIT_KV"
+# Then replace the id below with the returned value
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# ── Environment Variables ─────────────────────────────────────────────────────
 [vars]
-APP_NAME = "insighthunter-main"
-MAIN_BASE_URL = "https://insighthunter.app"
-AUTH_BASE_URL = "https://auth.insighthunter.app"
-GATEWAY_BASE_URL = "https://gateway.insighthunter.app"
-CHECKOUT_BASE_URL = "https://checkout.insighthunter.app/session"
-BILLING_PROVIDER_SECRET = "REPLACE_WITH_SECRET_REF"
+APP_NAME            = "insighthunter-main"
+MAIN_BASE_URL       = "https://insighthunter.app"
+AUTH_BASE_URL       = "https://auth.insighthunter.app"
+GATEWAY_BASE_URL    = "https://gateway.insighthunter.app"
+BIZFORMA_BASE_URL   = "https://bizforma.insighthunter.app"
+CHECKOUT_BASE_URL   = "https://checkout.insighthunter.app/session"
+
+# Stripe Product IDs — MUST match insighthunter.app pricing page
+STRIPE_PRICE_LITE     = ""                        # free — no Stripe product
+STRIPE_PRICE_STANDARD = ""                        # TODO: create $49/mo product in Stripe
+STRIPE_PRICE_PRO      = "prod_U9zYEwdL9Ca7Xu"    # existing
+
+# Deprecated — kept for backward compat until plan migration complete
+# Remove after /checkout/start is confirmed on lite/standard/pro codes
+STRIPE_PRICE_STARTER  = "prod_U9zYWaE9xpW0Tx"
+STRIPE_PRICE_GROWTH   = "prod_U9zYM5rWy3zKPv"
+
+# ── Secrets (set via CLI — never commit values here) ─────────────────────────
+# wrangler secret put BILLING_PROVIDER_SECRET
+# wrangler secret put BILLING_WEBHOOK_SECRET
+# wrangler secret put STRIPE_SECRET_KEY
