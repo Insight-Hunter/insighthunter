@@ -9,9 +9,12 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.1.2",
+    "@astrojs/svelte": "^9.0.1",
     "@insighthunter/auth-shared": "workspace:*",
     "astro": "^7.0.6",
-    "hono": "^4.6.10"
+    "hono": "^4.6.10",
+    "svelte": "^5.56.4"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250701.0"

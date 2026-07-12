@@ -530,7 +530,7 @@ app.get("/checkout/start", async (c) => {
       plan_code: plan,
       product,
     },
-  });
+});
 
   if (!checkout.url) {
     return c.text("Unable to create Stripe checkout session", 500);
