@@ -21,11 +21,15 @@ export interface BizformaEnv {
   // Durable Object — FormationAgent
   FORMATION_AGENT: DurableObjectNamespace;
 
+  // Workers AI
+  AI: Ai;
+
   // Vars from wrangler.jsonc
   APP_NAME: string;
   ENVIRONMENT: string;
   AUTH_URL: string;
   APP_URL: string;
   JWKS_URL: string;
-  JWT_SECRET?: string; // optional HS256 fallback for internal service calls
+  JWT_SECRET?: string;
+  INTERNAL_SECRET?: string; // for cron/internal endpoints
 }

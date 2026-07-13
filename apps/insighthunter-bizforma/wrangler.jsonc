@@ -1,6 +1,5 @@
 {
   // insighthunter-bizforma — Business Formation App
-  // Cloudflare Workers + D1 + R2 + KV + Queues
   "name": "insighthunter-bizforma",
   "main": "src/index.ts",
   "compatibility_date": "2025-03-07",
@@ -11,6 +10,11 @@
     "head_sampling_rate": 1
   },
 
+  // Cron triggers — daily reminders + overdue flagging
+  "triggers": {
+    "crons": ["0 9 * * *", "0 0 * * *"]
+  },
+
   "vars": {
     "APP_NAME": "insighthunter-bizforma",
     "ENVIRONMENT": "development",
@@ -19,7 +23,6 @@
     "JWKS_URL": "https://auth.insighthunter.app/.well-known/jwks.json"
   },
 
-  // D1 — relational data: formation cases, compliance events, documents, wizard sessions
   "d1_databases": [
     {
       "binding": "DB",
@@ -29,7 +32,6 @@
     }
   ],
 
-  // R2 — document vault: articles of org, operating agreements, EIN letters
   "r2_buckets": [
     {
       "binding": "DOCUMENTS",
@@ -38,7 +40,6 @@
     }
   ],
 
-  // KV — AI result caching, rate limit counters, feature flags
   "kv_namespaces": [
     {
       "binding": "CACHE",
@@ -47,17 +48,10 @@
     }
   ],
 
-  // Queues — async PDF generation, compliance reminder dispatch
   "queues": {
     "producers": [
-      {
-        "binding": "PDF_QUEUE",
-        "queue": "insighthunter-bizforma-pdf"
-      },
-      {
-        "binding": "REMINDER_QUEUE",
-        "queue": "insighthunter-bizforma-reminders"
-      }
+      { "binding": "PDF_QUEUE",      "queue": "insighthunter-bizforma-pdf" },
+      { "binding": "REMINDER_QUEUE", "queue": "insighthunter-bizforma-reminders" }
     ],
     "consumers": [
       {
@@ -75,7 +69,6 @@
     ]
   },
 
-  // Analytics Engine — track formation events, document uploads, AI usage
   "analytics_engine_datasets": [
     {
       "binding": "ANALYTICS",
@@ -83,13 +76,13 @@
     }
   ],
 
-  // Durable Objects — FormationAgent for long-running coordination
+  "ai": {
+    "binding": "AI"
+  },
+
   "durable_objects": {
     "bindings": [
-      {
-        "name": "FORMATION_AGENT",
-        "class_name": "FormationAgent"
-      }
+      { "name": "FORMATION_AGENT", "class_name": "FormationAgent" }
     ]
   },
 
