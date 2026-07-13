@@ -1,0 +1,102 @@
+{
+  // insighthunter-bizforma — Business Formation App
+  // Cloudflare Workers + D1 + R2 + KV + Queues
+  "name": "insighthunter-bizforma",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  "vars": {
+    "APP_NAME": "insighthunter-bizforma",
+    "ENVIRONMENT": "development",
+    "AUTH_URL": "https://auth.insighthunter.app",
+    "APP_URL": "https://bizforma.insighthunter.app",
+    "JWKS_URL": "https://auth.insighthunter.app/.well-known/jwks.json"
+  },
+
+  // D1 — relational data: formation cases, compliance events, documents, wizard sessions
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter-bizforma",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "migrations_dir": "../../packages/database/migrations"
+    }
+  ],
+
+  // R2 — document vault: articles of org, operating agreements, EIN letters
+  "r2_buckets": [
+    {
+      "binding": "DOCUMENTS",
+      "bucket_name": "insighthunter-bizforma-documents",
+      "preview_bucket_name": "insighthunter-bizforma-documents-preview"
+    }
+  ],
+
+  // KV — AI result caching, rate limit counters, feature flags
+  "kv_namespaces": [
+    {
+      "binding": "CACHE",
+      "id": "REPLACE_WITH_KV_NAMESPACE_ID",
+      "preview_id": "REPLACE_WITH_KV_PREVIEW_ID"
+    }
+  ],
+
+  // Queues — async PDF generation, compliance reminder dispatch
+  "queues": {
+    "producers": [
+      {
+        "binding": "PDF_QUEUE",
+        "queue": "insighthunter-bizforma-pdf"
+      },
+      {
+        "binding": "REMINDER_QUEUE",
+        "queue": "insighthunter-bizforma-reminders"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "insighthunter-bizforma-pdf",
+        "max_batch_size": 5,
+        "max_batch_timeout": 30,
+        "dead_letter_queue": "insighthunter-bizforma-pdf-dlq"
+      },
+      {
+        "queue": "insighthunter-bizforma-reminders",
+        "max_batch_size": 20,
+        "max_batch_timeout": 60,
+        "dead_letter_queue": "insighthunter-bizforma-reminders-dlq"
+      }
+    ]
+  },
+
+  // Analytics Engine — track formation events, document uploads, AI usage
+  "analytics_engine_datasets": [
+    {
+      "binding": "ANALYTICS",
+      "dataset": "insighthunter_bizforma_events"
+    }
+  ],
+
+  // Durable Objects — FormationAgent for long-running coordination
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "FORMATION_AGENT",
+        "class_name": "FormationAgent"
+      }
+    ]
+  },
+
+  "migrations": [
+    {
+      "tag": "v1-formation-agent",
+      "new_sqlite_classes": ["FormationAgent"]
+    }
+  ]
+}
