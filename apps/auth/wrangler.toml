@@ -1,0 +1,15 @@
+name = "insighthunter-auth"
+main = "src/index.ts"
+compatibility_date = "2026-07-05"
+
+[observability]
+enabled = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter_auth"
+database_id = "REPLACE_WITH_AUTH_DB_ID"
+
+[vars]
+APP_NAME = "insighthunter-auth"
+SESSION_TTL_SECONDS = "604800"

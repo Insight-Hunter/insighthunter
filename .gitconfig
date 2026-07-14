@@ -1,7 +1,0 @@
-[init]
-	defaultBranch = main
-[core]
-	editor = code --wait
-[user]
-	name = jmichaelh
-	email = michael@turneratlanta.com

@@ -1,0 +1,16 @@
+name = "insighthunter-report"
+main = "src/index.ts"
+compatibility_date = "2026-07-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[vars]
+APP_NAME = "insighthunter-report"
+ENVIRONMENT = "development"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-ledger"
+database_id = "8dc66f6a-da61-4421-a092-a4845fc0db8d"

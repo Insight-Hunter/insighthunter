@@ -1,0 +1,16 @@
+name = "insighthunter-advisor"
+main = "src/index.ts"
+compatibility_date = "2026-07-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[vars]
+APP_NAME = "insighthunter-advisor"
+ENVIRONMENT = "development"
+AUTH_URL = "https://auth.insighthunter.app"
+LEDGER_URL = "https://ledger.insighthunter.app"
+
+[ai]
+binding = "AI"

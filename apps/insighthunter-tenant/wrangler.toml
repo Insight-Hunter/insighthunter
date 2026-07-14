@@ -1,0 +1,16 @@
+name = "insighthunter-tenant"
+main = "src/index.ts"
+compatibility_date = "2026-07-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[vars]
+APP_NAME = "insighthunter-tenant"
+ENVIRONMENT = "development"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-dispatch"
+database_id = "2a0331eb-4775-4ad2-9126-0560336486df"

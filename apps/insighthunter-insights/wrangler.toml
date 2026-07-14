@@ -1,0 +1,15 @@
+name = "insighthunter-insights"
+main = "src/index.ts"
+compatibility_date = "2026-07-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[vars]
+APP_NAME = "insighthunter-insights"
+ENVIRONMENT = "development"
+
+[[migrations]]
+tag = "v2-remove-durable-objects"
+deleted_classes = ["CfoAgent"]
