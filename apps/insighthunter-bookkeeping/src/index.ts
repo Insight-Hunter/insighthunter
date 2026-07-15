@@ -1,24 +1,23 @@
-import type { D1Database } from "@cloudflare/workers-types";
-import { Hono } from "hono";
-
 export interface Env {
   DB: D1Database;
+  IMPORTS: R2Bucket;
+  IMPORT_QUEUE: Queue;
+  IMPORT_SESSION: DurableObjectNamespace;
+  ENVIRONMENT: string;
+  IMPORT_BUCKET: string;
 }
 
-const app = new Hono<{ Bindings: Env }>();
+import { router } from './routes/imports';
 
-app.get("/health", (c) => c.json({ service: "bookkeeping", ok: true }));
-
-/** Chart of accounts — list all accounts for the organization. */
-app.get("/chart-of-accounts", async (c) => {
-  const orgId = c.req.header("x-organization-id");
-  if (!orgId) return c.json({ error: "x-organization-id header required" }, 400);
-  const { results } = await c.env.DB.prepare(
-    "SELECT id, code, name, type, archived FROM accounts WHERE organization_id = ? ORDER BY code",
-  )
-    .bind(orgId)
-    .all();
-  return c.json({ items: results });
-});
-
-export default app;
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    return router(request, env, ctx);
+  },
+  async queue(batch: MessageBatch<any>, env: Env, ctx: ExecutionContext): Promise<void> {
+    for (const message of batch.messages) {
+      await import('./queues/import-jobs').then(({ handleImportJob }) =>
+        handleImportJob(message, env, ctx)
+      );
+    }
+  },
+};
