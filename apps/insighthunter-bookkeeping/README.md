@@ -8,10 +8,10 @@ apps/insighthunter-bookkeeping/
   wrangler.toml
   ## src/
            index.ts
-    ### routes/
+  ### routes/
             auth.ts
-    ### middleware/
+  ### middleware/
             require-auth.ts
-    ### db/
+  ### db/
             schema.sql
                                                                                                                                                                                                                                                                                  
