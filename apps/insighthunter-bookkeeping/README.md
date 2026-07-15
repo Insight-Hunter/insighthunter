@@ -6,12 +6,12 @@ Chart of accounts and bookkeeping flows.
 
 apps/insighthunter-bookkeeping/
   wrangler.toml
-  ## src/
-           index.ts
-  ### routes/
+  ### src/
+         index.ts
+  ####   routes/
             auth.ts
-  ### middleware/
+  ####   middleware/
             require-auth.ts
-  ### db/
+  ####   db/
             schema.sql
                                                                                                                                                                                                                                                                                  
