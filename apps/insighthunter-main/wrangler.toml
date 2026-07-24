@@ -21,6 +21,7 @@ id = "REPLACE_WITH_KV_NAMESPACE_ID"
 
 # ── Environment Variables ─────────────────────────────────────────────────────
 [vars]
+<<<<<<< HEAD
 APP_NAME            = "insighthunter-main"
 MAIN_BASE_URL       = "https://insighthunter.app"
 AUTH_BASE_URL       = "https://auth.insighthunter.app"
@@ -42,3 +43,13 @@ STRIPE_PRICE_GROWTH   = "prod_U9zYM5rWy3zKPv"
 # wrangler secret put BILLING_PROVIDER_SECRET
 # wrangler secret put BILLING_WEBHOOK_SECRET
 # wrangler secret put STRIPE_SECRET_KEY
+=======
+APP_NAME = "insighthunter-main"
+MAIN_BASE_URL = "https://insighthunter.app"
+AUTH_BASE_URL = "https://auth.insighthunter.app"
+GATEWAY_BASE_URL = "https://gateway.insighthunter.app"
+BIZFORMA_BASE_URL = "https://bizforma.insighthunter.app"
+STRIPE_PRICE_STARTER = "prod_U9zYWaE9xpW0Tx"
+STRIPE_PRICE_GROWTH = "prod_U9zYM5rWy3zKPv"
+STRIPE_PRICE_PRO = "prod_U9zYEwdL9Ca7Xu"
+>>>>>>> a01bb87 (astro pages)

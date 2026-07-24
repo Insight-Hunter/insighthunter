@@ -1,0 +1,106 @@
+---
+import Sidebar from '../components/dashboard/Sidebar.svelte';
+import TopBar from '../components/dashboard/TopBar.svelte';
+
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Insight Hunter workspace' } = Astro.props;
+const session = Astro.locals.session;
+
+if (!session) {
+  return Astro.redirect('/auth/login');
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{title} | Insight Hunter</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="rail">
+        <Sidebar session={session} />
+      </aside>
+
+      <div class="main-region">
+        <TopBar title={title} session={session} />
+        <main class="page-region">
+          <slot />
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
+
+<style>
+  :global(:root) {
+    color-scheme: dark;
+    --bg: #08111f;
+    --panel: #101b2e;
+    --panel-2: #132138;
+    --line: rgba(255,255,255,0.08);
+    --text: #f4f7fb;
+    --muted: #93a4bd;
+    --accent: #59a7ff;
+    --shadow: 0 24px 64px rgba(0,0,0,0.28);
+  }
+
+  :global(*) {
+    box-sizing: border-box;
+  }
+
+  :global(html),
+  :global(body) {
+    margin: 0;
+    min-height: 100%;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at top, rgba(88,140,255,0.08), transparent 30%), var(--bg);
+    color: var(--text);
+  }
+
+  .app-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+
+  .rail {
+    border-right: 1px solid var(--line);
+    background: rgba(7, 14, 26, 0.9);
+    backdrop-filter: blur(18px);
+  }
+
+  .main-region {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-region {
+    flex: 1;
+    padding: 24px;
+    overflow-x: hidden;
+  }
+
+  @media (max-width: 980px) {
+    .app-shell {
+      grid-template-columns: 1fr;
+    }
+
+    .rail {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .page-region {
+      padding: 18px;
+    }
+  }
+</style>
