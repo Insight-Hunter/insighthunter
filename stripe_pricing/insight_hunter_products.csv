@@ -1,0 +1,4 @@
+product_name,product_family,app,plan_code,billing_type,statement_descriptor_suffix,description,active
+Insight Hunter Starter,insight_hunter,insight_hunter,starter,recurring,IH START,"Entry tier for core Insight Hunter access, document vault, and compliance calendar.",TRUE
+Insight Hunter Growth,insight_hunter,insight_hunter,growth,recurring,IH GROW,"Adds AI advisor, advanced dashboarding, and lego forms.",TRUE
+Insight Hunter Pro,insight_hunter,insight_hunter,pro,recurring,IH PRO,Adds payroll workspace on top of Growth plan capabilities.,TRUE

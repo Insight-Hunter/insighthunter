@@ -26,7 +26,7 @@ import { FEATURE_KEYS } from "./authz/plans.js";
 import { ensureCustomer, getSession } from "./authz/session.js";
 import entitlementsRoutes from "./routes/entitlements.js";
 import onboarding from "./routes/onboarding.js";
-import webhooks from "./routes/webhooks.js";
+import { webhooks } from "./routes/webhooks.js";
 import Stripe from "stripe";
 >>>>>>> a01bb87 (astro pages)
 

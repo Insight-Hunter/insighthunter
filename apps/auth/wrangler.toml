@@ -1,15 +1,25 @@
 name = "insighthunter-auth"
 main = "src/index.ts"
-compatibility_date = "2026-07-05"
+compatibility_date = "2026-07-06"
+compatibility_flags = ["nodejs_compat"]
+
+[[routes]]
+pattern = "auth.insighthunter.app"
+zone_name = "insighthunter.app"
+custom_domain = true
 
 [observability]
 enabled = true
+head_sampling_rate = 1
 
 [[d1_databases]]
 binding = "DB"
-database_name = "insighthunter_auth"
-database_id = "REPLACE_WITH_AUTH_DB_ID"
+database_name = "insighthunter-auth-db"
+database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
 
 [vars]
-APP_NAME = "insighthunter-auth"
-SESSION_TTL_SECONDS = "604800"
+APP_BASE_URL = "https://auth.insighthunter.app"
+
+[dev]
+port = 8787
+local_protocol = "http"

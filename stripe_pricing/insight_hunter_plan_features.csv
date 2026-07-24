@@ -1,0 +1,17 @@
+plan_code,feature_code,included,notes
+starter,app.insight_hunter,TRUE,Base access
+starter,documents.vault,TRUE,Included in Starter
+starter,compliance.calendar,TRUE,Included in Starter
+growth,app.insight_hunter,TRUE,Inherited from Starter
+growth,documents.vault,TRUE,Inherited from Starter
+growth,compliance.calendar,TRUE,Inherited from Starter
+growth,ai.advisor,TRUE,Growth premium capability
+growth,forms.lego,TRUE,Growth premium capability
+growth,dashboard.advanced,TRUE,Growth premium capability
+pro,app.insight_hunter,TRUE,Inherited from Growth
+pro,documents.vault,TRUE,Inherited from Growth
+pro,compliance.calendar,TRUE,Inherited from Growth
+pro,ai.advisor,TRUE,Inherited from Growth
+pro,forms.lego,TRUE,Inherited from Growth
+pro,dashboard.advanced,TRUE,Inherited from Growth
+pro,payroll.workspace,TRUE,Pro-exclusive capability

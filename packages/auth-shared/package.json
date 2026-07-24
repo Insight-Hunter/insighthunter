@@ -11,8 +11,19 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "clean": "rm -rf dist",
+    "predev": "pnpm --filter @insighthunter/auth-shared build",
+    "dev": "wrangler dev src/index.ts",
+    "predeploy": "pnpm --filter @insighthunter/auth-shared build",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
   }
 }

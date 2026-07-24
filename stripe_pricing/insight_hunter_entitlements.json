@@ -1,0 +1,137 @@
+{
+  "app": "insight_hunter",
+  "product_family": "insight_hunter",
+  "generated_at": "2026-07-06T13:31:45.472Z",
+  "plans": {
+    "starter": {
+      "features": [
+        "app.insight_hunter",
+        "compliance.calendar",
+        "documents.vault"
+      ],
+      "feature_details": [
+        {
+          "feature_code": "app.insight_hunter",
+          "feature_name": "Insight Hunter app access",
+          "category": "core_access",
+          "description": "Access to the Insight Hunter application shell and onboarding handoff."
+        },
+        {
+          "feature_code": "compliance.calendar",
+          "feature_name": "Compliance calendar",
+          "category": "compliance",
+          "description": "Deadline dashboard, renewals, BOI tracking, and reminders."
+        },
+        {
+          "feature_code": "documents.vault",
+          "feature_name": "Document vault",
+          "category": "documents",
+          "description": "R2-backed business document storage and viewing."
+        }
+      ]
+    },
+    "growth": {
+      "features": [
+        "ai.advisor",
+        "app.insight_hunter",
+        "compliance.calendar",
+        "dashboard.advanced",
+        "documents.vault",
+        "forms.lego"
+      ],
+      "feature_details": [
+        {
+          "feature_code": "ai.advisor",
+          "feature_name": "AI advisor",
+          "category": "ai",
+          "description": "Streaming advisor chat, AI naming, and recommendations."
+        },
+        {
+          "feature_code": "app.insight_hunter",
+          "feature_name": "Insight Hunter app access",
+          "category": "core_access",
+          "description": "Access to the Insight Hunter application shell and onboarding handoff."
+        },
+        {
+          "feature_code": "compliance.calendar",
+          "feature_name": "Compliance calendar",
+          "category": "compliance",
+          "description": "Deadline dashboard, renewals, BOI tracking, and reminders."
+        },
+        {
+          "feature_code": "dashboard.advanced",
+          "feature_name": "Advanced dashboard",
+          "category": "analytics",
+          "description": "Premium analytics and dashboard surface."
+        },
+        {
+          "feature_code": "documents.vault",
+          "feature_name": "Document vault",
+          "category": "documents",
+          "description": "R2-backed business document storage and viewing."
+        },
+        {
+          "feature_code": "forms.lego",
+          "feature_name": "Lego forms",
+          "category": "forms",
+          "description": "Modular form builder, template library, and AI form fill."
+        }
+      ]
+    },
+    "pro": {
+      "features": [
+        "ai.advisor",
+        "app.insight_hunter",
+        "compliance.calendar",
+        "dashboard.advanced",
+        "documents.vault",
+        "forms.lego",
+        "payroll.workspace"
+      ],
+      "feature_details": [
+        {
+          "feature_code": "ai.advisor",
+          "feature_name": "AI advisor",
+          "category": "ai",
+          "description": "Streaming advisor chat, AI naming, and recommendations."
+        },
+        {
+          "feature_code": "app.insight_hunter",
+          "feature_name": "Insight Hunter app access",
+          "category": "core_access",
+          "description": "Access to the Insight Hunter application shell and onboarding handoff."
+        },
+        {
+          "feature_code": "compliance.calendar",
+          "feature_name": "Compliance calendar",
+          "category": "compliance",
+          "description": "Deadline dashboard, renewals, BOI tracking, and reminders."
+        },
+        {
+          "feature_code": "dashboard.advanced",
+          "feature_name": "Advanced dashboard",
+          "category": "analytics",
+          "description": "Premium analytics and dashboard surface."
+        },
+        {
+          "feature_code": "documents.vault",
+          "feature_name": "Document vault",
+          "category": "documents",
+          "description": "R2-backed business document storage and viewing."
+        },
+        {
+          "feature_code": "forms.lego",
+          "feature_name": "Lego forms",
+          "category": "forms",
+          "description": "Modular form builder, template library, and AI form fill."
+        },
+        {
+          "feature_code": "payroll.workspace",
+          "feature_name": "Payroll workspace",
+          "category": "payroll",
+          "description": "Payroll hub, W-4 workflows, contractor tracking, and 1099 tools."
+        }
+      ]
+    }
+  }
+}

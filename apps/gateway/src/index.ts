@@ -1,24 +1,20 @@
 import { Hono } from "hono";
-import { extractAuthToken, extractSessionToken, getLoginRedirectUrl, isProbablyBrowserRequest } from "@insighthunter/auth-shared";
-
-type SessionResponse = {
-  ok: boolean;
-  session?: {
-    token: string;
-    user: {
-      subject: string;
-      email?: string;
-      orgId?: string;
-    };
-    expiresAt: string;
-  };
-};
+import {
+  createRemoteJwksVerifier,
+  extractAuthToken,
+  extractSessionToken,
+  getLoginRedirectUrl,
+  isProbablyBrowserRequest,
+} from "@insighthunter/auth-shared";
 
 type Env = {
   Bindings: {
     APP_NAME: string;
     AUTH_BASE_URL: string;
     GATEWAY_BASE_URL: string;
+    AUTH_JWKS_URL: string;
+    AUTH_ISSUER: string;
+    AUTH_AUDIENCE: string;
   };
   Variables: {
     authUser: {
@@ -26,14 +22,15 @@ type Env = {
       email?: string;
       orgId?: string;
     };
-    authToken: string;
   };
 };
 
 const app = new Hono<Env>();
 
-async function requireAuth(c: any, next: () => Promise<void>) {
-  const token = extractAuthToken(c.req.raw) ?? extractSessionToken(c.req.raw);
+async function requireAuth(c: Parameters<typeof app.get>[1] extends never ? never : any, next: () => Promise<void>) {
+  const bearerToken = extractAuthToken(c.req.raw);
+  const sessionToken = extractSessionToken(c.req.raw);
+  const token = bearerToken ?? sessionToken;
 
   if (!token) {
     if (isProbablyBrowserRequest(c.req.raw)) {
@@ -43,45 +40,35 @@ async function requireAuth(c: any, next: () => Promise<void>) {
     return c.json({ error: "unauthorized" }, 401);
   }
 
-  const response = await fetch(`${c.env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}`);
+  try {
+    const verifier = createRemoteJwksVerifier({
+      jwksUrl: c.env.AUTH_JWKS_URL,
+      issuer: c.env.AUTH_ISSUER,
+      audience: c.env.AUTH_AUDIENCE,
+    });
 
-  if (!response.ok) {
-    return c.json({ error: "invalid_session" }, 401);
+    const user = await verifier.verify(token);
+    c.set("authUser", user);
+    await next();
+  } catch {
+    return c.json({ error: "invalid_token" }, 401);
   }
-
-  const data = (await response.json()) as SessionResponse;
-
-  if (!data.ok || !data.session) {
-    return c.json({ error: "invalid_session" }, 401);
-  }
-
-  c.set("authUser", data.session.user);
-  c.set("authToken", token);
-
-  await next();
 }
 
 app.get("/health", (c) => c.json({ ok: true, service: c.env.APP_NAME }));
 
-app.get("/me", requireAuth, (c) => {
+app.get("/", (c) => {
   return c.json({
-    ok: true,
-    user: c.get("authUser")
+    service: c.env.APP_NAME,
+    routes: ["/health", "/me"],
   });
 });
 
-app.get("/handoff", requireAuth, (c) => {
-  const appName = c.req.query("app") ?? "main";
-  const baseMap: Record<string, string> = {
-    main: "https://insighthunter.app/dashboard",
-    bizforma: "https://bizforma.insighthunter.app/"
-  };
-
-  const redirectTarget = baseMap[appName] ?? baseMap.main;
-  const url = new URL(redirectTarget);
-  url.searchParams.set("from", "gateway");
-
-  return c.redirect(url.toString(), 302);
+app.get("/me", requireAuth, (c) => {
+  return c.json({
+    ok: true,
+    user: c.get("authUser"),
+  });
 });
 
 export default app;

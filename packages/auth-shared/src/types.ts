@@ -4,28 +4,33 @@ export interface AuthenticatedUser {
   readonly orgId?: string;
 }
 
+export interface JwtPayload {
+  readonly sub: string;
+  readonly email?: string;
+  readonly org_id?: string;
+  readonly iss?: string;
+  readonly aud?: string | string[];
+  readonly exp?: number;
+  readonly nbf?: number;
+  readonly iat?: number;
+  readonly [key: string]: unknown;
+}
+
+export interface Jwk {
+  readonly kty: string;
+  readonly kid?: string;
+  readonly use?: string;
+  readonly alg?: string;
+  readonly n?: string;
+  readonly e?: string;
+}
+
+export interface JwksDocument {
+  readonly keys: readonly Jwk[];
+}
+
 export interface SessionRecord {
-  readonly id: string;
   readonly token: string;
-  readonly userId: string;
-  readonly email: string;
+  readonly user: AuthenticatedUser;
   readonly expiresAt: string;
-}
-
-export interface CustomerRecord {
-  readonly id: string;
-  readonly userId: string;
-  readonly email: string;
-  readonly stripeCustomerId?: string;
-  readonly createdAt: string;
-}
-
-export interface SubscriptionRecord {
-  readonly id: string;
-  readonly customerId: string;
-  readonly planCode: string;
-  readonly status: string;
-  readonly stripeSubscriptionId?: string;
-  readonly createdAt: string;
-  readonly updatedAt: string;
 }

@@ -22,5 +22,8 @@
     "turbo": "^2.0.14",
     "typescript": "^5.9.2",
     "wrangler": "^4.95.0"
+  },
+  "dependencies": {
+    "stripe": "^22.3.0"
   }
 }

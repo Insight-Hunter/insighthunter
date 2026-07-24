@@ -1,4 +1,3 @@
-import { extractSessionToken } from "@insighthunter/auth-shared";
 
 export type SessionLookup = {
   ok: boolean;
@@ -31,6 +30,32 @@ export async function getSession(
   const payload = (await response.json()) as SessionLookup;
   return payload.ok ? payload.session ?? null : null;
 }
+function extractSessionToken(request: Request, cookieName = "ih_session"): string | null {
+  const authHeader = request.headers.get("authorization") ?? request.headers.get("Authorization");
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice("Bearer ".length).trim();
+    return token.length > 0 ? token : null;
+  }
+
+  const cookieHeader = request.headers.get("cookie") ?? request.headers.get("Cookie");
+  if (!cookieHeader) return null;
+
+  const cookies = cookieHeader.split(";");
+  for (const rawCookie of cookies) {
+    const [rawName, ...rawValueParts] = rawCookie.trim().split("=");
+    if (rawName === cookieName) {
+      const value = rawValueParts.join("=").trim();
+      return value ? decodeURIComponent(value) : null;
+    }
+  }
+
+  return null;
+}
+
+export function getSessionToken(request: Request): string | null {
+  return extractSessionToken(request);
+}
+
 
 export async function ensureCustomer(
   db: D1Database,

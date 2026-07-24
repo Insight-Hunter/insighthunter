@@ -1,0 +1,8 @@
+insight_hunter_prices
+product_name,plan_code,interval,currency,unit_amount,lookup_key,price_nickname,app,product_family,active,notes
+Insight Hunter Starter,starter,month,usd,0,insight_hunter_starter_month,Starter Monthly,insight_hunter,insight_hunter,TRUE,Enter live monthly price in cents
+Insight Hunter Starter,starter,year,usd,0,insight_hunter_starter_year,Starter Annual,insight_hunter,insight_hunter,TRUE,Enter live annual price in cents
+Insight Hunter Growth,growth,month,usd,4900,insight_hunter_growth_month,Growth Monthly,insight_hunter,insight_hunter,TRUE,Enter live monthly price in cents
+Insight Hunter Growth,growth,year,usd,49000,insight_hunter_growth_year,Growth Annual,insight_hunter,insight_hunter,TRUE,Enter live annual price in cents
+Insight Hunter Pro,pro,month,usd,14900,insight_hunter_pro_month,Pro Monthly,insight_hunter,insight_hunter,TRUE,Enter live monthly price in cents
+Insight Hunter Pro,pro,year,usd,149000,insight_hunter_pro_year,Pro Annual,insight_hunter,insight_hunter,TRUE,Enter live annual price in cents

@@ -5,8 +5,9 @@ import {
   extractSessionToken,
   getLoginRedirectUrl,
   isProbablyBrowserRequest,
-  type AuthenticatedUser,
-} from "../../../packages/auth-shared/src/index.ts";
+  type AuthenticatedUser }
+  from "../../../packages/auth-shared/src/index.js";
+
 
 type GatewayBindings = {
   APP_NAME: string;

@@ -1,0 +1,8 @@
+feature_code,feature_name,app,product_family,category,description,active
+app.insight_hunter,Insight Hunter app access,insight_hunter,insight_hunter,core_access,Access to the Insight Hunter application shell and onboarding handoff.,TRUE
+documents.vault,Document vault,insight_hunter,insight_hunter,documents,R2-backed business document storage and viewing.,TRUE
+compliance.calendar,Compliance calendar,insight_hunter,insight_hunter,compliance,"Deadline dashboard, renewals, BOI tracking, and reminders.",TRUE
+ai.advisor,AI advisor,insight_hunter,insight_hunter,ai,"Streaming advisor chat, AI naming, and recommendations.",TRUE
+forms.lego,Lego forms,insight_hunter,insight_hunter,forms,"Modular form builder, template library, and AI form fill.",TRUE
+dashboard.advanced,Advanced dashboard,insight_hunter,insight_hunter,analytics,Premium analytics and dashboard surface.,TRUE
+payroll.workspace,Payroll workspace,insight_hunter,insight_hunter,payroll,"Payroll hub, W-4 workflows, contractor tracking, and 1099 tools.",TRUE
