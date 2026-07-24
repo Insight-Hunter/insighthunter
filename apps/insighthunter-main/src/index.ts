@@ -1,6 +1,7 @@
 // apps/insighthunter-main/src/index.ts
 import { Hono } from "hono";
-<<<<<<< HEAD
+
+
 import { cors } from "hono/cors";
 import {
   extractSessionToken,
@@ -9,6 +10,10 @@ import {
 } from "@insighthunter/auth-shared";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
+import { cors } from "hono/cors";
+import { extractSessionToken, getLoginRedirectUrl, getRegisterRedirectUrl } from "@insighthunter/auth-shared";
+
+// ── Types ────────────────────────────────────────────────────────────────────(fix: align plan codes to lite/standard/pro, secure billing webhook, add dashboard tiles)
 
 type SessionLookup = {
   ok: boolean;
@@ -18,7 +23,7 @@ type SessionLookup = {
     expiresAt: string;
   };
 };
-=======
+
 import { getLoginRedirectUrl, getRegisterRedirectUrl } from "@insighthunter/auth-shared";
 import { createStripeCheckoutSession } from "./billing/stripe.js";
 import { customerHasEntitlement } from "./authz/entitlements.js";
@@ -28,12 +33,13 @@ import entitlementsRoutes from "./routes/entitlements.js";
 import onboarding from "./routes/onboarding.js";
 import { webhooks } from "./routes/webhooks.js";
 import Stripe from "stripe";
->>>>>>> a01bb87 (astro pages)
+
 
 type Subscription = {
   plan_code: string;
   status: string;
   created_at: string;
+
   stripe_subscription_id?: string;
   stripe_checkout_session_id?: string;
 };
@@ -42,6 +48,7 @@ type Customer = {
   id: string;
   userId: string;
   email: string;
+
   stripeCustomerId?: string;
 };
 
@@ -54,26 +61,22 @@ type Env = {
     AUTH_BASE_URL: string;
     GATEWAY_BASE_URL: string;
     BIZFORMA_BASE_URL: string;
-<<<<<<< HEAD
     CHECKOUT_BASE_URL: string;
     BILLING_PROVIDER_SECRET: string;
     BILLING_WEBHOOK_SECRET: string;
-    STRIPE_SECRET_KEY: string;
     STRIPE_PRICE_LITE: string;
     STRIPE_PRICE_STANDARD: string;
-=======
     STRIPE_SECRET_KEY: string;
     STRIPE_WEBHOOK_SECRET: string;
     STRIPE_PRICE_STARTER: string;
     STRIPE_PRICE_GROWTH: string;
->>>>>>> a01bb87 (astro pages)
     STRIPE_PRICE_PRO: string;
   };
 };
 
 // ── Plan definitions (MUST match insighthunter.app pricing page) ──────────────
 
-<<<<<<< HEAD
+
 const PLANS = {
   lite:     { label: "Insight Lite",     price: 0,   txnLimit: 150, users: 1,    color: "#6b7280" },
   standard: { label: "Insight Standard", price: 49,  txnLimit: null, users: 3,   color: "#60a5fa" },
@@ -155,49 +158,87 @@ async function ensureCustomer(
     .run();
 
   return { id, userId, email };
-=======
+
 app.route("/", onboarding);
 app.route("/", webhooks);
 app.route("/", entitlementsRoutes);
 
-function renderPage(title: string, body: string): string {
-  return `
-    <!doctype html>
-    <html>
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>${title}</title>
-        <style>
-          body { font-family: Inter, Arial, sans-serif; margin: 0; background: #0b1020; color: #f7f8fc; }
-          .wrap { max-width: 1040px; margin: 0 auto; padding: 40px 20px; }
-          .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-          .card { background: #121933; padding: 24px; border-radius: 16px; border: 1px solid #2a3359; }
-          a.button { display:inline-block; padding:12px 16px; border-radius:10px; text-decoration:none; background:#4f7cff; color:white; }
-          .muted { color:#b9c2e3; }
-        </style>
-      </head>
-      <body>
-        <div class="wrap">${body}</div>
-      </body>
-    </html>
-  `;
+    CHECKOUT_BASE_URL: string;
+    BILLING_PROVIDER_SECRET: string;
+    BILLING_WEBHOOK_SECRET: string;
+    RATE_LIMIT_KV: KVNamespace;
+  };
+};
+
+// ── Plan definitions (MUST match live site pricing) ─────────────────────────
+
+const PLANS = {
+  lite: { label: "Insight Lite", price: 0, txnLimit: 150, users: 1 },
+  standard: { label: "Insight Standard", price: 49, txnLimit: null, users: 3 },
+  pro: { label: "Insight Pro", price: 129, txnLimit: null, users: null },
+} as const;
+
+type PlanCode = keyof typeof PLANS;
+
+const VALID_PLANS = new Set<string>(Object.keys(PLANS));
+
+// ── App definitions (drives dashboard tiles) ────────────────────────────────
+
+const APPS = [
+  { id: "bookkeeping", label: "Bookkeeping", desc: "Auto-categorized P&L, reconciliation, bank sync", plans: ["lite","standard","pro"], badge: "Core" },
+  { id: "payroll",     label: "Payroll",      desc: "W-2 + 1099 payroll, tax calcs, employer costs",  plans: ["standard","pro"],     badge: "Standard" },
+  { id: "bizforma",   label: "BizForma",     desc: "AI business formation — LLC, S-Corp, C-Corp",    plans: ["lite","standard","pro"], badge: "Core" },
+  { id: "scout",      label: "Scout CRM",    desc: "Leads, deals, and revenue pipeline",              plans: ["standard","pro"],     badge: "Standard" },
+  { id: "pbx",        label: "PBX Phone",    desc: "Cloud phone, IVR, voicemail-to-email",            plans: ["pro"],                badge: "Pro" },
+  { id: "finops",     label: "FinOps",       desc: "Budget vs actuals, cost centers, burn tracking",  plans: ["standard","pro"],     badge: "Standard" },
+  { id: "insights",   label: "AI CFO",       desc: "Anomaly detection, cash-flow forecasting",        plans: ["standard","pro"],     badge: "Standard" },
+  { id: "ledger",     label: "Ledger",       desc: "Double-entry general ledger & journal entries",   plans: ["standard","pro"],     badge: "Standard" },
+  { id: "report",     label: "Reports",      desc: "Custom report builder + white-label export",      plans: ["pro"],                badge: "Pro" },
+] as const;
+
+// ── Rate limiting helper ─────────────────────────────────────────────────────
+
+async function checkRateLimit(kv: KVNamespace, key: string, limit: number, windowSec: number): Promise<boolean> {
+  const current = await kv.get(key);
+  const count = current ? parseInt(current) : 0;
+  if (count >= limit) return false;
+  await kv.put(key, String(count + 1), { expirationTtl: windowSec });
+  return true;
 }
 
-function getPriceId(env: Env["Bindings"], plan: string): string {
-  switch (plan) {
-    case "growth":
-      return env.STRIPE_PRICE_GROWTH;
-    case "pro":
-      return env.STRIPE_PRICE_PRO;
-    case "starter":
-    default:
-      return env.STRIPE_PRICE_STARTER;
+// ── Shared helpers ───────────────────────────────────────────────────────────
+
+async function getSession(env: Env["Bindings"], token: string | null) {
+  if (!token) return null;
+  try {
+    const res = await fetch(`${env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}`);
+    if (!res.ok) return null;
+    const payload = (await res.json()) as SessionLookup;
+    return payload.ok ? payload.session ?? null : null;
+  } catch {
+    return null;
   }
->>>>>>> a01bb87 (astro pages)
 }
 
 // ── HTML renderer ─────────────────────────────────────────────────────────────
+
+async function ensureCustomer(db: D1Database, userId: string, email: string): Promise<Customer> {
+  const existing = await db.prepare(
+    "SELECT id, user_id, email FROM customers WHERE user_id = ? LIMIT 1"
+  ).bind(userId).first<{ id: string; user_id: string; email: string }>();
+
+  if (existing) return { id: existing.id, userId: existing.user_id, email: existing.email };
+
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+  await db.prepare(
+    "INSERT INTO customers (id, user_id, email, created_at) VALUES (?, ?, ?, ?)"
+  ).bind(id, userId, email, now).run();
+
+  return { id, userId, email };
+}
+
+// ── HTML helpers ─────────────────────────────────────────────────────────────
 
 function renderPage(title: string, body: string): string {
   return `<!doctype html>
@@ -256,6 +297,49 @@ function renderPage(title: string, body: string): string {
     .stat-box { background:#121933; border:1px solid #2a3359; border-radius:12px; padding:20px; text-align:center; }
     .stat-box .num { font-size:2rem; font-weight:800; color:#4f7cff; }
     .stat-box .lbl { font-size:13px; color:#b9c2e3; margin-top:4px; }
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: Inter, system-ui, sans-serif; margin: 0; background: #0b1020; color: #f7f8fc; line-height: 1.6; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+    nav { display:flex; align-items:center; gap:16px; padding:16px 20px; border-bottom:1px solid #1f2a4a; }
+    nav a { color:#b9c2e3; text-decoration:none; font-size:14px; }
+    nav a:hover { color:#fff; }
+    nav .logo { font-weight:700; color:#fff; margin-right:auto; font-size:18px; }
+    h1 { font-size:2rem; margin-bottom:8px; }
+    .muted { color:#b9c2e3; }
+    .btn { display:inline-block; padding:10px 18px; border-radius:8px; text-decoration:none; font-size:14px; font-weight:600; cursor:pointer; border:none; }
+    .btn-primary { background:#4f7cff; color:#fff; }
+    .btn-secondary { background:#1f2a4a; color:#b9c2e3; border:1px solid #2a3359; }
+    .btn-sm { padding:6px 12px; font-size:13px; }
+    .btn:hover { opacity:.88; }
+    .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; margin-top:24px; }
+    .card { background:#121933; padding:22px; border-radius:14px; border:1px solid #2a3359; }
+    .card h2 { font-size:1.1rem; margin:0 0 6px; }
+    .badge { display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; font-weight:600; margin-bottom:10px; }
+    .badge-core { background:#0d3b2e; color:#34d399; }
+    .badge-standard { background:#1c2e5e; color:#60a5fa; }
+    .badge-pro { background:#2d1b5e; color:#a78bfa; }
+    .badge-locked { background:#1e1e2e; color:#6b7280; }
+    .plan-tag { font-size:11px; color:#b9c2e3; }
+    .alert { padding:14px 18px; border-radius:10px; margin-bottom:20px; }
+    .alert-warning { background:#2d2400; border:1px solid #f59e0b; color:#fbbf24; }
+    .alert-success { background:#0a2e1a; border:1px solid #34d399; color:#34d399; }
+    .pricing-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:24px; margin-top:24px; }
+    .plan-card { background:#121933; padding:28px; border-radius:16px; border:1px solid #2a3359; }
+    .plan-card.featured { border-color:#4f7cff; background:#111d40; }
+    .plan-price { font-size:2.4rem; font-weight:800; margin:8px 0; }
+    .plan-price span { font-size:1rem; font-weight:400; color:#b9c2e3; }
+    .plan-features { list-style:none; padding:0; margin:16px 0 20px; }
+    .plan-features li { padding:5px 0; font-size:14px; }
+    .plan-features li::before { content:"✓ "; color:#4f7cff; }
+    .stat { font-size:2rem; font-weight:800; }
+    .stat-label { font-size:13px; color:#b9c2e3; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:12px 14px; text-align:left; border-bottom:1px solid #1f2a4a; font-size:14px; }
+    th { color:#b9c2e3; font-weight:600; }
+    .pill { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+    .pill-active { background:#0a2e1a; color:#34d399; }
+    .pill-inactive { background:#1e1e2e; color:#6b7280; }
   </style>
 </head>
 <body>
@@ -290,6 +374,11 @@ app.get("/health", (c) =>
 );
 
 // ── Home ──────────────────────────────────────────────────────────────────────
+app.use("*", cors({ origin: "*", allowMethods: ["GET","POST","OPTIONS"] }));
+
+app.get("/health", (c) => c.json({ ok: true, service: c.env.APP_NAME, ts: Date.now() }));
+
+// ── Marketing home ────────────────────────────────────────────────────────────
 
 app.get("/", (c) => {
   const loginUrl = getLoginRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL);
@@ -335,11 +424,11 @@ app.get("/", (c) => {
 // ── Pricing ───────────────────────────────────────────────────────────────────
 
 app.get("/pricing", (c) => {
-<<<<<<< HEAD
   return c.html(
     renderPage(
       "Pricing",
-      `
+
+      '
     <h1>Simple, Transparent Pricing</h1>
     <p class="muted">Start free. Scale when ready. Cancel anytime.</p>
     <div class="pricing-grid">
@@ -388,7 +477,7 @@ app.get("/pricing", (c) => {
           <li>Unlimited users</li>
         </ul>
         <a class="btn btn-primary" href="/start?plan=pro">Choose Pro</a>
-=======
+
   return c.html(renderPage("Pricing", `
     <h1>Pricing</h1>
     <div class="cards">
@@ -409,8 +498,25 @@ app.get("/pricing", (c) => {
         <p>$299/month</p>
         <p class="muted">Adds payroll workspace and broader operational tooling.</p>
         <a class="button" href="/start?plan=pro&product=bizforma">Choose Pro</a>
->>>>>>> a01bb87 (astro pages)
       </div>
+
+  return c.html(renderPage("Stop Flying Blind", `
+    <div style="text-align:center;padding:60px 0 40px;">
+      <h1 style="font-size:3rem;margin-bottom:12px;">Stop flying blind.<br/>Know your numbers.</h1>
+      <p class="muted" style="font-size:1.2rem;margin-bottom:32px;">AI-powered bookkeeping, payroll, cash-flow forecasting,<br/>and an AI CFO — all in one Cloudflare-native platform.</p>
+      <a class="btn btn-primary" style="font-size:1rem;padding:14px 28px;" href="${registerUrl}">Start Free — No Credit Card</a>
+      &nbsp;
+      <a class="btn btn-secondary" style="font-size:1rem;padding:14px 28px;" href="/pricing">See pricing →</a>
+      <p class="muted" style="margin-top:20px;font-size:13px;">✓ Cloudflare-native · Global Edge &nbsp;·&nbsp; ✓ Per-tenant data isolation &nbsp;·&nbsp; ✓ SOC 2 ready architecture</p>
+    </div>
+    <div class="cards">
+      ${APPS.map(a => `
+        <div class="card">
+          <span class="badge badge-${a.badge.toLowerCase()}">${a.badge}</span>
+          <h2>${a.label}</h2>
+          <p class="muted" style="font-size:14px;">${a.desc}</p>
+        </div>
+      `).join("")}
     </div>
     <hr class="divider"/>
     <h2>Add-Ons</h2>
@@ -433,36 +539,107 @@ app.get("/pricing", (c) => {
 // ── Auth flow ─────────────────────────────────────────────────────────────────
 
 app.get("/start", (c) => {
-<<<<<<< HEAD
   const plan = c.req.query("plan") ?? "lite";
   if (!VALID_PLANS.has(plan)) return c.redirect("/pricing", 302);
   return c.redirect(
     getRegisterRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL, "/auth/callback", plan),
     302,
   );
-=======
+
   const plan = c.req.query("plan") ?? "starter";
   const product = c.req.query("product") ?? "bizforma";
   const url = getRegisterRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL, "/auth/callback", plan);
   const redirect = new URL(url);
   redirect.searchParams.set("product", product);
   return c.redirect(redirect.toString(), 302);
->>>>>>> a01bb87 (astro pages)
+
+// ── Pricing ───────────────────────────────────────────────────────────────────
+
+app.get("/pricing", (c) => {
+  return c.html(renderPage("Pricing", `
+    <h1>Simple, Transparent Pricing</h1>
+    <p class="muted">Start free. Scale when ready. No hidden fees.</p>
+    <div class="pricing-grid">
+      <div class="plan-card">
+        <h2>Insight Lite</h2>
+        <p class="muted" style="font-size:13px;">Perfect for getting started — no card required.</p>
+        <div class="plan-price">$0 <span>/mo</span></div>
+        <ul class="plan-features">
+          <li>Basic bookkeeping (up to 150 txns/mo)</li>
+          <li>P&L statement</li>
+          <li>Cash flow overview</li>
+          <li>BizForma: 1 business setup</li>
+          <li>1 user</li>
+        </ul>
+        <a class="btn btn-secondary" href="/start?plan=lite">Get started free</a>
+      </div>
+      <div class="plan-card featured">
+        <div style="font-size:11px;font-weight:700;color:#4f7cff;margin-bottom:8px;">MOST POPULAR</div>
+        <h2>Insight Standard</h2>
+        <p class="muted" style="font-size:13px;">Everything growing businesses need.</p>
+        <div class="plan-price">$49 <span>/mo</span></div>
+        <ul class="plan-features">
+          <li>Full bookkeeping (unlimited txns)</li>
+          <li>Bank sync (Plaid)</li>
+          <li>Payroll (up to 5 employees)</li>
+          <li>AI CFO insights</li>
+          <li>Financial reports + export</li>
+          <li>Scout CRM (50 leads)</li>
+          <li>3 users</li>
+        </ul>
+        <a class="btn btn-primary" href="/start?plan=standard">Choose Standard</a>
+      </div>
+      <div class="plan-card">
+        <h2>Insight Pro</h2>
+        <p class="muted" style="font-size:13px;">Full operating system for high-velocity operators.</p>
+        <div class="plan-price">$129 <span>/mo</span></div>
+        <ul class="plan-features">
+          <li>Everything in Standard</li>
+          <li>Unlimited employees + payroll</li>
+          <li>PBX phone system (10 extensions)</li>
+          <li>Advanced AI forecasting</li>
+          <li>Scout CRM (unlimited)</li>
+          <li>White-label reports</li>
+          <li>API access + Priority support</li>
+          <li>Unlimited users</li>
+        </ul>
+        <a class="btn btn-primary" href="/start?plan=pro">Choose Pro</a>
+      </div>
+    </div>
+    <div style="margin-top:40px;">
+      <h2>Add-Ons</h2>
+      <table>
+        <thead><tr><th>Add-On</th><th>Price</th></tr></thead>
+        <tbody>
+          <tr><td>PBX Phone System</td><td>$29/mo</td></tr>
+          <tr><td>Extra Payroll Employee</td><td>$6/mo</td></tr>
+          <tr><td>White Label</td><td>$199/mo</td></tr>
+          <tr><td>Report Builder</td><td>$19/mo</td></tr>
+          <tr><td>BizForma Extra Filings</td><td>$49/filing</td></tr>
+          <tr><td>Website Services</td><td>$79/mo</td></tr>
+        </tbody>
+      </table>
+    </div>
+  `));
+});
+
+// ── Auth flow ─────────────────────────────────────────────────────────────────
+
+app.get("/start", (c) => {
+  const plan = c.req.query("plan") ?? "lite";
+  if (!VALID_PLANS.has(plan)) return c.redirect("/pricing", 302);
+  return c.redirect(getRegisterRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL, "/auth/callback", plan), 302);
 });
 
 app.get("/auth/callback", async (c) => {
   const token = c.req.query("session_token");
-<<<<<<< HEAD
   const plan = c.req.query("plan") ?? "lite";
-=======
   const plan = c.req.query("plan") ?? "starter";
   const product = c.req.query("product") ?? "bizforma";
->>>>>>> a01bb87 (astro pages)
 
   if (!token) return c.redirect("/pricing", 302);
   if (!VALID_PLANS.has(plan)) return c.redirect("/pricing", 302);
 
-<<<<<<< HEAD
   // Lite is free — skip checkout entirely
   const location = plan === "lite" ? "/dashboard" : `/checkout/start?plan=${encodeURIComponent(plan)}`;
 
@@ -472,118 +649,73 @@ app.get("/auth/callback", async (c) => {
     `ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`,
   );
   return res;
-=======
   const response = c.redirect(`/checkout/start?plan=${encodeURIComponent(plan)}&product=${encodeURIComponent(product)}`, 302);
   response.headers.append("Set-Cookie", `ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`);
   return response;
->>>>>>> a01bb87 (astro pages)
+
+  const plan = c.req.query("plan") ?? "lite";
+
+  if (!token) return c.redirect("/pricing", 302);
+  if (!VALID_PLANS.has(plan)) return c.redirect("/pricing", 302);
+
+  if (plan === "lite") {
+    // Lite is free — skip checkout, go straight to dashboard
+    const res = new Response(null, { status: 302, headers: { Location: "/dashboard" } });
+    res.headers.append("Set-Cookie", `ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`);
+    return res;
+  }
+
+  const res = new Response(null, {
+    status: 302,
+    headers: { Location: `/checkout/start?plan=${encodeURIComponent(plan)}` },
+  });
+  res.headers.append("Set-Cookie", `ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`);
+  return res;
 });
 
 // ── Checkout ──────────────────────────────────────────────────────────────────
 
 app.get("/checkout/start", async (c) => {
-<<<<<<< HEAD
   const plan = c.req.query("plan") ?? "standard";
   if (!VALID_PLANS.has(plan) || plan === "lite") return c.redirect("/pricing", 302);
 
   const token = extractSessionToken(c.req.raw);
   const session = await getSession(c.env, token);
   if (!session?.user.email) {
-=======
   const plan = c.req.query("plan") ?? "starter";
   const product = c.req.query("product") ?? "bizforma";
   const session = await getSession(c.env.AUTH_BASE_URL, c.req.raw);
 
   if (!session || !session.user.email) {
->>>>>>> a01bb87 (astro pages)
     return c.redirect(getLoginRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL), 302);
   }
+  const plan = c.req.query("plan") ?? "standard";
+  if (!VALID_PLANS.has(plan) || plan === "lite") return c.redirect("/pricing", 302);
+
+  const token = extractSessionToken(c.req.raw);
+  const session = await getSession(c.env, token);
+  if (!session?.user.email) return c.redirect(getLoginRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL), 302);
 
   const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
-
   const successUrl = new URL("/checkout/success", c.env.MAIN_BASE_URL);
   successUrl.searchParams.set("plan", plan);
-<<<<<<< HEAD
-=======
   successUrl.searchParams.set("product", product);
 
->>>>>>> a01bb87 (astro pages)
   const cancelUrl = new URL("/checkout/cancel", c.env.MAIN_BASE_URL);
   cancelUrl.searchParams.set("plan", plan);
-  cancelUrl.searchParams.set("product", product);
 
-  const checkout = await createStripeCheckoutSession(c.env.STRIPE_SECRET_KEY, {
-    mode: "subscription",
-    customer: customer.stripeCustomerId ?? undefined,
-    customer_email: customer.stripeCustomerId ? undefined : customer.email,
-    client_reference_id: customer.id,
-    success_url: successUrl.toString(),
-    cancel_url: cancelUrl.toString(),
-    line_items: [
-      {
-        price: getPriceId(c.env, plan),
-        quantity: 1,
-      },
-    ],
-    metadata: {
-      customer_id: customer.id,
-      plan_code: plan,
-      product,
-    },
-});
+  const checkoutUrl = new URL(c.env.CHECKOUT_BASE_URL);
+  checkoutUrl.searchParams.set("customer_id", customer.id);
+  checkoutUrl.searchParams.set("plan", plan);
+  checkoutUrl.searchParams.set("success_url", successUrl.toString());
+  checkoutUrl.searchParams.set("cancel_url", cancelUrl.toString());
 
-  if (!checkout.url) {
-    return c.text("Unable to create Stripe checkout session", 500);
-  }
-
-  if (checkout.customer && checkout.customer !== customer.stripeCustomerId) {
-    await c.env.DB.prepare(
-      "UPDATE customers SET stripe_customer_id = ? WHERE id = ?"
-    ).bind(checkout.customer, customer.id).run();
-  }
-
-  const now = new Date().toISOString();
-  const existingPending = await c.env.DB.prepare(
-    `SELECT id FROM subscriptions
-     WHERE customer_id = ? AND plan_code = ? AND status IN ('pending', 'incomplete')
-     ORDER BY updated_at DESC
-     LIMIT 1`
-  ).bind(customer.id, plan).first<{ id: string }>();
-
-  if (existingPending?.id) {
-    await c.env.DB.prepare(
-      `UPDATE subscriptions
-       SET stripe_checkout_session_id = ?,
-           updated_at = ?
-       WHERE id = ?`
-    ).bind(
-      checkout.id,
-      now,
-      existingPending.id,
-    ).run();
-  } else {
-    await c.env.DB.prepare(
-      `INSERT INTO subscriptions (
-        id, customer_id, plan_code, status, stripe_checkout_session_id, billing_provider, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, 'stripe', ?, ?)`
-    ).bind(
-      crypto.randomUUID(),
-      customer.id,
-      plan,
-      "pending",
-      checkout.id,
-      now,
-      now,
-    ).run();
-  }
-
-  return c.redirect(checkout.url, 302);
+  return c.redirect(checkoutUrl.toString(), 302);
 });
 
 // NOTE: /checkout/success is UI-only. Real plan activation happens via /billing/webhook.
 // This page must NOT write to subscriptions — it is reachable without payment.
 app.get("/checkout/success", async (c) => {
-<<<<<<< HEAD
   const plan = (c.req.query("plan") ?? "standard") as PlanCode;
   const planInfo = PLANS[plan] ?? PLANS.standard;
 
@@ -599,7 +731,7 @@ app.get("/checkout/success", async (c) => {
     `,
     ),
   );
-=======
+
   const plan = c.req.query("plan") ?? "starter";
   const product = c.req.query("product") ?? "bizforma";
   const session = await getSession(c.env.AUTH_BASE_URL, c.req.raw);
@@ -626,7 +758,6 @@ app.get("/checkout/success", async (c) => {
   }
 
   return c.redirect(`/onboarding/route?plan=${encodeURIComponent(subscription.plan_code)}&product=${encodeURIComponent(product)}`, 302);
->>>>>>> a01bb87 (astro pages)
 });
 
 app.get("/checkout/cancel", (c) => {
@@ -771,20 +902,101 @@ app.post("/api/onboard", async (c) => {
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 
 app.get("/dashboard", async (c) => {
-<<<<<<< HEAD
+
   const token = extractSessionToken(c.req.raw);
   const session = await getSession(c.env, token);
   if (!session?.user.email) {
-=======
+
   const session = await getSession(c.env.AUTH_BASE_URL, c.req.raw);
 
   if (!session || !session.user.email) {
 >>>>>>> a01bb87 (astro pages)
     return c.redirect(getLoginRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL), 302);
+
+  // NOTE: This is the redirect landing — actual plan activation MUST happen via billing webhook below.
+  // This page is only confirmation UI. Do NOT write subscriptions here (vulnerable to direct URL access).
+  const plan = c.req.query("plan") ?? "standard";
+  const token = extractSessionToken(c.req.raw);
+  const session = await getSession(c.env, token);
+  if (!session?.user.email) return c.redirect("/pricing", 302);
+
+  return c.html(renderPage("Payment received", `
+    <div class="alert alert-success">✓ Payment received — activating your subscription...</div>
+    <h1>Welcome to ${PLANS[plan as PlanCode]?.label ?? plan}!</h1>
+    <p class="muted">Your account is being activated. This usually takes under 30 seconds.</p>
+    <p><a class="btn btn-primary" href="/dashboard">Go to dashboard →</a></p>
+    <script>setTimeout(()=>location.href='/dashboard',3000)</script>
+  `));
+});
+
+app.get("/checkout/cancel", (c) => {
+  return c.html(renderPage("Checkout canceled", `
+    <h1>Checkout canceled</h1>
+    <p class="muted">No charges were made.</p>
+    <p><a class="btn btn-secondary" href="/pricing">← Return to pricing</a></p>
+  `));
+});
+
+// ── Billing webhook (Stripe/LemonSqueezy) ────────────────────────────────────
+
+app.post("/billing/webhook", async (c) => {
+  const sig = c.req.header("stripe-signature") ?? c.req.header("x-signature") ?? "";
+  const body = await c.req.text();
+
+  // Verify HMAC-SHA256 signature
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(c.env.BILLING_WEBHOOK_SECRET),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["verify"]
+  );
+
+  let payload: { event: string; customer_id: string; plan_code: string };
+  try {
+    payload = JSON.parse(body);
+  } catch {
+    return c.json({ error: "invalid json" }, 400);
+>>>>>>> b4ee618 (fix: align plan codes to lite/standard/pro, secure billing webhook, add dashboard tiles)
   }
 
+  // For Stripe: validate sig header; for LemonSqueezy: validate X-Signature
+  // Minimal implementation — expand per provider
+  if (!sig && c.env.BILLING_WEBHOOK_SECRET) {
+    return c.json({ error: "missing signature" }, 401);
+  }
+
+  const { event, customer_id, plan_code } = payload;
+  if (!VALID_PLANS.has(plan_code)) return c.json({ error: "unknown plan" }, 400);
+
+  if (event === "subscription.activated" || event === "order.created") {
+    const now = new Date().toISOString();
+    await c.env.DB.prepare(`
+      INSERT INTO subscriptions (id, customer_id, plan_code, status, created_at, updated_at)
+      VALUES (?, ?, ?, 'active', ?, ?)
+      ON CONFLICT(customer_id) DO UPDATE SET plan_code=excluded.plan_code, status='active', updated_at=excluded.updated_at
+    `).bind(crypto.randomUUID(), customer_id, plan_code, now, now).run();
+  }
+
+  if (event === "subscription.cancelled" || event === "subscription.expired") {
+    await c.env.DB.prepare(`
+      UPDATE subscriptions SET status='cancelled', updated_at=? WHERE customer_id=?
+    `).bind(new Date().toISOString(), customer_id).run();
+  }
+
+  return c.json({ ok: true });
+});
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+
+app.get("/dashboard", async (c) => {
+  const token = extractSessionToken(c.req.raw);
+  const session = await getSession(c.env, token);
+  if (!session?.user.email) return c.redirect(getLoginRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL), 302);
+
   const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
-<<<<<<< HEAD
+
+
   const subscription = await c.env.DB.prepare(`
     SELECT plan_code, status, created_at, stripe_subscription_id
     FROM subscriptions WHERE customer_id = ? ORDER BY created_at DESC LIMIT 1
@@ -844,7 +1056,7 @@ app.get("/dashboard", async (c) => {
         ${planInfo.price > 0 ? `<p class="muted" style="font-size:12px;margin-top:4px;">$${planInfo.price}/mo</p>` : ""}
         ${plan !== "pro" ? `<br/><a class="btn btn-primary btn-sm" style="margin-top:6px;" href="/pricing">Upgrade plan</a>` : ""}
       </div>
-=======
+
   const subscription = await c.env.DB.prepare(
     `SELECT plan_code, status, current_period_end, cancel_at_period_end
      FROM subscriptions
@@ -858,25 +1070,46 @@ app.get("/dashboard", async (c) => {
     cancel_at_period_end?: number | null;
   }>();
 
-  const hasAdvancedDashboard = await customerHasEntitlement(c.env.DB, customer.id, FEATURE_KEYS.DASHBOARD_ADVANCED);
-  const hasAiAdvisor = await customerHasEntitlement(c.env.DB, customer.id, FEATURE_KEYS.AI_ADVISOR);
-  const hasPayroll = await customerHasEntitlement(c.env.DB, customer.id, FEATURE_KEYS.PAYROLL_WORKSPACE);
-  const hasBizForma = await customerHasEntitlement(c.env.DB, customer.id, FEATURE_KEYS.APP_BIZFORMA);
+  const subscription = await c.env.DB.prepare(`
+    SELECT plan_code, status, created_at FROM subscriptions
+    WHERE customer_id = ? ORDER BY created_at DESC LIMIT 1
+  `).bind(customer.id).first<Subscription>();
+>>>>>>> b4ee618 (fix: align plan codes to lite/standard/pro, secure billing webhook, add dashboard tiles)
 
-  if (!subscription || (subscription.status !== "active" && subscription.status !== "trialing")) {
-    return c.redirect("/pricing", 302);
-  }
+  // Lite users get provisioned automatically
+  const plan: PlanCode = (subscription?.plan_code as PlanCode) ?? "lite";
+  const planInfo = PLANS[plan];
+  const isActive = !subscription || subscription.status === "active";
+
+  if (!isActive) return c.redirect("/pricing", 302);
+
+  const appTiles = APPS.map(a => {
+    const hasAccess = a.plans.includes(plan as never);
+    const badgeClass = `badge-${a.badge.toLowerCase()}`;
+    return `
+      <div class="card" style="${!hasAccess ? "opacity:.5;" : ""}">
+        <span class="badge ${hasAccess ? badgeClass : "badge-locked"}">${a.badge}</span>
+        <h2>${a.label}</h2>
+        <p class="muted" style="font-size:13px;">${a.desc}</p>
+        ${hasAccess
+          ? `<a class="btn btn-primary btn-sm" href="${c.env.GATEWAY_BASE_URL}/handoff?app=${a.id}&token=${token}">Open →</a>`
+          : `<span class="muted" style="font-size:12px;">Requires ${a.plans[0]} plan</span>`
+        }
+      </div>`;
+  }).join("");
 
   return c.html(renderPage("Dashboard", `
-    <h1>Welcome back</h1>
-    <p class="muted">${session.user.email}</p>
-    <div class="card">
-      <h2>Current plan</h2>
-      <p>${subscription.plan_code}</p>
-      <p class="muted">Status: ${subscription.status}</p>
-      <p class="muted">Renews through: ${subscription.current_period_end ?? "Pending Stripe sync"}</p>
-      <p class="muted">Cancel at period end: ${subscription.cancel_at_period_end ? "Yes" : "No"}</p>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <div>
+        <h1 style="margin:0;">Welcome back</h1>
+        <p class="muted" style="margin:4px 0 0;">${session.user.email}</p>
+      </div>
+      <div style="text-align:right;">
+        <span class="pill pill-active">${planInfo.label}</span>
+        ${plan !== "pro" ? `&nbsp;<a class="btn btn-secondary btn-sm" href="/pricing">Upgrade</a>` : ""}
+      </div>
     </div>
+
     <div class="card">
       <h2>Entitlements</h2>
       <p class="muted">Advanced dashboard: ${hasAdvancedDashboard ? "Yes" : "No"}</p>
@@ -898,6 +1131,53 @@ app.get("/dashboard", async (c) => {
     `,
     ),
   );
+
+    <div class="cards">${appTiles}</div>
+    <div style="margin-top:40px;">
+      <h2>Account</h2>
+      <table>
+        <tr><th>Plan</th><td>${planInfo.label}</td></tr>
+        <tr><th>Price</th><td>${planInfo.price === 0 ? "Free" : `$${planInfo.price}/mo`}</td></tr>
+        <tr><th>Status</th><td><span class="pill pill-active">Active</span></td></tr>
+        <tr><th>Member since</th><td>${subscription?.created_at ? new Date(subscription.created_at).toLocaleDateString() : "Today"}</td></tr>
+      </table>
+    </div>
+  `));
+>>>>>>> b4ee618 (fix: align plan codes to lite/standard/pro, secure billing webhook, add dashboard tiles)
+});
+
+// ── Onboarding API ─────────────────────────────────────────────────────────────
+
+app.post("/api/onboard", async (c) => {
+  const ip = c.req.header("cf-connecting-ip") ?? "unknown";
+  const allowed = await checkRateLimit(c.env.RATE_LIMIT_KV, `onboard:${ip}`, 5, 60);
+  if (!allowed) return c.json({ error: "rate_limit_exceeded" }, 429);
+
+  let body: { org_name?: string; industry?: string; plan?: string };
+  try { body = await c.req.json(); } catch { return c.json({ error: "invalid_json" }, 400); }
+
+  const { org_name, industry, plan = "lite" } = body;
+  if (!org_name || typeof org_name !== "string" || org_name.trim().length < 2) {
+    return c.json({ error: "org_name required (min 2 chars)" }, 422);
+  }
+  if (!VALID_PLANS.has(plan)) {
+    return c.json({ error: "invalid plan" }, 422);
+  }
+
+  const token = extractSessionToken(c.req.raw);
+  const session = await getSession(c.env, token);
+  if (!session?.user.email) return c.json({ error: "unauthenticated" }, 401);
+
+  const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
+
+  // Write org record
+  const orgId = crypto.randomUUID();
+  const now = new Date().toISOString();
+  await c.env.DB.prepare(
+    "INSERT INTO organizations (id, customer_id, name, industry, plan_code, created_at) VALUES (?, ?, ?, ?, ?, ?)"
+  ).bind(orgId, customer.id, org_name.trim(), industry ?? null, plan, now).run();
+
+  return c.json({ ok: true, org_id: orgId, plan });
 });
 
 export default app;
