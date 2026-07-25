@@ -9,7 +9,7 @@ export const onRequest: PagesFunction<{
     : (params.path || '').toString()
 
   const incoming = new URL(request.url)
-  const target = new URL(`${base.replace(/\/$/, '')}/api/${wildcard}`)
+  const target = new URL('${base.replace(/\/$/, '')}/api/${wildcard}')
 
   target.search = incoming.search
 

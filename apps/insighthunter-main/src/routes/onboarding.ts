@@ -31,7 +31,7 @@ onboarding.get("/onboarding/route", async (c) => {
       return c.redirect("/pricing", 302);
     }
 
-    return c.redirect(`${c.env.GATEWAY_BASE_URL}/handoff?app=bizforma`, 302);
+    return c.redirect('${c.env.GATEWAY_BASE_URL}/handoff?app=bizforma', 302);
   }
 
   return c.redirect("/dashboard", 302);

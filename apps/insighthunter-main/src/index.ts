@@ -33,6 +33,7 @@ import entitlementsRoutes from "./routes/entitlements.js";
 import onboarding from "./routes/onboarding.js";
 import { webhooks } from "./routes/webhooks.js";
 import Stripe from "stripe";
+import { any } from "astro/zod";
 
 
 type Subscription = {
@@ -120,7 +121,7 @@ async function checkRateLimit(
 async function getSession(env: Env["Bindings"], token: string | null) {
   if (!token) return null;
   try {
-    const res = await fetch(`${env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}`);
+    const res = await fetch('${env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}');
     if (!res.ok) return null;
     const payload = (await res.json()) as SessionLookup;
     return payload.ok ? (payload.session ?? null) : null;
@@ -211,7 +212,7 @@ async function checkRateLimit(kv: KVNamespace, key: string, limit: number, windo
 async function getSession(env: Env["Bindings"], token: string | null) {
   if (!token) return null;
   try {
-    const res = await fetch(`${env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}`);
+    const res = await fetch('${env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}');
     if (!res.ok) return null;
     const payload = (await res.json()) as SessionLookup;
     return payload.ok ? payload.session ?? null : null;
@@ -241,7 +242,7 @@ async function ensureCustomer(db: D1Database, userId: string, email: string): Pr
 // ── HTML helpers ─────────────────────────────────────────────────────────────
 
 function renderPage(title: string, body: string): string {
-  return `<!doctype html>
+  return '<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
@@ -350,7 +351,7 @@ function renderPage(title: string, body: string): string {
 </nav>
 <div class="wrap">${body}</div>
 </body>
-</html>`;
+</html>';
 }
 
 // ── App ───────────────────────────────────────────────────────────────────────
@@ -385,18 +386,18 @@ app.get("/", (c) => {
   const registerUrl = getRegisterRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL);
 
   const appCards = APPS.map(
-    (a) => `
+    (a) => '
     <div class="card">
       <span class="badge" style="background:${a.badgeColor};color:${a.badgeText}">${a.badge}</span>
       <h2>${a.label}</h2>
       <p class="muted" style="font-size:13px;">${a.desc}</p>
-    </div>`,
+    </div>',
   ).join("");
 
   return c.html(
     renderPage(
       "Stop Flying Blind",
-      `
+      '
     <div class="hero">
       <h1>Stop flying blind.<br/>Know your numbers.</h1>
       <p class="muted" style="font-size:1.15rem;margin-bottom:32px;">AI-powered bookkeeping, payroll, cash-flow forecasting,<br/>and an AI CFO — built on Cloudflare's global edge.</p>
@@ -416,7 +417,7 @@ app.get("/", (c) => {
       &nbsp;&nbsp;
       <a class="btn btn-secondary" href="${loginUrl}">Log in →</a>
     </div>
-    `,
+    ',
     ),
   );
 });
@@ -478,7 +479,7 @@ app.get("/pricing", (c) => {
         </ul>
         <a class="btn btn-primary" href="/start?plan=pro">Choose Pro</a>
 
-  return c.html(renderPage("Pricing", `
+  return c.html(renderPage("Pricing", '
     <h1>Pricing</h1>
     <div class="cards">
       <div class="card">
@@ -500,7 +501,7 @@ app.get("/pricing", (c) => {
         <a class="button" href="/start?plan=pro&product=bizforma">Choose Pro</a>
       </div>
 
-  return c.html(renderPage("Stop Flying Blind", `
+  return c.html(renderPage("Stop Flying Blind", '
     <div style="text-align:center;padding:60px 0 40px;">
       <h1 style="font-size:3rem;margin-bottom:12px;">Stop flying blind.<br/>Know your numbers.</h1>
       <p class="muted" style="font-size:1.2rem;margin-bottom:32px;">AI-powered bookkeeping, payroll, cash-flow forecasting,<br/>and an AI CFO — all in one Cloudflare-native platform.</p>
@@ -510,13 +511,13 @@ app.get("/pricing", (c) => {
       <p class="muted" style="margin-top:20px;font-size:13px;">✓ Cloudflare-native · Global Edge &nbsp;·&nbsp; ✓ Per-tenant data isolation &nbsp;·&nbsp; ✓ SOC 2 ready architecture</p>
     </div>
     <div class="cards">
-      ${APPS.map(a => `
+      ${APPS.map(a => '
         <div class="card">
           <span class="badge badge-${a.badge.toLowerCase()}">${a.badge}</span>
           <h2>${a.label}</h2>
           <p class="muted" style="font-size:14px;">${a.desc}</p>
         </div>
-      `).join("")}
+      ').join("")}
     </div>
     <hr class="divider"/>
     <h2>Add-Ons</h2>
@@ -531,7 +532,7 @@ app.get("/pricing", (c) => {
         <tr><td>Website Services</td><td>$79/mo</td></tr>
       </tbody>
     </table>
-    `,
+    ',
     ),
   );
 });
@@ -556,7 +557,7 @@ app.get("/start", (c) => {
 // ── Pricing ───────────────────────────────────────────────────────────────────
 
 app.get("/pricing", (c) => {
-  return c.html(renderPage("Pricing", `
+  return c.html(renderPage("Pricing", '
     <h1>Simple, Transparent Pricing</h1>
     <p class="muted">Start free. Scale when ready. No hidden fees.</p>
     <div class="pricing-grid">
@@ -620,7 +621,7 @@ app.get("/pricing", (c) => {
         </tbody>
       </table>
     </div>
-  `));
+  '));
 });
 
 // ── Auth flow ─────────────────────────────────────────────────────────────────
@@ -641,16 +642,16 @@ app.get("/auth/callback", async (c) => {
   if (!VALID_PLANS.has(plan)) return c.redirect("/pricing", 302);
 
   // Lite is free — skip checkout entirely
-  const location = plan === "lite" ? "/dashboard" : `/checkout/start?plan=${encodeURIComponent(plan)}`;
+  const location = plan === "lite" ? "/dashboard" : '/checkout/start?plan=${encodeURIComponent(plan)}';
 
   const res = new Response(null, { status: 302, headers: { Location: location } });
   res.headers.append(
     "Set-Cookie",
-    `ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`,
+    'ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800',
   );
   return res;
-  const response = c.redirect(`/checkout/start?plan=${encodeURIComponent(plan)}&product=${encodeURIComponent(product)}`, 302);
-  response.headers.append("Set-Cookie", `ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`);
+  const response = c.redirect('/checkout/start?plan=${encodeURIComponent(plan)}&product=${encodeURIComponent(product)}', 302);
+  response.headers.append("Set-Cookie", 'ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800');
   return response;
 
   const plan = c.req.query("plan") ?? "lite";
@@ -661,15 +662,15 @@ app.get("/auth/callback", async (c) => {
   if (plan === "lite") {
     // Lite is free — skip checkout, go straight to dashboard
     const res = new Response(null, { status: 302, headers: { Location: "/dashboard" } });
-    res.headers.append("Set-Cookie", `ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`);
+    res.headers.append("Set-Cookie", 'ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800');
     return res;
   }
 
   const res = new Response(null, {
     status: 302,
-    headers: { Location: `/checkout/start?plan=${encodeURIComponent(plan)}` },
+    headers: { Location: '/checkout/start?plan=${encodeURIComponent(plan)}' },
   });
-  res.headers.append("Set-Cookie", `ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`);
+  res.headers.append("Set-Cookie", 'ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800');
   return res;
 });
 
@@ -722,13 +723,13 @@ app.get("/checkout/success", async (c) => {
   return c.html(
     renderPage(
       "Payment received",
-      `
+      '
     <div class="alert alert-success">✓ Payment received — activating your subscription...</div>
     <h1>Welcome to ${planInfo.label}!</h1>
     <p class="muted">Your account is being activated. This typically takes under 30 seconds.</p>
     <p><a class="btn btn-primary" href="/dashboard">Go to dashboard →</a></p>
     <script>setTimeout(()=>location.href='/dashboard',4000)</script>
-    `,
+    ',
     ),
   );
 
@@ -742,34 +743,34 @@ app.get("/checkout/success", async (c) => {
 
   const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
   const subscription = await c.env.DB.prepare(
-    `SELECT plan_code, status
+    'SELECT plan_code, status
      FROM subscriptions
      WHERE customer_id = ?
      ORDER BY updated_at DESC
-     LIMIT 1`
+     LIMIT 1'
   ).bind(customer.id).first<{ plan_code: string; status: string }>();
 
   if (!subscription || (subscription.status !== "active" && subscription.status !== "trialing")) {
-    return c.html(renderPage("Processing subscription", `
+    return c.html(renderPage("Processing subscription", '
       <h1>Payment received</h1>
       <p class="muted">We are confirming your subscription. Refresh in a few seconds.</p>
       <p><a class="button" href="/checkout/success?plan=${encodeURIComponent(plan)}&product=${encodeURIComponent(product)}">Refresh status</a></p>
-    `));
+    '));
   }
 
-  return c.redirect(`/onboarding/route?plan=${encodeURIComponent(subscription.plan_code)}&product=${encodeURIComponent(product)}`, 302);
+  return c.redirect('/onboarding/route?plan=${encodeURIComponent(subscription.plan_code)}&product=${encodeURIComponent(product)}', 302);
 });
 
 app.get("/checkout/cancel", (c) => {
   return c.html(
     renderPage(
       "Checkout canceled",
-      `
+      '
     <div class="alert alert-warning">⚠ Checkout was canceled. No charges were made.</div>
     <h1>No problem.</h1>
     <p class="muted">You can restart whenever you're ready.</p>
     <p><a class="btn btn-secondary" href="/pricing">← Return to pricing</a></p>
-    `,
+    ',
     ),
   );
 });
@@ -791,7 +792,7 @@ app.post("/billing/webhook", async (c) => {
       ];
       const timestamp = sig.match(/t=(\d+)/)?.[1] ?? "";
       const v1 = sig.match(/v1=([a-f0-9]+)/)?.[1] ?? "";
-      const signedPayload = `${timestamp}.${body}`;
+      const signedPayload = '${timestamp}.${body}';
       const key = await crypto.subtle.importKey(
         "raw",
         new TextEncoder().encode(c.env.BILLING_WEBHOOK_SECRET),
@@ -836,7 +837,7 @@ app.post("/billing/webhook", async (c) => {
   const now = new Date().toISOString();
 
   if (event.type === "checkout.session.completed" || event.type === "customer.subscription.updated") {
-    await c.env.DB.prepare(`
+    await c.env.DB.prepare('
       INSERT INTO subscriptions (id, customer_id, plan_code, status, stripe_subscription_id, created_at, updated_at)
       VALUES (?, ?, ?, 'active', ?, ?, ?)
       ON CONFLICT(customer_id) DO UPDATE
@@ -844,15 +845,15 @@ app.post("/billing/webhook", async (c) => {
             status = 'active',
             stripe_subscription_id = excluded.stripe_subscription_id,
             updated_at = excluded.updated_at
-    `)
+    ')
       .bind(crypto.randomUUID(), customerId, planCode, stripeSubId, now, now)
       .run();
   }
 
   if (event.type === "customer.subscription.deleted" || event.type === "invoice.payment_failed") {
-    await c.env.DB.prepare(`
+    await c.env.DB.prepare('
       UPDATE subscriptions SET status = 'cancelled', updated_at = ? WHERE customer_id = ?
-    `)
+    ')
       .bind(now, customerId)
       .run();
   }
@@ -864,7 +865,7 @@ app.post("/billing/webhook", async (c) => {
 
 app.post("/api/onboard", async (c) => {
   const ip = c.req.header("cf-connecting-ip") ?? "unknown";
-  const allowed = await checkRateLimit(c.env.RATE_LIMIT_KV, `onboard:${ip}`, 5, 60);
+  const allowed = await checkRateLimit(c.env.RATE_LIMIT_KV, 'onboard:${ip}', 5, 60);
   if (!allowed) return c.json({ error: "rate_limit_exceeded" }, 429);
 
   let body: { org_name?: string; industry?: string; plan?: string };
@@ -910,7 +911,6 @@ app.get("/dashboard", async (c) => {
   const session = await getSession(c.env.AUTH_BASE_URL, c.req.raw);
 
   if (!session || !session.user.email) {
->>>>>>> a01bb87 (astro pages)
     return c.redirect(getLoginRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL), 302);
 
   // NOTE: This is the redirect landing — actual plan activation MUST happen via billing webhook below.
@@ -920,22 +920,21 @@ app.get("/dashboard", async (c) => {
   const session = await getSession(c.env, token);
   if (!session?.user.email) return c.redirect("/pricing", 302);
 
-  return c.html(renderPage("Payment received", `
-    <div class="alert alert-success">✓ Payment received — activating your subscription...</div>
-    <h1>Welcome to ${PLANS[plan as PlanCode]?.label ?? plan}!</h1>
+  return c.html(renderPage("Payment received",
+   '<div class="alert alert-success">Payment received — activating your subscription...</div>
+    <h1> Welcome to ${PLANS[plan as PlanCode]}.string </h1>
     <p class="muted">Your account is being activated. This usually takes under 30 seconds.</p>
-    <p><a class="btn btn-primary" href="/dashboard">Go to dashboard →</a></p>
-    <script>setTimeout(()=>location.href='/dashboard',3000)</script>
-  `));
-});
+    <p><a class="btn btn-primary" href="/dashboard"> Go to dashboard </a></p>
+    <script>setTimeout(()=>location.href='/dashboard',3000)</script>'
+      ));
+
 
 app.get("/checkout/cancel", (c) => {
-  return c.html(renderPage("Checkout canceled", `
-    <h1>Checkout canceled</h1>
+  return c.html(renderPage("Checkout canceled",
+    '<h1>Checkout canceled</h1>
     <p class="muted">No charges were made.</p>
-    <p><a class="btn btn-secondary" href="/pricing">← Return to pricing</a></p>
-  `));
-});
+    <p><a class="btn btn-secondary" href="/pricing"> Return to pricing</a></p>'
+      ))};
 
 // ── Billing webhook (Stripe/LemonSqueezy) ────────────────────────────────────
 
@@ -957,7 +956,6 @@ app.post("/billing/webhook", async (c) => {
     payload = JSON.parse(body);
   } catch {
     return c.json({ error: "invalid json" }, 400);
->>>>>>> b4ee618 (fix: align plan codes to lite/standard/pro, secure billing webhook, add dashboard tiles)
   }
 
   // For Stripe: validate sig header; for LemonSqueezy: validate X-Signature
@@ -971,17 +969,17 @@ app.post("/billing/webhook", async (c) => {
 
   if (event === "subscription.activated" || event === "order.created") {
     const now = new Date().toISOString();
-    await c.env.DB.prepare(`
+    await c.env.DB.prepare('
       INSERT INTO subscriptions (id, customer_id, plan_code, status, created_at, updated_at)
       VALUES (?, ?, ?, 'active', ?, ?)
       ON CONFLICT(customer_id) DO UPDATE SET plan_code=excluded.plan_code, status='active', updated_at=excluded.updated_at
-    `).bind(crypto.randomUUID(), customer_id, plan_code, now, now).run();
+    ').bind(crypto.randomUUID(), customer_id, plan_code, now, now).run();
   }
 
   if (event === "subscription.cancelled" || event === "subscription.expired") {
-    await c.env.DB.prepare(`
+    await c.env.DB.prepare('
       UPDATE subscriptions SET status='cancelled', updated_at=? WHERE customer_id=?
-    `).bind(new Date().toISOString(), customer_id).run();
+    ').bind(new Date().toISOString(), customer_id).run();
   }
 
   return c.json({ ok: true });
@@ -997,10 +995,10 @@ app.get("/dashboard", async (c) => {
   const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
 
 
-  const subscription = await c.env.DB.prepare(`
+  const subscription = await c.env.DB.prepare('
     SELECT plan_code, status, created_at, stripe_subscription_id
     FROM subscriptions WHERE customer_id = ? ORDER BY created_at DESC LIMIT 1
-  `)
+  ')
     .bind(customer.id)
     .first<Subscription>();
 
@@ -1013,12 +1011,12 @@ app.get("/dashboard", async (c) => {
     return c.html(
       renderPage(
         "Subscription inactive",
-        `
+        '
       <div class="alert alert-warning">⚠ Your subscription is inactive.</div>
       <h1>Reactivate your account</h1>
       <p class="muted">Your previous plan was <strong>${planInfo.label}</strong>. Choose a plan below to reactivate.</p>
       <p><a class="btn btn-primary" href="/pricing">View plans →</a></p>
-      `,
+      ',
       ),
     );
   }
@@ -1027,25 +1025,25 @@ app.get("/dashboard", async (c) => {
     const hasAccess = (a.plans as readonly string[]).includes(plan);
     const appUrl = a.id === "bizforma"
       ? c.env.BIZFORMA_BASE_URL
-      : `${c.env.GATEWAY_BASE_URL}/handoff?app=${a.id}&token=${encodeURIComponent(token ?? "")}`;
+      : '${c.env.GATEWAY_BASE_URL}/handoff?app=${a.id}&token=${encodeURIComponent(token ?? "")}';
 
-    return `
+    return '
     <div class="card ${hasAccess ? "" : "card-locked"}">
       <span class="badge" style="background:${a.badgeColor};color:${a.badgeText};">${a.badge}</span>
       <h2>${a.label}</h2>
       <p class="muted" style="font-size:13px;margin-bottom:14px;">${a.desc}</p>
       ${hasAccess
-        ? `<a class="btn btn-primary btn-sm" href="${appUrl}">Open →</a>`
-        : `<span style="font-size:12px;color:#6b7280;">🔒 Requires ${a.plans[0]} plan</span>
-           <br/><a class="btn btn-secondary btn-sm" style="margin-top:8px;" href="/pricing">Upgrade</a>`
+        ? '<a class="btn btn-primary btn-sm" href="${appUrl}">Open →</a>'
+        : '<span style="font-size:12px;color:#6b7280;">🔒 Requires ${a.plans[0]} plan</span>
+           <br/><a class="btn btn-secondary btn-sm" style="margin-top:8px;" href="/pricing">Upgrade</a>'
       }
-    </div>`;
+    </div>';
   }).join("");
 
   return c.html(
     renderPage(
       "Dashboard",
-      `
+      '
     <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:28px;">
       <div>
         <h1 style="margin-bottom:4px;">Welcome back</h1>
@@ -1053,16 +1051,16 @@ app.get("/dashboard", async (c) => {
       </div>
       <div style="text-align:right;">
         <span class="pill pill-active">${planInfo.label}</span>
-        ${planInfo.price > 0 ? `<p class="muted" style="font-size:12px;margin-top:4px;">$${planInfo.price}/mo</p>` : ""}
-        ${plan !== "pro" ? `<br/><a class="btn btn-primary btn-sm" style="margin-top:6px;" href="/pricing">Upgrade plan</a>` : ""}
+        ${planInfo.price > 0 ? '<p class="muted" style="font-size:12px;margin-top:4px;">$${planInfo.price}/mo</p>' : ""}
+        ${plan !== "pro" ? '<br/><a class="btn btn-primary btn-sm" style="margin-top:6px;" href="/pricing">Upgrade plan</a>' : ""}
       </div>
 
   const subscription = await c.env.DB.prepare(
-    `SELECT plan_code, status, current_period_end, cancel_at_period_end
+    'SELECT plan_code, status, current_period_end, cancel_at_period_end
      FROM subscriptions
      WHERE customer_id = ?
      ORDER BY updated_at DESC
-     LIMIT 1`
+     LIMIT 1'
   ).bind(customer.id).first<{
     plan_code: string;
     status: string;
@@ -1070,11 +1068,10 @@ app.get("/dashboard", async (c) => {
     cancel_at_period_end?: number | null;
   }>();
 
-  const subscription = await c.env.DB.prepare(`
+  const subscription = await c.env.DB.prepare('
     SELECT plan_code, status, created_at FROM subscriptions
     WHERE customer_id = ? ORDER BY created_at DESC LIMIT 1
-  `).bind(customer.id).first<Subscription>();
->>>>>>> b4ee618 (fix: align plan codes to lite/standard/pro, secure billing webhook, add dashboard tiles)
+  ').bind(customer.id).first<Subscription>();
 
   // Lite users get provisioned automatically
   const plan: PlanCode = (subscription?.plan_code as PlanCode) ?? "lite";
@@ -1085,20 +1082,20 @@ app.get("/dashboard", async (c) => {
 
   const appTiles = APPS.map(a => {
     const hasAccess = a.plans.includes(plan as never);
-    const badgeClass = `badge-${a.badge.toLowerCase()}`;
-    return `
+    const badgeClass = 'badge-${a.badge.toLowerCase()}';
+    return '
       <div class="card" style="${!hasAccess ? "opacity:.5;" : ""}">
         <span class="badge ${hasAccess ? badgeClass : "badge-locked"}">${a.badge}</span>
         <h2>${a.label}</h2>
         <p class="muted" style="font-size:13px;">${a.desc}</p>
         ${hasAccess
-          ? `<a class="btn btn-primary btn-sm" href="${c.env.GATEWAY_BASE_URL}/handoff?app=${a.id}&token=${token}">Open →</a>`
-          : `<span class="muted" style="font-size:12px;">Requires ${a.plans[0]} plan</span>`
+          ? '<a class="btn btn-primary btn-sm" href="${c.env.GATEWAY_BASE_URL}/handoff?app=${a.id}&token=${token}">Open →</a>'
+          : '<span class="muted" style="font-size:12px;">Requires ${a.plans[0]} plan</span>'
         }
-      </div>`;
+      </div>';
   }).join("");
 
-  return c.html(renderPage("Dashboard", `
+  return c.html(renderPage("Dashboard", '
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
       <div>
         <h1 style="margin:0;">Welcome back</h1>
@@ -1106,7 +1103,7 @@ app.get("/dashboard", async (c) => {
       </div>
       <div style="text-align:right;">
         <span class="pill pill-active">${planInfo.label}</span>
-        ${plan !== "pro" ? `&nbsp;<a class="btn btn-secondary btn-sm" href="/pricing">Upgrade</a>` : ""}
+        ${plan !== "pro" ? '&nbsp;<a class="btn btn-secondary btn-sm" href="/pricing">Upgrade</a>' : ""}
       </div>
     </div>
 
@@ -1116,19 +1113,18 @@ app.get("/dashboard", async (c) => {
       <p class="muted">AI advisor: ${hasAiAdvisor ? "Yes" : "No"}</p>
       <p class="muted">Payroll workspace: ${hasPayroll ? "Yes" : "No"}</p>
       <p class="muted">BizForma app: ${hasBizForma ? "Yes" : "No"}</p>
->>>>>>> a01bb87 (astro pages)
     </div>
     <div class="cards">${appTiles}</div>
     <hr class="divider"/>
     <h2>Account Details</h2>
     <table>
       <tr><th>Plan</th><td>${planInfo.label}</td></tr>
-      <tr><th>Price</th><td>${planInfo.price === 0 ? "Free" : `$${planInfo.price}/mo`}</td></tr>
+      <tr><th>Price</th><td>${planInfo.price === 0 ? "Free" : '$${planInfo.price}/mo'}</td></tr>
       <tr><th>Status</th><td><span class="pill pill-active">Active</span></td></tr>
-      ${subscription?.created_at ? `<tr><th>Member since</th><td>${new Date(subscription.created_at).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})}</td></tr>` : ""}
-      ${subscription?.stripe_subscription_id ? `<tr><th>Subscription ID</th><td style="font-family:monospace;font-size:12px;">${subscription.stripe_subscription_id}</td></tr>` : ""}
+      ${subscription?.created_at ? '<tr><th>Member since</th><td>${new Date(subscription.created_at).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})}</td></tr>' : ""}
+      ${subscription?.stripe_subscription_id ? '<tr><th>Subscription ID</th><td style="font-family:monospace;font-size:12px;">${subscription.stripe_subscription_id}</td></tr>' : ""}
     </table>
-    `,
+    ',
     ),
   );
 
@@ -1137,20 +1133,19 @@ app.get("/dashboard", async (c) => {
       <h2>Account</h2>
       <table>
         <tr><th>Plan</th><td>${planInfo.label}</td></tr>
-        <tr><th>Price</th><td>${planInfo.price === 0 ? "Free" : `$${planInfo.price}/mo`}</td></tr>
+        <tr><th>Price</th><td>${planInfo.price === 0 ? "Free" : '$${planInfo.price}/mo'}</td></tr>
         <tr><th>Status</th><td><span class="pill pill-active">Active</span></td></tr>
         <tr><th>Member since</th><td>${subscription?.created_at ? new Date(subscription.created_at).toLocaleDateString() : "Today"}</td></tr>
       </table>
     </div>
-  `));
->>>>>>> b4ee618 (fix: align plan codes to lite/standard/pro, secure billing webhook, add dashboard tiles)
+  '));
 });
 
 // ── Onboarding API ─────────────────────────────────────────────────────────────
 
 app.post("/api/onboard", async (c) => {
   const ip = c.req.header("cf-connecting-ip") ?? "unknown";
-  const allowed = await checkRateLimit(c.env.RATE_LIMIT_KV, `onboard:${ip}`, 5, 60);
+  const allowed = await checkRateLimit(c.env.RATE_LIMIT_KV, 'onboard:${ip}', 5, 60);
   if (!allowed) return c.json({ error: "rate_limit_exceeded" }, 429);
 
   let body: { org_name?: string; industry?: string; plan?: string };

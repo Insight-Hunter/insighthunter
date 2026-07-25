@@ -34,7 +34,7 @@
   </div>
 
   {#if resolvedDelta}
-    <div class={`kpi-delta ${toneClass}`}>
+    <div class={'kpi-delta ${toneClass}'}>
       <span class="delta-pill">{resolvedDelta}</span>
     </div>
   {/if}

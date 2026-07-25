@@ -46,7 +46,7 @@ export async function createStripeCheckoutSession(input: CreateCheckoutSessionIn
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${input.secretKey}`,
+      Authorization: 'Bearer ${input.secretKey}',
       "Content-Type": "application/x-www-form-urlencoded"
     },
     body
@@ -54,7 +54,7 @@ export async function createStripeCheckoutSession(input: CreateCheckoutSessionIn
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`Stripe checkout session failed: ${response.status} ${text}`);
+    throw new Error('Stripe checkout session failed: ${response.status} ${text}');
   }
 
   const payload = await response.json() as { id: string; url: string };
@@ -76,7 +76,7 @@ export async function verifyStripeWebhookSignature(
 
   const timestamp = timestampPart.slice(2);
   const signature = v1Part.slice(3);
-  const signedPayload = `${timestamp}.${payload}`;
+  const signedPayload = '${timestamp}.${payload}';
 
   const key = await crypto.subtle.importKey(
     "raw",

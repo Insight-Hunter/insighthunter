@@ -52,4 +52,3 @@ BIZFORMA_BASE_URL = "https://bizforma.insighthunter.app"
 STRIPE_PRICE_STARTER = "prod_U9zYWaE9xpW0Tx"
 STRIPE_PRICE_GROWTH = "prod_U9zYM5rWy3zKPv"
 STRIPE_PRICE_PRO = "prod_U9zYEwdL9Ca7Xu"
->>>>>>> a01bb87 (astro pages)

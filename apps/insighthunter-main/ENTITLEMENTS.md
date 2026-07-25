@@ -8,6 +8,6 @@
 
 ## Apply schema
 
-```bash
+'''bash
 cd apps/insighthunter-main
 wrangler d1 execute insighthunter_main --file=schema.sql

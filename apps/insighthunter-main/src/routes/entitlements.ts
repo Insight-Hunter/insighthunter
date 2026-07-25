@@ -23,10 +23,10 @@ entitlements.get("/api/entitlements", async (c) => {
   const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
 
   const rows = await c.env.DB.prepare(
-    `SELECT feature_key, status, source, expires_at, metadata_json
+    'SELECT feature_key, status, source, expires_at, metadata_json
      FROM entitlements
      WHERE customer_id = ?
-     ORDER BY feature_key ASC`
+     ORDER BY feature_key ASC'
   ).bind(customer.id).all<{
     results: Array<{
       feature_key: string;
