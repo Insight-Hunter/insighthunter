@@ -1,0 +1,178 @@
+
+---
+export const prerender = true;
+
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+---
+
+<MarketingLayout
+  title="Insight Hunter | AI CFO workspace for small business"
+  description="Insight Hunter gives small businesses an AI-powered finance command center for cash flow, reporting, compliance, planning, and operational decisions."
+>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Finance operations, clarity, and control</p>
+        <h1>Stop flying blind.</h1>
+        <p class="lede">
+          Insight Hunter gives founders and operators a live CFO workspace that turns bookkeeping,
+          reporting, compliance, and AI guidance into one operating system.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="/auth/register">Create account</a>
+          <a class="btn btn-secondary" href="/pricing">View pricing</a>
+        </div>
+        <ul class="hero-points">
+          <li>Cash flow visibility built for real operating decisions.</li>
+          <li>AI-guided finance workflows for lean teams.</li>
+          <li>One platform for advisory, reporting, and execution.</li>
+        </ul>
+      </div>
+
+      <div class="hero-panel">
+        <div class="hero-card card-strong">
+          <div class="card-head">
+            <span>Live finance signal</span>
+            <span class="pill">Investor-ready</span>
+          </div>
+          <div class="metric">$184,200</div>
+          <div class="metric-label">Projected 30-day cash runway movement</div>
+          <div class="trend-row">
+            <div>
+              <strong>+18.4%</strong>
+              <span>Collections efficiency</span>
+            </div>
+            <div>
+              <strong>-11.2%</strong>
+              <span>Unplanned spend variance</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-stack">
+          <article class="mini-card">
+            <p class="mini-label">Advisory</p>
+            <h3>Ask better questions.</h3>
+            <p>
+              Surface margin leaks, hiring pressure, and working capital issues before they become
+              expensive.
+            </p>
+          </article>
+          <article class="mini-card">
+            <p class="mini-label">Operations</p>
+            <h3>Act from one place.</h3>
+            <p>
+              Move from dashboard insight to payroll, compliance, document, and planning workflows
+              without switching systems.
+            </p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="proof">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Built for disciplined operators</p>
+        <h2>A finance platform that behaves like a real control center.</h2>
+        <p>
+          Insight Hunter combines strategic visibility with operational tools so small businesses can
+          run with enterprise-grade discipline without carrying enterprise overhead.
+        </p>
+      </div>
+
+      <div class="proof-grid">
+        <article class="proof-card">
+          <h3>AI advisor with context</h3>
+          <p>
+            Ask questions against your operating picture, not a generic chatbot. Move from analysis
+            to decision support in one workflow.
+          </p>
+        </article>
+        <article class="proof-card">
+          <h3>Compliance and documents</h3>
+          <p>
+            Keep filings, obligations, deadlines, and business records inside one accountable system.
+          </p>
+        </article>
+        <article class="proof-card">
+          <h3>Launch point for every app</h3>
+          <p>
+            Use the main shell as the command layer for Advisor, ledger, finops, formation, payroll,
+            and future domain apps.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="operating-model">
+    <div class="container operating-grid">
+      <div>
+        <p class="eyebrow">Why it converts</p>
+        <h2>Designed for trust before scale.</h2>
+      </div>
+      <div class="operating-copy">
+        <p>
+          Investors, prospects, and customers should understand the product quickly: what it does,
+          who it serves, and why it wins. This page frames Insight Hunter as a serious operating
+          platform instead of a lightweight template SaaS.
+        </p>
+        <p>
+          The result is a stronger front door for account creation, subscription conversion, and
+          product handoff into the dashboard.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="container cta-shell">
+      <div>
+        <p class="eyebrow">Start now</p>
+        <h2>Build your finance operating system on a modern edge stack.</h2>
+      </div>
+      <div class="cta-actions">
+        <a class="btn btn-primary" href="/auth/register">Get started</a>
+        <a class="btn btn-secondary" href="/pricing">Compare plans</a>
+      </div>
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  .container {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+  }
+
+  .hero {
+    padding: 88px 0 72px;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .eyebrow {
+    margin: 0 0 14px;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 7vw, 5.6rem);
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+    margin: 0 0 20px;
+  }
+
+  .lede {
+    font-
