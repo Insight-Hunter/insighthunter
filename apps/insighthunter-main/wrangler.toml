@@ -21,7 +21,6 @@ id = "REPLACE_WITH_KV_NAMESPACE_ID"
 
 # ── Environment Variables ─────────────────────────────────────────────────────
 [vars]
-<<<<<<< HEAD
 APP_NAME            = "insighthunter-main"
 MAIN_BASE_URL       = "https://insighthunter.app"
 AUTH_BASE_URL       = "https://auth.insighthunter.app"
@@ -30,8 +29,8 @@ BIZFORMA_BASE_URL   = "https://bizforma.insighthunter.app"
 CHECKOUT_BASE_URL   = "https://checkout.insighthunter.app/session"
 
 # Stripe Product IDs — MUST match insighthunter.app pricing page
-STRIPE_PRICE_LITE     = ""                        # free — no Stripe product
-STRIPE_PRICE_STANDARD = ""                        # TODO: create $49/mo product in Stripe
+STRIPE_PRICE_LITE     = "prod_U9zYWaE9xpW0Tx"    # free — no Stripe product
+STRIPE_PRICE_STANDARD = "prod_U9zYM5rWy3zKPv"    # TODO: create $49/mo product in Stripe
 STRIPE_PRICE_PRO      = "prod_U9zYEwdL9Ca7Xu"    # existing
 
 # Deprecated — kept for backward compat until plan migration complete
@@ -43,7 +42,7 @@ STRIPE_PRICE_GROWTH   = "prod_U9zYM5rWy3zKPv"
 # wrangler secret put BILLING_PROVIDER_SECRET
 # wrangler secret put BILLING_WEBHOOK_SECRET
 # wrangler secret put STRIPE_SECRET_KEY
-=======
+
 APP_NAME = "insighthunter-main"
 MAIN_BASE_URL = "https://insighthunter.app"
 AUTH_BASE_URL = "https://auth.insighthunter.app"
@@ -52,4 +51,3 @@ BIZFORMA_BASE_URL = "https://bizforma.insighthunter.app"
 STRIPE_PRICE_STARTER = "prod_U9zYWaE9xpW0Tx"
 STRIPE_PRICE_GROWTH = "prod_U9zYM5rWy3zKPv"
 STRIPE_PRICE_PRO = "prod_U9zYEwdL9Ca7Xu"
->>>>>>> a01bb87 (astro pages)
