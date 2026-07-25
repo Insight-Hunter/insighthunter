@@ -41,8 +41,8 @@ function getBaseRules(entityType: string, state: string, formedAt: string): Comp
     },
     {
       event_type: "annual_report",
-      title: `${state} Annual Report / Statement of Information`,
-      description: `File your annual report with the ${state} Secretary of State to maintain active status.`,
+      title: '${state} Annual Report / Statement of Information',
+      description: 'File your annual report with the ${state} Secretary of State to maintain active status.',
       offsetMonths: monthsToAnnual,
       recurringMonths: 12,
     },
@@ -61,8 +61,8 @@ function getBaseRules(entityType: string, state: string, formedAt: string): Comp
 
     rules.push({
       event_type: "tax_filing",
-      title: `${state} State Tax Return Due`,
-      description: `File your ${state} state business tax return.`,
+      title: '${state} State Tax Return Due',
+      description: 'File your ${state} state business tax return.',
       offsetMonths: entityType === "C-CORP" ? 4 : 3,
       recurringMonths: 12,
     });
@@ -105,9 +105,9 @@ export async function seedComplianceCalendar(
       const id = crypto.randomUUID();
       inserts.push(
         db.prepare(
-          `INSERT OR IGNORE INTO compliance_events
+          'INSERT OR IGNORE INTO compliance_events
            (id, formation_case_id, tenant_id, event_type, title, description, due_date, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+           VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))'
         ).bind(
           id, caseId, tenantId,
           rule.event_type, rule.title, rule.description,
@@ -131,7 +131,7 @@ export async function getComplianceEvents(
   tenantId: string,
   filter?: { status?: string; from?: string; to?: string }
 ): Promise<Record<string, unknown>[]> {
-  let query = `SELECT * FROM compliance_events WHERE formation_case_id = ? AND tenant_id = ?`;
+  let query = 'SELECT * FROM compliance_events WHERE formation_case_id = ? AND tenant_id = ?';
   const bindings: unknown[] = [caseId, tenantId];
 
   if (filter?.status) { query += " AND status = ?"; bindings.push(filter.status); }
@@ -150,8 +150,8 @@ export async function markComplianceEventComplete(
   tenantId: string
 ): Promise<boolean> {
   const result = await db.prepare(
-    `UPDATE compliance_events SET status = 'completed', completed_at = datetime('now'), updated_at = datetime('now')
-     WHERE id = ? AND tenant_id = ?`
+    'UPDATE compliance_events SET status = 'completed', completed_at = datetime('now'), updated_at = datetime('now')
+     WHERE id = ? AND tenant_id = ?'
   ).bind(eventId, tenantId).run();
   return (result.meta?.changes ?? 0) > 0;
 }
@@ -159,8 +159,8 @@ export async function markComplianceEventComplete(
 export async function flagOverdueEvents(db: D1Database): Promise<number> {
   const today = new Date().toISOString().split("T")[0];
   const result = await db.prepare(
-    `UPDATE compliance_events SET status = 'overdue', updated_at = datetime('now')
-     WHERE status = 'pending' AND due_date < ?`
+    'UPDATE compliance_events SET status = 'overdue', updated_at = datetime('now')
+     WHERE status = 'pending' AND due_date < ?'
   ).bind(today).run();
   return result.meta?.changes ?? 0;
 }

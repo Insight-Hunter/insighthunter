@@ -1,0 +1,49 @@
+---
+import '../styles/global.css';
+import { site } from '../data/site';
+const { title = site.name, description = site.description } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-row">
+        <a href="/" class="brand">Insight Hunter</a>
+        <nav class="nav-links">
+          {site.nav.map((item) => <a href={item.href}>{item.label}</a>)}
+        </nav>
+      </div>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="footer">
+      <div class="container grid cards-3">
+        <div>
+          <div class="brand">Insight Hunter</div>
+          <p>AI-powered bookkeeping, payroll, reporting, and forecasting for operators who need clarity fast.</p>
+        </div>
+        <div>
+          <strong>Explore</strong>
+          <div class="grid" style="gap:.35rem; margin-top:.75rem;">
+            {site.nav.map((item) => <a href={item.href}>{item.label}</a>)}
+          </div>
+        </div>
+        <div>
+          <strong>Legal</strong>
+          <div class="grid" style="gap:.35rem; margin-top:.75rem;">
+            {site.legal.map((item) => <a href={item.href}>{item.label}</a>)}
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

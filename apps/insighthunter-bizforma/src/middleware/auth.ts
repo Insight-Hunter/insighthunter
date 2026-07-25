@@ -88,7 +88,7 @@ function unauthenticated(c: Context<{ Bindings: BizformaEnv }>, reason: string):
   if (isProbablyBrowserRequest(c.req.raw)) {
     const authUrl = c.env.AUTH_URL ?? "https://auth.insighthunter.app";
     const returnTo = encodeURIComponent(c.req.url);
-    return c.redirect(`${authUrl}/login?return_to=${returnTo}`, 302);
+    return c.redirect('${authUrl}/login?return_to=${returnTo}', 302);
   }
   return c.json({ error: "unauthorized", reason }, 401);
 }

@@ -10,8 +10,8 @@ const formation = new Hono<HonoEnv>();
 formation.get("/", async (c) => {
   const { tenantId } = c.get("auth");
   const { results } = await c.env.DB.prepare(
-    `SELECT id, entity_type, business_name, state, status, wizard_step, created_at, updated_at
-     FROM formation_cases WHERE tenant_id = ? ORDER BY created_at DESC`
+    'SELECT id, entity_type, business_name, state, status, wizard_step, created_at, updated_at
+     FROM formation_cases WHERE tenant_id = ? ORDER BY created_at DESC'
   ).bind(tenantId).all();
   return c.json({ cases: results });
 });
@@ -22,19 +22,19 @@ formation.get("/:id", async (c) => {
   const id = c.req.param("id");
 
   const formationCase = await c.env.DB.prepare(
-    `SELECT * FROM formation_cases WHERE id = ? AND tenant_id = ?`
+    'SELECT * FROM formation_cases WHERE id = ? AND tenant_id = ?'
   ).bind(id, tenantId).first();
 
   if (!formationCase) return c.json({ error: "not_found" }, 404);
 
   const { results: documents } = await c.env.DB.prepare(
-    `SELECT id, document_type, file_name, content_type, size_bytes, status, generated, created_at
-     FROM bizforma_documents WHERE formation_case_id = ? ORDER BY created_at DESC`
+    'SELECT id, document_type, file_name, content_type, size_bytes, status, generated, created_at
+     FROM bizforma_documents WHERE formation_case_id = ? ORDER BY created_at DESC'
   ).bind(id).all();
 
   const { results: compliance } = await c.env.DB.prepare(
-    `SELECT id, event_type, title, due_date, status, completed_at
-     FROM compliance_events WHERE formation_case_id = ? ORDER BY due_date ASC`
+    'SELECT id, event_type, title, due_date, status, completed_at
+     FROM compliance_events WHERE formation_case_id = ? ORDER BY due_date ASC'
   ).bind(id).all();
 
   return c.json({ case: formationCase, documents, compliance });
@@ -58,8 +58,8 @@ formation.post("/", async (c) => {
   const now = new Date().toISOString();
 
   await c.env.DB.prepare(
-    `INSERT INTO formation_cases (id, tenant_id, user_id, entity_type, business_name, state, wizard_data, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    'INSERT INTO formation_cases (id, tenant_id, user_id, entity_type, business_name, state, wizard_data, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).bind(
     id, tenantId, userId,
     body.entity_type, body.business_name, body.state,
@@ -92,7 +92,7 @@ formation.patch("/:id", async (c) => {
   }>();
 
   const existing = await c.env.DB.prepare(
-    `SELECT id, wizard_data FROM formation_cases WHERE id = ? AND tenant_id = ?`
+    'SELECT id, wizard_data FROM formation_cases WHERE id = ? AND tenant_id = ?'
   ).bind(id, tenantId).first<{ id: string; wizard_data: string }>();
 
   if (!existing) return c.json({ error: "not_found" }, 404);
@@ -103,7 +103,7 @@ formation.patch("/:id", async (c) => {
     : existing.wizard_data;
 
   await c.env.DB.prepare(
-    `UPDATE formation_cases SET
+    'UPDATE formation_cases SET
       wizard_step = COALESCE(?, wizard_step),
       wizard_data = ?,
       status = COALESCE(?, status),
@@ -113,7 +113,7 @@ formation.patch("/:id", async (c) => {
       registered_agent = COALESCE(?, registered_agent),
       principal_address = COALESCE(?, principal_address),
       updated_at = datetime('now')
-     WHERE id = ? AND tenant_id = ?`
+     WHERE id = ? AND tenant_id = ?'
   ).bind(
     body.wizard_step ?? null,
     mergedData,
@@ -135,7 +135,7 @@ formation.delete("/:id", async (c) => {
   const id = c.req.param("id");
 
   const existing = await c.env.DB.prepare(
-    `SELECT id, status FROM formation_cases WHERE id = ? AND tenant_id = ?`
+    'SELECT id, status FROM formation_cases WHERE id = ? AND tenant_id = ?'
   ).bind(id, tenantId).first<{ id: string; status: string }>();
 
   if (!existing) return c.json({ error: "not_found" }, 404);
@@ -144,7 +144,7 @@ formation.delete("/:id", async (c) => {
   }
 
   await c.env.DB.prepare(
-    `UPDATE formation_cases SET status = 'cancelled', updated_at = datetime('now') WHERE id = ? AND tenant_id = ?`
+    'UPDATE formation_cases SET status = 'cancelled', updated_at = datetime('now') WHERE id = ? AND tenant_id = ?'
   ).bind(id, tenantId).run();
 
   return c.json({ id, status: "cancelled" });
@@ -157,19 +157,19 @@ formation.post("/:id/documents/upload-url", async (c) => {
   const body = await c.req.json<{ file_name: string; content_type?: string; document_type?: string }>();
 
   const existing = await c.env.DB.prepare(
-    `SELECT id FROM formation_cases WHERE id = ? AND tenant_id = ?`
+    'SELECT id FROM formation_cases WHERE id = ? AND tenant_id = ?'
   ).bind(id, tenantId).first();
 
   if (!existing) return c.json({ error: "not_found" }, 404);
 
   const docId = crypto.randomUUID();
-  const r2Key = `${tenantId}/${id}/${docId}/${body.file_name}`;
+  const r2Key = '${tenantId}/${id}/${docId}/${body.file_name}';
   const now = new Date().toISOString();
 
   // Create DB record in pending state before upload
   await c.env.DB.prepare(
-    `INSERT INTO bizforma_documents (id, formation_case_id, tenant_id, user_id, document_type, file_name, r2_key, content_type, status, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
+    'INSERT INTO bizforma_documents (id, formation_case_id, tenant_id, user_id, document_type, file_name, r2_key, content_type, status, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)'
   ).bind(
     docId, id, tenantId, userId,
     body.document_type ?? "custom",
@@ -184,7 +184,7 @@ formation.post("/:id/documents/upload-url", async (c) => {
   return c.json({
     doc_id: docId,
     r2_key: r2Key,
-    upload_url: `/api/formation/${id}/documents/${docId}/upload`,
+    upload_url: '/api/formation/${id}/documents/${docId}/upload',
     expires_in: 3600,
   }, 201);
 });
@@ -196,7 +196,7 @@ formation.put("/:id/documents/:docId/upload", async (c) => {
   const docId = c.req.param("docId");
 
   const doc = await c.env.DB.prepare(
-    `SELECT r2_key, content_type FROM bizforma_documents WHERE id = ? AND formation_case_id = ? AND tenant_id = ?`
+    'SELECT r2_key, content_type FROM bizforma_documents WHERE id = ? AND formation_case_id = ? AND tenant_id = ?'
   ).bind(docId, caseId, tenantId).first<{ r2_key: string; content_type: string }>();
 
   if (!doc) return c.json({ error: "not_found" }, 404);
@@ -211,7 +211,7 @@ formation.put("/:id/documents/:docId/upload", async (c) => {
   const size = parseInt(c.req.header("content-length") ?? "0");
 
   await c.env.DB.prepare(
-    `UPDATE bizforma_documents SET status = 'uploaded', size_bytes = ?, updated_at = datetime('now') WHERE id = ?`
+    'UPDATE bizforma_documents SET status = 'uploaded', size_bytes = ?, updated_at = datetime('now') WHERE id = ?'
   ).bind(size, docId).run();
 
   // Queue PDF processing job

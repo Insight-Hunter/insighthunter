@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
+---
+<BaseLayout title="Blog — Insight Hunter">
+  <section class="section">
+    <div class="container">
+      <div class="eyebrow">Blog</div>
+      <h1 class="page-title">Practical finance operating insight for small businesses.</h1>
+      <div class="grid cards-2">
+        {posts.map((post) => (
+          <article class="card">
+            <div class="eyebrow">{post.data.category}</div>
+            <h2>{post.data.title}</h2>
+            <p>{post.data.description}</p>
+            <a class="btn btn-secondary" href={`/blog/${post.slug}`}>Read article</a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

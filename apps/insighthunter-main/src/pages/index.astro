@@ -1,475 +1,61 @@
 ---
-export const prerender = true;
-
-import MarketingLayout from '../layouts/MarketingLayout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { features, pricing, site } from '../data/site';
 ---
-
-<MarketingLayout
-  title="Insight Hunter | Finance intelligence for growing businesses"
-  description="Insight Hunter combines AI financial analysis, bookkeeping support, reporting, and operational visibility in one Cloudflare edge-powered platform."
->
-  <section class="hero">
-    <div class="container hero-shell">
-      <div class="hero-copy-wrap">
-        <div class="hero-badge">
-          <span class="flame-mark" aria-hidden="true">
-            <svg viewBox="0 0 64 64" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M35.4 6C40.8 14.7 42.3 21.4 39.8 27.1C47.3 27.9 53 34.1 53 42.2C53 51.5 45.3 58 34.7 58C22.6 58 14 50.3 14 39.2C14 29.6 20 22.9 27.8 18.2C27.7 23.5 29.8 27.3 33.3 30.2C35.2 26.9 36.5 22.8 35.7 18.2C35 14.3 33.8 10.5 35.4 6Z" fill="#F97316" />
-              <path d="M34.1 24.8C38.8 29.4 41 33.8 41 38.3C41 44.2 36.7 48.4 30.9 48.4C25.7 48.4 21.8 44.6 21.8 39.6C21.8 35.3 24.7 31.8 29.5 28.9C29.8 32 31.4 34.6 34 36.7C35.2 33.8 35.6 29.8 34.1 24.8Z" fill="#FDBA74" />
-            </svg>
-          </span>
-          <span>Cloudflare edge-powered finance intelligence</span>
-        </div>
-
-        <h1>Turn bookkeeping, cash flow, and reporting into decisions you can act on now.</h1>
-
-        <p class="hero-copy">
-          InsightHunter brings together AI financial analysis, automated bookkeeping,
-          multi-entity reporting, and operational visibility in one workspace.
-          See what changed, what needs attention, and what to do next without chasing
-          spreadsheets, disconnected tools, or delayed reports.
-        </p>
-
-        <div class="hero-actions">
-          <a href="/signup" class="btn btn-primary">Start your subscription</a>
-          <a href="/features" class="btn btn-secondary">Explore features</a>
-        </div>
-
-        <div class="hero-metrics">
-          <div>
-            <strong>One workspace</strong>
-            <span>Finance visibility, reporting, and workflows together.</span>
-          </div>
-          <div>
-            <strong>Edge-powered</strong>
-            <span>Fast, resilient delivery with Cloudflare infrastructure.</span>
-          </div>
-          <div>
-            <strong>Built for action</strong>
-            <span>Answers that help operators move quicker and with more confidence.</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="hero-panel">
-        <div class="hero-panel-card hero-panel-primary">
-          <p class="panel-label">Live business visibility</p>
-          <h2>Ask plain-language questions. Get clearer financial answers.</h2>
-          <p>
-            Track cash movement, trends, reporting signals, and operational performance
-            from one connected platform built for growing businesses.
-          </p>
-        </div>
-
-        <div class="hero-proof">
-          <div>
-            <strong>AI-powered answers</strong>
-            <span>Ask about cash, trends, performance, and business movement across your data.</span>
-          </div>
-          <div>
-            <strong>Bookkeeping that stays moving</strong>
-            <span>Support categorization, cleaner records, and faster workflows with automation.</span>
-          </div>
-          <div>
-            <strong>Reporting built for growth</strong>
-            <span>Track entities, performance, and decision-ready financial views at scale.</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="value-section">
-    <div class="container">
-      <div class="section-heading">
-        <p class="section-kicker">Why teams choose InsightHunter</p>
-        <h2>From scattered financial activity to a usable operating view.</h2>
-        <p>
-          InsightHunter is designed for founders, finance teams, and advisors who need
-          faster answers, cleaner visibility, and less manual chasing across systems.
-        </p>
-      </div>
-
-      <div class="value-grid">
-        <article>
-          <h3>Finance intelligence in one place</h3>
-          <p>Bring together cash flow visibility, bookkeeping support, reporting, and operational context instead of bouncing across disconnected systems.</p>
-        </article>
-        <article>
-          <h3>Deeper insight, faster action</h3>
-          <p>Move from raw transactions and reports to usable answers, clearer trends, and better decisions without waiting on manual analysis.</p>
-        </article>
-        <article>
-          <h3>Built for modern business ops</h3>
-          <p>InsightHunter is built for operators who need speed, clarity, and scalable infrastructure behind the scenes.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="feature-section">
-    <div class="container">
-      <div class="section-heading narrow">
-        <p class="section-kicker">Core capabilities</p>
-        <h2>Features that match how real businesses run.</h2>
-      </div>
-
-      <div class="feature-grid">
-        <article>
-          <h3>AI financial analysis</h3>
-          <p>Ask direct questions about cash, movement, trends, and performance using natural language instead of digging through disconnected reports.</p>
-        </article>
-        <article>
-          <h3>Automated bookkeeping support</h3>
-          <p>Keep financial operations moving with categorization support, cleaner records, and workflows designed to reduce spreadsheet dependency.</p>
-        </article>
-        <article>
-          <h3>Multi-entity reporting</h3>
-          <p>See broader performance across entities and business units with reporting that helps growing organizations make decisions faster.</p>
-        </article>
-        <article>
-          <h3>Operational visibility</h3>
-          <p>Connect finance intelligence to what is happening across the business so reporting becomes more actionable, not just more detailed.</p>
-        </article>
-        <article>
-          <h3>Cloudflare edge delivery</h3>
-          <p>Run on infrastructure built for speed, resilience, and global reach, giving the platform a modern operational foundation.</p>
-        </article>
-        <article>
-          <h3>Expansion-ready platform</h3>
-          <p>Designed to support connected modules like communications, payroll-ready workflows, and broader business services as the platform grows.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="cta-section">
-    <div class="container cta-shell">
+<BaseLayout title="Insight Hunter — Stop flying blind" description={site.description}>
+  <section class="section">
+    <div class="container grid cards-2" style="align-items:center;">
       <div>
-        <p class="section-kicker">Ready to move faster?</p>
-        <h2>Start using InsightHunter as your finance intelligence workspace.</h2>
-        <p>
-          Give your business a clearer view of what is happening now, what changed,
-          and what needs action next.
-        </p>
+        <div class="eyebrow">Finance operating system</div>
+        <h1 class="hero-title">Stop flying blind. Know your numbers.</h1>
+        <p class="lead">Insight Hunter brings bookkeeping, payroll, reporting, forecasting, and AI-guided financial context into one edge-native platform for small business operators.</p>
+        <div style="display:flex; gap:.9rem; flex-wrap:wrap; margin-top:1.5rem;">
+          <a class="btn btn-primary" href="/pricing">See pricing</a>
+          <a class="btn btn-secondary" href="/features">Explore features</a>
+        </div>
       </div>
-
-      <div class="cta-actions">
-        <a href="/signup" class="btn btn-primary">Start your subscription</a>
-        <a href="/pricing" class="btn btn-secondary">View pricing</a>
+      <div class="subtle-panel">
+        <div class="grid cards-2">
+          <div class="card"><div class="kicker">Typical stack replaced</div><div class="metric">5-9 tools</div><p>Reduce context switching across bookkeeping, reporting, and finance operations.</p></div>
+          <div class="card"><div class="kicker">Decision speed</div><div class="metric">Same day</div><p>Give owners and advisors current visibility instead of month-late spreadsheets.</p></div>
+        </div>
       </div>
     </div>
   </section>
-</MarketingLayout>
 
-<style>
-  :global(:root) {
-    --page-bg: #08111f;
-    --panel: rgba(15, 23, 42, 0.78);
-    --panel-strong: rgba(15, 23, 42, 0.96);
-    --panel-soft: rgba(30, 41, 59, 0.72);
-    --text: #e5eefb;
-    --muted: #94a3b8;
-    --muted-strong: #cbd5e1;
-    --border: rgba(148, 163, 184, 0.18);
-    --border-strong: rgba(249, 115, 22, 0.26);
-    --accent: #f97316;
-    --accent-soft: #fb923c;
-    --accent-glow: rgba(249, 115, 22, 0.24);
-    --cyan-soft: rgba(34, 211, 238, 0.16);
-    --hero-shadow: 0 30px 80px rgba(2, 6, 23, 0.45);
-  }
+  <section class="section">
+    <div class="container">
+      <div class="eyebrow">Platform capabilities</div>
+      <h2 class="page-title">One system for the numbers that run the business.</h2>
+      <div class="grid cards-3">
+        {features.map((feature) => (
+          <article class="card">
+            <h3>{feature.title}</h3>
+            <p>{feature.summary}</p>
+            <a href={`/features/${feature.slug}`} class="eyebrow">Read more</a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
 
-  :global(body) {
-    background:
-      radial-gradient(circle at top left, rgba(249, 115, 22, 0.12), transparent 28%),
-      radial-gradient(circle at top right, rgba(34, 211, 238, 0.08), transparent 26%),
-      linear-gradient(180deg, #07101c 0%, #0a1322 45%, #09111d 100%);
-    color: var(--text);
-  }
-
-  .container {
-    width: min(1180px, calc(100% - 40px));
-    margin: 0 auto;
-  }
-
-  .hero {
-    padding: 92px 0 72px;
-  }
-
-  .hero-shell {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-    gap: 36px;
-    align-items: stretch;
-  }
-
-  .hero-copy-wrap {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    width: fit-content;
-    padding: 10px 16px;
-    margin-bottom: 22px;
-    border: 1px solid var(--border-strong);
-    border-radius: 999px;
-    background: rgba(249, 115, 22, 0.08);
-    color: #ffd6b8;
-    font-size: 0.95rem;
-    font-weight: 700;
-    box-shadow: 0 10px 30px rgba(249, 115, 22, 0.08);
-  }
-
-  .flame-mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  h1 {
-    margin: 0 0 22px;
-    font-size: clamp(3rem, 6.8vw, 5.8rem);
-    line-height: 0.94;
-    letter-spacing: -0.045em;
-    max-width: 11ch;
-    color: #f8fafc;
-  }
-
-  .hero-copy {
-    max-width: 64ch;
-    margin: 0 0 32px;
-    font-size: 1.14rem;
-    line-height: 1.75;
-    color: var(--muted-strong);
-  }
-
-  .hero-actions,
-  .cta-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-
-  .hero-actions {
-    margin-bottom: 34px;
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 48px;
-    padding: 0 20px;
-    border-radius: 14px;
-    font-weight: 700;
-    text-decoration: none;
-    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
-  }
-
-  .btn:hover {
-    transform: translateY(-1px);
-  }
-
-  .btn-primary {
-    color: white;
-    background: linear-gradient(180deg, var(--accent-soft), var(--accent));
-    box-shadow: 0 12px 34px var(--accent-glow);
-  }
-
-  .btn-secondary {
-    color: var(--text);
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.03);
-  }
-
-  .hero-metrics {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-  }
-
-  .hero-metrics div,
-  .hero-proof div,
-  .value-grid article,
-  .feature-grid article {
-    padding: 20px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015));
-    box-shadow: var(--hero-shadow);
-  }
-
-  .hero-metrics strong,
-  .hero-proof strong,
-  .value-grid h3,
-  .feature-grid h3 {
-    display: block;
-    margin-bottom: 10px;
-    font-size: 1rem;
-    color: #f8fafc;
-  }
-
-  .hero-metrics span,
-  .hero-proof span,
-  .value-grid p,
-  .feature-grid p,
-  .section-heading p,
-  .cta-shell p {
-    color: var(--muted);
-    line-height: 1.65;
-  }
-
-  .hero-panel {
-    display: grid;
-    gap: 18px;
-    align-content: center;
-  }
-
-  .hero-panel-card {
-    padding: 28px;
-    border-radius: 28px;
-    border: 1px solid var(--border);
-    background:
-      linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.84)),
-      radial-gradient(circle at top right, rgba(249, 115, 22, 0.12), transparent 32%);
-    box-shadow: var(--hero-shadow);
-  }
-
-  .hero-panel-primary {
-    border-color: rgba(34, 211, 238, 0.18);
-  }
-
-  .panel-label,
-  .section-kicker {
-    margin: 0 0 12px;
-    font-size: 0.78rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent-soft);
-    font-weight: 700;
-  }
-
-  .hero-panel h2,
-  .section-heading h2,
-  .cta-shell h2 {
-    margin: 0 0 14px;
-    font-size: clamp(1.8rem, 3vw, 2.8rem);
-    line-height: 1.08;
-    letter-spacing: -0.03em;
-    color: #f8fafc;
-  }
-
-  .hero-panel p {
-    margin: 0;
-    color: var(--muted-strong);
-    line-height: 1.7;
-  }
-
-  .hero-proof,
-  .value-grid,
-  .feature-grid {
-    display: grid;
-    gap: 18px;
-  }
-
-  .hero-proof,
-  .value-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .feature-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .value-section,
-  .feature-section,
-  .cta-section {
-    padding: 36px 0 84px;
-  }
-
-  .section-heading {
-    max-width: 760px;
-    margin-bottom: 30px;
-  }
-
-  .section-heading.narrow {
-    max-width: 620px;
-  }
-
-  .cta-shell {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    padding: 30px;
-    border-radius: 28px;
-    border: 1px solid var(--border);
-    background:
-      linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.82)),
-      radial-gradient(circle at left center, rgba(249, 115, 22, 0.1), transparent 30%);
-    box-shadow: var(--hero-shadow);
-  }
-
-  @media (max-width: 1080px) {
-    .hero-shell,
-    .feature-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .hero-metrics,
-    .hero-proof,
-    .value-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .cta-shell {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  }
-
-  @media (max-width: 720px) {
-    .hero {
-      padding: 72px 0 56px;
-    }
-
-    .container {
-      width: min(1180px, calc(100% - 28px));
-    }
-
-    h1 {
-      font-size: clamp(2.5rem, 13vw, 4rem);
-      max-width: 12ch;
-    }
-
-    .hero-panel-card,
-    .hero-metrics div,
-    .hero-proof div,
-    .value-grid article,
-    .feature-grid article,
-    .cta-shell {
-      padding: 22px;
-      border-radius: 22px;
-    }
-
-    .hero-copy {
-      font-size: 1.02rem;
-    }
-
-    .hero-actions,
-    .cta-actions {
-      width: 100%;
-    }
-
-    .hero-actions a,
-    .cta-actions a {
-      flex: 1 1 100%;
-    }
-  }
-</style>
+  <section class="section">
+    <div class="container">
+      <div class="eyebrow">Pricing</div>
+      <h2 class="page-title">Start simple, then grow into the full operating layer.</h2>
+      <div class="grid cards-3">
+        {pricing.map((plan) => (
+          <article class="card" style={plan.featured ? 'border-color: var(--primary); transform: translateY(-4px);' : ''}>
+            <h3>{plan.name}</h3>
+            <div class="metric">{plan.price}<span style="font-size:1rem; color:var(--muted);">{plan.cadence}</span></div>
+            <p>{plan.description}</p>
+            <ul>
+              {plan.bullets.map((item) => <li>{item}</li>)}
+            </ul>
+            <a class={plan.featured ? 'btn btn-primary' : 'btn btn-secondary'} href="/pricing">{plan.cta}</a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -70,14 +70,14 @@ export class FormationAgent extends DurableObject<BizformaEnv> {
         await this.ctx.storage.put("state", this.state);
 
         // Sprint 5: each step calls the real external service (SOS API, IRS EIN, pdf generator)
-        console.log(`[FormationAgent] caseId=${this.state.caseId} step=${step}`);
+        console.log('[FormationAgent] caseId=${this.state.caseId} step=${step}');
 
         // Simulated async work placeholder
         await new Promise((r) => setTimeout(r, 100));
 
         if (step === "complete") {
           await this.env.DB.prepare(
-            `UPDATE formation_cases SET status = 'filed', filed_at = datetime('now') WHERE id = ? AND tenant_id = ?`
+            'UPDATE formation_cases SET status = 'filed', filed_at = datetime('now') WHERE id = ? AND tenant_id = ?'
           ).bind(this.state.caseId, this.state.tenantId).run();
         }
       } catch (err) {

@@ -1,40 +1,60 @@
-import { createMiddleware } from "hono/factory";
-import { getLoginRedirectUrl } from "@insighthunter/auth-shared";
-import { customerHasEntitlement } from "./entitlements.js";
-import type { FeatureKey } from "./plans.js";
-import { ensureCustomer, getSession } from "./session.js";
+import type { MiddlewareHandler } from 'hono';
+import { getSession, type SessionRecord } from './session.js';
 
-type Bindings = {
-  AUTH_BASE_URL: string;
-  MAIN_BASE_URL: string;
-  DB: D1Database;
+export type OrganizationRecord = {
+  id: string;
 };
 
-export function requireEntitlement(featureKey: FeatureKey) {
-  return createMiddleware<{ Bindings: Bindings }>(async (c, next) => {
-    const session = await getSession(c.env.AUTH_BASE_URL, c.req.raw);
+export type MemberRecord = {
+  userId: string;
+  email: string;
+};
 
-    if (!session || !session.user.email) {
-      const loginUrl = getLoginRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL);
-      return c.redirect(loginUrl, 302);
-    }
+export type AppBindings = {
+  AUTH_BASE_URL: string;
+  MAIN_BASE_URL: string;
+};
 
-    const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
-    const allowed = await customerHasEntitlement(c.env.DB, customer.id, featureKey);
+export type AppVariables = {
+  session: SessionRecord;
+  organization: OrganizationRecord | null;
+  member: MemberRecord;
+};
 
-    if (!allowed) {
-      return c.json(
-        {
-          ok: false,
-          error: "entitlement_required",
-          feature: featureKey,
-        },
-        403,
-      );
-    }
+type AppEnv = {
+  Bindings: AppBindings;
+  Variables: AppVariables;
+};
 
-    c.set("session", session);
-    c.set("customer", customer);
-    await next();
-  });
+function buildLoginUrl(authBaseUrl: string, returnTo: string): string {
+  const base = authBaseUrl.replace(/\/$/, '');
+  return `${base}/login?returnTo=${encodeURIComponent(returnTo)}`;
 }
+
+function toOrganization(session: SessionRecord): OrganizationRecord | null {
+  if (!session.user.orgId) return null;
+  return { id: session.user.orgId };
+}
+
+function toMember(session: SessionRecord): MemberRecord {
+  return {
+    userId: session.user.subject,
+    email: session.user.email ?? '',
+  };
+}
+
+export const requireAuth: MiddlewareHandler<AppEnv> = async (c, next) => {
+  const session = await getSession(c.env.AUTH_BASE_URL, c.req.raw);
+
+  if (!session) {
+    const url = new URL(c.req.url);
+    const returnTo = `${c.env.MAIN_BASE_URL.replace(/\/$/, '')}${url.pathname}${url.search}`;
+    return c.redirect(buildLoginUrl(c.env.AUTH_BASE_URL, returnTo), 302);
+  }
+
+  c.set('session', session);
+  c.set('organization', toOrganization(session));
+  c.set('member', toMember(session));
+
+  await next();
+};

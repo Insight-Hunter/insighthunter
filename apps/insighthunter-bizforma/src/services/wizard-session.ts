@@ -49,8 +49,8 @@ export async function createWizardSession(
   expiresAt.setDate(expiresAt.getDate() + SESSION_TTL_DAYS);
 
   await db.prepare(
-    `INSERT INTO formation_wizard_sessions (id, formation_case_id, tenant_id, user_id, session_data, current_step, expires_at, created_at, updated_at)
-     VALUES (?, ?, ?, ?, '{}', 1, ?, datetime('now'), datetime('now'))`
+    'INSERT INTO formation_wizard_sessions (id, formation_case_id, tenant_id, user_id, session_data, current_step, expires_at, created_at, updated_at)
+     VALUES (?, ?, ?, ?, '{}', 1, ?, datetime('now'), datetime('now'))'
   ).bind(id, caseId ?? null, tenantId, userId, expiresAt.toISOString()).run();
 
   return id;
@@ -62,8 +62,8 @@ export async function getWizardSession(
   tenantId: string
 ): Promise<{ id: string; current_step: number; total_steps: number; session_data: WizardSessionData; formation_case_id: string | null } | null> {
   const row = await db.prepare(
-    `SELECT id, formation_case_id, current_step, total_steps, session_data, expires_at
-     FROM formation_wizard_sessions WHERE id = ? AND tenant_id = ?`
+    'SELECT id, formation_case_id, current_step, total_steps, session_data, expires_at
+     FROM formation_wizard_sessions WHERE id = ? AND tenant_id = ?'
   ).bind(sessionId, tenantId).first<{
     id: string; formation_case_id: string | null;
     current_step: number; total_steps: number;
@@ -89,7 +89,7 @@ export async function updateWizardSession(
   patch: { current_step?: number; session_data?: Partial<WizardSessionData>; formation_case_id?: string }
 ): Promise<boolean> {
   const existing = await db.prepare(
-    `SELECT session_data FROM formation_wizard_sessions WHERE id = ? AND tenant_id = ?`
+    'SELECT session_data FROM formation_wizard_sessions WHERE id = ? AND tenant_id = ?'
   ).bind(sessionId, tenantId).first<{ session_data: string }>();
 
   if (!existing) return false;
@@ -103,13 +103,13 @@ export async function updateWizardSession(
   newExpiry.setDate(newExpiry.getDate() + SESSION_TTL_DAYS);
 
   await db.prepare(
-    `UPDATE formation_wizard_sessions SET
+    'UPDATE formation_wizard_sessions SET
        current_step = COALESCE(?, current_step),
        session_data = ?,
        formation_case_id = COALESCE(?, formation_case_id),
        expires_at = ?,
        updated_at = datetime('now')
-     WHERE id = ? AND tenant_id = ?`
+     WHERE id = ? AND tenant_id = ?'
   ).bind(
     patch.current_step ?? null,
     merged,
@@ -127,13 +127,13 @@ export async function deleteWizardSession(
   tenantId: string
 ): Promise<void> {
   await db.prepare(
-    `DELETE FROM formation_wizard_sessions WHERE id = ? AND tenant_id = ?`
+    'DELETE FROM formation_wizard_sessions WHERE id = ? AND tenant_id = ?'
   ).bind(sessionId, tenantId).run();
 }
 
 export async function purgeExpiredSessions(db: D1Database): Promise<number> {
   const result = await db.prepare(
-    `DELETE FROM formation_wizard_sessions WHERE expires_at < datetime('now')`
+    'DELETE FROM formation_wizard_sessions WHERE expires_at < datetime('now')'
   ).run();
   return result.meta?.changes ?? 0;
 }

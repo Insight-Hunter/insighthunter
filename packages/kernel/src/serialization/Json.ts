@@ -3,7 +3,7 @@ const BIGINT_PREFIX = "__bigint__:";
 export function stringifyJson(value: unknown): string {
   return JSON.stringify(value, (_, currentValue) => {
     return typeof currentValue === "bigint"
-      ? `${BIGINT_PREFIX}${currentValue.toString()}`
+      ? '${BIGINT_PREFIX}${currentValue.toString()}'
       : currentValue;
   });
 }

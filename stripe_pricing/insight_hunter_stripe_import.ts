@@ -104,7 +104,7 @@ function isTrue(value: string | undefined): boolean {
 
 function req(name: string): string {
   const value = process.env[name];
-  if (!value) throw new Error(`Missing required env var: ${name}`);
+  if (!value) throw new Error('Missing required env var: ${name}');
   return value;
 }
 
@@ -161,13 +161,13 @@ async function main() {
     generated_at: new Date().toISOString(),
     plans: entitlementMap,
   }, null, 2));
-  console.log(`Wrote entitlement map: ${entitlementsJson}`);
+  console.log('Wrote entitlement map: ${entitlementsJson}');
 
   const productIdByName = new Map<string, string>();
 
   for (const row of products) {
     const existing = await stripe.products.search({
-      query: `name:'${row.product_name.replace(/'/g, "\\'")}'`,
+      query: 'name:'${row.product_name.replace(/'/g, "\\'")}'',
       limit: 1,
     }).catch(() => ({ data: [] as Stripe.Product[] }));
 
@@ -186,7 +186,7 @@ async function main() {
           billing_type: row.billing_type,
         },
       });
-      console.log(`Created product: ${row.product_name} -> ${product.id}`);
+      console.log('Created product: ${row.product_name} -> ${product.id}');
     } else {
       product = await stripe.products.update(product.id, {
         description: row.description || undefined,
@@ -199,7 +199,7 @@ async function main() {
           billing_type: row.billing_type,
         },
       });
-      console.log(`Updated product: ${row.product_name} -> ${product.id}`);
+      console.log('Updated product: ${row.product_name} -> ${product.id}');
     }
 
     productIdByName.set(row.product_name, product.id);
@@ -207,23 +207,23 @@ async function main() {
 
   for (const row of prices) {
     if (!row.unit_amount || Number.isNaN(Number(row.unit_amount))) {
-      console.log(`Skipped price ${row.lookup_key}: missing unit_amount`);
+      console.log('Skipped price ${row.lookup_key}: missing unit_amount');
       continue;
     }
 
     const productId = productIdByName.get(row.product_name);
     if (!productId) {
-      console.log(`Skipped price ${row.lookup_key}: product not found for ${row.product_name}`);
+      console.log('Skipped price ${row.lookup_key}: product not found for ${row.product_name}');
       continue;
     }
 
     const existing = await stripe.prices.search({
-      query: `lookup_key:'${row.lookup_key.replace(/'/g, "\\'")}'`,
+      query: 'lookup_key:'${row.lookup_key.replace(/'/g, "\\'")}'',
       limit: 1,
     }).catch(() => ({ data: [] as Stripe.Price[] }));
 
     if (existing.data.length > 0) {
-      console.log(`Price exists: ${row.lookup_key} -> ${existing.data[0].id}`);
+      console.log('Price exists: ${row.lookup_key} -> ${existing.data[0].id}');
       continue;
     }
 
@@ -242,12 +242,12 @@ async function main() {
       },
     });
 
-    console.log(`Created price: ${row.lookup_key} -> ${price.id}`);
+    console.log('Created price: ${row.lookup_key} -> ${price.id}');
   }
 
   console.log("Entitlement summary:");
   for (const [plan, data] of Object.entries(entitlementMap)) {
-    console.log(`${plan}: ${data.features.join(", ")}`);
+    console.log('${plan}: ${data.features.join(", ")}');
   }
 
   console.log("Done. Products and prices are synced, and insight_hunter_entitlements.json is ready for your Worker app.");

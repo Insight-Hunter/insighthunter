@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const copy = {
+  'bookkeeping': ['Bookkeeping automation', 'Bring bank data, categorization, reconciliation, and close workflows into one operating surface.'],
+  'forecasting': ['Cash-flow forecasting', 'See where cash is heading before it becomes a surprise, with scenario planning and actionable alerts.'],
+  'payroll': ['Payroll workflows', 'Support payroll operations, visibility into employer costs, and finance-ready payroll context.'],
+  'ai-cfo': ['AI CFO guidance', 'Translate financial movement into plain-language operational guidance for owners and advisors.'],
+  'bizforma': ['Business formation', 'Launch and maintain the operating structure a new business needs, from setup through compliance.'],
+  'reporting': ['Operator reporting', 'Package P&L, cash, KPIs, and executive commentary into cleaner reporting loops.']
+};
+const [title, description] = copy['bizforma'];
+---
+<BaseLayout title={title + ' — Insight Hunter'}>
+  <section class="section">
+    <div class="container prose">
+      <div class="eyebrow">Feature detail</div>
+      <h1 class="page-title">{title}</h1>
+      <p class="lead">{description}</p>
+      <div class="card">
+        <p>Insight Hunter is designed to reduce swivel-chair work across finance operations and improve decision quality with a cleaner operating surface.</p>
+        <p>This page is part of the generated restore scaffold and should be expanded with product-specific screenshots, workflows, and CTA paths during final integration.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

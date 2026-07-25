@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "insighthunter-main",
+  "main": "./dist/_worker.js/index.js",
+  "compatibility_date": "2026-07-25",
+  "assets": {
+    "directory": "./dist"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "PUBLIC_SITE_URL": "https://insighthunter.app",
+    "PUBLIC_AUTH_URL": "https://auth.insighthunter.app",
+    "PUBLIC_APP_NAME": "Insight Hunter"
+  }
+}

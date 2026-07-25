@@ -17,8 +17,8 @@ export class ImportSessionDO {
         createdAt: new Date().toISOString(),
       });
       await this.env.DB.prepare(
-        `INSERT OR REPLACE INTO import_sessions (id, status, file_name, object_key, updated_at)
-         VALUES (?, ?, ?, ?, datetime('now'))`
+        'INSERT OR REPLACE INTO import_sessions (id, status, file_name, object_key, updated_at)
+         VALUES (?, ?, ?, ?, datetime('now'))'
       ).bind(body.sessionId, 'uploaded', body.fileName, body.objectKey).run();
       return Response.json({ ok: true, sessionId: body.sessionId });
     }
@@ -34,9 +34,9 @@ export class ImportSessionDO {
     if (request.method === 'POST' && url.pathname === '/import/review') {
       const payload = await request.json<any>();
       await this.env.DB.prepare(
-        `UPDATE import_rows
+        'UPDATE import_rows
          SET normalized_description = ?, normalized_amount = ?, normalized_date = ?, category = ?, confidence = ?, review_status = ?, updated_at = datetime('now')
-         WHERE id = ? AND session_id = ?`
+         WHERE id = ? AND session_id = ?'
       ).bind(
         payload.normalized_description,
         payload.normalized_amount,
@@ -48,8 +48,8 @@ export class ImportSessionDO {
         payload.sessionId
       ).run();
       await this.env.DB.prepare(
-        `INSERT INTO review_actions (id, session_id, row_id, action_type, payload)
-         VALUES (?, ?, ?, ?, ?)`
+        'INSERT INTO review_actions (id, session_id, row_id, action_type, payload)
+         VALUES (?, ?, ?, ?, ?)'
       ).bind(crypto.randomUUID(), payload.sessionId, payload.rowId, 'review', JSON.stringify(payload)).run();
       return Response.json({ ok: true });
     }
@@ -57,7 +57,7 @@ export class ImportSessionDO {
     if (request.method === 'POST' && url.pathname === '/import/commit') {
       const payload = await request.json<any>();
       await this.env.DB.prepare(
-        `UPDATE import_sessions SET status = ?, updated_at = datetime('now') WHERE id = ?`
+        'UPDATE import_sessions SET status = ?, updated_at = datetime('now') WHERE id = ?'
       ).bind('committed', payload.sessionId).run();
       await this.state.storage.put('committed', { committedAt: new Date().toISOString() });
       return Response.json({ ok: true, committed: true });

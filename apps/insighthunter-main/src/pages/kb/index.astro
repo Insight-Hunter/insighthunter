@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+const items = await getCollection('kb');
+---
+<BaseLayout title="Knowledge Base — Insight Hunter">
+  <section class="section">
+    <div class="container">
+      <div class="eyebrow">Knowledge Base</div>
+      <h1 class="page-title">Reference material, workflows, and answers.</h1>
+      <div class="grid cards-2">
+        {items.map((item) => (
+          <article class="card">
+            <div class="eyebrow">{item.data.section}</div>
+            <h2>{item.data.title}</h2>
+            <p>{item.data.description}</p>
+            <a class="btn btn-secondary" href={`/kb/${item.slug}`}>Open article</a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -58,7 +58,7 @@ app.route("/api/wizard", wizard);
 
 // ── Cloudflare Scheduled Trigger (cron) ──────────────────────────────────────
 async function scheduled(event: ScheduledEvent, env: BizformaEnv): Promise<void> {
-  console.log(`[scheduled] cron=${event.cron} at=${new Date().toISOString()}`);
+  console.log('[scheduled] cron=${event.cron} at=${new Date().toISOString()}');
 
   // Daily 9am UTC: dispatch compliance reminders to queue
   if (event.cron === "0 9 * * *") {
@@ -84,9 +84,9 @@ async function queue(
   if (queueName === "insighthunter-bizforma-pdf") {
     for (const msg of batch.messages) {
       const job = msg.body as { type: string; doc_id: string; r2_key: string };
-      console.log(`[pdf-queue] Processing ${job.type} for doc ${job.doc_id}`);
+      console.log('[pdf-queue] Processing ${job.type} for doc ${job.doc_id}');
       await env.DB.prepare(
-        `UPDATE bizforma_documents SET status = 'ready', updated_at = datetime('now') WHERE id = ?`
+        'UPDATE bizforma_documents SET status = 'ready', updated_at = datetime('now') WHERE id = ?'
       ).bind(job.doc_id).run();
       msg.ack();
     }

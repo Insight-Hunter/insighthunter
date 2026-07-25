@@ -12,8 +12,8 @@ interface AiTextResult {
 }
 
 function cacheKey(prefix: string, data: Record<string, unknown>): string {
-  const sorted = Object.keys(data).sort().map((k) => `${k}=${data[k]}`).join("&");
-  return `ai:${prefix}:${sorted}`;
+  const sorted = Object.keys(data).sort().map((k) => '${k}=${data[k]}').join("&");
+  return 'ai:${prefix}:${sorted}';
 }
 
 export async function getEntityRecommendation(env: BizformaEnv, params: {
@@ -28,7 +28,7 @@ export async function getEntityRecommendation(env: BizformaEnv, params: {
   const cached = await env.CACHE.get(key);
   if (cached) return JSON.parse(cached);
 
-  const prompt = `You are a business formation advisor for small businesses in the United States.
+  const prompt = 'You are a business formation advisor for small businesses in the United States.
 
 A client wants to form a business with these details:
 - State: ${params.state}
@@ -40,7 +40,7 @@ A client wants to form a business with these details:
 
 Recommend the best entity type (LLC, S-Corp, C-Corp, Sole Proprietorship, or Partnership).
 Respond ONLY as valid JSON with keys: recommendation (string), rationale (string, 2 sentences max), pros (array of 3 strings), cons (array of 3 strings).
-Do not include markdown or explanation outside the JSON.`;
+Do not include markdown or explanation outside the JSON.';
 
   const result = await env.AI.run(MODEL, {
     prompt,
@@ -68,7 +68,7 @@ export async function getNameSuggestions(env: BizformaEnv, params: {
   const cached = await env.CACHE.get(key);
   if (cached) return JSON.parse(cached);
 
-  const prompt = `You are helping a small business owner name their new ${params.entity_type} in ${params.state}.
+  const prompt = 'You are helping a small business owner name their new ${params.entity_type} in ${params.state}.
 
 Keywords they want to convey: ${params.keywords.join(", ")}
 Industry: ${params.industry ?? "general business"}
@@ -77,7 +77,7 @@ Generate 5 creative, available-sounding business names. Each name should be memo
 Also provide 3 tips for checking name availability in ${params.state}.
 
 Respond ONLY as valid JSON with keys: suggestions (array of 5 strings, just the name without entity suffix), tips (array of 3 strings).
-Do not include markdown or explanation outside the JSON.`;
+Do not include markdown or explanation outside the JSON.';
 
   const result = await env.AI.run(MODEL, {
     prompt,
@@ -103,13 +103,13 @@ export async function getOperatingAgreementClauses(env: BizformaEnv, params: {
   const cached = await env.CACHE.get(key);
   if (cached) return JSON.parse(cached);
 
-  const prompt = `Generate key clauses for a ${params.entity_type} Operating Agreement for "${params.business_name}" in ${params.state} with ${params.owners} owner(s).
+  const prompt = 'Generate key clauses for a ${params.entity_type} Operating Agreement for "${params.business_name}" in ${params.state} with ${params.owners} owner(s).
 
 Include these sections: Purpose, Management Structure, Capital Contributions, Profit Distribution, Voting Rights, Dissolution.
 Keep each clause concise (2-3 sentences). Use plain English, not legalese.
 
 Respond ONLY as valid JSON with key: clauses (array of objects with keys: section (string), content (string)).
-Do not include markdown or explanation outside the JSON.`;
+Do not include markdown or explanation outside the JSON.';
 
   const result = await env.AI.run(MODEL, {
     prompt,
@@ -134,7 +134,7 @@ function buildFallbackRecommendation(params: {
 
   return {
     recommendation: rec,
-    rationale: `Based on ${params.owners} owner(s) and estimated revenue, a ${rec} offers the best balance of liability protection and tax efficiency.`,
+    rationale: 'Based on ${params.owners} owner(s) and estimated revenue, a ${rec} offers the best balance of liability protection and tax efficiency.',
     pros: ["Limited liability protection", "Pass-through taxation", "Flexible management structure"],
     cons: ["Annual filing requirements", "State fees apply", "May require registered agent"],
   };
@@ -144,11 +144,11 @@ function buildFallbackNames(params: { keywords: string[]; entity_type: string; s
   const kw = params.keywords[0] ?? "Apex";
   return {
     suggestions: [
-      `${kw} Ventures`, `${kw} Group`, `${kw} Solutions`,
-      `${kw} Partners`, `${kw} Enterprises`,
+      '${kw} Ventures', '${kw} Group', '${kw} Solutions',
+      '${kw} Partners', '${kw} Enterprises',
     ],
     tips: [
-      `Search the ${params.state} Secretary of State business name database online.`,
+      'Search the ${params.state} Secretary of State business name database online.',
       "Check USPTO trademark database for conflicts at tmsearch.uspto.gov.",
       "Verify the .com domain is available before finalizing your name.",
     ],

@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { features } from '../../data/site';
+---
+<BaseLayout title="Features — Insight Hunter">
+  <section class="section">
+    <div class="container">
+      <div class="eyebrow">Features</div>
+      <h1 class="page-title">What the platform actually helps you do.</h1>
+      <div class="grid cards-2">
+        {features.map((feature) => (
+          <article class="card">
+            <h2>{feature.title}</h2>
+            <p>{feature.summary}</p>
+            <a class="btn btn-secondary" href={`/features/${feature.slug}`}>Open page</a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

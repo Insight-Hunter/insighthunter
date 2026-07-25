@@ -13,10 +13,10 @@ export async function handleImportJob(message: Message<any>, env: Env, ctx: Exec
   for (const parsed of parsedRows) {
     const normalized = normalizeBankRow(parsed);
     await env.DB.prepare(
-      `INSERT INTO import_rows (
+      'INSERT INTO import_rows (
         id, session_id, row_index, source_date, source_description, source_amount,
         normalized_description, normalized_amount, normalized_date, category, confidence, review_status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     ).bind(
       crypto.randomUUID(),
       sessionId,
@@ -34,7 +34,7 @@ export async function handleImportJob(message: Message<any>, env: Env, ctx: Exec
   }
 
   await env.DB.prepare(
-    `UPDATE import_sessions SET status = ?, row_count = ?, updated_at = datetime('now') WHERE id = ?`
+    'UPDATE import_sessions SET status = ?, row_count = ?, updated_at = datetime('now') WHERE id = ?'
   ).bind('parsed', parsedRows.length, sessionId).run();
 }
 

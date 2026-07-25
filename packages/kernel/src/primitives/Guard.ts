@@ -6,7 +6,7 @@ export function againstNullOrUndefined<T>(
   name: string,
 ): Result<T, ValidationError> {
   if (value === null || value === undefined) {
-    return Result.fail(new ValidationError(`${name} is required.`, { name }));
+    return Result.fail(new ValidationError('${name} is required.', { name }));
   }
 
   return Result.ok(value);
@@ -14,7 +14,7 @@ export function againstNullOrUndefined<T>(
 
 export function againstEmptyString(value: string, name: string): Result<string, ValidationError> {
   if (value.trim().length === 0) {
-    return Result.fail(new ValidationError(`${name} cannot be empty.`, { name }));
+    return Result.fail(new ValidationError('${name} cannot be empty.', { name }));
   }
 
   return Result.ok(value);
@@ -28,7 +28,7 @@ export function againstOutOfRange(
 ): Result<number, ValidationError> {
   if (value < min || value > max) {
     return Result.fail(
-      new ValidationError(`${name} must be between ${min} and ${max}.`, {
+      new ValidationError('${name} must be between ${min} and ${max}.', {
         name,
         min,
         max,
@@ -62,7 +62,7 @@ export function guardAll(
 
 /**
  * Namespace object kept for backward-compatibility with call sites that use
- * `Guard.againstNullOrUndefined(...)` etc.
+ * 'Guard.againstNullOrUndefined(...)' etc.
  */
 export const Guard = {
   againstNullOrUndefined,

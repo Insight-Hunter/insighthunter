@@ -24,8 +24,8 @@ The package contains dependency-free DDD primitives:
 
 ## Scripts
 
-- `pnpm --filter @insighthunter/kernel build`
-- `pnpm --filter @insighthunter/kernel typecheck`
-- `pnpm --filter @insighthunter/kernel test`
-- `pnpm --filter @insighthunter/kernel lint`
+- 'pnpm --filter @insighthunter/kernel build'
+- 'pnpm --filter @insighthunter/kernel typecheck'
+- 'pnpm --filter @insighthunter/kernel test'
+- 'pnpm --filter @insighthunter/kernel lint'
 

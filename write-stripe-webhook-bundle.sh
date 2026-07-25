@@ -136,7 +136,7 @@ function getPriceIdForPlan(planCode: string, env: StripeEnv): string {
     case "pro":
       return env.STRIPE_PRO_PRICE_ID;
     default:
-      throw new Error(`Unsupported plan code: ${planCode}`);
+      throw new Error('Unsupported plan code: ${planCode}');
   }
 }
 
@@ -221,7 +221,7 @@ export async function verifyStripeWebhookSignature(
     throw new Error("Stripe webhook signature timestamp outside tolerance.");
   }
 
-  const expected = await hmacSha256Hex(secret, `${timestamp}.${payload}`);
+  const expected = await hmacSha256Hex(secret, '${timestamp}.${payload}');
   const matched = signatures.some((signature) => secureCompareHex(signature, expected));
 
   if (!matched) {
@@ -262,7 +262,7 @@ export async function createStripeCheckoutSession(
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+      Authorization: 'Bearer ${env.STRIPE_SECRET_KEY}',
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: body.toString(),
@@ -270,7 +270,7 @@ export async function createStripeCheckoutSession(
 
   if (!response.ok) {
     const detail = await response.text();
-    throw new Error(`Stripe checkout session creation failed: ${response.status} ${detail}`);
+    throw new Error('Stripe checkout session creation failed: ${response.status} ${detail}');
   }
 
   return (await response.json()) as StripeCheckoutSession;
@@ -348,7 +348,7 @@ const ACTIVE_STATUSES = new Set(["active", "trialing"]);
 const app = new Hono<Env>();
 
 function renderPage(title: string, body: string): string {
-  return `
+  return '
     <!doctype html>
     <html>
       <head>
@@ -369,7 +369,7 @@ function renderPage(title: string, body: string): string {
         <div class="wrap">${body}</div>
       </body>
     </html>
-  `;
+  ';
 }
 
 async function getSession(env: Env["Bindings"], token: string | null) {
@@ -377,7 +377,7 @@ async function getSession(env: Env["Bindings"], token: string | null) {
     return null;
   }
 
-  const response = await fetch(`${env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}`);
+  const response = await fetch('${env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}');
 
   if (!response.ok) {
     return null;
@@ -439,7 +439,7 @@ async function findCustomerByStripeCustomerId(db: D1Database, stripeCustomerId: 
 }
 
 async function getLatestSubscription(db: D1Database, customerId: string) {
-  return db.prepare(`
+  return db.prepare('
     SELECT
       id,
       customer_id,
@@ -458,7 +458,7 @@ async function getLatestSubscription(db: D1Database, customerId: string) {
     WHERE customer_id = ?
     ORDER BY updated_at DESC, created_at DESC
     LIMIT 1
-  `).bind(customerId).first<SubscriptionRow>();
+  ').bind(customerId).first<SubscriptionRow>();
 }
 
 function normalizeSubscriptionStatus(status: string | null | undefined): string {
@@ -494,7 +494,7 @@ async function writePendingCheckout(
 ) {
   const now = new Date().toISOString();
 
-  await db.prepare(`
+  await db.prepare('
     INSERT INTO subscriptions (
       id,
       customer_id,
@@ -514,7 +514,7 @@ async function writePendingCheckout(
       status = excluded.status,
       stripe_customer_id = excluded.stripe_customer_id,
       updated_at = excluded.updated_at
-  `).bind(
+  ').bind(
     crypto.randomUUID(),
     input.customerId,
     input.planCode,
@@ -549,7 +549,7 @@ async function upsertSubscriptionFromCheckout(db: D1Database, session: StripeChe
     await ensureCustomer(db, customer.user_id, customer.email, stripeCustomerId);
   }
 
-  await db.prepare(`
+  await db.prepare('
     INSERT INTO subscriptions (
       id,
       customer_id,
@@ -571,7 +571,7 @@ async function upsertSubscriptionFromCheckout(db: D1Database, session: StripeChe
       stripe_customer_id = excluded.stripe_customer_id,
       stripe_subscription_id = excluded.stripe_subscription_id,
       updated_at = excluded.updated_at
-  `).bind(
+  ').bind(
     crypto.randomUUID(),
     customer.id,
     metadata.plan_code ?? "starter",
@@ -608,7 +608,7 @@ async function upsertSubscriptionFromStripe(db: D1Database, subscription: Stripe
   const onboardingStatus = ACTIVE_STATUSES.has(status) ? "ready" : "pending";
   const now = new Date().toISOString();
 
-  await db.prepare(`
+  await db.prepare('
     INSERT INTO subscriptions (
       id,
       customer_id,
@@ -633,7 +633,7 @@ async function upsertSubscriptionFromStripe(db: D1Database, subscription: Stripe
       current_period_end = excluded.current_period_end,
       canceled_at = excluded.canceled_at,
       updated_at = excluded.updated_at
-  `).bind(
+  ').bind(
     crypto.randomUUID(),
     customerId,
     planCode,
@@ -655,18 +655,18 @@ app.get("/", (c) => {
   const loginUrl = getLoginRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL);
   const registerUrl = getRegisterRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL);
 
-  return c.html(renderPage("Insight Hunter", `
+  return c.html(renderPage("Insight Hunter", '
     <h1>Insight Hunter</h1>
     <p class="muted">AI-powered finance, compliance, and operations for growing businesses.</p>
     <p><a class="button" href="${registerUrl}">Create account</a> <a class="button" href="${loginUrl}">Log in</a></p>
     <p><a class="button" href="/pricing">See pricing</a></p>
-  `));
+  '));
 });
 
 app.get("/pricing", (c) => {
   const defaultAppCode = c.env.DEFAULT_APP_CODE || "bizforma";
 
-  return c.html(renderPage("Pricing", `
+  return c.html(renderPage("Pricing", '
     <h1>Pricing</h1>
     <div class="cards">
       <div class="card">
@@ -688,13 +688,13 @@ app.get("/pricing", (c) => {
         <a class="button" href="/start?plan=pro&app=${encodeURIComponent(defaultAppCode)}">Choose Pro</a>
       </div>
     </div>
-  `));
+  '));
 });
 
 app.get("/start", (c) => {
   const plan = c.req.query("plan") ?? "starter";
   const appCode = c.req.query("app") ?? c.env.DEFAULT_APP_CODE ?? "bizforma";
-  const callbackPath = `/auth/callback?app=${encodeURIComponent(appCode)}`;
+  const callbackPath = '/auth/callback?app=${encodeURIComponent(appCode)}';
 
   return c.redirect(
     getRegisterRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL, callbackPath, plan),
@@ -712,12 +712,12 @@ app.get("/auth/callback", async (c) => {
   }
 
   const response = c.redirect(
-    `/checkout/start?plan=${encodeURIComponent(plan)}&app=${encodeURIComponent(appCode)}`,
+    '/checkout/start?plan=${encodeURIComponent(plan)}&app=${encodeURIComponent(appCode)}',
     302,
   );
   response.headers.append(
     "Set-Cookie",
-    `ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`,
+    'ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800',
   );
 
   return response;
@@ -735,9 +735,9 @@ app.get("/checkout/start", async (c) => {
 
   const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
   const successUrl =
-    `${c.env.MAIN_BASE_URL}/checkout/success?plan=${encodeURIComponent(plan)}&app=${encodeURIComponent(appCode)}&session_id={CHECKOUT_SESSION_ID}`;
+    '${c.env.MAIN_BASE_URL}/checkout/success?plan=${encodeURIComponent(plan)}&app=${encodeURIComponent(appCode)}&session_id={CHECKOUT_SESSION_ID}';
   const cancelUrl =
-    `${c.env.MAIN_BASE_URL}/checkout/cancel?plan=${encodeURIComponent(plan)}&app=${encodeURIComponent(appCode)}`;
+    '${c.env.MAIN_BASE_URL}/checkout/cancel?plan=${encodeURIComponent(plan)}&app=${encodeURIComponent(appCode)}';
 
   const stripeSession = await createStripeCheckoutSession(c.env, {
     planCode: plan,
@@ -780,7 +780,7 @@ app.get("/checkout/success", async (c) => {
 
   const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
   const latest = sessionId
-    ? await c.env.DB.prepare(`
+    ? await c.env.DB.prepare('
         SELECT
           id,
           customer_id,
@@ -798,29 +798,29 @@ app.get("/checkout/success", async (c) => {
         FROM subscriptions
         WHERE stripe_checkout_session_id = ?
         LIMIT 1
-      `).bind(sessionId).first<SubscriptionRow>()
+      ').bind(sessionId).first<SubscriptionRow>()
     : await getLatestSubscription(c.env.DB, customer.id);
 
   if (latest && ACTIVE_STATUSES.has(latest.status)) {
-    return c.redirect(`/onboarding?app=${encodeURIComponent(latest.app_code)}`, 302);
+    return c.redirect('/onboarding?app=${encodeURIComponent(latest.app_code)}', 302);
   }
 
-  return c.html(renderPage("Checkout received", `
+  return c.html(renderPage("Checkout received", '
     <h1>Payment received</h1>
     <p class="muted">We are confirming your subscription with Stripe.</p>
     <p class="warn">If this page does not move you forward within a few seconds, open onboarding manually.</p>
     <p><a class="button" href="/onboarding?app=${encodeURIComponent(appCode)}">Continue</a></p>
-  `));
+  '));
 });
 
 app.get("/checkout/cancel", (c) => {
   const plan = c.req.query("plan") ?? "starter";
 
-  return c.html(renderPage("Checkout canceled", `
+  return c.html(renderPage("Checkout canceled", '
     <h1>Checkout canceled</h1>
     <p class="muted">Your ${plan} checkout was canceled.</p>
     <p><a class="button" href="/pricing">Return to pricing</a></p>
-  `));
+  '));
 });
 
 app.get("/onboarding", async (c) => {
@@ -846,7 +846,7 @@ app.get("/onboarding", async (c) => {
   ).bind("complete", new Date().toISOString(), subscription.id).run();
 
   if (appCode === "bizforma") {
-    return c.redirect(`${c.env.GATEWAY_BASE_URL}/handoff?app=bizforma`, 302);
+    return c.redirect('${c.env.GATEWAY_BASE_URL}/handoff?app=bizforma', 302);
   }
 
   return c.redirect("/dashboard?welcome=1", 302);

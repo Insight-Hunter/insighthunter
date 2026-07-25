@@ -22,13 +22,13 @@ export function assertInvariant(condition: boolean, message: string): asserts co
 
 function stableStringify(value: unknown): string {
   if (Array.isArray(value)) {
-    return `[${value.map((item) => stableStringify(item)).join(",")}]`;
+    return '[${value.map((item) => stableStringify(item)).join(",")}]';
   }
 
   if (value !== null && typeof value === "object") {
     const record = value as Record<string, unknown>;
     const keys = Object.keys(record).sort();
-    return `{${keys.map((key) => `${key}:${stableStringify(record[key])}`).join(",")}}`;
+    return '{${keys.map((key) => '${key}:${stableStringify(record[key])}').join(",")}}';
   }
 
   return JSON.stringify(value);

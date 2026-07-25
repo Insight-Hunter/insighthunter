@@ -84,7 +84,7 @@ export async function createStripeCheckoutSession(input: CreateCheckoutSessionIn
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${input.secretKey}`,
+      Authorization: 'Bearer ${input.secretKey}',
       "Content-Type": "application/x-www-form-urlencoded"
     },
     body
@@ -92,7 +92,7 @@ export async function createStripeCheckoutSession(input: CreateCheckoutSessionIn
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`Stripe checkout session failed: ${response.status} ${text}`);
+    throw new Error('Stripe checkout session failed: ${response.status} ${text}');
   }
 
   const payload = await response.json() as { id: string; url: string };
@@ -114,7 +114,7 @@ export async function verifyStripeWebhookSignature(
 
   const timestamp = timestampPart.slice(2);
   const signature = v1Part.slice(3);
-  const signedPayload = `${timestamp}.${payload}`;
+  const signedPayload = '${timestamp}.${payload}';
 
   const key = await crypto.subtle.importKey(
     "raw",
@@ -191,12 +191,12 @@ export function registerWebhookRoutes(app: Hono<Env>) {
         ).bind(checkoutSessionId).first<{ id: string }>();
 
         if (!existing) {
-          await c.env.DB.prepare(`
+          await c.env.DB.prepare('
             INSERT INTO subscriptions (
               id, customer_id, plan_code, status, stripe_subscription_id,
               stripe_checkout_session_id, created_at, updated_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          `).bind(
+          ').bind(
             crypto.randomUUID(),
             customerId,
             planCode,
@@ -220,11 +220,11 @@ export function registerWebhookRoutes(app: Hono<Env>) {
         : null;
       const now = new Date().toISOString();
 
-      await c.env.DB.prepare(`
+      await c.env.DB.prepare('
         UPDATE subscriptions
         SET status = ?, cancel_at_period_end = ?, current_period_end = ?, updated_at = ?
         WHERE stripe_subscription_id = ?
-      `).bind(
+      ').bind(
         status,
         cancelAtPeriodEnd,
         currentPeriodEnd,
@@ -237,11 +237,11 @@ export function registerWebhookRoutes(app: Hono<Env>) {
       const stripeSubscriptionId = String(object.id ?? "");
       const now = new Date().toISOString();
 
-      await c.env.DB.prepare(`
+      await c.env.DB.prepare('
         UPDATE subscriptions
         SET status = ?, updated_at = ?
         WHERE stripe_subscription_id = ?
-      `).bind(
+      ').bind(
         "canceled",
         now,
         stripeSubscriptionId
@@ -281,7 +281,7 @@ async function getSession(env: Env["Bindings"], token: string | null) {
     return null;
   }
 
-  const response = await fetch(`${env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}`);
+  const response = await fetch('${env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}');
 
   if (!response.ok) {
     return null;
@@ -308,20 +308,20 @@ export function registerOnboardingRoutes(app: Hono<Env>) {
       return c.redirect("/pricing", 302);
     }
 
-    const subscription = await c.env.DB.prepare(`
+    const subscription = await c.env.DB.prepare('
       SELECT plan_code, status
       FROM subscriptions
       WHERE customer_id = ?
       ORDER BY updated_at DESC
       LIMIT 1
-    `).bind(customer.id).first<{ plan_code: string; status: string }>();
+    ').bind(customer.id).first<{ plan_code: string; status: string }>();
 
     if (!subscription || subscription.status !== "active") {
       return c.redirect("/pricing", 302);
     }
 
     if (subscription.plan_code === "pro" || subscription.plan_code === "growth") {
-      return c.redirect(`${c.env.GATEWAY_BASE_URL}/handoff?app=bizforma`, 302);
+      return c.redirect('${c.env.GATEWAY_BASE_URL}/handoff?app=bizforma', 302);
     }
 
     return c.redirect("/dashboard", 302);
@@ -366,7 +366,7 @@ type Env = {
 const app = new Hono<Env>();
 
 function renderPage(title: string, body: string): string {
-  return `
+  return '
     <!doctype html>
     <html>
       <head>
@@ -386,7 +386,7 @@ function renderPage(title: string, body: string): string {
         <div class="wrap">${body}</div>
       </body>
     </html>
-  `;
+  ';
 }
 
 async function getSession(env: Env["Bindings"], token: string | null) {
@@ -394,7 +394,7 @@ async function getSession(env: Env["Bindings"], token: string | null) {
     return null;
   }
 
-  const response = await fetch(`${env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}`);
+  const response = await fetch('${env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}');
 
   if (!response.ok) {
     return null;
@@ -450,16 +450,16 @@ app.get("/", (c) => {
   const loginUrl = getLoginRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL);
   const registerUrl = getRegisterRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL);
 
-  return c.html(renderPage("Insight Hunter", `
+  return c.html(renderPage("Insight Hunter", '
     <h1>Insight Hunter</h1>
     <p class="muted">AI-powered finance, compliance, and operations for growing businesses.</p>
     <p><a class="button" href="${registerUrl}">Create account</a> <a class="button" href="${loginUrl}">Log in</a></p>
     <p><a class="button" href="/pricing">See pricing</a></p>
-  `));
+  '));
 });
 
 app.get("/pricing", (c) => {
-  return c.html(renderPage("Pricing", `
+  return c.html(renderPage("Pricing", '
     <h1>Pricing</h1>
     <div class="cards">
       <div class="card">
@@ -481,7 +481,7 @@ app.get("/pricing", (c) => {
         <a class="button" href="/start?plan=pro">Choose Pro</a>
       </div>
     </div>
-  `));
+  '));
 });
 
 app.get("/start", (c) => {
@@ -497,8 +497,8 @@ app.get("/auth/callback", async (c) => {
     return c.redirect("/pricing", 302);
   }
 
-  const response = c.redirect(`/checkout/start?plan=${encodeURIComponent(plan)}`, 302);
-  response.headers.append("Set-Cookie", `ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`);
+  const response = c.redirect('/checkout/start?plan=${encodeURIComponent(plan)}', 302);
+  response.headers.append("Set-Cookie", 'ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800');
   return response;
 });
 
@@ -534,21 +534,21 @@ app.get("/checkout/start", async (c) => {
 app.get("/checkout/success", async (c) => {
   const plan = c.req.query("plan") ?? "starter";
 
-  return c.html(renderPage("Processing payment", `
+  return c.html(renderPage("Processing payment", '
     <h1>Processing payment</h1>
     <p class="muted">Your ${plan} checkout completed. We are confirming billing now.</p>
     <p><a class="button" href="/onboarding">Continue</a></p>
-  `));
+  '));
 });
 
 app.get("/checkout/cancel", (c) => {
   const plan = c.req.query("plan") ?? "starter";
 
-  return c.html(renderPage("Checkout canceled", `
+  return c.html(renderPage("Checkout canceled", '
     <h1>Checkout canceled</h1>
     <p class="muted">Your ${plan} checkout was canceled.</p>
     <p><a class="button" href="/pricing">Return to pricing</a></p>
-  `));
+  '));
 });
 
 app.get("/dashboard", async (c) => {
@@ -560,13 +560,13 @@ app.get("/dashboard", async (c) => {
   }
 
   const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
-  const subscription = await c.env.DB.prepare(`
+  const subscription = await c.env.DB.prepare('
     SELECT plan_code, status, current_period_end, cancel_at_period_end, updated_at
     FROM subscriptions
     WHERE customer_id = ?
     ORDER BY updated_at DESC
     LIMIT 1
-  `).bind(customer.id).first<{
+  ').bind(customer.id).first<{
     plan_code: string;
     status: string;
     current_period_end?: string | null;
@@ -578,7 +578,7 @@ app.get("/dashboard", async (c) => {
     return c.redirect("/pricing", 302);
   }
 
-  return c.html(renderPage("Dashboard", `
+  return c.html(renderPage("Dashboard", '
     <h1>Welcome back</h1>
     <p class="muted">${session.user.email}</p>
     <div class="card">
@@ -589,7 +589,7 @@ app.get("/dashboard", async (c) => {
       <p class="muted">Cancel at period end: ${subscription.cancel_at_period_end ? "yes" : "no"}</p>
     </div>
     <p><a class="button" href="/onboarding">Continue to app</a></p>
-  `));
+  '));
 });
 
 registerWebhookRoutes(app);
@@ -626,7 +626,7 @@ mode = "smart"
 [observability.logs]
 enabled = true
 
-# Set these with `wrangler secret put`
+# Set these with 'wrangler secret put'
 # STRIPE_SECRET_KEY
 # STRIPE_WEBHOOK_SECRET
 EOF

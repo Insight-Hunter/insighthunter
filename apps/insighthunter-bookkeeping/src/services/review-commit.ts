@@ -9,10 +9,10 @@ export type ReviewCommitPayload = {
 };
 
 export function buildReviewSql() {
-  return `
+  return '
     UPDATE import_rows
     SET normalized_description = ?, normalized_amount = ?, normalized_date = ?, category = ?, confidence = ?, review_status = ?, updated_at = datetime('now')
     WHERE id = ? AND session_id = ?
-  `;
+  ';
 }
 

@@ -36,7 +36,7 @@ export class NotFoundError extends DomainError {
   constructor(entity: string, id: string) {
     super({
       code: "domain.not_found",
-      message: `${entity} was not found`,
+      message: '${entity} was not found',
       metadata: { entity, id },
     });
     this.name = "NotFoundError";

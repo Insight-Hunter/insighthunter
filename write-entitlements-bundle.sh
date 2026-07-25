@@ -143,11 +143,11 @@ export async function syncEntitlementsForSubscription(
 
   if (!subscriptionCanGrantEntitlements(subscription.status)) {
     await db.prepare(
-      `UPDATE entitlements
+      'UPDATE entitlements
        SET status = 'inactive',
            expires_at = COALESCE(?, expires_at, ?),
            updated_at = ?
-       WHERE subscription_id = ?`
+       WHERE subscription_id = ?'
     ).bind(
       subscription.current_period_end ?? null,
       now,
@@ -161,11 +161,11 @@ export async function syncEntitlementsForSubscription(
   const features = getPlanFeatures(subscription.plan_code);
 
   await db.prepare(
-    `UPDATE entitlements
+    'UPDATE entitlements
      SET status = 'inactive',
          expires_at = COALESCE(?, expires_at),
          updated_at = ?
-     WHERE subscription_id = ?`
+     WHERE subscription_id = ?'
   ).bind(
     subscription.current_period_end ?? null,
     now,
@@ -174,22 +174,22 @@ export async function syncEntitlementsForSubscription(
 
   for (const featureKey of features) {
     const existing = await db.prepare(
-      `SELECT id
+      'SELECT id
        FROM entitlements
        WHERE customer_id = ? AND feature_key = ?
-       LIMIT 1`
+       LIMIT 1'
     ).bind(subscription.customer_id, featureKey).first<{ id: string }>();
 
     if (existing?.id) {
       await db.prepare(
-        `UPDATE entitlements
+        'UPDATE entitlements
          SET subscription_id = ?,
              status = 'active',
              source = 'plan',
              expires_at = ?,
              metadata_json = ?,
              updated_at = ?
-         WHERE id = ?`
+         WHERE id = ?'
       ).bind(
         subscription.id,
         subscription.current_period_end ?? null,
@@ -201,7 +201,7 @@ export async function syncEntitlementsForSubscription(
     }
 
     await db.prepare(
-      `INSERT INTO entitlements (
+      'INSERT INTO entitlements (
         id,
         customer_id,
         subscription_id,
@@ -213,7 +213,7 @@ export async function syncEntitlementsForSubscription(
         metadata_json,
         created_at,
         updated_at
-      ) VALUES (?, ?, ?, ?, 'active', 'plan', ?, ?, ?, ?, ?)`
+      ) VALUES (?, ?, ?, ?, 'active', 'plan', ?, ?, ?, ?, ?)'
     ).bind(
       crypto.randomUUID(),
       subscription.customer_id,
@@ -234,13 +234,13 @@ export async function customerHasEntitlement(
   featureKey: FeatureKey,
 ): Promise<boolean> {
   const row = await db.prepare(
-    `SELECT id
+    'SELECT id
      FROM entitlements
      WHERE customer_id = ?
        AND feature_key = ?
        AND status = 'active'
        AND (expires_at IS NULL OR expires_at >= ?)
-     LIMIT 1`
+     LIMIT 1'
   ).bind(customerId, featureKey, new Date().toISOString()).first<{ id: string }>();
 
   return Boolean(row?.id);
@@ -272,7 +272,7 @@ export async function getSession(
     return null;
   }
 
-  const response = await fetch(`${authBaseUrl}/session/${encodeURIComponent(token)}`);
+  const response = await fetch('${authBaseUrl}/session/${encodeURIComponent(token)}');
 
   if (!response.ok) {
     return null;
@@ -380,10 +380,10 @@ entitlements.get("/api/entitlements", async (c) => {
   const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
 
   const rows = await c.env.DB.prepare(
-    `SELECT feature_key, status, source, expires_at, metadata_json
+    'SELECT feature_key, status, source, expires_at, metadata_json
      FROM entitlements
      WHERE customer_id = ?
-     ORDER BY feature_key ASC`
+     ORDER BY feature_key ASC'
   ).bind(customer.id).all<{
     results: Array<{
       feature_key: string;
@@ -471,7 +471,7 @@ onboarding.get("/onboarding/route", async (c) => {
       return c.redirect("/pricing", 302);
     }
 
-    return c.redirect(`${c.env.GATEWAY_BASE_URL}/handoff?app=bizforma`, 302);
+    return c.redirect('${c.env.GATEWAY_BASE_URL}/handoff?app=bizforma', 302);
   }
 
   return c.redirect("/dashboard", 302);
@@ -539,8 +539,8 @@ async function insertBillingEvent(
   payload: string,
 ) {
   await db.prepare(
-    `INSERT INTO billing_events (id, provider, provider_event_id, event_type, payload_json, processed_at)
-     VALUES (?, 'stripe', ?, ?, ?, ?)`
+    'INSERT INTO billing_events (id, provider, provider_event_id, event_type, payload_json, processed_at)
+     VALUES (?, 'stripe', ?, ?, ?, ?)'
   ).bind(
     crypto.randomUUID(),
     eventId,
@@ -563,16 +563,16 @@ async function upsertSubscriptionFromCheckout(
 
   const now = new Date().toISOString();
   const existingByCheckout = await db.prepare(
-    `SELECT id FROM subscriptions WHERE stripe_checkout_session_id = ? LIMIT 1`
+    'SELECT id FROM subscriptions WHERE stripe_checkout_session_id = ? LIMIT 1'
   ).bind(checkout.id).first<{ id: string }>();
 
   if (existingByCheckout?.id) {
     await db.prepare(
-      `UPDATE subscriptions
+      'UPDATE subscriptions
        SET status = ?,
            stripe_subscription_id = COALESCE(?, stripe_subscription_id),
            updated_at = ?
-       WHERE id = ?`
+       WHERE id = ?'
     ).bind(
       "active",
       checkout.subscription ?? null,
@@ -581,9 +581,9 @@ async function upsertSubscriptionFromCheckout(
     ).run();
 
     const sub = await db.prepare(
-      `SELECT id, customer_id, plan_code, status, current_period_end
+      'SELECT id, customer_id, plan_code, status, current_period_end
        FROM subscriptions
-       WHERE id = ? LIMIT 1`
+       WHERE id = ? LIMIT 1'
     ).bind(existingByCheckout.id).first<{
       id: string;
       customer_id: string;
@@ -600,20 +600,20 @@ async function upsertSubscriptionFromCheckout(
   }
 
   const latestCustomerPlan = await db.prepare(
-    `SELECT id FROM subscriptions
+    'SELECT id FROM subscriptions
      WHERE customer_id = ? AND plan_code = ?
      ORDER BY updated_at DESC
-     LIMIT 1`
+     LIMIT 1'
   ).bind(customerId, planCode).first<{ id: string }>();
 
   if (latestCustomerPlan?.id) {
     await db.prepare(
-      `UPDATE subscriptions
+      'UPDATE subscriptions
        SET status = ?,
            stripe_subscription_id = COALESCE(?, stripe_subscription_id),
            stripe_checkout_session_id = COALESCE(?, stripe_checkout_session_id),
            updated_at = ?
-       WHERE id = ?`
+       WHERE id = ?'
     ).bind(
       "active",
       checkout.subscription ?? null,
@@ -623,9 +623,9 @@ async function upsertSubscriptionFromCheckout(
     ).run();
 
     const sub = await db.prepare(
-      `SELECT id, customer_id, plan_code, status, current_period_end
+      'SELECT id, customer_id, plan_code, status, current_period_end
        FROM subscriptions
-       WHERE id = ? LIMIT 1`
+       WHERE id = ? LIMIT 1'
     ).bind(latestCustomerPlan.id).first<{
       id: string;
       customer_id: string;
@@ -644,10 +644,10 @@ async function upsertSubscriptionFromCheckout(
   const newId = crypto.randomUUID();
 
   await db.prepare(
-    `INSERT INTO subscriptions (
+    'INSERT INTO subscriptions (
       id, customer_id, plan_code, status, stripe_subscription_id, stripe_checkout_session_id,
       billing_provider, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, 'stripe', ?, ?)`
+    ) VALUES (?, ?, ?, ?, ?, ?, 'stripe', ?, ?)'
   ).bind(
     newId,
     customerId,
@@ -660,9 +660,9 @@ async function upsertSubscriptionFromCheckout(
   ).run();
 
   const sub = await db.prepare(
-    `SELECT id, customer_id, plan_code, status, current_period_end
+    'SELECT id, customer_id, plan_code, status, current_period_end
      FROM subscriptions
-     WHERE id = ? LIMIT 1`
+     WHERE id = ? LIMIT 1'
   ).bind(newId).first<{
     id: string;
     customer_id: string;
@@ -691,7 +691,7 @@ async function updateSubscriptionLifecycle(
   const canceledAt = unixToIso(subscription.canceled_at);
 
   const existing = await db.prepare(
-    `SELECT id FROM subscriptions WHERE stripe_subscription_id = ? LIMIT 1`
+    'SELECT id FROM subscriptions WHERE stripe_subscription_id = ? LIMIT 1'
   ).bind(subscription.id).first<{ id: string }>();
 
   let targetId: string | null = null;
@@ -700,7 +700,7 @@ async function updateSubscriptionLifecycle(
     targetId = existing.id;
 
     await db.prepare(
-      `UPDATE subscriptions
+      'UPDATE subscriptions
        SET status = ?,
            plan_code = ?,
            current_period_start = ?,
@@ -708,7 +708,7 @@ async function updateSubscriptionLifecycle(
            cancel_at_period_end = ?,
            canceled_at = ?,
            updated_at = ?
-       WHERE id = ?`
+       WHERE id = ?'
     ).bind(
       subscription.status ?? "incomplete",
       planCode,
@@ -729,10 +729,10 @@ async function updateSubscriptionLifecycle(
     targetId = crypto.randomUUID();
 
     await db.prepare(
-      `INSERT INTO subscriptions (
+      'INSERT INTO subscriptions (
         id, customer_id, plan_code, status, stripe_subscription_id, billing_provider,
         current_period_start, current_period_end, cancel_at_period_end, canceled_at, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, 'stripe', ?, ?, ?, ?, ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, 'stripe', ?, ?, ?, ?, ?, ?)'
     ).bind(
       targetId,
       customerId,
@@ -753,9 +753,9 @@ async function updateSubscriptionLifecycle(
   }
 
   const sub = await db.prepare(
-    `SELECT id, customer_id, plan_code, status, current_period_end
+    'SELECT id, customer_id, plan_code, status, current_period_end
      FROM subscriptions
-     WHERE id = ? LIMIT 1`
+     WHERE id = ? LIMIT 1'
   ).bind(targetId).first<{
     id: string;
     customer_id: string;
@@ -843,7 +843,7 @@ app.route("/", webhooks);
 app.route("/", entitlementsRoutes);
 
 function renderPage(title: string, body: string): string {
-  return `
+  return '
     <!doctype html>
     <html>
       <head>
@@ -863,7 +863,7 @@ function renderPage(title: string, body: string): string {
         <div class="wrap">${body}</div>
       </body>
     </html>
-  `;
+  ';
 }
 
 function getPriceId(env: Env["Bindings"], plan: string): string {
@@ -884,16 +884,16 @@ app.get("/", (c) => {
   const loginUrl = getLoginRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL);
   const registerUrl = getRegisterRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL);
 
-  return c.html(renderPage("Insight Hunter", `
+  return c.html(renderPage("Insight Hunter", '
     <h1>Insight Hunter</h1>
     <p class="muted">AI-powered finance, compliance, and operations for growing businesses.</p>
     <p><a class="button" href="${registerUrl}">Create account</a> <a class="button" href="${loginUrl}">Log in</a></p>
     <p><a class="button" href="/pricing">See pricing</a></p>
-  `));
+  '));
 });
 
 app.get("/pricing", (c) => {
-  return c.html(renderPage("Pricing", `
+  return c.html(renderPage("Pricing", '
     <h1>Pricing</h1>
     <div class="cards">
       <div class="card">
@@ -915,7 +915,7 @@ app.get("/pricing", (c) => {
         <a class="button" href="/start?plan=pro&product=bizforma">Choose Pro</a>
       </div>
     </div>
-  `));
+  '));
 });
 
 app.get("/start", (c) => {
@@ -936,8 +936,8 @@ app.get("/auth/callback", async (c) => {
     return c.redirect("/pricing", 302);
   }
 
-  const response = c.redirect(`/checkout/start?plan=${encodeURIComponent(plan)}&product=${encodeURIComponent(product)}`, 302);
-  response.headers.append("Set-Cookie", `ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`);
+  const response = c.redirect('/checkout/start?plan=${encodeURIComponent(plan)}&product=${encodeURIComponent(product)}', 302);
+  response.headers.append("Set-Cookie", 'ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800');
   return response;
 });
 
@@ -992,18 +992,18 @@ app.get("/checkout/start", async (c) => {
 
   const now = new Date().toISOString();
   const existingPending = await c.env.DB.prepare(
-    `SELECT id FROM subscriptions
+    'SELECT id FROM subscriptions
      WHERE customer_id = ? AND plan_code = ? AND status IN ('pending', 'incomplete')
      ORDER BY updated_at DESC
-     LIMIT 1`
+     LIMIT 1'
   ).bind(customer.id, plan).first<{ id: string }>();
 
   if (existingPending?.id) {
     await c.env.DB.prepare(
-      `UPDATE subscriptions
+      'UPDATE subscriptions
        SET stripe_checkout_session_id = ?,
            updated_at = ?
-       WHERE id = ?`
+       WHERE id = ?'
     ).bind(
       checkout.id,
       now,
@@ -1011,9 +1011,9 @@ app.get("/checkout/start", async (c) => {
     ).run();
   } else {
     await c.env.DB.prepare(
-      `INSERT INTO subscriptions (
+      'INSERT INTO subscriptions (
         id, customer_id, plan_code, status, stripe_checkout_session_id, billing_provider, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, 'stripe', ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, 'stripe', ?, ?)'
     ).bind(
       crypto.randomUUID(),
       customer.id,
@@ -1039,32 +1039,32 @@ app.get("/checkout/success", async (c) => {
 
   const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
   const subscription = await c.env.DB.prepare(
-    `SELECT plan_code, status
+    'SELECT plan_code, status
      FROM subscriptions
      WHERE customer_id = ?
      ORDER BY updated_at DESC
-     LIMIT 1`
+     LIMIT 1'
   ).bind(customer.id).first<{ plan_code: string; status: string }>();
 
   if (!subscription || (subscription.status !== "active" && subscription.status !== "trialing")) {
-    return c.html(renderPage("Processing subscription", `
+    return c.html(renderPage("Processing subscription", '
       <h1>Payment received</h1>
       <p class="muted">We are confirming your subscription. Refresh in a few seconds.</p>
       <p><a class="button" href="/checkout/success?plan=${encodeURIComponent(plan)}&product=${encodeURIComponent(product)}">Refresh status</a></p>
-    `));
+    '));
   }
 
-  return c.redirect(`/onboarding/route?plan=${encodeURIComponent(subscription.plan_code)}&product=${encodeURIComponent(product)}`, 302);
+  return c.redirect('/onboarding/route?plan=${encodeURIComponent(subscription.plan_code)}&product=${encodeURIComponent(product)}', 302);
 });
 
 app.get("/checkout/cancel", (c) => {
   const plan = c.req.query("plan") ?? "starter";
 
-  return c.html(renderPage("Checkout canceled", `
+  return c.html(renderPage("Checkout canceled", '
     <h1>Checkout canceled</h1>
     <p class="muted">Your ${plan} checkout was canceled.</p>
     <p><a class="button" href="/pricing">Return to pricing</a></p>
-  `));
+  '));
 });
 
 app.get("/dashboard", async (c) => {
@@ -1076,11 +1076,11 @@ app.get("/dashboard", async (c) => {
 
   const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
   const subscription = await c.env.DB.prepare(
-    `SELECT plan_code, status, current_period_end, cancel_at_period_end
+    'SELECT plan_code, status, current_period_end, cancel_at_period_end
      FROM subscriptions
      WHERE customer_id = ?
      ORDER BY updated_at DESC
-     LIMIT 1`
+     LIMIT 1'
   ).bind(customer.id).first<{
     plan_code: string;
     status: string;
@@ -1097,7 +1097,7 @@ app.get("/dashboard", async (c) => {
     return c.redirect("/pricing", 302);
   }
 
-  return c.html(renderPage("Dashboard", `
+  return c.html(renderPage("Dashboard", '
     <h1>Welcome back</h1>
     <p class="muted">${session.user.email}</p>
     <div class="card">
@@ -1115,7 +1115,7 @@ app.get("/dashboard", async (c) => {
       <p class="muted">BizForma app: ${hasBizForma ? "Yes" : "No"}</p>
     </div>
     <p><a class="button" href="${c.env.GATEWAY_BASE_URL}/handoff?app=bizforma">Open BizForma</a></p>
-  `));
+  '));
 });
 
 export default app;
@@ -1156,6 +1156,6 @@ cat > "$APP_DIR/ENTITLEMENTS.md" <<'EOF'
 
 ## Apply schema
 
-```bash
+'''bash
 cd apps/insighthunter-main
 wrangler d1 execute insighthunter_main --file=schema.sql

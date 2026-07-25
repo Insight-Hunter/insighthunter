@@ -4,26 +4,26 @@ Production-oriented monorepo for InsightHunter applications and shared platform 
 
 ## Workspace
 
-- `apps/*` — deployable applications and Workers.
-- `packages/*` — shared domain, platform, SDK, and UI packages.
-- `infrastructure/*` — IaC, deployment, and environment automation.
+- 'apps/*' — deployable applications and Workers.
+- 'packages/*' — shared domain, platform, SDK, and UI packages.
+- 'infrastructure/*' — IaC, deployment, and environment automation.
 
 ## Standards
 
 - Strict TypeScript.
-- No `any`.
+- No 'any'.
 - Domain logic independent of infrastructure.
 - Constructor injection and immutable domain primitives.
 - CI-gated lint, typecheck, test, and build.
 
 ## Commands
 
-- `pnpm install`
-- `pnpm dev`
-- `pnpm lint`
-- `pnpm typecheck`
-- `pnpm test`
-- `pnpm build`
+- 'pnpm install'
+- 'pnpm dev'
+- 'pnpm lint'
+- 'pnpm typecheck'
+- 'pnpm test'
+- 'pnpm build'
 
 ## Current focus
 

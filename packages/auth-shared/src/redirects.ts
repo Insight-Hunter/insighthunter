@@ -1,5 +1,5 @@
 export function ensureTrailingSlash(value: string): string {
-  return value.endsWith("/") ? value : `${value}/`;
+  return value.endsWith("/") ? value : '${value}/';
 }
 export function getLoginRedirectUrl(
   authBaseUrl: string,

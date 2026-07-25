@@ -9,6 +9,6 @@
 - [ ] Typecheck passes.
 - [ ] Tests pass.
 - [ ] Build passes.
-- [ ] No `any` introduced.
+- [ ] No 'any' introduced.
 - [ ] No circular dependencies introduced.
 - [ ] Domain logic remains infrastructure-independent.

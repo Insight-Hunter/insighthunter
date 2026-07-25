@@ -81,23 +81,23 @@ function deriveApp(price: Stripe.Price | null | undefined): string {
 
 async function ensureSchema(db: D1Database) {
   await db.batch([
-    db.prepare(`
+    db.prepare('
       CREATE TABLE IF NOT EXISTS stripe_customers (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         org_id TEXT,
         user_id TEXT,
-        stripe_customer_id TEXT NOT NULL UNIQUE,
+        stripe_organization_id TEXT NOT NULL UNIQUE,
         email TEXT,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
-    `),
-    db.prepare(`
+    '),
+    db.prepare('
       CREATE TABLE IF NOT EXISTS subscriptions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         org_id TEXT NOT NULL,
         app TEXT NOT NULL,
-        stripe_customer_id TEXT NOT NULL,
+        stripe_organization_id TEXT NOT NULL,
         stripe_subscription_id TEXT NOT NULL UNIQUE,
         stripe_price_id TEXT,
         stripe_product_id TEXT,
@@ -110,8 +110,8 @@ async function ensureSchema(db: D1Database) {
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
-    `),
-    db.prepare(`
+    '),
+    db.prepare('
       CREATE TABLE IF NOT EXISTS entitlements (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         org_id TEXT NOT NULL,
@@ -125,8 +125,8 @@ async function ensureSchema(db: D1Database) {
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(org_id, app, feature_code)
       )
-    `),
-    db.prepare(`
+    '),
+    db.prepare('
       CREATE TABLE IF NOT EXISTS webhook_events (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         provider TEXT NOT NULL,
@@ -134,14 +134,14 @@ async function ensureSchema(db: D1Database) {
         event_type TEXT NOT NULL,
         processed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
-    `),
+    '),
   ])
 }
 
 async function alreadyProcessed(db: D1Database, eventId: string) {
   const row = await db
     .prepare(
-      `SELECT event_id FROM webhook_events WHERE provider = 'stripe' AND event_id = ?1 LIMIT 1`
+      'SELECT event_id FROM webhook_events WHERE provider = 'stripe' AND event_id = ?1 LIMIT 1'
     )
     .bind(eventId)
     .first()
@@ -150,11 +150,11 @@ async function alreadyProcessed(db: D1Database, eventId: string) {
 
 async function markProcessed(db: D1Database, eventId: string, eventType: string) {
   await db
-    .prepare(`
+    .prepare('
       INSERT INTO webhook_events (provider, event_id, event_type)
       VALUES ('stripe', ?1, ?2)
       ON CONFLICT(event_id) DO NOTHING
-    `)
+    ')
     .bind(eventId, eventType)
     .run()
 }
@@ -167,15 +167,15 @@ async function upsertCustomer(
   userId?: string | null
 ) {
   await db
-    .prepare(`
-      INSERT INTO stripe_customers (org_id, user_id, stripe_customer_id, email, updated_at)
+    .prepare('
+      INSERT INTO stripe_customers (org_id, user_id, stripe_organization_id, email, updated_at)
       VALUES (?1, ?2, ?3, ?4, CURRENT_TIMESTAMP)
-      ON CONFLICT(stripe_customer_id) DO UPDATE SET
+      ON CONFLICT(stripe_organization_id) DO UPDATE SET
         org_id = excluded.org_id,
         user_id = excluded.user_id,
         email = excluded.email,
         updated_at = CURRENT_TIMESTAMP
-    `)
+    ')
     .bind(orgId, userId ?? null, stripeCustomerId, email ?? null)
     .run()
 }
@@ -188,13 +188,13 @@ async function replaceEntitlements(
   active: boolean
 ) {
   await db
-    .prepare(`
+    .prepare('
       UPDATE entitlements
       SET active = 0,
           revoked_at = CURRENT_TIMESTAMP,
           updated_at = CURRENT_TIMESTAMP
       WHERE org_id = ?1 AND app = ?2
-    `)
+    ')
     .bind(orgId, appName)
     .run()
 
@@ -203,7 +203,7 @@ async function replaceEntitlements(
   const features = PLAN_FEATURES[planCode] ?? []
   for (const featureCode of features) {
     await db
-      .prepare(`
+      .prepare('
         INSERT INTO entitlements (org_id, app, feature_code, source_plan_code, active, granted_at, revoked_at, updated_at)
         VALUES (?1, ?2, ?3, ?4, 1, CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP)
         ON CONFLICT(org_id, app, feature_code) DO UPDATE SET
@@ -211,7 +211,7 @@ async function replaceEntitlements(
           active = 1,
           revoked_at = NULL,
           updated_at = CURRENT_TIMESTAMP
-      `)
+      ')
       .bind(orgId, appName, featureCode, planCode)
       .run()
   }
@@ -226,7 +226,7 @@ async function upsertSubscriptionFromStripe(
   const planCode = derivePlanCode(price)
 
   if (!planCode) {
-    throw new Error(`Could not derive plan_code for subscription ${subscription.id}`)
+    throw new Error('Could not derive plan_code for subscription ${subscription.id}')
   }
 
   const appName = deriveApp(price)
@@ -236,13 +236,13 @@ async function upsertSubscriptionFromStripe(
       : subscription.customer?.id
 
   if (!stripeCustomerId) {
-    throw new Error(`Missing stripe customer for subscription ${subscription.id}`)
+    throw new Error('Missing stripe customer for subscription ${subscription.id}')
   }
 
   const meta = subscription.metadata ?? {}
   const orgId = meta.org_id || price?.metadata?.org_id || ''
   if (!orgId) {
-    throw new Error(`Missing org_id metadata for subscription ${subscription.id}`)
+    throw new Error('Missing org_id metadata for subscription ${subscription.id}')
   }
 
   await upsertCustomer(
@@ -254,9 +254,9 @@ async function upsertSubscriptionFromStripe(
   )
 
   await db
-    .prepare(`
+    .prepare('
       INSERT INTO subscriptions (
-        org_id, app, stripe_customer_id, stripe_subscription_id, stripe_price_id, stripe_product_id,
+        org_id, app, stripe_organization_id, stripe_subscription_id, stripe_price_id, stripe_product_id,
         plan_code, status, current_period_start, current_period_end, cancel_at_period_end, canceled_at,
         updated_at
       )
@@ -264,7 +264,7 @@ async function upsertSubscriptionFromStripe(
       ON CONFLICT(stripe_subscription_id) DO UPDATE SET
         org_id = excluded.org_id,
         app = excluded.app,
-        stripe_customer_id = excluded.stripe_customer_id,
+        stripe_organization_id = excluded.stripe_organization_id,
         stripe_price_id = excluded.stripe_price_id,
         stripe_product_id = excluded.stripe_product_id,
         plan_code = excluded.plan_code,
@@ -274,7 +274,7 @@ async function upsertSubscriptionFromStripe(
         cancel_at_period_end = excluded.cancel_at_period_end,
         canceled_at = excluded.canceled_at,
         updated_at = CURRENT_TIMESTAMP
-    `)
+    ')
     .bind(
       orgId,
       appName,
@@ -305,17 +305,17 @@ async function deactivateSubscription(
   const orgId = subscription.metadata?.org_id || price?.metadata?.org_id || ''
 
   if (!orgId) {
-    throw new Error(`Missing org_id metadata for canceled subscription ${subscription.id}`)
+    throw new Error('Missing org_id metadata for canceled subscription ${subscription.id}')
   }
 
   await db
-    .prepare(`
+    .prepare('
       UPDATE subscriptions
       SET status = ?2,
           canceled_at = ?3,
           updated_at = CURRENT_TIMESTAMP
       WHERE stripe_subscription_id = ?1
-    `)
+    ')
     .bind(
       subscription.id,
       subscription.status,
@@ -418,12 +418,12 @@ app.post('/webhooks/stripe', async (c) => {
 
         if (subscriptionId) {
           await c.env.DB
-            .prepare(`
+            .prepare('
               UPDATE subscriptions
               SET status = 'past_due',
                   updated_at = CURRENT_TIMESTAMP
               WHERE stripe_subscription_id = ?1
-            `)
+            ')
             .bind(subscriptionId)
             .run()
         }

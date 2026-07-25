@@ -1,16 +1,16 @@
 # Pack 3 Install
 
 ## Setup
-```bash
+'''bash
 cd /Users/jamesmichaelhunterturner/insighthunter
 pnpm install
 bash scripts/setup-pack-3.sh
-```
+'''
 
 ## Run checks
-```bash
+'''bash
 pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
-```
+'''

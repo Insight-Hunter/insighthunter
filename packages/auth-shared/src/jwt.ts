@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 // JWT verification using Web Crypto API — works in Cloudflare Workers edge runtime
 // Supports HS256 (shared secret) and RS256 (public key from auth.insighthunter.app JWKS)
 
@@ -61,7 +61,7 @@ export async function verifyHS256(token: string, secret: string): Promise<JWTVer
       ["verify"]
     );
 
-    const signingInput = encoder.encode(`${headerB64}.${payloadB64}`);
+    const signingInput = encoder.encode('${headerB64}.${payloadB64}');
     const signature = base64UrlDecode(signatureB64);
 
     const valid = await crypto.subtle.verify("HMAC", cryptoKey, signature, signingInput);
@@ -89,9 +89,9 @@ export async function verifyRS256(token: string, jwksUrl: string): Promise<JWTVe
     const headerStr = new TextDecoder().decode(base64UrlDecode(headerB64));
     const header = JSON.parse(headerStr) as { alg: string; kid?: string };
 
-    if (header.alg !== "RS256") return { valid: false, error: `unsupported_algorithm:${header.alg}` };
+    if (header.alg !== "RS256") return { valid: false, error: 'unsupported_algorithm:${header.alg}' };
 
-    const cacheKey = `${jwksUrl}:${header.kid ?? "default"}`;
+    const cacheKey = '${jwksUrl}:${header.kid ?? "default"}';
     let publicKey = jwksCache.get(cacheKey);
 
     if (!publicKey) {
@@ -114,7 +114,7 @@ export async function verifyRS256(token: string, jwksUrl: string): Promise<JWTVe
     }
 
     const encoder = new TextEncoder();
-    const signingInput = encoder.encode(`${headerB64}.${payloadB64}`);
+    const signingInput = encoder.encode('${headerB64}.${payloadB64}');
     const signature = base64UrlDecode(signatureB64);
 
     const valid = await crypto.subtle.verify("RSASSA-PKCS1-v1_5", publicKey, signature, signingInput);
@@ -128,7 +128,7 @@ export async function verifyRS256(token: string, jwksUrl: string): Promise<JWTVe
   } catch (err) {
     return { valid: false, error: err instanceof Error ? err.message : "unknown_error" };
   }
-=======
+
 import type { AuthenticatedUser, Jwk, JwksDocument, JwtPayload } from "./types.js";
 
 type JwtHeader = {
@@ -236,7 +236,7 @@ async function getJwks(jwksUrl: string): Promise<JwksDocument> {
   const response = await fetch(jwksUrl);
 
   if (!response.ok) {
-    throw new Error(`Unable to fetch JWKS: ${response.status}`);
+    throw new Error('Unable to fetch JWKS: ${response.status}');
   }
 
   return (await response.json()) as JwksDocument;
@@ -244,7 +244,7 @@ async function getJwks(jwksUrl: string): Promise<JwksDocument> {
 
 function getVerificationAlgorithm(jwk: Jwk): AlgorithmIdentifier {
   if (jwk.kty !== "RSA") {
-    throw new Error(`Unsupported JWK key type: ${jwk.kty}`);
+    throw new Error('Unsupported JWK key type: ${jwk.kty}');
   }
 
   return RS256_VERIFY_ALGORITHM;
@@ -252,7 +252,7 @@ function getVerificationAlgorithm(jwk: Jwk): AlgorithmIdentifier {
 
 async function importVerificationKey(jwk: Jwk): Promise<CryptoKey> {
   if (jwk.kty !== "RSA") {
-    throw new Error(`Unsupported JWK key type: ${jwk.kty}`);
+    throw new Error('Unsupported JWK key type: ${jwk.kty}');
   }
 
   const subtle = getSubtleCrypto();
@@ -272,7 +272,7 @@ async function importVerificationKey(jwk: Jwk): Promise<CryptoKey> {
 
 async function verifySignature(token: string, jwk: Jwk): Promise<boolean> {
   const [headerSegment, payloadSegment, signatureSegment] = splitToken(token);
-  const signingInput = `${headerSegment}.${payloadSegment}`;
+  const signingInput = '${headerSegment}.${payloadSegment}';
   const signature = base64UrlDecode(signatureSegment);
   const subtle = getSubtleCrypto();
   const key = await importVerificationKey(jwk);
@@ -344,5 +344,4 @@ export function createRemoteJwksVerifier(options: JwtVerifierOptions): JwtVerifi
 
 export async function verifyJwt(token: string, options: JwtVerifierOptions): Promise<AuthenticatedUser> {
   return verifyJwtToken(token, options);
->>>>>>> 3c37f2b (auth and main)
 }

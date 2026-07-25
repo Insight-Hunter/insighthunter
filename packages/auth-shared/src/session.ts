@@ -1,11 +1,11 @@
 export function createSessionCookie(token: string, maxAgeSeconds: number): string {
   return [
-    `ih_session=${token}`,
+    'ih_session=${token}',
     "Path=/",
     "HttpOnly",
     "Secure",
     "SameSite=Lax",
-    `Max-Age=${maxAgeSeconds}`,
+    'Max-Age=${maxAgeSeconds}',
   ].join("; ");
 }
 

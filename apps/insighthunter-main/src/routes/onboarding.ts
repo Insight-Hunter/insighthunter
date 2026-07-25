@@ -1,40 +1,36 @@
-import { Hono } from "hono";
-import { customerHasEntitlement } from "../authz/entitlements.js";
-import { FEATURE_KEYS } from "../authz/plans.js";
-import { ensureCustomer, getSession } from "../authz/session.js";
+// apps/insighthunter-main/src/routes/onboarding.ts
+import { Hono } from 'hono';
+import { getSession } from '../authz/session.js';
 
 type Env = {
   Bindings: {
     AUTH_BASE_URL: string;
-    MAIN_BASE_URL: string;
-    GATEWAY_BASE_URL: string;
-    DB: D1Database;
   };
 };
 
 const onboarding = new Hono<Env>();
 
-onboarding.get("/onboarding/route", async (c) => {
-  const product = c.req.query("product") ?? "main";
+onboarding.get('/api/onboarding', async (c) => {
   const session = await getSession(c.env.AUTH_BASE_URL, c.req.raw);
 
-  if (!session || !session.user.email) {
-    return c.redirect("/pricing", 302);
+  if (!session) {
+    return c.json(
+      {
+        ok: false,
+        error: 'unauthenticated',
+      },
+      401,
+    );
   }
 
-  const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
-
-  if (product === "bizforma") {
-    const canUseBizForma = await customerHasEntitlement(c.env.DB, customer.id, FEATURE_KEYS.APP_BIZFORMA);
-
-    if (!canUseBizForma) {
-      return c.redirect("/pricing", 302);
-    }
-
-    return c.redirect('${c.env.GATEWAY_BASE_URL}/handoff?app=bizforma', 302);
-  }
-
-  return c.redirect("/dashboard", 302);
+  return c.json({
+    ok: true,
+    onboarding: {
+      userId: session.user.subject,
+      email: session.user.email ?? null,
+      status: 'ready',
+    },
+  });
 });
 
 export default onboarding;

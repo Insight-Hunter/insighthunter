@@ -22,11 +22,11 @@ export async function processReminderBatch(
   for (const msg of batch.messages) {
     const job = msg.body;
     try {
-      console.log(`[reminder-consumer] type=${job.type} case=${job.case_id} event=${job.event_id} due=${job.due_date}`);
+      console.log('[reminder-consumer] type=${job.type} case=${job.case_id} event=${job.event_id} due=${job.due_date}');
 
       // Mark reminder as sent in DB
       await env.DB.prepare(
-        `UPDATE compliance_events SET reminder_sent = 1, updated_at = datetime('now') WHERE id = ? AND tenant_id = ?`
+        'UPDATE compliance_events SET reminder_sent = 1, updated_at = datetime('now') WHERE id = ? AND tenant_id = ?'
       ).bind(job.event_id, job.tenant_id).run();
 
       // Track analytics
@@ -44,7 +44,7 @@ export async function processReminderBatch(
 
       msg.ack();
     } catch (err) {
-      console.error(`[reminder-consumer] failed for event ${job.event_id}:`, err);
+      console.error('[reminder-consumer] failed for event ${job.event_id}:', err);
       msg.retry({ delaySeconds: 300 });
     }
   }
@@ -62,11 +62,11 @@ export async function dispatchUpcomingReminders(env: BizformaEnv): Promise<void>
     const dateStr = targetDate.toISOString().split("T")[0];
 
     const { results } = await env.DB.prepare(
-      `SELECT ce.id, ce.formation_case_id, ce.tenant_id, ce.event_type, ce.title, ce.due_date,
+      'SELECT ce.id, ce.formation_case_id, ce.tenant_id, ce.event_type, ce.title, ce.due_date,
               fc.user_id
        FROM compliance_events ce
        JOIN formation_cases fc ON fc.id = ce.formation_case_id
-       WHERE ce.due_date = ? AND ce.status = 'pending' AND ce.reminder_sent = 0`
+       WHERE ce.due_date = ? AND ce.status = 'pending' AND ce.reminder_sent = 0'
     ).bind(dateStr).all<{
       id: string; formation_case_id: string; tenant_id: string;
       event_type: string; title: string; due_date: string; user_id: string;
@@ -86,6 +86,6 @@ export async function dispatchUpcomingReminders(env: BizformaEnv): Promise<void>
       await env.REMINDER_QUEUE.send(job);
     }
 
-    console.log(`[reminder-dispatcher] queued ${results.length} reminders for ${dateStr} (${days}d threshold)`);
+    console.log('[reminder-dispatcher] queued ${results.length} reminders for ${dateStr} (${days}d threshold)');
   }
 }

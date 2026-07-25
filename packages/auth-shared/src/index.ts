@@ -3,13 +3,13 @@ export { createRemoteJwksVerifier, verifyJwt } from "./jwt.js";
 export function getLoginRedirectUrl(returnTo?: string): string {
   const base = "https://auth.insighthunter.app/login";
   if (!returnTo) return base;
-  return `${base}?returnTo=${encodeURIComponent(returnTo)}`;
+  return '${base}?returnTo=${encodeURIComponent(returnTo)}';
 }
 
 export function getRegisterRedirectUrl(returnTo?: string): string {
   const base = "https://auth.insighthunter.app/register";
   if (!returnTo) return base;
-  return `${base}?returnTo=${encodeURIComponent(returnTo)}`;
+  return '${base}?returnTo=${encodeURIComponent(returnTo)}';
 }
 
 export function extractSessionToken(request: Request, cookieName = "ih_session"): string | null {

@@ -124,12 +124,12 @@ EOF
 cat > "$REPO/packages/auth-shared/src/session.ts" <<'EOF'
 export function createSessionCookie(token: string, maxAgeSeconds: number): string {
   return [
-    `ih_session=${token}`,
+    'ih_session=${token}',
     "Path=/",
     "HttpOnly",
     "Secure",
     "SameSite=Lax",
-    `Max-Age=${maxAgeSeconds}`
+    'Max-Age=${maxAgeSeconds}'
   ].join("; ");
 }
 
@@ -147,7 +147,7 @@ EOF
 
 cat > "$REPO/packages/auth-shared/src/redirects.ts" <<'EOF'
 export function ensureTrailingSlash(value: string): string {
-  return value.endsWith("/") ? value : `${value}/`;
+  return value.endsWith("/") ? value : '${value}/';
 }
 
 export function getLoginRedirectUrl(authBaseUrl: string, appBaseUrl: string, callbackPath = "/auth/callback"): string {
@@ -253,7 +253,7 @@ app.get("/login", (c) => {
   const redirectUri = c.req.query("redirect_uri") ?? "https://insighthunter.app/auth/callback";
   const plan = c.req.query("plan") ?? "";
 
-  return c.html(`
+  return c.html('
     <!doctype html>
     <html>
       <body style="font-family:sans-serif;padding:40px">
@@ -266,14 +266,14 @@ app.get("/login", (c) => {
         </form>
       </body>
     </html>
-  `);
+  ');
 });
 
 app.get("/register", (c) => {
   const redirectUri = c.req.query("redirect_uri") ?? "https://insighthunter.app/auth/callback";
   const plan = c.req.query("plan") ?? "";
 
-  return c.html(`
+  return c.html('
     <!doctype html>
     <html>
       <body style="font-family:sans-serif;padding:40px">
@@ -286,7 +286,7 @@ app.get("/register", (c) => {
         </form>
       </body>
     </html>
-  `);
+  ');
 });
 
 app.post("/callback", async (c) => {
@@ -334,13 +334,13 @@ app.post("/callback", async (c) => {
 app.get("/session/:token", async (c) => {
   const token = c.req.param("token");
 
-  const row = await c.env.DB.prepare(`
+  const row = await c.env.DB.prepare('
     SELECT sessions.token, sessions.expires_at, users.id as user_id, users.email
     FROM sessions
     JOIN users ON users.id = sessions.user_id
     WHERE sessions.token = ?
     LIMIT 1
-  `).bind(token).first<{ token: string; expires_at: string; user_id: string; email: string }>();
+  ').bind(token).first<{ token: string; expires_at: string; user_id: string; email: string }>();
 
   if (!row) {
     return c.json({ ok: false, error: "not_found" }, 404);
@@ -475,7 +475,7 @@ async function requireAuth(c: any, next: () => Promise<void>) {
     return c.json({ error: "unauthorized" }, 401);
   }
 
-  const response = await fetch(`${c.env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}`);
+  const response = await fetch('${c.env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}');
 
   if (!response.ok) {
     return c.json({ error: "invalid_session" }, 401);
@@ -621,7 +621,7 @@ type Env = {
 const app = new Hono<Env>();
 
 function renderPage(title: string, body: string): string {
-  return `
+  return '
     <!doctype html>
     <html>
       <head>
@@ -641,7 +641,7 @@ function renderPage(title: string, body: string): string {
         <div class="wrap">${body}</div>
       </body>
     </html>
-  `;
+  ';
 }
 
 async function getSession(env: Env["Bindings"], token: string | null) {
@@ -649,7 +649,7 @@ async function getSession(env: Env["Bindings"], token: string | null) {
     return null;
   }
 
-  const response = await fetch(`${env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}`);
+  const response = await fetch('${env.AUTH_BASE_URL}/session/${encodeURIComponent(token)}');
 
   if (!response.ok) {
     return null;
@@ -692,16 +692,16 @@ app.get("/", (c) => {
   const loginUrl = getLoginRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL);
   const registerUrl = getRegisterRedirectUrl(c.env.AUTH_BASE_URL, c.env.MAIN_BASE_URL);
 
-  return c.html(renderPage("Insight Hunter", `
+  return c.html(renderPage("Insight Hunter", '
     <h1>Insight Hunter</h1>
     <p class="muted">AI-powered finance, compliance, and operations for growing businesses.</p>
     <p><a class="button" href="${registerUrl}">Create account</a> <a class="button" href="${loginUrl}">Log in</a></p>
     <p><a class="button" href="/pricing">See pricing</a></p>
-  `));
+  '));
 });
 
 app.get("/pricing", (c) => {
-  return c.html(renderPage("Pricing", `
+  return c.html(renderPage("Pricing", '
     <h1>Pricing</h1>
     <div class="cards">
       <div class="card">
@@ -723,7 +723,7 @@ app.get("/pricing", (c) => {
         <a class="button" href="/start?plan=pro">Choose Pro</a>
       </div>
     </div>
-  `));
+  '));
 });
 
 app.get("/start", (c) => {
@@ -739,8 +739,8 @@ app.get("/auth/callback", async (c) => {
     return c.redirect("/pricing", 302);
   }
 
-  const response = c.redirect(`/checkout/start?plan=${encodeURIComponent(plan)}`, 302);
-  response.headers.append("Set-Cookie", `ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`);
+  const response = c.redirect('/checkout/start?plan=${encodeURIComponent(plan)}', 302);
+  response.headers.append("Set-Cookie", 'ih_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800');
   return response;
 });
 
@@ -781,11 +781,11 @@ app.get("/checkout/success", async (c) => {
   const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
   const now = new Date().toISOString();
 
-  await c.env.DB.prepare(`
+  await c.env.DB.prepare('
     INSERT INTO subscriptions (
       id, customer_id, plan_code, status, created_at, updated_at
     ) VALUES (?, ?, ?, ?, ?, ?)
-  `).bind(
+  ').bind(
     crypto.randomUUID(),
     customer.id,
     plan,
@@ -794,21 +794,21 @@ app.get("/checkout/success", async (c) => {
     now
   ).run();
 
-  return c.html(renderPage("Subscription active", `
+  return c.html(renderPage("Subscription active", '
     <h1>Subscription active</h1>
     <p class="muted">Your ${plan} subscription is now active.</p>
     <p><a class="button" href="/dashboard">Go to dashboard</a></p>
-  `));
+  '));
 });
 
 app.get("/checkout/cancel", (c) => {
   const plan = c.req.query("plan") ?? "starter";
 
-  return c.html(renderPage("Checkout canceled", `
+  return c.html(renderPage("Checkout canceled", '
     <h1>Checkout canceled</h1>
     <p class="muted">Your ${plan} checkout was canceled.</p>
     <p><a class="button" href="/pricing">Return to pricing</a></p>
-  `));
+  '));
 });
 
 app.get("/dashboard", async (c) => {
@@ -820,19 +820,19 @@ app.get("/dashboard", async (c) => {
   }
 
   const customer = await ensureCustomer(c.env.DB, session.user.subject, session.user.email);
-  const subscription = await c.env.DB.prepare(`
+  const subscription = await c.env.DB.prepare('
     SELECT plan_code, status, created_at
     FROM subscriptions
     WHERE customer_id = ?
     ORDER BY created_at DESC
     LIMIT 1
-  `).bind(customer.id).first<{ plan_code: string; status: string; created_at: string }>();
+  ').bind(customer.id).first<{ plan_code: string; status: string; created_at: string }>();
 
   if (!subscription || subscription.status !== "active") {
     return c.redirect("/pricing", 302);
   }
 
-  return c.html(renderPage("Dashboard", `
+  return c.html(renderPage("Dashboard", '
     <h1>Welcome back</h1>
     <p class="muted">${session.user.email}</p>
     <div class="card">
@@ -841,7 +841,7 @@ app.get("/dashboard", async (c) => {
       <p class="muted">Status: ${subscription.status}</p>
     </div>
     <p><a class="button" href="${c.env.GATEWAY_BASE_URL}/handoff?app=bizforma">Open BizForma</a></p>
-  `));
+  '));
 });
 
 export default app;

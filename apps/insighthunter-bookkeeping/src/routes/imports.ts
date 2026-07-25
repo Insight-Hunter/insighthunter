@@ -11,7 +11,7 @@ export async function router(request: Request, env: Env, ctx: ExecutionContext):
     }
 
     const sessionId = crypto.randomUUID();
-    const objectKey = `imports/${sessionId}/${file.name}`;
+    const objectKey = 'imports/${sessionId}/${file.name}';
     await env.IMPORTS.put(objectKey, file.stream(), {
       httpMetadata: { contentType: file.type || 'text/csv' },
       customMetadata: {

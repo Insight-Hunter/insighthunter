@@ -68,7 +68,7 @@ accountsRoutes.patch("/accounts/:id", async (c) => {
 
   values.push(id, orgId);
   await c.env.DB.prepare(
-    `UPDATE accounts SET ${fields.join(", ")} WHERE id = ? AND organization_id = ?`,
+    'UPDATE accounts SET ${fields.join(", ")} WHERE id = ? AND organization_id = ?',
   )
     .bind(...values)
     .run();
