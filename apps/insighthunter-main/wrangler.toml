@@ -17,7 +17,7 @@ database_id = "04854880-81f5-4c02-b555-905a34492b92"
 # Then replace the id below with the returned value
 [[kv_namespaces]]
 binding = "RATE_LIMIT_KV"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "11bb640530264ada82ee25b9547bed47"
 
 # ── Environment Variables ─────────────────────────────────────────────────────
 [vars]
