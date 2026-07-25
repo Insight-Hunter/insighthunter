@@ -3,7 +3,8 @@ export interface Props {
   title: string;
   description?: string;
 }
-
+const loginUrl = 'https://auth.insighthunter.app/login';
+const signupUrl = 'https://auth.insighthunter.app/signup';
 const { title, description = 'Insight Hunter — finance intelligence for growing businesses' } = Astro.props;
 ---
 
@@ -20,9 +21,9 @@ const { title, description = 'Insight Hunter — finance intelligence for growin
       <div class="container header-inner">
         <a href="/" class="brand">Insight Hunter</a>
         <nav class="nav-links">
-          <a href="/pricing">Pricing</a>
-          <a href="http://auth.insighthunter.app/login">Log in</a>
-          <a href="http://auth.insighthunter.app/signup" class="cta">Get started</a>
+           <a href="/pricing">Pricing</a>
+           <a href={loginUrl}>Log in</a>
+           <a href={signupUrl} class="cta">Get started</a>
         </nav>
       </div>
     </header>
@@ -163,4 +164,3 @@ const { title, description = 'Insight Hunter — finance intelligence for growin
     }
   }
 </style>
-EOF
