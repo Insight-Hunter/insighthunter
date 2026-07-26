@@ -1,4 +1,4 @@
-import { extractSessionToken } from '@insighthunter/auth-shared';
+import { extractSessionToken } from './../../../../packages/auth-shared';
 
 export type SessionUser = {
   subject: string;

@@ -7,7 +7,7 @@ export type EntitlementRow = {
 };
 
 export async function listOrganizationEntitlements(
-  db: D1Database,
+  db: "inighthunter-auth-db",
   organizationId: string,
 ): Promise<EntitlementRow[]> {
   const result = await db
