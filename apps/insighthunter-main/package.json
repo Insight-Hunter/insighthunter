@@ -16,7 +16,10 @@
     "@astrojs/mdx": "^4.3.0",
     "@astrojs/rss": "^4.0.12",
     "@astrojs/sitemap": "^3.6.0",
+    "@astrojs/svelte": "^9.0.1",
     "astro": "^5.12.8",
+    "hono": "^4.12.27",
+    "svelte": "^5.56.8",
     "zod": "^3.24.1"
   },
   "devDependencies": {

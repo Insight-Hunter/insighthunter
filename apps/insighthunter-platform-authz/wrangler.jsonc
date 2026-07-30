@@ -1,0 +1,21 @@
+{
+  "name": "insighthunter-platform-authz",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-29",
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter-platform",
+      "database_id": "REPLACE_WITH_D1_ID"
+    }
+  ],
+  "vars": {
+    "AUTH_ISSUER": "https://auth.insighthunter.app",
+    "AUTH_AUDIENCE": "insighthunter-app",
+    "AUTH_JWKS_URL": "https://auth.insighthunter.app/.well-known/jwks.json"
+  }
+}
