@@ -1,16 +1,225 @@
 ---
+// apps/insighthunter-main/src/pages/dashboard/index.astro
+// Unified app launcher — replaces placeholder scaffold
+// Fetches /api/dashboard on load; redirects to /login if unauthenticated
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
+
 <BaseLayout title="Dashboard — Insight Hunter">
-  <section class="section">
-    <div class="container">
-      <div class="eyebrow">Dashboard</div>
-      <h1 class="page-title">Operator overview shell.</h1>
-      <div class="grid cards-3">
-        <div class="card"><div class="kicker">Cash runway</div><div class="metric">8.4 mo</div><p>Example dashboard metric in the restore scaffold.</p></div>
-        <div class="card"><div class="kicker">Net margin</div><div class="metric">21%</div><p>Replace these placeholders with live data bindings once backend restore is finished.</p></div>
-        <div class="card"><div class="kicker">Alerts</div><div class="metric">3</div><p>Use this page as the dashboard entry point tied to auth and entitlement state.</p></div>
+  <div id="dashboard-shell" class="dashboard-shell">
+    <!-- Loading state -->
+    <div id="loading" class="loading-screen">
+      <div class="spinner"></div>
+      <p>Loading your workspace…</p>
+    </div>
+
+    <!-- Auth error -->
+    <div id="auth-error" class="hidden">
+      <p>Session expired. <a href="/login">Sign in again</a></p>
+    </div>
+
+    <!-- Main dashboard -->
+    <div id="dashboard-content" class="hidden">
+      <!-- Header -->
+      <header class="dash-header">
+        <div class="dash-header-left">
+          <span class="ih-logo">InsightHunter</span>
+          <span id="org-name" class="org-badge"></span>
+        </div>
+        <div class="dash-header-right">
+          <span id="user-name" class="user-name"></span>
+          <span id="user-role" class="role-badge"></span>
+          <button onclick="signOut()" class="btn-ghost">Sign out</button>
+        </div>
+      </header>
+
+      <!-- Health Score Banner -->
+      <section class="health-banner">
+        <div class="health-left">
+          <div class="health-label">Business Health Score</div>
+          <div class="health-score">
+            <span id="health-number" class="score-number">—</span>
+            <span class="score-max">/100</span>
+            <span id="health-label" class="score-label"></span>
+          </div>
+        </div>
+        <div id="health-breakdown" class="health-breakdown"></div>
+      </section>
+
+      <!-- App Launcher -->
+      <section class="app-launcher">
+        <h2 class="section-title">Your Applications</h2>
+        <div id="app-grid" class="app-grid"></div>
+      </section>
+
+      <!-- Bottom row: notifications + activity -->
+      <div class="dash-bottom">
+        <section class="dash-panel">
+          <h3 class="panel-title">Notifications</h3>
+          <ul id="notifications-list" class="item-list">
+            <li class="empty-state">No new notifications</li>
+          </ul>
+        </section>
+        <section class="dash-panel">
+          <h3 class="panel-title">Recent Activity</h3>
+          <ul id="activity-list" class="item-list">
+            <li class="empty-state">No recent activity</li>
+          </ul>
+        </section>
       </div>
     </div>
-  </section>
+  </div>
 </BaseLayout>
+
+<style>
+  .dashboard-shell { min-height: 100vh; background: #F8FAFC; font-family: system-ui, sans-serif; }
+  .loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 1rem; color: #64748B; }
+  .spinner { width: 2rem; height: 2rem; border: 3px solid #E2E8F0; border-top-color: #4F46E5; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .hidden { display: none !important; }
+
+  /* Header */
+  .dash-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: #fff; border-bottom: 1px solid #E2E8F0; }
+  .ih-logo { font-weight: 700; font-size: 1.1rem; color: #4F46E5; }
+  .org-badge { margin-left: 1rem; font-size: 0.85rem; background: #EEF2FF; color: #4338CA; padding: 0.2rem 0.6rem; border-radius: 999px; }
+  .dash-header-right { display: flex; align-items: center; gap: 1rem; }
+  .user-name { font-weight: 500; font-size: 0.9rem; }
+  .role-badge { font-size: 0.75rem; background: #F1F5F9; color: #475569; padding: 0.15rem 0.5rem; border-radius: 999px; text-transform: capitalize; }
+  .btn-ghost { background: none; border: 1px solid #E2E8F0; padding: 0.3rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; color: #64748B; }
+  .btn-ghost:hover { background: #F8FAFC; }
+
+  /* Health Banner */
+  .health-banner { display: flex; justify-content: space-between; align-items: center; margin: 2rem 2rem 0; padding: 1.5rem 2rem; background: #fff; border-radius: 12px; border: 1px solid #E2E8F0; }
+  .health-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 0.25rem; }
+  .score-number { font-size: 3rem; font-weight: 700; color: #1E293B; }
+  .score-max { font-size: 1.2rem; color: #94A3B8; margin-left: 0.2rem; }
+  .score-label { margin-left: 0.75rem; font-size: 0.9rem; font-weight: 600; color: #059669; }
+  .health-breakdown { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .breakdown-item { text-align: center; }
+  .breakdown-key { font-size: 0.7rem; color: #94A3B8; text-transform: capitalize; }
+  .breakdown-val { font-size: 1rem; font-weight: 600; color: #1E293B; }
+
+  /* App Grid */
+  .app-launcher { margin: 2rem 2rem 0; }
+  .section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 1rem; }
+  .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+  .app-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.5rem; cursor: pointer; transition: all 0.15s; text-decoration: none; display: block; }
+  .app-card:hover { border-color: var(--app-color); box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
+  .app-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+  .app-name { font-weight: 600; font-size: 1rem; color: #1E293B; margin-bottom: 0.25rem; }
+  .app-desc { font-size: 0.8rem; color: #64748B; line-height: 1.4; }
+  .app-tier { margin-top: 0.75rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  .tier1 { color: #4F46E5; }
+  .tier2 { color: #0891B2; }
+
+  /* Bottom panels */
+  .dash-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 2rem 3rem; }
+  .dash-panel { background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.5rem; }
+  .panel-title { font-size: 0.85rem; font-weight: 600; color: #1E293B; margin-bottom: 1rem; }
+  .item-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+  .item-list li { font-size: 0.85rem; color: #475569; padding: 0.4rem 0; border-bottom: 1px solid #F1F5F9; }
+  .empty-state { color: #94A3B8 !important; font-style: italic; border-bottom: none !important; }
+</style>
+
+<script>
+  async function loadDashboard() {
+    const token = localStorage.getItem('ih_token');
+    if (!token) {
+      window.location.href = '/login';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/dashboard', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.status === 401) {
+        localStorage.removeItem('ih_token');
+        window.location.href = '/login';
+        return;
+      }
+
+      if (!res.ok) throw new Error('Dashboard load failed');
+
+      const data = await res.json();
+      renderDashboard(data);
+    } catch (err) {
+      console.error(err);
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('auth-error').classList.remove('hidden');
+    }
+  }
+
+  function renderDashboard(data) {
+    // User/org header
+    document.getElementById('user-name').textContent = data.user.name || data.user.email;
+    document.getElementById('user-role').textContent = data.user.role.replace('_', ' ');
+    document.getElementById('org-name').textContent = data.org.name;
+
+    // Health score
+    document.getElementById('health-number').textContent = data.healthScore.score;
+    document.getElementById('health-label').textContent = data.healthScore.label;
+
+    const breakdown = document.getElementById('health-breakdown');
+    for (const [key, val] of Object.entries(data.healthScore.breakdown)) {
+      const div = document.createElement('div');
+      div.className = 'breakdown-item';
+      div.innerHTML = `
+        <div class="breakdown-key">${key.replace(/_/g, ' ')}</div>
+        <div class="breakdown-val">${Math.round(val)}</div>
+      `;
+      breakdown.appendChild(div);
+    }
+
+    // App grid
+    const grid = document.getElementById('app-grid');
+    for (const app of data.apps) {
+      const a = document.createElement('a');
+      a.href = app.url;
+      a.className = 'app-card';
+      a.style.setProperty('--app-color', app.color);
+      a.innerHTML = `
+        <div class="app-icon">${app.icon}</div>
+        <div class="app-name">${app.name}</div>
+        <div class="app-desc">${app.description}</div>
+        <div class="app-tier ${app.tier}">${app.tier === 'tier1' ? '★ Core' : 'Add-on'}</div>
+      `;
+      grid.appendChild(a);
+    }
+
+    // Notifications
+    if (data.notifications?.length > 0) {
+      const list = document.getElementById('notifications-list');
+      list.innerHTML = '';
+      for (const n of data.notifications) {
+        const li = document.createElement('li');
+        li.textContent = n.title || n.body;
+        list.appendChild(li);
+      }
+    }
+
+    // Activity
+    if (data.recentActivity?.length > 0) {
+      const list = document.getElementById('activity-list');
+      list.innerHTML = '';
+      for (const a of data.recentActivity) {
+        const li = document.createElement('li');
+        const d = new Date(a.created_at).toLocaleDateString();
+        li.textContent = `${a.action} — ${d}`;
+        list.appendChild(li);
+      }
+    }
+
+    // Show dashboard
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('dashboard-content').classList.remove('hidden');
+  }
+
+  function signOut() {
+    localStorage.removeItem('ih_token');
+    window.location.href = '/';
+  }
+
+  loadDashboard();
+</script>

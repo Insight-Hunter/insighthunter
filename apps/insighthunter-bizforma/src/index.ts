@@ -15,7 +15,6 @@ import type { ReminderJob } from "./queues/reminder-consumer.js";
 
 const app = new Hono<{ Bindings: BizformaEnv }>();
 
-// ── Global Middleware ────────────────────────────────────────────────────────
 app.use("*", timing());
 app.use("*", logger());
 app.use("*", secureHeaders());
@@ -36,7 +35,6 @@ app.use(
   })
 );
 
-// ── Public Routes ────────────────────────────────────────────────────────────
 app.get("/health", (c) =>
   c.json({
     service: "insighthunter-bizforma",
@@ -49,7 +47,6 @@ app.get("/health", (c) =>
 
 app.get("/", (c) => c.redirect("https://bizforma.insighthunter.app", 302));
 
-// ── Protected API Routes ─────────────────────────────────────────────────────
 app.use("/api/*", requireAuth);
 
 app.route("/api/formation", formation);
@@ -58,16 +55,13 @@ app.route("/api/dashboard", dashboard);
 app.route("/api/ai", ai);
 app.route("/api/wizard", wizard);
 
-// ── Cloudflare Scheduled Trigger (cron) ──────────────────────────────────────
 async function scheduled(event: ScheduledEvent, env: BizformaEnv): Promise<void> {
   console.log(`[scheduled] cron=${event.cron} at=${new Date().toISOString()}`);
 
-  // Daily 9am UTC: dispatch compliance reminders to queue
   if (event.cron === "0 9 * * *") {
     await dispatchUpcomingReminders(env);
   }
 
-  // Daily midnight UTC: flag overdue events and purge expired wizard sessions
   if (event.cron === "0 0 * * *") {
     const { flagOverdueEvents } = await import("./services/compliance-calendar.js");
     const { purgeExpiredSessions } = await import("./services/wizard-session.js");
@@ -76,7 +70,6 @@ async function scheduled(event: ScheduledEvent, env: BizformaEnv): Promise<void>
   }
 }
 
-// ── Queue Consumer Handler ────────────────────────────────────────────────────
 async function queue(
   batch: MessageBatch<{ type: string; doc_id?: string; r2_key?: string } | ReminderJob>,
   env: BizformaEnv

@@ -6,7 +6,6 @@ type HonoEnv = { Bindings: BizformaEnv; Variables: { auth: AuthContext } };
 
 const formation = new Hono<HonoEnv>();
 
-// GET /api/formation — list all formation cases for the authenticated tenant
 formation.get("/", async (c) => {
   const { tenantId } = c.get("auth");
   const { results } = await c.env.DB.prepare(
@@ -19,7 +18,6 @@ formation.get("/", async (c) => {
   return c.json({ cases: results ?? [] });
 });
 
-// GET /api/formation/:id — get a single formation case with documents and compliance events
 formation.get("/:id", async (c) => {
   const { tenantId } = c.get("auth");
   const id = c.req.param("id");
@@ -53,7 +51,6 @@ formation.get("/:id", async (c) => {
   });
 });
 
-// POST /api/formation — create a new formation case
 formation.post("/", async (c) => {
   const { tenantId, userId } = c.get("auth");
   const body = await c.req.json<{
@@ -98,7 +95,6 @@ formation.post("/", async (c) => {
   return c.json({ id, status: "draft", created_at: now }, 201);
 });
 
-// PATCH /api/formation/:id — update wizard step data or status
 formation.patch("/:id", async (c) => {
   const { tenantId } = c.get("auth");
   const id = c.req.param("id");
@@ -161,7 +157,6 @@ formation.patch("/:id", async (c) => {
   return c.json({ id, updated: true });
 });
 
-// DELETE /api/formation/:id — soft-cancel a formation case
 formation.delete("/:id", async (c) => {
   const { tenantId } = c.get("auth");
   const id = c.req.param("id");
@@ -173,7 +168,6 @@ formation.delete("/:id", async (c) => {
   ).bind(id, tenantId).first<{ id: string; status: string }>();
 
   if (!existing) return c.json({ error: "not_found" }, 404);
-
   if (existing.status === "filed" || existing.status === "approved") {
     return c.json({ error: "cannot_cancel_filed_case" }, 409);
   }
@@ -187,7 +181,6 @@ formation.delete("/:id", async (c) => {
   return c.json({ id, status: "cancelled" });
 });
 
-// POST /api/formation/:id/documents/upload-url — get a signed R2 upload URL
 formation.post("/:id/documents/upload-url", async (c) => {
   const { tenantId, userId } = c.get("auth");
   const id = c.req.param("id");
@@ -234,7 +227,6 @@ formation.post("/:id/documents/upload-url", async (c) => {
   );
 });
 
-// PUT /api/formation/:id/documents/:docId/upload — stream body directly into R2
 formation.put("/:id/documents/:docId/upload", async (c) => {
   const { tenantId } = c.get("auth");
   const caseId = c.req.param("id");

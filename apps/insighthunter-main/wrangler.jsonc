@@ -12,5 +12,31 @@
     "PUBLIC_SITE_URL": "https://insighthunter.app",
     "PUBLIC_AUTH_URL": "https://auth.insighthunter.app",
     "PUBLIC_APP_NAME": "Insight Hunter"
+  },
+
+  "routes": [
+    { "pattern": "insighthunter.app/*", "zone_name": "insighthunter.app" }
+  ],
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter-platform",
+      "database_id": "<YOUR_D1_ID>"
+    }
+  ],
+
+  "kv_namespaces": [
+    { "binding": "AUTH_KV",  "id": "<YOUR_AUTH_KV_ID>" },
+    { "binding": "SESSIONS", "id": "<YOUR_SESSIONS_KV_ID>" }
+  ],
+
+  "vars": {
+    "PUBLIC_SITE_URL": "https://insighthunter.app",
+    "PUBLIC_AUTH_URL": "https://auth.insighthunter.app",
+    "PUBLIC_APP_NAME": "Insight Hunter"
   }
+
+  // Secrets — set via: wrangler secret put JWT_SECRET
+  // JWT_SECRET
 }

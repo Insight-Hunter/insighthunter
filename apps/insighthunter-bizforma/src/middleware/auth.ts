@@ -1,7 +1,12 @@
 import type { Context, Next } from "hono";
-import { extractSessionToken, extractAuthToken, isProbablyBrowserRequest } from "@insighthunter/auth-shared";
-import { verifyHS256, verifyRS256 } from "@insighthunter/auth-shared";
-import type { JWTPayload } from "@insighthunter/auth-shared";
+import {
+  extractSessionToken,
+  extractAuthToken,
+  isProbablyBrowserRequest,
+  verifyHS256,
+  verifyRS256,
+} from "https://github.com/Insight-Hunter/insighthunter/blob/dd4f1507f279ae4ddb19af1dd95bc2b331992ddb/packages/authz/src/index.ts";
+import type { JWTPayload } from "https://github.com/Insight-Hunter/insighthunter/blob/dd4f1507f279ae4ddb19af1dd95bc2b331992ddb/packages/authz/src/index.ts";
 import type { BizformaEnv } from "../types.js";
 
 export type AuthContext = {
@@ -18,8 +23,6 @@ declare module "hono" {
   }
 }
 
-// Verifies session token from cookie OR Bearer JWT from Authorization header.
-// On failure: redirects browser requests to auth.insighthunter.app, returns 401 for API clients.
 export async function requireAuth(c: Context<{ Bindings: BizformaEnv }>, next: Next): Promise<Response | void> {
   const sessionToken = extractSessionToken(c.req.raw);
   const bearerToken = extractAuthToken(c.req.raw);
@@ -31,7 +34,6 @@ export async function requireAuth(c: Context<{ Bindings: BizformaEnv }>, next: N
 
   let payload: JWTPayload | undefined;
 
-  // Try HS256 shared secret first (internal service-to-service)
   if (c.env.JWT_SECRET) {
     const result = await verifyHS256(token, c.env.JWT_SECRET);
     if (result.valid && result.payload) {
@@ -39,7 +41,6 @@ export async function requireAuth(c: Context<{ Bindings: BizformaEnv }>, next: N
     }
   }
 
-  // Fall back to RS256 via JWKS from auth.insighthunter.app
   if (!payload) {
     const jwksUrl = c.env.JWKS_URL ?? "https://auth.insighthunter.app/.well-known/jwks.json";
     const result = await verifyRS256(token, jwksUrl);
@@ -65,7 +66,6 @@ export async function requireAuth(c: Context<{ Bindings: BizformaEnv }>, next: N
   await next();
 }
 
-// Optional auth — sets auth context if token present, never blocks
 export async function optionalAuth(c: Context<{ Bindings: BizformaEnv }>, next: Next): Promise<Response | void> {
   const token = extractSessionToken(c.req.raw) ?? extractAuthToken(c.req.raw);
   if (token) {
@@ -88,7 +88,7 @@ function unauthenticated(c: Context<{ Bindings: BizformaEnv }>, reason: string):
   if (isProbablyBrowserRequest(c.req.raw)) {
     const authUrl = c.env.AUTH_URL ?? "https://auth.insighthunter.app";
     const returnTo = encodeURIComponent(c.req.url);
-    return c.redirect('${authUrl}/login?return_to=${returnTo}', 302);
+    return c.redirect(`${authUrl}/login?return_to=${returnTo}`, 302);
   }
   return c.json({ error: "unauthorized", reason }, 401);
 }

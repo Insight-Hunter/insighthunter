@@ -1,22 +1,17 @@
-// Compliance Calendar Service
-// Generates compliance events from a formation case using state-specific rules.
-// All dates are ISO strings. Events written to D1 compliance_events table.
-
 import type { BizformaEnv } from "../types.js";
 
 export interface ComplianceRule {
   event_type: string;
   title: string;
   description: string;
-  offsetMonths: number; // months after formation date
-  recurringMonths?: number; // if set, repeat every N months
+  offsetMonths: number;
+  recurringMonths?: number;
 }
 
-// State-specific annual report due dates (months after fiscal year end = Dec 31)
 const STATE_ANNUAL_REPORT_MONTH: Record<string, number> = {
-  GA: 4,  // April
-  DE: 3,  // March
-  FL: 5,  // May
+  GA: 4,
+  DE: 3,
+  FL: 5,
   TX: 5,
   CA: 3,
   NY: 3,
@@ -28,7 +23,6 @@ const STATE_ANNUAL_REPORT_MONTH: Record<string, number> = {
 function getBaseRules(entityType: string, state: string, formedAt: string): ComplianceRule[] {
   const annualReportMonth = STATE_ANNUAL_REPORT_MONTH[state] ?? 4;
   const formedDate = new Date(formedAt);
-  // Months until next annual report
   const monthsToAnnual = ((annualReportMonth - 1 - formedDate.getMonth()) + 12) % 12 || 12;
 
   const rules: ComplianceRule[] = [
@@ -41,8 +35,8 @@ function getBaseRules(entityType: string, state: string, formedAt: string): Comp
     },
     {
       event_type: "annual_report",
-      title: '${state} Annual Report / Statement of Information',
-      description: 'File your annual report with the ${state} Secretary of State to maintain active status.',
+      title: `${state} Annual Report / Statement of Information`,
+      description: `File your annual report with the ${state} Secretary of State to maintain active status.`,
       offsetMonths: monthsToAnnual,
       recurringMonths: 12,
     },
@@ -52,17 +46,18 @@ function getBaseRules(entityType: string, state: string, formedAt: string): Comp
     rules.push({
       event_type: "tax_filing",
       title: "Federal Tax Return Due",
-      description: entityType === "C-CORP"
-        ? "Form 1120 — Corporate tax return due April 15 (or Oct 15 with extension)."
-        : "Form 1065 / Schedule K-1 or 1120-S due March 15.",
+      description:
+        entityType === "C-CORP"
+          ? "Form 1120 — Corporate tax return due April 15 (or Oct 15 with extension)."
+          : "Form 1065 / Schedule K-1 or 1120-S due March 15.",
       offsetMonths: entityType === "C-CORP" ? 4 : 3,
       recurringMonths: 12,
     });
 
     rules.push({
       event_type: "tax_filing",
-      title: '${state} State Tax Return Due',
-      description: 'File your ${state} state business tax return.',
+      title: `${state} State Tax Return Due`,
+      description: `File your ${state} state business tax return.`,
       offsetMonths: entityType === "C-CORP" ? 4 : 3,
       recurringMonths: 12,
     });
@@ -105,12 +100,16 @@ export async function seedComplianceCalendar(
       const id = crypto.randomUUID();
       inserts.push(
         db.prepare(
-          'INSERT OR IGNORE INTO compliance_events
+          `INSERT OR IGNORE INTO compliance_events
            (id, formation_case_id, tenant_id, event_type, title, description, due_date, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))'
+           VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
         ).bind(
-          id, caseId, tenantId,
-          rule.event_type, rule.title, rule.description,
+          id,
+          caseId,
+          tenantId,
+          rule.event_type,
+          rule.title,
+          rule.description,
           dueDate.toISOString().split("T")[0]
         ).run()
       );
@@ -131,17 +130,27 @@ export async function getComplianceEvents(
   tenantId: string,
   filter?: { status?: string; from?: string; to?: string }
 ): Promise<Record<string, unknown>[]> {
-  let query = 'SELECT * FROM compliance_events WHERE formation_case_id = ? AND tenant_id = ?';
+  let query = "SELECT * FROM compliance_events WHERE formation_case_id = ? AND tenant_id = ?";
   const bindings: unknown[] = [caseId, tenantId];
 
-  if (filter?.status) { query += " AND status = ?"; bindings.push(filter.status); }
-  if (filter?.from)   { query += " AND due_date >= ?"; bindings.push(filter.from); }
-  if (filter?.to)     { query += " AND due_date <= ?"; bindings.push(filter.to); }
+  if (filter?.status) {
+    query += " AND status = ?";
+    bindings.push(filter.status);
+  }
+  if (filter?.from) {
+    query += " AND due_date >= ?";
+    bindings.push(filter.from);
+  }
+  if (filter?.to) {
+    query += " AND due_date <= ?";
+    bindings.push(filter.to);
+  }
+
   query += " ORDER BY due_date ASC";
 
   const stmt = db.prepare(query);
   const { results } = await stmt.bind(...bindings).all();
-  return results as Record<string, unknown>[];
+  return (results ?? []) as Record<string, unknown>[];
 }
 
 export async function markComplianceEventComplete(
@@ -150,17 +159,20 @@ export async function markComplianceEventComplete(
   tenantId: string
 ): Promise<boolean> {
   const result = await db.prepare(
-    'UPDATE compliance_events SET status = 'completed', completed_at = datetime('now'), updated_at = datetime('now')
-     WHERE id = ? AND tenant_id = ?'
+    `UPDATE compliance_events
+     SET status = 'completed', completed_at = datetime('now'), updated_at = datetime('now')
+     WHERE id = ? AND tenant_id = ?`
   ).bind(eventId, tenantId).run();
+
   return (result.meta?.changes ?? 0) > 0;
 }
 
 export async function flagOverdueEvents(db: D1Database): Promise<number> {
-  const today = new Date().toISOString().split("T")[0];
   const result = await db.prepare(
-    'UPDATE compliance_events SET status = 'overdue', updated_at = datetime('now')
-     WHERE status = 'pending' AND due_date < ?'
-  ).bind(today).run();
+    `UPDATE compliance_events
+     SET status = 'overdue', updated_at = datetime('now')
+     WHERE status IN ('due', 'pending') AND due_date < date('now')`
+  ).run();
+
   return result.meta?.changes ?? 0;
 }

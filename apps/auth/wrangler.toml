@@ -23,3 +23,30 @@ APP_BASE_URL = "https://auth.insighthunter.app"
 [dev]
 port = 8787
 local_protocol = "http"
+# apps/auth/wrangler.toml
+name = "insighthunter-auth"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[[routes]]
+pattern = "auth.insighthunter.app/*"
+zone_name = "insighthunter.app"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-platform"
+database_id = "<YOUR_D1_ID>"
+
+[[kv_namespaces]]
+binding = "AUTH_KV"
+id = "<YOUR_KV_ID>"
+
+# Secrets (set via wrangler secret put):
+# JWT_SECRET
+# RESEND_API_KEY
+# STRIPE_SECRET_KEY
+# STRIPE_WEBHOOK_SECRET

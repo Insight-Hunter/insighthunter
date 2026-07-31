@@ -11,7 +11,6 @@ type HonoEnv = { Bindings: BizformaEnv; Variables: { auth: AuthContext } };
 
 const ai = new Hono<HonoEnv>();
 
-// POST /api/ai/entity-recommendation
 ai.post("/entity-recommendation", async (c) => {
   const { tenantId, userId } = c.get("auth");
   const body = await c.req.json<{
@@ -40,7 +39,6 @@ ai.post("/entity-recommendation", async (c) => {
   });
 });
 
-// POST /api/ai/name-suggestions
 ai.post("/name-suggestions", async (c) => {
   const { tenantId, userId } = c.get("auth");
   const body = await c.req.json<{
@@ -64,7 +62,6 @@ ai.post("/name-suggestions", async (c) => {
   return c.json(result);
 });
 
-// POST /api/ai/operating-agreement-clauses
 ai.post("/operating-agreement-clauses", async (c) => {
   const { tenantId } = c.get("auth");
   const body = await c.req.json<{
@@ -75,7 +72,10 @@ ai.post("/operating-agreement-clauses", async (c) => {
   }>();
 
   if (!body.entity_type || !body.state || !body.owners || !body.business_name) {
-    return c.json({ error: "missing_required_fields", required: ["entity_type", "state", "owners", "business_name"] }, 400);
+    return c.json(
+      { error: "missing_required_fields", required: ["entity_type", "state", "owners", "business_name"] },
+      400
+    );
   }
 
   const result = await getOperatingAgreementClauses(c.env, body);

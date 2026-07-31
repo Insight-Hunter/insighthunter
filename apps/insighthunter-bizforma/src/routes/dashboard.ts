@@ -80,13 +80,9 @@ dashboard.post("/case/:caseId/seed", async (c) => {
     `SELECT entity_type, state, created_at
      FROM formation_cases
      WHERE id = ? AND tenant_id = ?`
-  )
-    .bind(caseId, tenantId)
-    .first<{ entity_type: string; state: string; created_at: string }>();
+  ).bind(caseId, tenantId).first<{ entity_type: string; state: string; created_at: string }>();
 
-  if (!formation) {
-    return c.json({ error: "formation_case_not_found" }, 404);
-  }
+  if (!formation) return c.json({ error: "formation_case_not_found" }, 404);
 
   const createdCount = await seedComplianceCalendar(
     c.env.DB,
@@ -102,10 +98,7 @@ dashboard.post("/case/:caseId/seed", async (c) => {
     indexes: ["compliance_calendar_seeded"],
   });
 
-  return c.json({
-    seeded: true,
-    events_created: createdCount,
-  });
+  return c.json({ seeded: true, events_created: createdCount });
 });
 
 dashboard.patch("/events/:eventId/complete", async (c) => {
@@ -113,9 +106,7 @@ dashboard.patch("/events/:eventId/complete", async (c) => {
   const eventId = c.req.param("eventId");
 
   const updated = await markComplianceEventComplete(c.env.DB, eventId, tenantId);
-  if (!updated) {
-    return c.json({ error: "not_found" }, 404);
-  }
+  if (!updated) return c.json({ error: "not_found" }, 404);
 
   return c.json({
     event_id: eventId,

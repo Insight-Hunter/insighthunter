@@ -12,7 +12,6 @@ type HonoEnv = { Bindings: BizformaEnv; Variables: { auth: AuthContext } };
 
 const compliance = new Hono<HonoEnv>();
 
-// GET /api/compliance/:caseId — list all compliance events for a formation case
 compliance.get("/:caseId", async (c) => {
   const { tenantId } = c.get("auth");
   const caseId = c.req.param("caseId");
@@ -22,13 +21,12 @@ compliance.get("/:caseId", async (c) => {
   return c.json({ case_id: caseId, events, count: events.length });
 });
 
-// POST /api/compliance/:caseId/seed — generate compliance calendar from formation case data
 compliance.post("/:caseId/seed", async (c) => {
   const { tenantId } = c.get("auth");
   const caseId = c.req.param("caseId");
 
   const formation = await c.env.DB.prepare(
-    'SELECT entity_type, state, created_at FROM formation_cases WHERE id = ? AND tenant_id = ?'
+    "SELECT entity_type, state, created_at FROM formation_cases WHERE id = ? AND tenant_id = ?"
   ).bind(caseId, tenantId).first<{ entity_type: string; state: string; created_at: string }>();
 
   if (!formation) return c.json({ error: "formation_case_not_found" }, 404);
@@ -50,7 +48,6 @@ compliance.post("/:caseId/seed", async (c) => {
   return c.json({ seeded: true, events_created: count });
 });
 
-// PATCH /api/compliance/events/:eventId/complete — mark event as complete
 compliance.patch("/events/:eventId/complete", async (c) => {
   const { tenantId } = c.get("auth");
   const eventId = c.req.param("eventId");
@@ -59,9 +56,7 @@ compliance.patch("/events/:eventId/complete", async (c) => {
   return c.json({ event_id: eventId, status: "completed" });
 });
 
-// POST /api/compliance/flag-overdue — internal/cron trigger to mark overdue events
 compliance.post("/flag-overdue", async (c) => {
-  // Require internal service header to prevent public abuse
   const secret = c.req.header("x-internal-secret");
   if (!secret || secret !== c.env.INTERNAL_SECRET) {
     return c.json({ error: "forbidden" }, 403);

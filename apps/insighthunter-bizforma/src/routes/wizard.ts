@@ -12,7 +12,6 @@ type HonoEnv = { Bindings: BizformaEnv; Variables: { auth: AuthContext } };
 
 const wizard = new Hono<HonoEnv>();
 
-// POST /api/wizard/sessions — start a new wizard session
 wizard.post("/sessions", async (c) => {
   const { tenantId, userId } = c.get("auth");
   const body = await c.req.json<{ formation_case_id?: string }>().catch(() => ({}));
@@ -20,7 +19,6 @@ wizard.post("/sessions", async (c) => {
   return c.json({ session_id: sessionId, current_step: 1, total_steps: 11 }, 201);
 });
 
-// GET /api/wizard/sessions/:id — load wizard session state
 wizard.get("/sessions/:id", async (c) => {
   const { tenantId } = c.get("auth");
   const session = await getWizardSession(c.env.DB, c.req.param("id"), tenantId);
@@ -28,7 +26,6 @@ wizard.get("/sessions/:id", async (c) => {
   return c.json(session);
 });
 
-// PATCH /api/wizard/sessions/:id — save step data and advance
 wizard.patch("/sessions/:id", async (c) => {
   const { tenantId } = c.get("auth");
   const body = await c.req.json<{
@@ -44,7 +41,6 @@ wizard.patch("/sessions/:id", async (c) => {
   return c.json({ updated: true, session });
 });
 
-// DELETE /api/wizard/sessions/:id — abandon wizard session
 wizard.delete("/sessions/:id", async (c) => {
   const { tenantId } = c.get("auth");
   await deleteWizardSession(c.env.DB, c.req.param("id"), tenantId);
