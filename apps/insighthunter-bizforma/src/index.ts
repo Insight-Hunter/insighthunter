@@ -7,6 +7,7 @@ import type { BizformaEnv } from "./types.js";
 import { requireAuth } from "./middleware/auth.js";
 import { formation } from "./routes/formation.js";
 import { compliance } from "./routes/compliance.js";
+import { dashboard } from "./routes/dashboard.js";
 import { ai } from "./routes/ai.js";
 import { wizard } from "./routes/wizard.js";
 import { processReminderBatch, dispatchUpcomingReminders } from "./queues/reminder-consumer.js";
@@ -42,7 +43,7 @@ app.get("/health", (c) =>
     ok: true,
     version: "0.3.0",
     timestamp: new Date().toISOString(),
-    routes: ["/api/formation", "/api/compliance", "/api/ai", "/api/wizard"],
+    routes: ["/api/formation", "/api/compliance", "/api/dashboard", "/api/ai", "/api/wizard"],
   })
 );
 
@@ -53,24 +54,25 @@ app.use("/api/*", requireAuth);
 
 app.route("/api/formation", formation);
 app.route("/api/compliance", compliance);
+app.route("/api/dashboard", dashboard);
 app.route("/api/ai", ai);
 app.route("/api/wizard", wizard);
 
 // ── Cloudflare Scheduled Trigger (cron) ──────────────────────────────────────
 async function scheduled(event: ScheduledEvent, env: BizformaEnv): Promise<void> {
-  console.log('[scheduled] cron=${event.cron} at=${new Date().toISOString()}');
+  console.log(`[scheduled] cron=${event.cron} at=${new Date().toISOString()}`);
 
   // Daily 9am UTC: dispatch compliance reminders to queue
   if (event.cron === "0 9 * * *") {
     await dispatchUpcomingReminders(env);
   }
 
-  // Daily midnight UTC: flag overdue events
+  // Daily midnight UTC: flag overdue events and purge expired wizard sessions
   if (event.cron === "0 0 * * *") {
-    const { flagOverdueEvents, purgeExpiredSessions } = await import("./services/compliance-calendar.js");
-    const { purgeExpiredSessions: purge } = await import("./services/wizard-session.js");
+    const { flagOverdueEvents } = await import("./services/compliance-calendar.js");
+    const { purgeExpiredSessions } = await import("./services/wizard-session.js");
     await flagOverdueEvents(env.DB);
-    await purge(env.DB);
+    await purgeExpiredSessions(env.DB);
   }
 }
 
@@ -84,9 +86,9 @@ async function queue(
   if (queueName === "insighthunter-bizforma-pdf") {
     for (const msg of batch.messages) {
       const job = msg.body as { type: string; doc_id: string; r2_key: string };
-      console.log('[pdf-queue] Processing ${job.type} for doc ${job.doc_id}');
+      console.log(`[pdf-queue] Processing ${job.type} for doc ${job.doc_id}`);
       await env.DB.prepare(
-        'UPDATE bizforma_documents SET status = 'ready', updated_at = datetime('now') WHERE id = ?'
+        "UPDATE bizforma_documents SET status = 'ready', updated_at = datetime('now') WHERE id = ?"
       ).bind(job.doc_id).run();
       msg.ack();
     }

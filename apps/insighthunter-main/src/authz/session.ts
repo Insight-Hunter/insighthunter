@@ -1,4 +1,4 @@
-import { extractSessionToken } from './../../../../packages/auth-shared';
+import { extractSessionToken } from '../../../../packages/authz';
 
 export type SessionUser = {
   subject: string;
