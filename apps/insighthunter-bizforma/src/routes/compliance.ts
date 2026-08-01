@@ -1,68 +1,56 @@
+// routes/compliance.ts — Compliance calendar events API
 import { Hono } from "hono";
 import type { BizformaEnv } from "../types.js";
-import type { AuthContext } from "../middleware/auth.js";
 import {
-  seedComplianceCalendar,
-  getComplianceEvents,
-  markComplianceEventComplete,
-  flagOverdueEvents,
+  listEventsByCase, listUpcomingEvents,
+  createEvent, markEventComplete
 } from "../services/compliance-calendar.js";
 
-type HonoEnv = { Bindings: BizformaEnv; Variables: { auth: AuthContext } };
+export const compliance = new Hono<{ Bindings: BizformaEnv }>();
 
-const compliance = new Hono<HonoEnv>();
-
-compliance.get("/:caseId", async (c) => {
-  const { tenantId } = c.get("auth");
-  const caseId = c.req.param("caseId");
-  const { status, from, to } = c.req.query();
-
-  const events = await getComplianceEvents(c.env.DB, caseId, tenantId, { status, from, to });
-  return c.json({ case_id: caseId, events, count: events.length });
+// GET /api/compliance/upcoming — events due in next 30 days
+compliance.get("/upcoming", async (c) => {
+  const orgId = c.get("orgId");
+  const days  = Number(c.req.query("days") ?? 30);
+  const events = await listUpcomingEvents(c.env.DB, orgId, days);
+  return c.json({ events });
 });
 
-compliance.post("/:caseId/seed", async (c) => {
-  const { tenantId } = c.get("auth");
-  const caseId = c.req.param("caseId");
-
-  const formation = await c.env.DB.prepare(
-    "SELECT entity_type, state, created_at FROM formation_cases WHERE id = ? AND tenant_id = ?"
-  ).bind(caseId, tenantId).first<{ entity_type: string; state: string; created_at: string }>();
-
-  if (!formation) return c.json({ error: "formation_case_not_found" }, 404);
-
-  const count = await seedComplianceCalendar(
-    c.env.DB,
-    caseId,
-    tenantId,
-    formation.entity_type,
-    formation.state,
-    formation.created_at
-  );
-
-  c.env.ANALYTICS.writeDataPoint({
-    blobs: [tenantId, caseId, formation.entity_type, formation.state],
-    indexes: ["compliance_calendar_seeded"],
-  });
-
-  return c.json({ seeded: true, events_created: count });
+// GET /api/compliance/case/:caseId
+compliance.get("/case/:caseId", async (c) => {
+  const { caseId } = c.req.param();
+  const events = await listEventsByCase(c.env.DB, caseId);
+  return c.json({ events });
 });
 
-compliance.patch("/events/:eventId/complete", async (c) => {
-  const { tenantId } = c.get("auth");
-  const eventId = c.req.param("eventId");
-  const updated = await markComplianceEventComplete(c.env.DB, eventId, tenantId);
-  if (!updated) return c.json({ error: "not_found" }, 404);
-  return c.json({ event_id: eventId, status: "completed" });
-});
-
-compliance.post("/flag-overdue", async (c) => {
-  const secret = c.req.header("x-internal-secret");
-  if (!secret || secret !== c.env.INTERNAL_SECRET) {
-    return c.json({ error: "forbidden" }, 403);
+// POST /api/compliance/case/:caseId — add a compliance event
+compliance.post("/case/:caseId", async (c) => {
+  const { caseId } = c.req.param();
+  const orgId = c.get("orgId");
+  const body  = await c.req.json<{
+    event_type: string;
+    title: string;
+    due_date: string;
+    notes?: string;
+  }>();
+  if (!body.event_type || !body.title || !body.due_date) {
+    return c.json({ error: "event_type, title, due_date required" }, 400);
   }
-  const count = await flagOverdueEvents(c.env.DB);
-  return c.json({ flagged: count });
+  await createEvent(c.env.DB, {
+    case_id: caseId, org_id: orgId,
+    event_type: body.event_type,
+    title: body.title,
+    due_date: body.due_date,
+    status: "pending",
+    notes: body.notes,
+  });
+  return c.json({ ok: true }, 201);
 });
 
-export { compliance };
+// PATCH /api/compliance/events/:eventId/complete
+compliance.patch("/events/:eventId/complete", async (c) => {
+  const { eventId } = c.req.param();
+  const { notes }   = await c.req.json<{ notes?: string }>();
+  await markEventComplete(c.env.DB, eventId, notes);
+  return c.json({ ok: true });
+});

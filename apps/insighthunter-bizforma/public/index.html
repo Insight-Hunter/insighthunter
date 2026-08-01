@@ -1,13 +1,442 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>BizForma</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BizForma — Business Formation</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #F8FAFC; color: #1E293B; }
+
+    /* ── Nav ── */
+    nav { display: flex; justify-content: space-between; align-items: center;
+          padding: 1rem 2rem; background: #fff; border-bottom: 1px solid #E2E8F0; }
+    .nav-logo { font-weight: 700; font-size: 1.1rem; color: #0891B2; }
+    .nav-right { display: flex; gap: 1rem; align-items: center; }
+    .btn { padding: 0.5rem 1.2rem; border-radius: 8px; font-size: 0.9rem;
+           cursor: pointer; border: none; font-weight: 500; }
+    .btn-primary { background: #0891B2; color: #fff; }
+    .btn-ghost   { background: transparent; border: 1px solid #E2E8F0; color: #64748B; }
+    .btn:hover   { opacity: 0.88; }
+
+    /* ── Pages ── */
+    .page { display: none; padding: 2rem; max-width: 1100px; margin: 0 auto; }
+    .page.active { display: block; }
+
+    /* ── Dashboard ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
+                  gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 12px;
+                 padding: 1.25rem; text-align: center; }
+    .stat-val  { font-size: 2rem; font-weight: 700; color: #0891B2; }
+    .stat-lbl  { font-size: 0.75rem; color: #94A3B8; text-transform: uppercase;
+                 letter-spacing: 0.05em; margin-top: 0.25rem; }
+
+    .section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;
+                     color: #94A3B8; margin-bottom: 1rem; }
+    .card-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .card-item { background: #fff; border: 1px solid #E2E8F0; border-radius: 10px;
+                 padding: 1rem 1.25rem; display: flex; justify-content: space-between;
+                 align-items: center; cursor: pointer; transition: border-color 0.15s; }
+    .card-item:hover { border-color: #0891B2; }
+    .card-name  { font-weight: 600; font-size: 0.95rem; }
+    .card-meta  { font-size: 0.8rem; color: #64748B; margin-top: 0.15rem; }
+    .badge { padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.7rem;
+             font-weight: 600; text-transform: uppercase; }
+    .badge-draft    { background: #F1F5F9; color: #64748B; }
+    .badge-active   { background: #D1FAE5; color: #065F46; }
+    .badge-filed    { background: #DBEAFE; color: #1D4ED8; }
+    .badge-overdue  { background: #FEE2E2; color: #991B1B; }
+    .badge-pending  { background: #FEF3C7; color: #92400E; }
+
+    /* ── Wizard ── */
+    .wizard-wrap { max-width: 640px; margin: 0 auto; }
+    .wizard-steps { display: flex; gap: 0.5rem; margin-bottom: 2rem; }
+    .step-dot { width: 32px; height: 32px; border-radius: 50%; display: flex;
+                align-items: center; justify-content: center; font-size: 0.8rem;
+                font-weight: 700; border: 2px solid #E2E8F0; color: #94A3B8; }
+    .step-dot.active   { background: #0891B2; border-color: #0891B2; color: #fff; }
+    .step-dot.complete { background: #D1FAE5; border-color: #059669; color: #065F46; }
+    .wizard-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 14px;
+                   padding: 2rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.4rem; }
+    input, select, textarea {
+      width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #E2E8F0; border-radius: 8px;
+      font-size: 0.9rem; outline: none; transition: border-color 0.15s;
+    }
+    input:focus, select:focus { border-color: #0891B2; }
+    .wizard-nav { display: flex; justify-content: space-between; margin-top: 1.5rem; }
+
+    /* ── AI Panel ── */
+    .ai-panel { background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; padding: 1.5rem; }
+    .ai-messages { min-height: 200px; max-height: 380px; overflow-y: auto;
+                   margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    .msg { padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.875rem; line-height: 1.5; max-width: 85%; }
+    .msg-user { background: #0891B2; color: #fff; align-self: flex-end; }
+    .msg-ai   { background: #F1F5F9; color: #1E293B; align-self: flex-start; }
+    .ai-input-row { display: flex; gap: 0.5rem; }
+    .ai-input-row input { flex: 1; }
+
+    /* ── Compliance ── */
+    .event-item { background: #fff; border: 1px solid #E2E8F0; border-radius: 10px;
+                  padding: 1rem 1.25rem; display: flex; justify-content: space-between;
+                  align-items: center; }
+    .event-due  { font-size: 0.8rem; color: #64748B; }
+
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 3rem; color: #94A3B8; }
+    .spinner { width: 1.5rem; height: 1.5rem; border: 3px solid #E2E8F0;
+               border-top-color: #0891B2; border-radius: 50%;
+               animation: spin 0.7s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Empty ── */
+    .empty { text-align: center; padding: 3rem; color: #94A3B8; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">🏢 BizForma</span>
+  <div class="nav-right">
+    <button class="btn btn-ghost" onclick="showPage('compliance')">Compliance</button>
+    <button class="btn btn-ghost" onclick="showPage('ai')">AI Advisor</button>
+    <button class="btn btn-primary" onclick="showPage('wizard')">+ New Business</button>
+  </div>
+</nav>
+
+<!-- ── Dashboard ── -->
+<div id="page-dashboard" class="page active">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+    <h1 style="font-size:1.4rem;font-weight:700">Business Formation</h1>
+    <button class="btn btn-primary" onclick="showPage('wizard')">+ Start Formation</button>
+  </div>
+  <div id="stats-grid" class="stats-grid"></div>
+  <p class="section-title">Your Businesses</p>
+  <div id="cases-list" class="card-list"><div class="loading"><span class="spinner"></span></div></div>
+</div>
+
+<!-- ── Wizard ── -->
+<div id="page-wizard" class="page">
+  <div class="wizard-wrap">
+    <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1.5rem">Start a New Business</h2>
+    <div class="wizard-steps" id="wizard-steps"></div>
+    <div class="wizard-card" id="wizard-body"></div>
+  </div>
+</div>
+
+<!-- ── Compliance ── -->
+<div id="page-compliance" class="page">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+    <h2 style="font-size:1.2rem;font-weight:700">Compliance Calendar</h2>
+    <span id="overdue-badge"></span>
+  </div>
+  <div id="compliance-list" class="card-list"><div class="loading"><span class="spinner"></span></div></div>
+</div>
+
+<!-- ── AI ── -->
+<div id="page-ai" class="page">
+  <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1.5rem">AI Formation Advisor</h2>
+  <div class="ai-panel">
+    <div class="ai-messages" id="ai-messages">
+      <div class="msg msg-ai">Hi! I'm your BizForma AI advisor. Ask me anything about business formation, entity types, or compliance requirements.</div>
+    </div>
+    <div class="ai-input-row">
+      <input id="ai-input" placeholder="Ask a question about forming your business…" onkeydown="if(event.key==='Enter')sendAI()" />
+      <button class="btn btn-primary" onclick="sendAI()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '';
+const token = localStorage.getItem('ih_token') ?? 'dev-token';
+const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
+// ── Navigation ────────────────────────────────────────────────────────────
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  if (name === 'dashboard')  loadDashboard();
+  if (name === 'compliance') loadCompliance();
+  if (name === 'wizard')     initWizard();
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────
+
+async function loadDashboard() {
+  try {
+    const res  = await fetch(`${API}/api/dashboard`, { headers });
+    const data = await res.json();
+
+    const sg = document.getElementById('stats-grid');
+    sg.innerHTML = '';
+    const stats = [
+      { val: data.stats.total,    lbl: 'Total'    },
+      { val: data.stats.active,   lbl: 'Active'   },
+      { val: data.stats.draft,    lbl: 'Draft'    },
+      { val: data.stats.filed,    lbl: 'Filed'    },
+      { val: data.stats.due_soon, lbl: 'Due Soon' },
+      { val: data.stats.overdue,  lbl: 'Overdue'  },
+    ];
+    for (const s of stats) {
+      const div = document.createElement('div');
+      div.className = 'stat-card';
+      div.innerHTML = `<div class="stat-val">${s.val}</div><div class="stat-lbl">${s.lbl}</div>`;
+      sg.appendChild(div);
+    }
+
+    const cl = document.getElementById('cases-list');
+    cl.innerHTML = '';
+    if (!data.cases?.length) {
+      cl.innerHTML = '<div class="empty">No businesses yet. <a href="#" onclick="showPage(\'wizard\')">Start your first formation →</a></div>';
+      return;
+    }
+    for (const c of data.cases) {
+      const div = document.createElement('div');
+      div.className = 'card-item';
+      div.innerHTML = `
+        <div>
+          <div class="card-name">${c.business_name}</div>
+          <div class="card-meta">${c.entity_type} · ${c.state}</div>
+        </div>
+        <span class="badge badge-${c.status}">${c.status}</span>`;
+      cl.appendChild(div);
+    }
+  } catch (e) {
+    document.getElementById('cases-list').innerHTML = '<div class="empty">Error loading data</div>';
+  }
+}
+
+// ── Compliance ────────────────────────────────────────────────────────────
+
+async function loadCompliance() {
+  try {
+    const res    = await fetch(`${API}/api/compliance/upcoming?days=60`, { headers });
+    const { events } = await res.json();
+    const list   = document.getElementById('compliance-list');
+    list.innerHTML = '';
+
+    const overdue = events.filter(e => e.status === 'overdue');
+    const ob = document.getElementById('overdue-badge');
+    if (overdue.length) {
+      ob.innerHTML = `<span class="badge badge-overdue">${overdue.length} Overdue</span>`;
+    }
+
+    if (!events.length) {
+      list.innerHTML = '<div class="empty">No upcoming compliance events</div>';
+      return;
+    }
+    for (const e of events) {
+      const div = document.createElement('div');
+      div.className = 'event-item';
+      div.innerHTML = `
+        <div>
+          <div class="card-name">${e.title}</div>
+          <div class="event-due">Due: ${e.due_date} · ${e.event_type}</div>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center">
+          <span class="badge badge-${e.status}">${e.status}</span>
+          ${e.status !== 'completed' ? `<button class="btn btn-ghost" style="font-size:0.75rem;padding:0.25rem 0.6rem" onclick="completeEvent('${e.id}', this)">Done</button>` : ''}
+        </div>`;
+      list.appendChild(div);
+    }
+  } catch { document.getElementById('compliance-list').innerHTML = '<div class="empty">Error loading events</div>'; }
+}
+
+async function completeEvent(eventId, btn) {
+  btn.disabled = true;
+  await fetch(`${API}/api/compliance/events/${eventId}/complete`, {
+    method: 'PATCH', headers, body: JSON.stringify({})
+  });
+  loadCompliance();
+}
+
+// ── Wizard ────────────────────────────────────────────────────────────────
+
+const STEPS = [
+  {
+    title: 'Entity Type',
+    fields: [
+      { name: 'entity_type', label: 'Entity Type', type: 'select',
+        options: ['LLC','S-Corp','C-Corp','Sole Proprietorship','Partnership'] },
+    ]
+  },
+  {
+    title: 'Business Info',
+    fields: [
+      { name: 'business_name', label: 'Business Name', type: 'text', placeholder: 'Acme LLC' },
+      { name: 'state',         label: 'Formation State', type: 'select',
+        options: ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA',
+                  'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+                  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT',
+                  'VA','WA','WV','WI','WY'] },
+    ]
+  },
+  {
+    title: 'Registered Agent',
+    fields: [
+      { name: 'registered_agent', label: 'Registered Agent Name', type: 'text', placeholder: 'Your name or agent company' },
+    ]
+  },
+  {
+    title: 'AI Recommendation',
+    ai: true,
+  },
+  {
+    title: 'Review & Submit',
+    review: true,
+  },
+];
+
+let wizardStep = 0;
+let wizardData = {};
+let wizardSessionId = null;
+
+async function initWizard() {
+  wizardStep = 0;
+  wizardData = {};
+  wizardSessionId = null;
+
+  try {
+    const res = await fetch(`${API}/api/wizard/start`, { method: 'POST', headers, body: '{}' });
+    const { session } = await res.json();
+    wizardSessionId = session?.id;
+  } catch (e) {
+    wizardSessionId = 'local-' + crypto.randomUUID();
+  }
+  renderWizard();
+}
+
+function renderWizard() {
+  const stepsEl = document.getElementById('wizard-steps');
+  stepsEl.innerHTML = '';
+  for (let i = 0; i < STEPS.length; i++) {
+    const d = document.createElement('div');
+    d.className = 'step-dot' + (i === wizardStep ? ' active' : i < wizardStep ? ' complete' : '');
+    d.textContent = i < wizardStep ? '✓' : String(i + 1);
+    stepsEl.appendChild(d);
+  }
+
+  const body   = document.getElementById('wizard-body');
+  const step   = STEPS[wizardStep];
+  body.innerHTML = `<h3 style="font-weight:600;margin-bottom:1.25rem">${step.title}</h3>`;
+
+  if (step.ai) {
+    body.innerHTML += `
+      <div id="ai-rec-box" style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:10px;padding:1.25rem;margin-bottom:1rem;min-height:80px">
+        <span class="spinner"></span> Getting AI recommendation…
+      </div>`;
+    getEntityRecommendation();
+  } else if (step.review) {
+    body.innerHTML += `<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:1.25rem;font-size:0.9rem">
+      ${Object.entries(wizardData).map(([k,v]) => `<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid #F1F5F9"><span style="color:#64748B;text-transform:capitalize">${k.replace(/_/g,' ')}</span><span style="font-weight:600">${v}</span></div>`).join('')}
+    </div>`;
+  } else {
+    for (const f of (step.fields ?? [])) {
+      let input = '';
+      if (f.type === 'select') {
+        input = `<select name="${f.name}" onchange="wizardData['${f.name}']=this.value">
+          <option value="">Select…</option>
+          ${f.options.map(o => `<option value="${o}" ${wizardData[f.name]===o?'selected':''}>${o}</option>`).join('')}
+        </select>`;
+      } else {
+        input = `<input type="${f.type}" name="${f.name}" placeholder="${f.placeholder??''}"
+          value="${wizardData[f.name]??''}"
+          oninput="wizardData['${f.name}']=this.value" />`;
+      }
+      body.innerHTML += `<div class="form-group"><label>${f.label}</label>${input}</div>`;
+    }
+  }
+
+  const isLast = wizardStep === STEPS.length - 1;
+  body.innerHTML += `
+    <div class="wizard-nav">
+      <button class="btn btn-ghost" onclick="wizardBack()" ${wizardStep===0?'disabled':''}>Back</button>
+      <button class="btn btn-primary" onclick="${isLast ? 'submitWizard()' : 'wizardNext()'}">${isLast ? 'Submit' : 'Continue'}</button>
+    </div>`;
+}
+
+async function wizardNext() {
+  wizardStep++;
+  if (wizardSessionId && !wizardSessionId.startsWith('local-')) {
+    await fetch(`${API}/api/wizard/${wizardSessionId}/step`, {
+      method: 'PATCH', headers, body: JSON.stringify({ step: wizardStep, data: wizardData })
+    }).catch(() => {});
+  }
+  renderWizard();
+}
+
+function wizardBack() { if (wizardStep > 0) { wizardStep--; renderWizard(); } }
+
+async function getEntityRecommendation() {
+  const box = document.getElementById('ai-rec-box');
+  try {
+    const res = await fetch(`${API}/api/ai/recommend-entity`, {
+      method: 'POST', headers,
+      body: JSON.stringify({
+        description: wizardData.business_name ?? 'small business',
+        state: wizardData.state ?? 'DE',
+        owners: 1,
+        liability_concern: true,
+      })
+    });
+    const data = await res.json();
+    box.innerHTML = `
+      <div style="font-weight:600;color:#0891B2;margin-bottom:0.5rem">
+        Recommended: ${data.recommendation ?? 'LLC'}
+      </div>
+      <div style="font-size:0.85rem;color:#475569">${data.reason ?? ''}</div>`;
+    if (data.recommendation) wizardData.entity_type ??= data.recommendation;
+  } catch {
+    box.innerHTML = '<span style="color:#94A3B8">AI recommendation unavailable</span>';
+  }
+}
+
+async function submitWizard() {
+  if (!wizardSessionId) return;
+  try {
+    const res = await fetch(`${API}/api/wizard/${wizardSessionId}/complete`, {
+      method: 'POST', headers, body: '{}'
+    });
+    const data = await res.json();
+    if (data.ok) {
+      alert(`✓ ${data.case.business_name} formation started!`);
+      showPage('dashboard');
+    }
+  } catch { alert('Submission failed — try again'); }
+}
+
+// ── AI Advisor ────────────────────────────────────────────────────────────
+
+async function sendAI() {
+  const input   = document.getElementById('ai-input');
+  const msgs    = document.getElementById('ai-messages');
+  const question = input.value.trim();
+  if (!question) return;
+
+  input.value = '';
+  msgs.innerHTML += `<div class="msg msg-user">${question}</div>`;
+  msgs.innerHTML += `<div class="msg msg-ai" id="ai-thinking"><span class="spinner"></span></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const res  = await fetch(`${API}/api/ai/advise`, {
+      method: 'POST', headers,
+      body: JSON.stringify({ question })
+    });
+    const data = await res.json();
+    document.getElementById('ai-thinking').innerHTML = data.answer ?? 'No response';
+  } catch {
+    document.getElementById('ai-thinking').innerHTML = 'Error reaching AI — try again';
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+loadDashboard();
+</script>
+</body>
 </html>

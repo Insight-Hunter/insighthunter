@@ -1,18 +1,14 @@
-// Reminder Queue Consumer
-// Processes compliance reminder jobs from insighthunter-bizforma-reminders queue.
-// Sprint 3 will wire actual email/push notification via insighthunter-notifications service.
-
+// queues/reminder-consumer.ts — Processes reminder jobs from the queue
 import type { BizformaEnv } from "../types.js";
 
 export interface ReminderJob {
-  type: "compliance_reminder" | "deadline_alert" | "overdue_notice";
+  type: "compliance_reminder";
   case_id: string;
   event_id: string;
   user_id: string;
-  tenant_id: string;
+  org_id: string;
   due_date: string;
-  event_title: string;
-  days_until_due: number;
+  title: string;
 }
 
 export async function processReminderBatch(
@@ -22,70 +18,55 @@ export async function processReminderBatch(
   for (const msg of batch.messages) {
     const job = msg.body;
     try {
-      console.log('[reminder-consumer] type=${job.type} case=${job.case_id} event=${job.event_id} due=${job.due_date}');
+      console.log(`[reminders] Sending reminder: ${job.title} due ${job.due_date}`);
 
-      // Mark reminder as sent in DB
-      await env.DB.prepare(
-        'UPDATE compliance_events SET reminder_sent = 1, updated_at = datetime('now') WHERE id = ? AND tenant_id = ?'
-      ).bind(job.event_id, job.tenant_id).run();
+      // Write notification to platform DB (cross-worker)
+      await env.DB.prepare(`
+        INSERT OR IGNORE INTO notifications
+          (id, org_id, user_id, title, body, type, read, created_at)
+        VALUES (?1,?2,?3,?4,?5,'warning',0,datetime('now'))
+      `).bind(
+        crypto.randomUUID(),
+        job.org_id, job.user_id,
+        `Compliance Due: ${job.title}`,
+        `Action required by ${job.due_date}`,
+      ).run();
 
-      // Track analytics
       env.ANALYTICS.writeDataPoint({
-        blobs: [job.tenant_id, job.case_id, job.event_id, job.type],
-        doubles: [job.days_until_due],
-        indexes: ["compliance_reminder_sent"],
+        blobs: [job.org_id, job.event_id, "reminder_sent"],
+        indexes: ["compliance_reminder"],
       });
-
-      // Sprint 3: forward to insighthunter-notifications Worker via service binding
-      // await env.NOTIFICATIONS.fetch(new Request('https://notifications/send', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ user_id: job.user_id, title: job.event_title, due_date: job.due_date }),
-      // }));
 
       msg.ack();
     } catch (err) {
-      console.error('[reminder-consumer] failed for event ${job.event_id}:', err);
-      msg.retry({ delaySeconds: 300 });
+      console.error(`[reminders] Failed for event ${job.event_id}:`, err);
+      msg.retry();
     }
   }
 }
 
-// Scheduled trigger — dispatches upcoming compliance reminders to queue
-// Wire this to a cron trigger: 0 9 * * * (daily at 9am UTC)
 export async function dispatchUpcomingReminders(env: BizformaEnv): Promise<void> {
-  const today = new Date();
-  const thresholds = [1, 7, 14, 30]; // days before due date to remind
+  const cutoff = new Date(Date.now() + 14 * 86400000).toISOString().split("T")[0];
 
-  for (const days of thresholds) {
-    const targetDate = new Date(today);
-    targetDate.setDate(targetDate.getDate() + days);
-    const dateStr = targetDate.toISOString().split("T")[0];
+  const result = await env.DB.prepare(`
+    SELECT e.*, c.org_id, c.user_id
+    FROM bizforma_compliance_events e
+    JOIN bizforma_cases c ON c.id = e.case_id
+    WHERE e.status = 'pending' AND e.due_date <= ?1
+  `).bind(cutoff).all<ReminderJob & { user_id: string; org_id: string }>();
 
-    const { results } = await env.DB.prepare(
-      'SELECT ce.id, ce.formation_case_id, ce.tenant_id, ce.event_type, ce.title, ce.due_date,
-              fc.user_id
-       FROM compliance_events ce
-       JOIN formation_cases fc ON fc.id = ce.formation_case_id
-       WHERE ce.due_date = ? AND ce.status = 'pending' AND ce.reminder_sent = 0'
-    ).bind(dateStr).all<{
-      id: string; formation_case_id: string; tenant_id: string;
-      event_type: string; title: string; due_date: string; user_id: string;
-    }>();
+  const jobs = result.results ?? [];
+  console.log(`[reminders] Dispatching ${jobs.length} reminders`);
 
-    for (const event of results) {
-      const job: ReminderJob = {
-        type: days === 1 ? "deadline_alert" : "compliance_reminder",
-        case_id: event.formation_case_id,
-        event_id: event.id,
-        user_id: event.user_id,
-        tenant_id: event.tenant_id,
-        due_date: event.due_date,
-        event_title: event.title,
-        days_until_due: days,
-      };
-      await env.REMINDER_QUEUE.send(job);
-    }
-
-    console.log('[reminder-dispatcher] queued ${results.length} reminders for ${dateStr} (${days}d threshold)');
+  for (const job of jobs) {
+    await env.REMINDER_QUEUE.send({
+      type: "compliance_reminder",
+      case_id:  job.case_id,
+      event_id: job.id,
+      user_id:  job.user_id,
+      org_id:   job.org_id,
+      due_date: job.due_date,
+      title:    job.title,
+    } as ReminderJob);
   }
 }

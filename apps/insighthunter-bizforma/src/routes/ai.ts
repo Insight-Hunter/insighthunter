@@ -1,91 +1,113 @@
+// routes/ai.ts — AI-assisted formation guidance via Workers AI
 import { Hono } from "hono";
 import type { BizformaEnv } from "../types.js";
-import type { AuthContext } from "../middleware/auth.js";
-import {
-  getEntityRecommendation,
-  getNameSuggestions,
-  getOperatingAgreementClauses,
-} from "../services/ai-advisor.js";
 
-type HonoEnv = { Bindings: BizformaEnv; Variables: { auth: AuthContext } };
+export const ai = new Hono<{ Bindings: BizformaEnv }>();
 
-const ai = new Hono<HonoEnv>();
+const SYSTEM_PROMPT = `You are BizForma AI, an expert business formation assistant.
+You help small business owners choose the right entity structure, understand compliance
+requirements, and navigate state-specific filing rules. Be concise, accurate, and
+always recommend consulting a licensed attorney for final decisions.`;
 
-ai.post("/entity-recommendation", async (c) => {
-  const { tenantId, userId } = c.get("auth");
-  const body = await c.req.json<{
-    state: string;
-    business_type: string;
-    owners: number;
-    annual_revenue?: number;
-    employees?: number;
-    raise_investment?: boolean;
+// POST /api/ai/advise — free-form formation question
+ai.post("/advise", async (c) => {
+  const { question, context } = await c.req.json<{
+    question: string;
+    context?: { entity_type?: string; state?: string; business_name?: string };
   }>();
 
-  if (!body.state || !body.business_type || !body.owners) {
-    return c.json({ error: "missing_required_fields", required: ["state", "business_type", "owners"] }, 400);
-  }
+  if (!question) return c.json({ error: "question required" }, 400);
 
-  const result = await getEntityRecommendation(c.env, body);
+  const contextStr = context
+    ? `Business context: ${JSON.stringify(context)}\n\n`
+    : "";
+
+  const response = await c.env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user",   content: `${contextStr}${question}` },
+    ],
+    max_tokens: 512,
+  });
+
+  const answer = (response as { response?: string }).response ?? "";
 
   c.env.ANALYTICS.writeDataPoint({
-    blobs: [tenantId, userId, body.state, body.business_type, result.recommendation],
-    indexes: ["ai_entity_recommendation"],
+    blobs: [c.get("orgId"), "ai_advise"],
+    indexes: ["ai_usage"],
   });
 
-  return c.json({
-    ...result,
-    disclaimer: "This is not legal or tax advice. Consult a licensed attorney or CPA.",
-  });
+  return c.json({ answer });
 });
 
-ai.post("/name-suggestions", async (c) => {
-  const { tenantId, userId } = c.get("auth");
+// POST /api/ai/recommend-entity — structured entity type recommendation
+ai.post("/recommend-entity", async (c) => {
   const body = await c.req.json<{
-    keywords: string[];
-    state: string;
-    entity_type: string;
-    industry?: string;
-  }>();
-
-  if (!body.keywords?.length || !body.state || !body.entity_type) {
-    return c.json({ error: "missing_required_fields", required: ["keywords", "state", "entity_type"] }, 400);
-  }
-
-  const result = await getNameSuggestions(c.env, body);
-
-  c.env.ANALYTICS.writeDataPoint({
-    blobs: [tenantId, userId, body.state, body.entity_type],
-    indexes: ["ai_name_suggestions"],
-  });
-
-  return c.json(result);
-});
-
-ai.post("/operating-agreement-clauses", async (c) => {
-  const { tenantId } = c.get("auth");
-  const body = await c.req.json<{
-    entity_type: string;
+    description: string;
     state: string;
     owners: number;
-    business_name: string;
+    liability_concern: boolean;
+    tax_preference?: string;
   }>();
 
-  if (!body.entity_type || !body.state || !body.owners || !body.business_name) {
-    return c.json(
-      { error: "missing_required_fields", required: ["entity_type", "state", "owners", "business_name"] },
-      400
-    );
+  if (!body.description || !body.state) {
+    return c.json({ error: "description and state required" }, 400);
   }
 
-  const result = await getOperatingAgreementClauses(c.env, body);
+  const prompt = `A business owner needs entity formation advice.
+Business description: ${body.description}
+State: ${body.state}
+Number of owners: ${body.owners ?? 1}
+Liability concern: ${body.liability_concern ? "Yes" : "No"}
+Tax preference: ${body.tax_preference ?? "not specified"}
 
-  c.env.ANALYTICS.writeDataPoint({
-    blobs: [tenantId, body.state, body.entity_type],
-    indexes: ["ai_oa_clauses"],
+Recommend the best entity type (LLC, S-Corp, C-Corp, Sole Proprietorship, or Partnership).
+Respond with JSON: { "recommendation": "...", "reason": "...", "pros": [...], "cons": [...] }`;
+
+  const response = await c.env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user",   content: prompt },
+    ],
+    max_tokens: 400,
   });
 
-  return c.json(result);
+  const raw = (response as { response?: string }).response ?? "{}";
+  let parsed: unknown = {};
+  try { parsed = JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0] ?? "{}"); } catch { parsed = { recommendation: raw }; }
+
+  return c.json(parsed);
 });
 
-export { ai };
+// GET /api/ai/compliance-summary/:caseId — plain-language compliance brief
+ai.get("/compliance-summary/:caseId", async (c) => {
+  const { caseId } = c.req.param();
+  const orgId = c.get("orgId");
+
+  const formationCase = await c.env.DB.prepare(
+    "SELECT * FROM bizforma_cases WHERE id = ?1 AND org_id = ?2"
+  ).bind(caseId, orgId).first<{ entity_type: string; state: string; business_name: string }>();
+
+  if (!formationCase) return c.json({ error: "Case not found" }, 404);
+
+  const events = await c.env.DB.prepare(
+    "SELECT * FROM bizforma_compliance_events WHERE case_id = ?1 ORDER BY due_date ASC LIMIT 10"
+  ).bind(caseId).all();
+
+  const prompt = `Summarize upcoming compliance obligations for:
+Entity: ${formationCase.entity_type} in ${formationCase.state}
+Business: ${formationCase.business_name}
+Upcoming events: ${JSON.stringify(events.results ?? [])}
+
+Provide a brief plain-language summary of what the owner needs to do and when.`;
+
+  const response = await c.env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user",   content: prompt },
+    ],
+    max_tokens: 350,
+  });
+
+  return c.json({ summary: (response as { response?: string }).response ?? "" });
+});

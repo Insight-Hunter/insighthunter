@@ -1,92 +1,75 @@
+// agents/formation-agent.ts — Durable Object: long-running formation workflow
 import { DurableObject } from "cloudflare:workers";
 import type { BizformaEnv } from "../types.js";
 
-// FormationAgent — Durable Object coordinating long-running formation flows
-// Persists state across async steps: SOS filing → EIN request → doc generation → compliance calendar seed
-export interface FormationAgentState {
+interface AgentState {
   caseId: string;
-  tenantId: string;
-  step: "idle" | "sos_filing" | "ein_request" | "doc_generation" | "compliance_seed" | "complete" | "error";
-  lastUpdated: string;
-  errorMessage?: string;
+  orgId: string;
+  step: string;
+  history: Array<{ ts: string; event: string; data?: unknown }>;
+  createdAt: string;
 }
 
 export class FormationAgent extends DurableObject<BizformaEnv> {
-  private state: FormationAgentState = {
-    caseId: "",
-    tenantId: "",
-    step: "idle",
-    lastUpdated: new Date().toISOString(),
-  };
+  private state: AgentState | null = null;
 
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
 
-    if (request.method === "GET" && url.pathname === "/status") {
-      const stored = await this.ctx.storage.get<FormationAgentState>("state");
-      return Response.json(stored ?? this.state);
+    switch (url.pathname) {
+      case "/init":    return this.handleInit(request);
+      case "/advance": return this.handleAdvance(request);
+      case "/status":  return this.handleStatus();
+      default:
+        return new Response("Not found", { status: 404 });
     }
-
-    if (request.method === "POST" && url.pathname === "/start") {
-      const body = await request.json<{ case_id: string; tenant_id: string }>();
-      this.state = {
-        caseId: body.case_id,
-        tenantId: body.tenant_id,
-        step: "sos_filing",
-        lastUpdated: new Date().toISOString(),
-      };
-      await this.ctx.storage.put("state", this.state);
-
-      // Kick off formation workflow asynchronously
-      this.ctx.waitUntil(this.runFormationFlow());
-
-      return Response.json({ started: true, state: this.state });
-    }
-
-    if (request.method === "POST" && url.pathname === "/advance") {
-      const body = await request.json<{ next_step: FormationAgentState["step"]; data?: Record<string, unknown> }>();
-      this.state.step = body.next_step;
-      this.state.lastUpdated = new Date().toISOString();
-      await this.ctx.storage.put("state", this.state);
-      return Response.json({ advanced: true, state: this.state });
-    }
-
-    return new Response("Not Found", { status: 404 });
   }
 
-  private async runFormationFlow(): Promise<void> {
-    const steps: FormationAgentState["step"][] = [
-      "sos_filing",
-      "ein_request",
-      "doc_generation",
-      "compliance_seed",
-      "complete",
-    ];
-
-    for (const step of steps) {
-      try {
-        this.state.step = step;
-        this.state.lastUpdated = new Date().toISOString();
-        await this.ctx.storage.put("state", this.state);
-
-        // Sprint 5: each step calls the real external service (SOS API, IRS EIN, pdf generator)
-        console.log('[FormationAgent] caseId=${this.state.caseId} step=${step}');
-
-        // Simulated async work placeholder
-        await new Promise((r) => setTimeout(r, 100));
-
-        if (step === "complete") {
-          await this.env.DB.prepare(
-            'UPDATE formation_cases SET status = 'filed', filed_at = datetime('now') WHERE id = ? AND tenant_id = ?'
-          ).bind(this.state.caseId, this.state.tenantId).run();
-        }
-      } catch (err) {
-        this.state.step = "error";
-        this.state.errorMessage = err instanceof Error ? err.message : "unknown_error";
-        this.state.lastUpdated = new Date().toISOString();
-        await this.ctx.storage.put("state", this.state);
-        break;
-      }
+  private async handleInit(request: Request): Promise<Response> {
+    if (this.state) {
+      return Response.json({ ok: false, error: "Agent already initialized", state: this.state });
     }
+    const { caseId, orgId } = await request.json<{ caseId: string; orgId: string }>();
+    this.state = {
+      caseId, orgId,
+      step: "intake",
+      history: [{ ts: new Date().toISOString(), event: "agent_initialized" }],
+      createdAt: new Date().toISOString(),
+    };
+    await this.ctx.storage.put("state", this.state);
+    return Response.json({ ok: true, state: this.state });
+  }
+
+  private async handleAdvance(request: Request): Promise<Response> {
+    if (!this.state) {
+      this.state = await this.ctx.storage.get<AgentState>("state") ?? null;
+    }
+    if (!this.state) return Response.json({ error: "Not initialized" }, { status: 400 });
+
+    const { event, data } = await request.json<{ event: string; data?: unknown }>();
+    this.state.history.push({ ts: new Date().toISOString(), event, data });
+    this.state.step = this.nextStep(this.state.step, event);
+    await this.ctx.storage.put("state", this.state);
+
+    return Response.json({ ok: true, step: this.state.step });
+  }
+
+  private async handleStatus(): Promise<Response> {
+    if (!this.state) {
+      this.state = await this.ctx.storage.get<AgentState>("state") ?? null;
+    }
+    return Response.json({ state: this.state });
+  }
+
+  private nextStep(current: string, event: string): string {
+    const flow: Record<string, Record<string, string>> = {
+      intake:      { submit: "name_check" },
+      name_check:  { approved: "document_prep", rejected: "intake" },
+      document_prep: { ready: "filing" },
+      filing:      { submitted: "pending_state", rejected: "document_prep" },
+      pending_state: { approved: "active", rejected: "filing" },
+      active:      {},
+    };
+    return flow[current]?.[event] ?? current;
   }
 }

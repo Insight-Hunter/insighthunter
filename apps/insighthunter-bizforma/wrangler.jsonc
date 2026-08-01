@@ -27,7 +27,7 @@
     {
       "binding": "DB",
       "database_name": "insighthunter-bizforma",
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_id": "ab885914-020c-47fa-b269-ce15710d2ffb",
       "migrations_dir": "../../packages/database/migrations"
     }
   ],

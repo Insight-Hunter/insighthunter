@@ -1,268 +1,115 @@
+// routes/formation.ts — Business formation case API
 import { Hono } from "hono";
 import type { BizformaEnv } from "../types.js";
-import type { AuthContext } from "../middleware/auth.js";
+import {
+  createCase, getCaseById, listCasesByOrg, updateCaseStatus
+} from "../services/formation.js";
+import { buildR2Key, uploadDocument } from "../services/document-store.js";
 
-type HonoEnv = { Bindings: BizformaEnv; Variables: { auth: AuthContext } };
+export const formation = new Hono<{ Bindings: BizformaEnv }>();
 
-const formation = new Hono<HonoEnv>();
-
+// GET /api/formation — list all cases for the org
 formation.get("/", async (c) => {
-  const { tenantId } = c.get("auth");
-  const { results } = await c.env.DB.prepare(
-    `SELECT id, entity_type, business_name, state, status, wizard_step, created_at, updated_at
-     FROM formation_cases
-     WHERE tenant_id = ?
-     ORDER BY created_at DESC`
-  ).bind(tenantId).all();
-
-  return c.json({ cases: results ?? [] });
+  const orgId = c.get("orgId");
+  const cases = await listCasesByOrg(c.env.DB, orgId);
+  return c.json({ cases });
 });
 
-formation.get("/:id", async (c) => {
-  const { tenantId } = c.get("auth");
-  const id = c.req.param("id");
-
-  const formationCase = await c.env.DB.prepare(
-    `SELECT *
-     FROM formation_cases
-     WHERE id = ? AND tenant_id = ?`
-  ).bind(id, tenantId).first();
-
-  if (!formationCase) return c.json({ error: "not_found" }, 404);
-
-  const { results: documents } = await c.env.DB.prepare(
-    `SELECT id, document_type, file_name, content_type, size_bytes, status, generated, created_at
-     FROM bizforma_documents
-     WHERE formation_case_id = ?
-     ORDER BY created_at DESC`
-  ).bind(id).all();
-
-  const { results: compliance } = await c.env.DB.prepare(
-    `SELECT id, event_type, title, due_date, status, completed_at
-     FROM compliance_events
-     WHERE formation_case_id = ?
-     ORDER BY due_date ASC`
-  ).bind(id).all();
-
-  return c.json({
-    case: formationCase,
-    documents: documents ?? [],
-    compliance: compliance ?? [],
-  });
-});
-
+// POST /api/formation — create a new formation case
 formation.post("/", async (c) => {
-  const { tenantId, userId } = c.get("auth");
-  const body = await c.req.json<{
+  const orgId  = c.get("orgId");
+  const userId = c.get("userId");
+  const body   = await c.req.json<{
     entity_type: string;
-    business_name: string;
     state: string;
-    wizard_data?: Record<string, unknown>;
+    business_name: string;
+    registered_agent?: string;
   }>();
 
-  if (!body.entity_type || !body.business_name || !body.state) {
-    return c.json(
-      { error: "missing_required_fields", required: ["entity_type", "business_name", "state"] },
-      400
-    );
+  if (!body.entity_type || !body.state || !body.business_name) {
+    return c.json({ error: "entity_type, state, and business_name are required" }, 400);
   }
 
-  const id = crypto.randomUUID();
-  const now = new Date().toISOString();
+  const newCase = await createCase(c.env.DB, {
+    org_id: orgId, user_id: userId,
+    entity_type: body.entity_type,
+    state: body.state,
+    business_name: body.business_name,
+    status: "draft",
+    registered_agent: body.registered_agent,
+  });
 
-  await c.env.DB.prepare(
-    `INSERT INTO formation_cases (
-      id, tenant_id, user_id, entity_type, business_name, state, wizard_data, created_at, updated_at
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).bind(
-    id,
-    tenantId,
-    userId,
-    body.entity_type,
-    body.business_name,
-    body.state,
-    JSON.stringify(body.wizard_data ?? {}),
-    now,
-    now
-  ).run();
-
-  c.env.ANALYTICS?.writeDataPoint?.({
-    blobs: [tenantId, userId, body.entity_type, body.state],
+  c.env.ANALYTICS.writeDataPoint({
+    blobs: [orgId, body.entity_type, body.state],
     indexes: ["formation_created"],
   });
 
-  return c.json({ id, status: "draft", created_at: now }, 201);
+  return c.json({ case: newCase }, 201);
 });
 
-formation.patch("/:id", async (c) => {
-  const { tenantId } = c.get("auth");
-  const id = c.req.param("id");
-  const body = await c.req.json<{
-    wizard_step?: number;
-    wizard_data?: Record<string, unknown>;
-    status?: string;
-    business_name?: string;
-    ein?: string;
-    sos_filing_number?: string;
-    registered_agent?: string;
-    principal_address?: string;
-  }>();
-
-  const existing = await c.env.DB.prepare(
-    `SELECT id, wizard_data
-     FROM formation_cases
-     WHERE id = ? AND tenant_id = ?`
-  ).bind(id, tenantId).first<{ id: string; wizard_data: string }>();
-
-  if (!existing) return c.json({ error: "not_found" }, 404);
-
-  let mergedData = existing.wizard_data;
-  if (body.wizard_data) {
-    try {
-      mergedData = JSON.stringify({
-        ...(existing.wizard_data ? JSON.parse(existing.wizard_data) : {}),
-        ...body.wizard_data,
-      });
-    } catch {
-      mergedData = JSON.stringify(body.wizard_data);
-    }
+// GET /api/formation/:id
+formation.get("/:id", async (c) => {
+  const { id } = c.req.param();
+  const orgId  = c.get("orgId");
+  const formationCase = await getCaseById(c.env.DB, id);
+  if (!formationCase || (formationCase as { org_id: string }).org_id !== orgId) {
+    return c.json({ error: "Not found" }, 404);
   }
-
-  await c.env.DB.prepare(
-    `UPDATE formation_cases SET
-      wizard_step = COALESCE(?, wizard_step),
-      wizard_data = ?,
-      status = COALESCE(?, status),
-      business_name = COALESCE(?, business_name),
-      ein = COALESCE(?, ein),
-      sos_filing_number = COALESCE(?, sos_filing_number),
-      registered_agent = COALESCE(?, registered_agent),
-      principal_address = COALESCE(?, principal_address),
-      updated_at = datetime('now')
-     WHERE id = ? AND tenant_id = ?`
-  ).bind(
-    body.wizard_step ?? null,
-    mergedData,
-    body.status ?? null,
-    body.business_name ?? null,
-    body.ein ?? null,
-    body.sos_filing_number ?? null,
-    body.registered_agent ?? null,
-    body.principal_address ?? null,
-    id,
-    tenantId
-  ).run();
-
-  return c.json({ id, updated: true });
+  return c.json({ case: formationCase });
 });
 
-formation.delete("/:id", async (c) => {
-  const { tenantId } = c.get("auth");
-  const id = c.req.param("id");
-
-  const existing = await c.env.DB.prepare(
-    `SELECT id, status
-     FROM formation_cases
-     WHERE id = ? AND tenant_id = ?`
-  ).bind(id, tenantId).first<{ id: string; status: string }>();
-
-  if (!existing) return c.json({ error: "not_found" }, 404);
-  if (existing.status === "filed" || existing.status === "approved") {
-    return c.json({ error: "cannot_cancel_filed_case" }, 409);
-  }
-
-  await c.env.DB.prepare(
-    `UPDATE formation_cases
-     SET status = 'cancelled', updated_at = datetime('now')
-     WHERE id = ? AND tenant_id = ?`
-  ).bind(id, tenantId).run();
-
-  return c.json({ id, status: "cancelled" });
+// PATCH /api/formation/:id/status
+formation.patch("/:id/status", async (c) => {
+  const { id }  = c.req.param();
+  const { status } = await c.req.json<{ status: string }>();
+  if (!status) return c.json({ error: "status required" }, 400);
+  await updateCaseStatus(c.env.DB, id, status);
+  return c.json({ ok: true, id, status });
 });
 
-formation.post("/:id/documents/upload-url", async (c) => {
-  const { tenantId, userId } = c.get("auth");
-  const id = c.req.param("id");
-  const body = await c.req.json<{ file_name: string; content_type?: string; document_type?: string }>();
+// POST /api/formation/:id/documents — upload a document to R2
+formation.post("/:id/documents", async (c) => {
+  const { id } = c.req.param();
+  const orgId  = c.get("orgId");
+  const formData = await c.req.formData();
+  const file = formData.get("file") as File | null;
+  const docType = formData.get("doc_type") as string ?? "document";
 
-  const existing = await c.env.DB.prepare(
-    `SELECT id
-     FROM formation_cases
-     WHERE id = ? AND tenant_id = ?`
-  ).bind(id, tenantId).first();
+  if (!file) return c.json({ error: "file required" }, 400);
 
-  if (!existing) return c.json({ error: "not_found" }, 404);
+  const buffer   = await file.arrayBuffer();
+  const r2Key    = buildR2Key(orgId, id, file.name);
+  await uploadDocument(c.env.DOCUMENTS, r2Key, buffer, file.type);
 
   const docId = crypto.randomUUID();
-  const r2Key = `${tenantId}/${id}/${docId}/${body.file_name}`;
-  const now = new Date().toISOString();
+  const now   = new Date().toISOString();
+  await c.env.DB.prepare(`
+    INSERT INTO bizforma_documents
+      (id, case_id, org_id, doc_type, filename, r2_key, status, created_at, updated_at)
+    VALUES (?1,?2,?3,?4,?5,?6,'pending',?7,?7)
+  `).bind(docId, id, orgId, docType, file.name, r2Key, now).run();
 
-  await c.env.DB.prepare(
-    `INSERT INTO bizforma_documents (
-      id, formation_case_id, tenant_id, user_id, document_type, file_name, r2_key, content_type, status, created_at, updated_at
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
-  ).bind(
-    docId,
-    id,
-    tenantId,
-    userId,
-    body.document_type ?? "custom",
-    body.file_name,
-    r2Key,
-    body.content_type ?? "application/pdf",
-    now,
-    now
-  ).run();
+  await c.env.PDF_QUEUE.send({ type: docType, doc_id: docId, r2_key: r2Key });
 
-  return c.json(
-    {
-      doc_id: docId,
-      r2_key: r2Key,
-      upload_url: `/api/formation/${id}/documents/${docId}/upload`,
-      expires_in: 3600,
-    },
-    201
-  );
+  return c.json({ ok: true, document_id: docId, r2_key: r2Key }, 201);
 });
 
-formation.put("/:id/documents/:docId/upload", async (c) => {
-  const { tenantId } = c.get("auth");
-  const caseId = c.req.param("id");
-  const docId = c.req.param("docId");
-
-  const doc = await c.env.DB.prepare(
-    `SELECT r2_key, content_type
-     FROM bizforma_documents
-     WHERE id = ? AND formation_case_id = ? AND tenant_id = ?`
-  ).bind(docId, caseId, tenantId).first<{ r2_key: string; content_type: string }>();
-
-  if (!doc) return c.json({ error: "not_found" }, 404);
-
-  const body = c.req.raw.body;
-  if (!body) return c.json({ error: "no_body" }, 400);
-
-  await c.env.DOCUMENTS.put(doc.r2_key, body, {
-    httpMetadata: { contentType: doc.content_type },
-  });
-
-  const size = parseInt(c.req.header("content-length") ?? "0", 10);
-
-  await c.env.DB.prepare(
-    `UPDATE bizforma_documents
-     SET status = 'uploaded', size_bytes = ?, updated_at = datetime('now')
-     WHERE id = ?`
-  ).bind(size, docId).run();
-
-  await c.env.PDF_QUEUE.send({ type: "process_document", doc_id: docId, r2_key: doc.r2_key });
-
-  c.env.ANALYTICS?.writeDataPoint?.({
-    blobs: [tenantId, caseId, docId, doc.content_type],
-    indexes: ["doc_uploaded"],
-  });
-
-  return c.json({ doc_id: docId, status: "uploaded" });
+// GET /api/formation/:id/documents — list documents for a case
+formation.get("/:id/documents", async (c) => {
+  const { id } = c.req.param();
+  const result = await c.env.DB.prepare(
+    "SELECT * FROM bizforma_documents WHERE case_id = ?1 ORDER BY created_at DESC"
+  ).bind(id).all();
+  return c.json({ documents: result.results ?? [] });
 });
 
-export { formation };
+// GET /api/formation/documents/:key/download — proxy R2 download
+formation.get("/documents/:key/download", async (c) => {
+  const key = decodeURIComponent(c.req.param("key"));
+  const obj = await c.env.DOCUMENTS.get(key);
+  if (!obj) return c.json({ error: "Not found" }, 404);
+  const headers = new Headers();
+  obj.writeHttpMetadata(headers);
+  headers.set("Content-Disposition", `attachment; filename="${key.split("/").pop()}"`);
+  return new Response(obj.body, { headers });
+});

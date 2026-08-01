@@ -2,20 +2,49 @@
   "name": "insighthunter-platform",
   "main": "src/index.ts",
   "compatibility_date": "2026-07-29",
+  "compatibility_flags": ["nodejs_compat"],
+
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1
   },
+
+  "routes": [
+    {
+      "pattern": "platform.insighthunter.app/*",
+      "zone_name": "insighthunter.app"
+    }
+  ],
+
   "d1_databases": [
     {
       "binding": "DB",
+      "database_name": "insighthunter-auth-db",
+      "database_id": "1b58d27d-77c0-481d-a490-0c043f0e063c"
+    },
+    {
+      "binding": "insighthunter_platform",
       "database_name": "insighthunter-platform",
-      "database_id": "REPLACE_WITH_D1_ID"
+      "database_id": "9fbe62e8-f08a-407a-a37d-5b23eeb6f8af"
     }
   ],
+
+  "kv_namespaces": [
+    {
+      "binding": "AUTH_KV",
+      "id": "8ac9bbaeda4d410db31878ebb8b8a3f1"
+    },
+    {
+      "binding":  "SESSIONS",
+      "id":  "60e34ba310ca40c79edec05470c7a271"
+    }
+  ],
+
   "vars": {
     "AUTH_ISSUER": "https://auth.insighthunter.app",
     "AUTH_AUDIENCE": "insighthunter-app",
     "AUTH_JWKS_URL": "https://auth.insighthunter.app/.well-known/jwks.json"
   }
+
+  // Secrets — wrangler secret put JWT_SECRET --name insighthunter-platform
 }

@@ -1,155 +1,54 @@
-const SESSION_TTL_DAYS = 7;
+// services/wizard-session.ts — Multi-step formation wizard state
+import type { D1Database } from "@cloudflare/workers-types";
 
-export interface WizardSessionData {
-  entity_type?: string;
-  business_name?: string;
-  name_alternatives?: string[];
-  state?: string;
-  owners?: Array<{ name: string; ownership_pct: number; role: string }>;
-  principal_address?: string;
-  registered_agent?: string;
-  registered_agent_type?: "self" | "service";
-  business_purpose?: string;
-  industry?: string;
-  naics_code?: string;
-  management_type?: "member_managed" | "manager_managed";
-  managers?: Array<{ name: string; title: string }>;
-  tax_election?: "default" | "s_corp" | "c_corp";
-  fiscal_year_end?: string;
-  oa_clauses?: Array<{ section: string; content: string }>;
-  need_ein?: boolean;
-  has_employees?: boolean;
-  confirmed?: boolean;
-  [key: string]: unknown;
-}
-
-export async function createWizardSession(
-  db: D1Database,
-  tenantId: string,
-  userId: string,
-  caseId?: string
-): Promise<string> {
-  const id = crypto.randomUUID();
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + SESSION_TTL_DAYS);
-
-  await db.prepare(
-    `INSERT INTO formation_wizard_sessions
-     (id, formation_case_id, tenant_id, user_id, session_data, current_step, expires_at, created_at, updated_at)
-     VALUES (?, ?, ?, ?, '{}', 1, ?, datetime('now'), datetime('now'))`
-  ).bind(id, caseId ?? null, tenantId, userId, expiresAt.toISOString()).run();
-
-  return id;
-}
-
-export async function getWizardSession(
-  db: D1Database,
-  sessionId: string,
-  tenantId: string
-): Promise<{
+export interface WizardSession {
   id: string;
-  current_step: number;
+  org_id: string;
+  user_id: string;
+  step: number;       // 0-based current step
   total_steps: number;
-  session_data: WizardSessionData;
-  formation_case_id: string | null;
-} | null> {
-  const row = await db.prepare(
-    `SELECT id, formation_case_id, current_step, total_steps, session_data, expires_at
-     FROM formation_wizard_sessions
-     WHERE id = ? AND tenant_id = ?`
-  ).bind(sessionId, tenantId).first<{
-    id: string;
-    formation_case_id: string | null;
-    current_step: number;
-    total_steps: number;
-    session_data: string;
-    expires_at: string;
-  }>();
-
-  if (!row) return null;
-  if (new Date(row.expires_at) < new Date()) return null;
-
-  let parsed: WizardSessionData = {};
-  try {
-    parsed = JSON.parse(row.session_data || "{}") as WizardSessionData;
-  } catch {
-    parsed = {};
-  }
-
-  return {
-    id: row.id,
-    formation_case_id: row.formation_case_id,
-    current_step: row.current_step,
-    total_steps: row.total_steps,
-    session_data: parsed,
-  };
+  data_json: string;  // accumulated form data
+  completed: number;  // 0 | 1
+  expires_at: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export async function updateWizardSession(
-  db: D1Database,
-  sessionId: string,
-  tenantId: string,
-  patch: { current_step?: number; session_data?: Partial<WizardSessionData>; formation_case_id?: string }
-): Promise<boolean> {
-  const existing = await db.prepare(
-    `SELECT session_data
-     FROM formation_wizard_sessions
-     WHERE id = ? AND tenant_id = ?`
-  ).bind(sessionId, tenantId).first<{ session_data: string }>();
+export async function createSession(db: D1Database, orgId: string, userId: string) {
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+  const expires = new Date(Date.now() + 7 * 86400000).toISOString(); // 7 days
+  await db.prepare(`
+    INSERT INTO bizforma_wizard_sessions
+      (id, org_id, user_id, step, total_steps, data_json, completed, expires_at, created_at, updated_at)
+    VALUES (?1,?2,?3,0,6,'{}',0,?4,?5,?5)
+  `).bind(id, orgId, userId, expires, now).run();
+  return getSession(db, id);
+}
 
-  if (!existing) return false;
+export async function getSession(db: D1Database, id: string) {
+  return db.prepare("SELECT * FROM bizforma_wizard_sessions WHERE id = ?1").bind(id).first();
+}
 
-  let merged = existing.session_data || "{}";
-  if (patch.session_data) {
-    try {
-      merged = JSON.stringify({
-        ...(existing.session_data ? JSON.parse(existing.session_data) : {}),
-        ...patch.session_data,
-      });
-    } catch {
-      merged = JSON.stringify(patch.session_data);
-    }
-  }
+export async function updateSessionStep(
+  db: D1Database, id: string, step: number, data: Record<string, unknown>
+) {
+  await db.prepare(`
+    UPDATE bizforma_wizard_sessions
+    SET step = ?1, data_json = ?2, updated_at = datetime('now')
+    WHERE id = ?3
+  `).bind(step, JSON.stringify(data), id).run();
+}
 
-  const newExpiry = new Date();
-  newExpiry.setDate(newExpiry.getDate() + SESSION_TTL_DAYS);
+export async function completeSession(db: D1Database, id: string) {
+  await db.prepare(`
+    UPDATE bizforma_wizard_sessions
+    SET completed = 1, updated_at = datetime('now') WHERE id = ?1
+  `).bind(id).run();
+}
 
+export async function purgeExpiredSessions(db: D1Database) {
   await db.prepare(
-    `UPDATE formation_wizard_sessions SET
-       current_step = COALESCE(?, current_step),
-       session_data = ?,
-       formation_case_id = COALESCE(?, formation_case_id),
-       expires_at = ?,
-       updated_at = datetime('now')
-     WHERE id = ? AND tenant_id = ?`
-  ).bind(
-    patch.current_step ?? null,
-    merged,
-    patch.formation_case_id ?? null,
-    newExpiry.toISOString(),
-    sessionId,
-    tenantId
+    "DELETE FROM bizforma_wizard_sessions WHERE expires_at < datetime('now') AND completed = 0"
   ).run();
-
-  return true;
-}
-
-export async function deleteWizardSession(
-  db: D1Database,
-  sessionId: string,
-  tenantId: string
-): Promise<void> {
-  await db.prepare(
-    `DELETE FROM formation_wizard_sessions
-     WHERE id = ? AND tenant_id = ?`
-  ).bind(sessionId, tenantId).run();
-}
-
-export async function purgeExpiredSessions(db: D1Database): Promise<number> {
-  const result = await db.prepare(
-    `DELETE FROM formation_wizard_sessions
-     WHERE expires_at < datetime('now')`
-  ).run();
-
-  return result.meta?.changes ?? 0;
 }

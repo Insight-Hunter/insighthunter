@@ -1,178 +1,63 @@
-import type { BizformaEnv } from "../types.js";
+// services/compliance-calendar.ts — Annual report, BOI, tax deadlines
+import type { D1Database } from "@cloudflare/workers-types";
 
-export interface ComplianceRule {
-  event_type: string;
+export interface ComplianceEvent {
+  id: string;
+  case_id: string;
+  org_id: string;
+  event_type: string;   // annual_report | boi_filing | tax_deadline | registered_agent_renewal
   title: string;
-  description: string;
-  offsetMonths: number;
-  recurringMonths?: number;
+  due_date: string;
+  status: string;       // pending | completed | overdue | waived
+  notes?: string;
+  created_at: string;
+  updated_at: string;
 }
 
-const STATE_ANNUAL_REPORT_MONTH: Record<string, number> = {
-  GA: 4,
-  DE: 3,
-  FL: 5,
-  TX: 5,
-  CA: 3,
-  NY: 3,
-  WY: 1,
-  NV: 1,
-  CO: 4,
-};
-
-function getBaseRules(entityType: string, state: string, formedAt: string): ComplianceRule[] {
-  const annualReportMonth = STATE_ANNUAL_REPORT_MONTH[state] ?? 4;
-  const formedDate = new Date(formedAt);
-  const monthsToAnnual = ((annualReportMonth - 1 - formedDate.getMonth()) + 12) % 12 || 12;
-
-  const rules: ComplianceRule[] = [
-    {
-      event_type: "registered_agent_renewal",
-      title: "Registered Agent Renewal",
-      description: "Renew your registered agent service to maintain good standing.",
-      offsetMonths: 11,
-      recurringMonths: 12,
-    },
-    {
-      event_type: "annual_report",
-      title: `${state} Annual Report / Statement of Information`,
-      description: `File your annual report with the ${state} Secretary of State to maintain active status.`,
-      offsetMonths: monthsToAnnual,
-      recurringMonths: 12,
-    },
-  ];
-
-  if (entityType === "LLC" || entityType === "S-CORP" || entityType === "C-CORP") {
-    rules.push({
-      event_type: "tax_filing",
-      title: "Federal Tax Return Due",
-      description:
-        entityType === "C-CORP"
-          ? "Form 1120 — Corporate tax return due April 15 (or Oct 15 with extension)."
-          : "Form 1065 / Schedule K-1 or 1120-S due March 15.",
-      offsetMonths: entityType === "C-CORP" ? 4 : 3,
-      recurringMonths: 12,
-    });
-
-    rules.push({
-      event_type: "tax_filing",
-      title: `${state} State Tax Return Due`,
-      description: `File your ${state} state business tax return.`,
-      offsetMonths: entityType === "C-CORP" ? 4 : 3,
-      recurringMonths: 12,
-    });
-  }
-
-  if (entityType === "LLC") {
-    rules.push({
-      event_type: "license_renewal",
-      title: "Business License Renewal",
-      description: "Renew city/county business license. Check local requirements.",
-      offsetMonths: 12,
-      recurringMonths: 12,
-    });
-  }
-
-  return rules;
+export async function listEventsByCase(db: D1Database, caseId: string) {
+  const r = await db.prepare(
+    "SELECT * FROM bizforma_compliance_events WHERE case_id = ?1 ORDER BY due_date ASC"
+  ).bind(caseId).all();
+  return r.results ?? [];
 }
 
-export async function seedComplianceCalendar(
+export async function listUpcomingEvents(db: D1Database, orgId: string, daysAhead = 30) {
+  const cutoff = new Date(Date.now() + daysAhead * 86400000).toISOString().split("T")[0];
+  const r = await db.prepare(`
+    SELECT * FROM bizforma_compliance_events
+    WHERE org_id = ?1 AND status = 'pending' AND due_date <= ?2
+    ORDER BY due_date ASC
+  `).bind(orgId, cutoff).all();
+  return r.results ?? [];
+}
+
+export async function flagOverdueEvents(db: D1Database) {
+  const today = new Date().toISOString().split("T")[0];
+  await db.prepare(`
+    UPDATE bizforma_compliance_events
+    SET status = 'overdue', updated_at = datetime('now')
+    WHERE status = 'pending' AND due_date < ?1
+  `).bind(today).run();
+}
+
+export async function markEventComplete(db: D1Database, eventId: string, notes?: string) {
+  await db.prepare(`
+    UPDATE bizforma_compliance_events
+    SET status = 'completed', notes = COALESCE(?1, notes), updated_at = datetime('now')
+    WHERE id = ?2
+  `).bind(notes ?? null, eventId).run();
+}
+
+export async function createEvent(
   db: D1Database,
-  caseId: string,
-  tenantId: string,
-  entityType: string,
-  state: string,
-  formedAt: string,
-  yearsAhead = 2
-): Promise<number> {
-  const rules = getBaseRules(entityType, state, formedAt);
-  const baseDate = new Date(formedAt);
-  const cutoff = new Date(formedAt);
-  cutoff.setFullYear(cutoff.getFullYear() + yearsAhead);
-
-  const inserts: Promise<D1Result>[] = [];
-
-  for (const rule of rules) {
-    let dueDate = new Date(baseDate);
-    dueDate.setMonth(dueDate.getMonth() + rule.offsetMonths);
-
-    while (dueDate <= cutoff) {
-      const id = crypto.randomUUID();
-      inserts.push(
-        db.prepare(
-          `INSERT OR IGNORE INTO compliance_events
-           (id, formation_case_id, tenant_id, event_type, title, description, due_date, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
-        ).bind(
-          id,
-          caseId,
-          tenantId,
-          rule.event_type,
-          rule.title,
-          rule.description,
-          dueDate.toISOString().split("T")[0]
-        ).run()
-      );
-
-      if (!rule.recurringMonths) break;
-      dueDate = new Date(dueDate);
-      dueDate.setMonth(dueDate.getMonth() + rule.recurringMonths);
-    }
-  }
-
-  await Promise.all(inserts);
-  return inserts.length;
-}
-
-export async function getComplianceEvents(
-  db: D1Database,
-  caseId: string,
-  tenantId: string,
-  filter?: { status?: string; from?: string; to?: string }
-): Promise<Record<string, unknown>[]> {
-  let query = "SELECT * FROM compliance_events WHERE formation_case_id = ? AND tenant_id = ?";
-  const bindings: unknown[] = [caseId, tenantId];
-
-  if (filter?.status) {
-    query += " AND status = ?";
-    bindings.push(filter.status);
-  }
-  if (filter?.from) {
-    query += " AND due_date >= ?";
-    bindings.push(filter.from);
-  }
-  if (filter?.to) {
-    query += " AND due_date <= ?";
-    bindings.push(filter.to);
-  }
-
-  query += " ORDER BY due_date ASC";
-
-  const stmt = db.prepare(query);
-  const { results } = await stmt.bind(...bindings).all();
-  return (results ?? []) as Record<string, unknown>[];
-}
-
-export async function markComplianceEventComplete(
-  db: D1Database,
-  eventId: string,
-  tenantId: string
-): Promise<boolean> {
-  const result = await db.prepare(
-    `UPDATE compliance_events
-     SET status = 'completed', completed_at = datetime('now'), updated_at = datetime('now')
-     WHERE id = ? AND tenant_id = ?`
-  ).bind(eventId, tenantId).run();
-
-  return (result.meta?.changes ?? 0) > 0;
-}
-
-export async function flagOverdueEvents(db: D1Database): Promise<number> {
-  const result = await db.prepare(
-    `UPDATE compliance_events
-     SET status = 'overdue', updated_at = datetime('now')
-     WHERE status IN ('due', 'pending') AND due_date < date('now')`
-  ).run();
-
-  return result.meta?.changes ?? 0;
+  data: Omit<ComplianceEvent, "id" | "created_at" | "updated_at">
+) {
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+  await db.prepare(`
+    INSERT INTO bizforma_compliance_events
+      (id, case_id, org_id, event_type, title, due_date, status, notes, created_at, updated_at)
+    VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10)
+  `).bind(id, data.case_id, data.org_id, data.event_type, data.title,
+    data.due_date, data.status ?? "pending", data.notes ?? null, now, now).run();
 }
