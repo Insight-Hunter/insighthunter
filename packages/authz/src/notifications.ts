@@ -1,25 +1,39 @@
-// Notification helpers — email via Resend + in-app via D1 notifications table
+// Notification helpers — CF Email Service (SEND_EMAIL binding) + in-app via D1
+
+// Cloudflare Email Service binding interface
+export interface SendEmailBinding {
+  send(message: {
+    to: { email: string; name?: string }[];
+    from: { email: string; name?: string };
+    subject: string;
+    html?: string;
+    text?: string;
+  }): Promise<void>;
+}
+
 export type NotificationSeverity = 'info' | 'warning' | 'critical';
 
+// Send transactional email via Cloudflare Email Service binding
+// The binding is injected from env (SEND_EMAIL) — no API key needed
 export async function sendEmail(opts: {
-  apiKey: string;
+  binding: SendEmailBinding;
   to: string;
   subject: string;
   html: string;
   from?: string;
+  fromName?: string;
 }): Promise<boolean> {
   try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${opts.apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: opts.from ?? 'InsightHunter <noreply@insighthunter.app>',
-        to: opts.to,
-        subject: opts.subject,
-        html: opts.html,
-      }),
+    await opts.binding.send({
+      to: [{ email: opts.to }],
+      from: {
+        email: opts.from ?? 'noreply@insighthunter.app',
+        name: opts.fromName ?? 'InsightHunter',
+      },
+      subject: opts.subject,
+      html: opts.html,
     });
-    return res.ok;
+    return true;
   } catch {
     return false;
   }
