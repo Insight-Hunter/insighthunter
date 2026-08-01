@@ -1,8 +1,8 @@
 // apps/insighthunter-main — Unified dashboard launcher (app.insighthunter.app)
 import { Hono } from 'hono';
 import { html } from 'hono/html';
-import { authGuard, getSession } from '@insighthunter/authz';
-import type { IHSession } from '@insighthunter/authz';
+import { authGuard, getSession } from '@insighthunter/auth-shared';
+import type { IHSession } from '@insighthunter/auth-shared';
 
 type Bindings = { KV_SESSIONS: KVNamespace };
 
@@ -20,18 +20,18 @@ app.use('*', async (c, next) => {
 app.use('/*', authGuard());
 
 const APP_TILES = [
-  { id: 'insights',     label: 'Insights',     icon: '📊', url: 'https://insights.insighthunter.app',     perm: 'forecast:read',      desc: 'Financial KPIs & forecasting' },
-  { id: 'bookkeeping',  label: 'Bookkeeping',  icon: '📒', url: 'https://bookkeeping.insighthunter.app',  perm: 'bookkeeping:read',   desc: 'Transactions & reconciliation' },
-  { id: 'payroll',      label: 'Payroll',      icon: '💰', url: 'https://payroll.insighthunter.app',      perm: 'payroll:read',       desc: 'Payroll & tax estimates' },
-  { id: 'advisor',      label: 'Advisor',      icon: '🤖', url: 'https://advisor.insighthunter.app',      perm: 'forecast:read',      desc: 'AI-powered CFO assistant' },
-  { id: 'bizforma',     label: 'BizForma',     icon: '🏛️', url: 'https://bizforma.insighthunter.app',     perm: 'documents:read',     desc: 'Entity & compliance management' },
-  { id: 'pbx',          label: 'PBX',          icon: '📞', url: 'https://pbx.insighthunter.app',          perm: 'org:read',           desc: 'Business phone & call analytics' },
-  { id: 'reports',      label: 'Reports',      icon: '📄', url: 'https://reports.insighthunter.app',      perm: 'reports:read',       desc: 'Automated financial reports' },
-  { id: 'ledger',       label: 'Ledger',       icon: '🗒️', url: 'https://ledger.insighthunter.app',       perm: 'bookkeeping:read',   desc: 'General ledger & chart of accounts' },
-  { id: 'finops',       label: 'FinOps',       icon: '⚙️', url: 'https://finops.insighthunter.app',       perm: 'billing:read',       desc: 'Cost optimization & tracking' },
-  { id: 'scout',        label: 'Scout',        icon: '🔍', url: 'https://scout.insighthunter.app',        perm: 'reports:read',       desc: 'Business intelligence & signals' },
-  { id: 'dispatch',     label: 'Dispatch',     icon: '🚚', url: 'https://dispatch.insighthunter.app',     perm: 'org:read',           desc: 'Operations & task dispatch' },
-  { id: 'notifications',label: 'Notifications',icon: '🔔', url: 'https://notifications.insighthunter.app',perm: 'org:read',           desc: 'Alerts & team notifications' },
+  { id: 'insights',     label: 'Insights',     icon: '📊', url: 'https://insights.insighthunter.app',     desc: 'Financial KPIs & forecasting' },
+  { id: 'bookkeeping',  label: 'Bookkeeping',  icon: '📒', url: 'https://bookkeeping.insighthunter.app',  desc: 'Transactions & reconciliation' },
+  { id: 'payroll',      label: 'Payroll',      icon: '💰', url: 'https://payroll.insighthunter.app',      desc: 'Payroll & tax estimates' },
+  { id: 'advisor',      label: 'Advisor',      icon: '🤖', url: 'https://advisor.insighthunter.app',      desc: 'AI-powered CFO assistant' },
+  { id: 'bizforma',     label: 'BizForma',     icon: '🏛️', url: 'https://bizforma.insighthunter.app',     desc: 'Entity & compliance management' },
+  { id: 'pbx',          label: 'PBX',          icon: '📞', url: 'https://pbx.insighthunter.app',          desc: 'Business phone & call analytics' },
+  { id: 'reports',      label: 'Reports',      icon: '📄', url: 'https://reports.insighthunter.app',      desc: 'Automated financial reports' },
+  { id: 'ledger',       label: 'Ledger',       icon: '🗒️', url: 'https://ledger.insighthunter.app',       desc: 'General ledger & chart of accounts' },
+  { id: 'finops',       label: 'FinOps',       icon: '⚙️', url: 'https://finops.insighthunter.app',       desc: 'Cost optimization & tracking' },
+  { id: 'scout',        label: 'Scout',        icon: '🔍', url: 'https://scout.insighthunter.app',        desc: 'Business intelligence & signals' },
+  { id: 'dispatch',     label: 'Dispatch',     icon: '🚚', url: 'https://dispatch.insighthunter.app',     desc: 'Operations & task dispatch' },
+  { id: 'notifications',label: 'Notifications',icon: '🔔', url: 'https://notifications.insighthunter.app',desc: 'Alerts & team notifications' },
 ] as const;
 
 const CSS = `

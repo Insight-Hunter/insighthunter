@@ -1,29 +1,19 @@
 {
   "name": "insighthunter-main",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "check": "astro check",
-    "format": "prettier --write ."
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.9",
-    "@astrojs/cloudflare": "^12.6.0",
-    "@astrojs/mdx": "^4.3.0",
-    "@astrojs/rss": "^4.0.12",
-    "@astrojs/sitemap": "^3.6.0",
-    "@astrojs/svelte": "^9.0.1",
-    "astro": "^5.12.8",
-    "hono": "^4.12.27",
-    "svelte": "^5.56.8",
-    "zod": "^3.24.1"
+    "@insighthunter/auth-shared": "workspace:*",
+    "hono": "^4.6.10"
   },
   "devDependencies": {
-    "prettier": "^3.3.3",
-    "typescript": "^5.9.3"
+    "@cloudflare/workers-types": "^4.20250701.0"
   }
 }
