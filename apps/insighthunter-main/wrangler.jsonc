@@ -1,36 +1,16 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "insighthunter-main",
-  "main": "./dist/_worker.js/index.js",
+  "main": "src/index.ts",
   "compatibility_date": "2026-07-25",
-  "assets": {
-    "directory": "./dist"
-  },
-  "observability": {
-    "enabled": true
-  },
-  "vars": {
-    "PUBLIC_SITE_URL": "https://insighthunter.app",
-    "PUBLIC_AUTH_URL": "https://auth.insighthunter.app",
-    "PUBLIC_APP_NAME": "Insight Hunter"
-  },
-
-  "routes": [
-    { "pattern": "insighthunter.app/*", "zone_name": "insighthunter.app" }
-  ],
-
-  "d1_databases": [
+  "observability": { "enabled": true },
+  "kv_namespaces": [
     {
-      "binding": "DB",
-      "database_name": "insighthunter-platform",
-      "database_id": "9fbe62e8-f08a-407a-a37d-5b23eeb6f8af"
+      "binding": "KV_SESSIONS",
+      "id": "REPLACE_WITH_KV_NAMESPACE_ID"
     }
   ],
-
-  "kv_namespaces": [
-    { "binding": "AUTH_KV",  "id": "8ac9bbaeda4d410db31878ebb8b8a3f1" },
-    { "binding": "SESSIONS", "id": "60e34ba310ca40c79edec05470c7a271" }
+  "routes": [
+    { "pattern": "app.insighthunter.app/*", "zone_name": "insighthunter.app" }
   ]
-
-  // Secrets — set via: wrangler secret put JWT_SECRET
-  // JWT_SECRET
 }
