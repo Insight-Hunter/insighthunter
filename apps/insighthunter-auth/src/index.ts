@@ -181,7 +181,11 @@ app.post('/login', async (c) => {
   return c.redirect(redirect);
 });
 
-// GET /register
+// GET /signup and /register
+app.get('/signup', (c) => {
+  return c.redirect('/register');
+});
+
 app.get('/register', (c) => {
   const plan = c.req.query('plan') ?? 'starter';
   const error = c.req.query('error');
