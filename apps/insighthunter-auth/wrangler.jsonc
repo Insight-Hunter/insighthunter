@@ -17,6 +17,14 @@
       "id": "REPLACE_WITH_KV_NAMESPACE_ID"
     }
   ],
+  // Cloudflare Email Service — Workers Paid required
+  // Setup: CF Dashboard → Compute → Email Service → Onboard Domain → insighthunter.app
+  "send_email": [
+    {
+      "name": "SEND_EMAIL",
+      "destination_address": "noreply@insighthunter.app"
+    }
+  ],
   "vars": {
     "APP_BASE_URL": "https://auth.insighthunter.app",
     "DASHBOARD_URL": "https://app.insighthunter.app",

@@ -4,11 +4,24 @@ import { setCookie, getCookie, deleteCookie } from 'hono/cookie';
 import { cors } from 'hono/middleware';
 import type { OrgRole } from '@insighthunter/authz';
 
+// Cloudflare Email Service binding type (Workers Paid)
+declare const SendEmail: unique symbol;
+export interface SendEmailBinding {
+  send(message: {
+    to: { email: string; name?: string }[];
+    from: { email: string; name?: string };
+    subject: string;
+    html?: string;
+    text?: string;
+    reply_to?: { email: string; name?: string }[];
+  }): Promise<void>;
+}
+
 type Bindings = {
   DB: D1Database;
   KV_SESSIONS: KVNamespace;
   AUTH_SECRET: string;
-  RESEND_API_KEY: string;
+  SEND_EMAIL: SendEmailBinding; // CF Email Service — no API key needed
   APP_BASE_URL: string;
   DASHBOARD_URL: string;
   MARKETING_URL: string;
@@ -79,11 +92,18 @@ async function writeAudit(db: D1Database, orgId: string, userId: string, action:
     .bind(crypto.randomUUID(), orgId, userId, action, resourceType, ip).run();
 }
 
-async function sendEmail(apiKey: string, to: string, subject: string, body: string): Promise<void> {
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: 'InsightHunter <noreply@insighthunter.app>', to, subject, html: body }),
+// Cloudflare Email Service — uses SEND_EMAIL binding, no external API key
+async function sendEmail(
+  binding: SendEmailBinding,
+  to: string,
+  subject: string,
+  htmlBody: string,
+): Promise<void> {
+  await binding.send({
+    to: [{ email: to }],
+    from: { email: 'noreply@insighthunter.app', name: 'InsightHunter' },
+    subject,
+    html: htmlBody,
   });
 }
 
@@ -212,8 +232,12 @@ app.post('/register', async (c) => {
     c.env.DB.prepare('INSERT INTO verification_tokens (id, user_id, token, type, expires_at) VALUES (?,?,?,\'email_verify\',?)').bind(tokenId, userId, verifyToken, now + 86400),
   ]);
   const verifyUrl = `${c.env.APP_BASE_URL}/verify-email?token=${verifyToken}`;
-  await sendEmail(c.env.RESEND_API_KEY, email, 'Verify your InsightHunter account',
-    `<p>Hi ${name},</p><p>Click below to verify your email:</p><p><a href="${verifyUrl}" style="background:#0ea5e9;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Verify Email</a></p><p>Expires in 24 hours.</p>`);
+  await sendEmail(
+    c.env.SEND_EMAIL,
+    email,
+    'Verify your InsightHunter account',
+    `<p>Hi ${name},</p><p>Click below to verify your email:</p><p><a href="${verifyUrl}" style="background:#0ea5e9;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Verify Email</a></p><p>Expires in 24 hours.</p>`,
+  );
   await writeAudit(c.env.DB, orgId, userId, 'user.register', 'user', ip);
   return c.redirect('/check-email?email=' + encodeURIComponent(email));
 });
@@ -282,8 +306,12 @@ app.post('/forgot-password', async (c) => {
     await c.env.DB.prepare('INSERT INTO verification_tokens (id, user_id, token, type, expires_at) VALUES (?,?,?,\'password_reset\',?)')
       .bind(crypto.randomUUID(), user.id, resetToken, now + 3600).run();
     const resetUrl = `${c.env.APP_BASE_URL}/reset-password?token=${resetToken}`;
-    await sendEmail(c.env.RESEND_API_KEY, email, 'Reset your InsightHunter password',
-      `<p>Hi ${user.name},</p><p>Click to reset your password (expires in 1 hour):</p><p><a href="${resetUrl}" style="background:#0ea5e9;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;">Reset Password</a></p>`);
+    await sendEmail(
+      c.env.SEND_EMAIL,
+      email,
+      'Reset your InsightHunter password',
+      `<p>Hi ${user.name},</p><p>Click to reset your password (expires in 1 hour):</p><p><a href="${resetUrl}" style="background:#0ea5e9;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;">Reset Password</a></p>`,
+    );
   }
   return c.redirect('/check-email?email=' + encodeURIComponent(email));
 });
@@ -332,7 +360,7 @@ app.get('/api/session', async (c) => {
   return c.json({ valid: true, session });
 });
 
-// API: /api/session (legacy /session/:token stub for backwards compat)
+// Legacy /session/:token stub for backwards compat
 app.get('/session/:token', (c) => c.json({
   ok: true,
   session: { token: c.req.param('token'), user: { subject: 'demo-user', email: 'demo@insighthunter.app' }, expiresAt: new Date(Date.now() + 3600000).toISOString() },
