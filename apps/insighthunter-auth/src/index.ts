@@ -2,10 +2,9 @@ import { Hono } from 'hono';
 import { html } from 'hono/html';
 import { setCookie, getCookie, deleteCookie } from 'hono/cookie';
 import { cors } from 'hono/middleware';
-import type { OrgRole } from '@insighthunter/authz';
+import type { OrgRole } from '@insighthunter/auth-shared';
 
 // Cloudflare Email Service binding type (Workers Paid)
-declare const SendEmail: unique symbol;
 export interface SendEmailBinding {
   send(message: {
     to: { email: string; name?: string }[];

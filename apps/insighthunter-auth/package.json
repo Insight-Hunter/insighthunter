@@ -10,7 +10,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@insighthunter/authz": "workspace:*",
+    "@insighthunter/auth-shared": "workspace:*",
     "hono": "^4.6.10"
   },
   "devDependencies": {
