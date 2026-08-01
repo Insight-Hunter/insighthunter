@@ -1,95 +1,100 @@
 {
-  // insighthunter-bizforma — Business Formation App
-  "name": "insighthunter-bizforma",
-  "main": "src/index.ts",
-  "compatibility_date": "2025-03-07",
-  "compatibility_flags": ["nodejs_compat"],
-
-  "observability": {
-    "enabled": true,
-    "head_sampling_rate": 1
-  },
-
-  // Cron triggers — daily reminders + overdue flagging
-  "triggers": {
-    "crons": ["0 9 * * *", "0 0 * * *"]
-  },
-
-  "vars": {
-    "APP_NAME": "insighthunter-bizforma",
-    "ENVIRONMENT": "development",
-    "AUTH_URL": "https://auth.insighthunter.app",
-    "APP_URL": "https://bizforma.insighthunter.app",
-    "JWKS_URL": "https://auth.insighthunter.app/.well-known/jwks.json"
-  },
-
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "insighthunter-bizforma",
-      "database_id": "ab885914-020c-47fa-b269-ce15710d2ffb",
-      "migrations_dir": "../../packages/database/migrations"
-    }
-  ],
-
-  "r2_buckets": [
-    {
-      "binding": "DOCUMENTS",
-      "bucket_name": "insighthunter-bizforma-documents",
-      "preview_bucket_name": "insighthunter-bizforma-documents-preview"
-    }
-  ],
-
-  "kv_namespaces": [
-    {
-      "binding": "CACHE",
-      "id": "REPLACE_WITH_KV_NAMESPACE_ID",
-      "preview_id": "REPLACE_WITH_KV_PREVIEW_ID"
-    }
-  ],
-
-  "queues": {
-    "producers": [
-      { "binding": "PDF_QUEUE",      "queue": "insighthunter-bizforma-pdf" },
-      { "binding": "REMINDER_QUEUE", "queue": "insighthunter-bizforma-reminders" }
-    ],
-    "consumers": [
-      {
-        "queue": "insighthunter-bizforma-pdf",
-        "max_batch_size": 5,
-        "max_batch_timeout": 30,
-        "dead_letter_queue": "insighthunter-bizforma-pdf-dlq"
-      },
-      {
-        "queue": "insighthunter-bizforma-reminders",
-        "max_batch_size": 20,
-        "max_batch_timeout": 60,
-        "dead_letter_queue": "insighthunter-bizforma-reminders-dlq"
-      }
-    ]
-  },
-
-  "analytics_engine_datasets": [
-    {
-      "binding": "ANALYTICS",
-      "dataset": "insighthunter_bizforma_events"
-    }
-  ],
-
-  "ai": {
-    "binding": "AI"
-  },
-
-  "durable_objects": {
-    "bindings": [
-      { "name": "FORMATION_AGENT", "class_name": "FormationAgent" }
-    ]
-  },
-
-  "migrations": [
-    {
-      "tag": "v1-formation-agent",
-      "new_sqlite_classes": ["FormationAgent"]
-    }
-  ]
+	// insighthunter-bizforma — Business Formation App
+	"name": "insighthunter-bizforma",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-03-07",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"observability": {
+		"enabled": true,
+		"head_sampling_rate": 1
+	},
+	// Cron triggers — daily reminders + overdue flagging
+	"triggers": {
+		"crons": [
+			"0 9 * * *",
+			"0 0 * * *"
+		]
+	},
+	"vars": {
+		"APP_NAME": "insighthunter-bizforma",
+		"ENVIRONMENT": "development",
+		"AUTH_URL": "https://auth.insighthunter.app",
+		"APP_URL": "https://bizforma.insighthunter.app",
+		"JWKS_URL": "https://auth.insighthunter.app/.well-known/jwks.json"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "insighthunter-bizforma",
+			"database_id": "ab885914-020c-47fa-b269-ce15710d2ffb",
+			"migrations_dir": "../../packages/database/migrations"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "DOCUMENTS",
+			"bucket_name": "insighthunter-bizforma-documents",
+			"preview_bucket_name": "insighthunter-bizforma-documents-preview"
+		}
+	],
+	"kv_namespaces": [
+		{
+			"binding": "CACHE",
+			"id": "785b5540d57b49bc8760e63824c36129",
+			"preview_id": "1171ae60a27b49f2b3ab24026d88795d"
+		}
+	],
+	"queues": {
+		"producers": [
+			{
+				"binding": "PDF_QUEUE",
+				"queue": "insighthunter-bizforma-pdf"
+			},
+			{
+				"binding": "REMINDER_QUEUE",
+				"queue": "insighthunter-bizforma-reminders"
+			}
+		],
+		"consumers": [
+			{
+				"queue": "insighthunter-bizforma-pdf",
+				"max_batch_size": 5,
+				"max_batch_timeout": 30,
+				"dead_letter_queue": "insighthunter-bizforma-pdf-dlq"
+			},
+			{
+				"queue": "insighthunter-bizforma-reminders",
+				"max_batch_size": 20,
+				"max_batch_timeout": 60,
+				"dead_letter_queue": "insighthunter-bizforma-reminders-dlq"
+			}
+		]
+	},
+	"analytics_engine_datasets": [
+		{
+			"binding": "ANALYTICS",
+			"dataset": "insighthunter_bizforma_events"
+		}
+	],
+	"ai": {
+		"binding": "AI"
+	},
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "FORMATION_AGENT",
+				"class_name": "FormationAgent"
+			}
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1-formation-agent",
+			"new_sqlite_classes": [
+				"FormationAgent"
+			]
+		}
+	]
 }
