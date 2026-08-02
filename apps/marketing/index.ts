@@ -175,7 +175,7 @@ app.get('/', (c) => {
       <li>5 Users + Roles</li>
       <li>Unlimited History</li>
     </ul>
-    <a href="https://auth.insighthunter.app/register?plan=growth" class="btn btn-primary" style="width:100%;text-align:center;">Start Free Trial</a>
+    <a href="https://auth.insighthunter.app/register" class="btn btn-primary" style="width:100%;text-align:center;">Start Free Trial</a>
   </div>
   <div class="price-card">
     <h3>Enterprise</h3>

@@ -1,8 +1,10 @@
 import { Hono } from 'hono';
 import { html } from 'hono/html';
 import { setCookie, getCookie, deleteCookie } from 'hono/cookie';
-import { cors } from 'hono/middleware';
-import type { OrgRole } from '@insighthunter/auth-shared';
+import { cors } from 'hono/cors';
+import { crypto, File, FormData, TextEncoder, URLSearchParams, type D1Database, type KVNamespace } from '@cloudflare/workers-types';
+
+export type OrgRole = 'owner' | 'admin' | 'finance_manager' | 'analyst' | 'bookkeeper' | 'viewer';
 
 // Cloudflare Email Service binding type (Workers Paid)
 export interface SendEmailBinding {
@@ -57,12 +59,42 @@ app.use('/api/*', cors({
   credentials: true,
 }));
 
+function getFormValue(body: unknown, key: string): string {
+  if (body instanceof FormData) {
+    return (body.get(key) as string | null) ?? '';
+  }
+
+  if (body instanceof URLSearchParams) {
+    return body.get(key) ?? '';
+  }
+
+  if (body && typeof body === 'object') {
+    const record = body as Record<string, unknown>;
+    const value = record[key];
+
+    if (typeof value === 'string') {
+      return value;
+    }
+
+    if (Array.isArray(value) && value.length > 0) {
+      const first = value[0];
+      return typeof first === 'string' ? first : '';
+    }
+
+    if (value instanceof File) {
+      return value.name;
+    }
+  }
+
+  return '';
+}
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 async function hashPassword(password: string): Promise<string> {
   const data = new TextEncoder().encode(password);
   const hash = await crypto.subtle.digest('SHA-256', data);
-  return btoa(String.fromCharCode(...new Uint8Array(hash)));
+  return (String.fromCharCode(...new Uint8Array(hash)));
 }
 
 async function verifyPassword(password: string, hash: string): Promise<boolean> {
@@ -160,9 +192,9 @@ app.get('/login', (c) => {
 // POST /login
 app.post('/login', async (c) => {
   const body = await c.req.parseBody();
-  const email = (body.email as string)?.toLowerCase().trim();
-  const password = body.password as string;
-  const redirect = (body.redirect as string) || c.env.DASHBOARD_URL;
+  const email = getFormValue(body, 'email').toLowerCase().trim();
+  const password = getFormValue(body, 'password');
+  const redirect = getFormValue(body, 'redirect') || c.env.DASHBOARD_URL;
   const ip = c.req.header('CF-Connecting-IP') ?? '0.0.0.0';
   const ua = c.req.header('User-Agent') ?? '';
   if (!email || !password) return c.redirect('/login?error=invalid');
@@ -210,11 +242,11 @@ app.get('/register', (c) => {
 // POST /register
 app.post('/register', async (c) => {
   const body = await c.req.parseBody();
-  const email = (body.email as string)?.toLowerCase().trim();
-  const name = (body.name as string)?.trim();
-  const company = (body.company as string)?.trim();
-  const password = body.password as string;
-  const plan = (body.plan as string) || 'starter';
+  const email = getFormValue(body, 'email').toLowerCase().trim();
+  const name = getFormValue(body, 'name').trim();
+  const company = getFormValue(body, 'company').trim();
+  const password = getFormValue(body, 'password');
+  const plan = getFormValue(body, 'plan') || 'starter';
   const ip = c.req.header('CF-Connecting-IP') ?? '0.0.0.0';
   if (!email || !name || !company || !password) return c.redirect('/register?error=missing');
   if (password.length < 8) return c.redirect('/register?error=weak_password');
@@ -300,7 +332,7 @@ app.get('/forgot-password', (c) => {
 // POST /forgot-password
 app.post('/forgot-password', async (c) => {
   const body = await c.req.parseBody();
-  const email = (body.email as string)?.toLowerCase().trim();
+  const email = getFormValue(body, 'email').toLowerCase().trim();
   if (!email) return c.redirect('/forgot-password');
   const user = await c.env.DB.prepare('SELECT id, name FROM users WHERE email = ?').bind(email).first<{ id: string; name: string }>();
   if (user) {
@@ -339,8 +371,8 @@ app.get('/reset-password', (c) => {
 // POST /reset-password
 app.post('/reset-password', async (c) => {
   const body = await c.req.parseBody();
-  const token = body.token as string;
-  const password = body.password as string;
+  const token = getFormValue(body, 'token');
+  const password = getFormValue(body, 'password');
   if (!token || !password || password.length < 8) return c.redirect(`/reset-password?token=${token}&error=1`);
   const now = Math.floor(Date.now() / 1000);
   const rec = await c.env.DB.prepare(`SELECT user_id FROM verification_tokens WHERE token = ? AND type = 'password_reset' AND expires_at > ? AND used_at IS NULL`).bind(token, now).first<{ user_id: string }>();
