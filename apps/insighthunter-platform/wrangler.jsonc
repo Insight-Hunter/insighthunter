@@ -21,30 +21,24 @@
       "binding": "DB",
       "database_name": "insighthunter-db",
       "database_id": "4c00676f-9023-4f25-a634-17817594ea0b"
-    },
-    {
-      "binding": "insighthunter_platform",
-      "database_name": "insighthunter-platform",
-      "database_id": "9fbe62e8-f08a-407a-a37d-5b23eeb6f8af"
     }
   ],
 
   "kv_namespaces": [
     {
-      "binding": "AUTH_KV",
-      "id": "8ac9bbaeda4d410db31878ebb8b8a3f1"
+      "binding": "KV_SESSIONS",
+      "id": "084631d3b2704097a57e57d89daee600"
     },
     {
-      "binding":  "KV_SESSIONS",
-      "id":  "084631d3b2704097a57e57d89daee600"
+      "binding": "KV_ENTITLEMENTS",
+      "id": "8ac9bbaeda4d410db31878ebb8b8a3f1"
     }
   ],
 
   "vars": {
-    "AUTH_ISSUER": "https://auth.insighthunter.app",
-    "AUTH_AUDIENCE": "insighthunter-app",
-    "AUTH_JWKS_URL": "https://auth.insighthunter.app/.well-known/jwks.json"
+    "AUTH_URL": "https://auth.insighthunter.app",
+    "DASHBOARD_URL": "https://app.insighthunter.app"
   }
 
-  // Secrets — wrangler secret put JWT_SECRET --name insighthunter-platform
+  // wrangler secret put STRIPE_PORTAL_URL --name insighthunter-platform
 }
