@@ -1,0 +1,33 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "insighthunter-insights",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-29",
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  "routes": [
+    { "pattern": "insights.insighthunter.app/*", "zone_name": "insighthunter.app" }
+  ],
+
+  // Shared D1 — same database as all other Workers
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter-db",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+    }
+  ],
+
+  "vars": {
+    "AUTH_URL":      "https://auth.insighthunter.app",
+    "DASHBOARD_URL": "https://app.insighthunter.app",
+    "ENVIRONMENT":   "production"
+  }
+
+  // No KV needed — gateway handles session; this Worker is stateless except D1.
+  // Replace REPLACE_WITH_D1_DATABASE_ID with the real id from insighthunter-auth/wrangler.jsonc
+}
