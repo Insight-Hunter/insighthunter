@@ -1,0 +1,69 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "insighthunter-bookkeeping",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-29",
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  "routes": [
+    { "pattern": "bookkeeping.insighthunter.app/*", "zone_name": "insighthunter.app" }
+  ],
+
+  // Shared D1 — same database as all other Workers
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter-db",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+    }
+  ],
+
+  // R2 bucket for raw CSV/OFX uploads
+  // Create with: wrangler r2 bucket create insighthunter-imports
+  "r2_buckets": [
+    {
+      "binding": "IMPORTS",
+      "bucket_name": "insighthunter-imports"
+    }
+  ],
+
+  // Queue for async CSV parse jobs
+  // Create with: wrangler queues create insighthunter-import-queue
+  "queues": {
+    "producers": [
+      { "binding": "IMPORT_QUEUE", "queue": "insighthunter-import-queue" }
+    ],
+    "consumers": [
+      {
+        "queue": "insighthunter-import-queue",
+        "max_batch_size": 10,
+        "max_batch_timeout": 30,
+        "max_retries": 3,
+        "dead_letter_queue": "insighthunter-import-dlq"
+      }
+    ]
+  },
+
+  // KV for fast import status polling
+  // Create with: wrangler kv namespace create KV_IMPORT_STATUS --name insighthunter-bookkeeping
+  "kv_namespaces": [
+    {
+      "binding": "KV_IMPORT_STATUS",
+      "id": "REPLACE_WITH_KV_IMPORT_STATUS_ID"
+    }
+  ],
+
+  "vars": {
+    "AUTH_URL":      "https://auth.insighthunter.app",
+    "DASHBOARD_URL": "https://app.insighthunter.app",
+    "ENVIRONMENT":   "production"
+  }
+
+  // No Durable Objects, no nodejs_compat needed.
+  // Replace all REPLACE_WITH_* with real provisioned IDs.
+  // Deploy order: provision R2 + Queue + KV first, then wrangler deploy.
+}
