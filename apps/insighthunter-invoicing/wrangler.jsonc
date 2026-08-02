@@ -1,0 +1,50 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "insighthunter-invoicing",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-29",
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  "routes": [
+    { "pattern": "invoicing.insighthunter.app/*", "zone_name": "insighthunter.app" }
+  ],
+
+  // Shared D1 — same database as all other Workers
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter-db",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+    }
+  ],
+
+  // R2 bucket for generated PDFs
+  // Create with: wrangler r2 bucket create insighthunter-invoice-pdfs
+  "r2_buckets": [
+    {
+      "binding": "INVOICE_PDFS",
+      "bucket_name": "insighthunter-invoice-pdfs"
+    }
+  ],
+
+  // Cloudflare Browser Rendering — for HTML-to-PDF invoice generation
+  // Enable in Cloudflare dashboard: Workers & Pages → your Worker → Browser Rendering
+  "browser": {
+    "binding": "BROWSER"
+  },
+
+  "vars": {
+    "AUTH_URL":      "https://auth.insighthunter.app",
+    "DASHBOARD_URL": "https://app.insighthunter.app",
+    "APP_URL":       "https://invoicing.insighthunter.app",
+    "ENVIRONMENT":   "production"
+  }
+
+  // No Durable Objects, no nodejs_compat.
+  // Replace REPLACE_WITH_D1_DATABASE_ID with real provisioned ID.
+  // Deploy: wrangler deploy
+}
