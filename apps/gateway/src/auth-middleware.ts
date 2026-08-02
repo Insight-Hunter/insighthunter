@@ -1,78 +1,74 @@
-import type { Context, Next } from "hono";
-import {
-  createRemoteJwksVerifier,
-  extractAuthToken,
-  extractSessionToken,
-  getLoginRedirectUrl,
-  isProbablyBrowserRequest,
-  type AuthenticatedUser }
-  from "../../../packages/auth-shared/src/index.js";
+// auth-middleware.ts
+// Standalone session validation helper — imported by index.ts and any
+// future gateway sub-routes that need direct session access.
 
+export type OrgRole = 'owner' | 'admin' | 'member' | 'viewer';
+export type OrgPlan = 'starter' | 'growth' | 'pro' | 'enterprise';
 
-type GatewayBindings = {
-  APP_NAME: string;
-  AUTH_BASE_URL: string;
-  GATEWAY_BASE_URL: string;
-  AUTH_JWKS_URL: string;
-  AUTH_ISSUER: string;
-  AUTH_AUDIENCE: string;
+export interface IHSession {
+  sessionId: string;
+  userId: string;
+  orgId: string;
+  email: string;
+  name: string;
+  orgName: string;
+  orgSlug: string;
+  role: OrgRole;
+  plan: OrgPlan;
+  mfaVerified: boolean;
+  createdAt: number;
+  expiresAt: number;
+}
+
+/**
+ * Resolves an IHSession from the ih_session cookie against KV_SESSIONS.
+ * Returns null if missing, expired, or invalid.
+ */
+export async function resolveSession(
+  kv: KVNamespace,
+  cookieHeader: string | undefined,
+): Promise<IHSession | null> {
+  if (!cookieHeader) return null;
+  const match = cookieHeader.match(/ih_session=([^;\s]+)/);
+  const sessionId = match?.[1];
+  if (!sessionId) return null;
+
+  const session = await kv.get(`session:${sessionId}`, 'json') as IHSession | null;
+  if (!session) return null;
+  if (session.expiresAt < Math.floor(Date.now() / 1000)) return null;
+  return session;
+}
+
+/**
+ * Injects all IH identity headers onto a mutable Headers object.
+ * Call this before forwarding any proxied request downstream.
+ */
+export function injectIdentityHeaders(headers: Headers, session: IHSession): void {
+  headers.set('X-User-Id',    session.userId);
+  headers.set('X-Org-Id',     session.orgId);
+  headers.set('X-User-Email', session.email);
+  headers.set('X-User-Name',  session.name);
+  headers.set('X-User-Role',  session.role);
+  headers.set('X-Org-Plan',   session.plan);
+  headers.set('X-Org-Slug',   session.orgSlug);
+  headers.set('X-Org-Name',   session.orgName);
+  headers.set('X-Gateway',    'insighthunter-gateway');
+}
+
+/**
+ * Returns true if the request Accept header prefers HTML (browser navigation).
+ */
+export function isBrowserRequest(req: Request): boolean {
+  return (req.headers.get('Accept') ?? '').includes('text/html');
+}
+
+/**
+ * Plan hierarchy rank — higher = more features.
+ */
+export const PLAN_RANK: Record<OrgPlan, number> = {
+  starter: 0, growth: 1, pro: 2, enterprise: 3,
 };
 
-type GatewayVariables = {
-  authUser: AuthenticatedUser;
-  authToken: string;
-};
-
-export type GatewayEnv = {
-  Bindings: GatewayBindings;
-  Variables: GatewayVariables;
-};
-
-export async function requireAuth(c: Context<GatewayEnv>, next: Next): Promise<Response | void> {
-  const bearerToken = extractAuthToken(c.req.raw);
-  const sessionToken = extractSessionToken(c.req.raw);
-  const token = bearerToken ?? sessionToken;
-
-  if (!token) {
-    if (isProbablyBrowserRequest(c.req.raw)) {
-      const redirectUrl = getLoginRedirectUrl(
-        c.env.AUTH_BASE_URL,
-        c.env.GATEWAY_BASE_URL,
-        "/auth/callback",
-      );
-
-      return c.redirect(redirectUrl, 302);
-    }
-
-    return c.json(
-      {
-        error: "unauthorized",
-        message: "Missing bearer token or session cookie.",
-      },
-      401,
-    );
-  }
-
-  try {
-    const verifier = createRemoteJwksVerifier({
-      jwksUrl: c.env.AUTH_JWKS_URL,
-      issuer: c.env.AUTH_ISSUER,
-      audience: c.env.AUTH_AUDIENCE,
-    });
-
-    const user = await verifier.verify(token);
-
-    c.set("authUser", user);
-    c.set("authToken", token);
-
-    await next();
-  } catch (error) {
-    return c.json(
-      {
-        error: "invalid_token",
-        message: error instanceof Error ? error.message : "Token verification failed.",
-      },
-      401,
-    );
-  }
+export function planSufficient(userPlan: OrgPlan, required: OrgPlan[]): boolean {
+  return required.some(r => PLAN_RANK[userPlan] >= PLAN_RANK[r]);
 }
