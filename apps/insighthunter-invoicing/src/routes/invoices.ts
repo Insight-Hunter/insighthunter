@@ -5,7 +5,6 @@ import { Hono } from 'hono';
 import type { Env } from '../index.js';
 import { getSession } from '../index.js';
 import { nextInvoiceNumber } from '../services/number-sequence.js';
-import { writeRevenueJournalEntry } from '../services/journal-writer.js';
 import { generateInvoicePdf } from '../services/invoice-pdf.js';
 
 export const invoiceRoutes = new Hono<{ Bindings: Env }>();
