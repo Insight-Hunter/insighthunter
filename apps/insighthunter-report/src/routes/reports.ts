@@ -1,7 +1,4 @@
-// routes/reports.ts
-// All financial report endpoints — derived from shared D1 journal data.
-// Reports: trial-balance, profit-loss, balance-sheet, cash-flow, ar-aging, ap-aging.
-
+// apps/insighthunter-report/src/routes/reports.ts
 import { Hono } from 'hono';
 import type { Env } from '../index.js';
 import { getSession } from '../index.js';
@@ -127,8 +124,7 @@ reportRoutes.get('/cash-flow', async (c) => {
   `).bind(session.orgId, from, to).first<{ inflows: number; outflows: number }>();
 
   const billsPaid = await c.env.DB.prepare(`
-    SELECT
-      COALESCE(SUM(amount), 0) AS payments
+    SELECT COALESCE(SUM(amount), 0) AS payments
     FROM bill_payments
     WHERE org_id = ?1 AND paid_at BETWEEN ?2 AND ?3
   `).bind(session.orgId, from, to).first<{ payments: number }>();
@@ -163,16 +159,18 @@ reportRoutes.get('/ar-aging', async (c) => {
 
   const { results } = await c.env.DB.prepare(`
     SELECT
-      c.name,
-      COALESCE(SUM(CASE WHEN julianday(?2) - julianday(i.due_date) <= 0   THEN i.total_amount - i.amount_paid ELSE 0 END), 0) AS current,
-      COALESCE(SUM(CASE WHEN julianday(?2) - julianday(i.due_date) BETWEEN 1  AND 30  THEN i.total_amount - i.amount_paid ELSE 0 END), 0) AS days_30,
-      COALESCE(SUM(CASE WHEN julianday(?2) - julianday(i.due_date) BETWEEN 31 AND 60  THEN i.total_amount - i.amount_paid ELSE 0 END), 0) AS days_60,
-      COALESCE(SUM(CASE WHEN julianday(?2) - julianday(i.due_date) > 60               THEN i.total_amount - i.amount_paid ELSE 0 END), 0) AS days_90_plus,
-      COALESCE(SUM(i.total_amount - i.amount_paid), 0) AS total
+      COALESCE(c.name, i.customer_name) AS name,
+      COALESCE(SUM(CASE WHEN julianday(?2) - julianday(i.due_date) <= 0   THEN i.balance_due ELSE 0 END), 0) AS current,
+      COALESCE(SUM(CASE WHEN julianday(?2) - julianday(i.due_date) BETWEEN 1  AND 30  THEN i.balance_due ELSE 0 END), 0) AS days_30,
+      COALESCE(SUM(CASE WHEN julianday(?2) - julianday(i.due_date) BETWEEN 31 AND 60  THEN i.balance_due ELSE 0 END), 0) AS days_60,
+      COALESCE(SUM(CASE WHEN julianday(?2) - julianday(i.due_date) > 60               THEN i.balance_due ELSE 0 END), 0) AS days_90_plus,
+      COALESCE(SUM(i.balance_due), 0) AS total
     FROM invoices i
-    LEFT JOIN clients c ON c.id = i.client_id
-    WHERE i.org_id = ?1 AND i.status IN ('sent','overdue')
-    GROUP BY c.id, c.name
+    LEFT JOIN customers c ON c.id = i.customer_id
+    WHERE i.org_id = ?1
+      AND i.status IN ('sent','overdue')
+      AND i.balance_due > 0
+    GROUP BY c.id, c.name, i.customer_name
     ORDER BY total DESC
   `).bind(session.orgId, today).all<{
     name: string;
