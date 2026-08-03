@@ -39,7 +39,6 @@ app.use('/*', headerGuard());
 // ── Dashboard UI (SSR HTML) ───────────────────────────────────────────────────
 app.get('/', async (c) => {
   const name    = c.req.header('X-User-Name')  ?? 'there';
-  const email   = c.req.header('X-User-Email') ?? '';
   const role    = c.req.header('X-User-Role')  ?? 'member';
   const orgName = c.req.header('X-Org-Name')   ?? 'My Org';
   const plan    = c.req.header('X-Org-Plan')   ?? 'starter';
