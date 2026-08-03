@@ -23,13 +23,6 @@ export type PayrollLineResult = {
   netPay:          number;
 };
 
-// Simplified 2026 federal withholding (flat bracket approximation per pay period)
-const FEDERAL_RATE: Record<string, number[]> = {
-  // [bracket_limit_annual, marginal_rate]
-  single:  [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37],
-  married: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37],
-};
-
 // Simplified state flat tax rates (approximate 2026)
 const STATE_FLAT_RATE: Record<string, number> = {
   AL: 0.05, AK: 0.00, AZ: 0.025, AR: 0.047, CA: 0.093, CO: 0.044,
