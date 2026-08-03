@@ -1,3 +1,4 @@
+// apps/insighthunter-report/src/index.ts
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { reportRoutes } from './routes/reports.js';
@@ -74,13 +75,7 @@ app.get('/', async (c) => {
 
   const asOf = new Date().toISOString().slice(0, 10);
 
-  const [
-    cashFlow,
-    apAging,
-    trialBalance,
-    profitLoss,
-    balanceSheet,
-  ] = await Promise.all([
+  const [cashFlow, apAging, trialBalance, profitLoss, balanceSheet] = await Promise.all([
     c.env.DB.prepare(`
       SELECT
         COALESCE(SUM(CASE WHEN a.type = 'ASSET' THEN jl.credit - jl.debit ELSE 0 END), 0) AS inflows,
