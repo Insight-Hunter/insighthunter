@@ -1,7 +1,5 @@
-import type { D1Database } from "@cloudflare/workers-types";
-import { Hono } from "hono";
-
-export interface Env {
+eimport type { D1Database } from "@cloudflare/workers-types";
+import { Hono } from  interface Env {
   DB: D1Database;
 }
 
