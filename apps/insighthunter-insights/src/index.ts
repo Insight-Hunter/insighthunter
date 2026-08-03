@@ -60,7 +60,6 @@ async function getKPIs(db: D1Database, orgId: string): Promise<KPIRow[]> {
   const now   = new Date();
   const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]!;
   const prev  = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0]!;
-  const prevEnd = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0]!;
 
   const sql = `
     SELECT
