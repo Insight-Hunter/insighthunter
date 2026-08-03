@@ -86,7 +86,6 @@ app.route('/api/reconciliation', reconciliationRoutes);
 // SSR UI
 app.get('/', async (c) => {
   const session = getSession(c.req.raw)!;
-  const firstName = session.name.split(' ')[0] ?? session.name;
 
   const html = `<!DOCTYPE html>
 <html lang="en">
