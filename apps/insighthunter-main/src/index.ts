@@ -43,7 +43,6 @@ app.get('/', async (c) => {
   const role    = c.req.header('X-User-Role')  ?? 'member';
   const orgName = c.req.header('X-Org-Name')   ?? 'My Org';
   const plan    = c.req.header('X-Org-Plan')   ?? 'starter';
-  const orgSlug = c.req.header('X-Org-Slug')   ?? '';
 
   const firstName = name.split(' ')[0] ?? name;
   const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
