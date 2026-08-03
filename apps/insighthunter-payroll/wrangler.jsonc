@@ -1,0 +1,33 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "insighthunter-payroll",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-29",
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  "routes": [
+    { "pattern": "payroll.insighthunter.app/*", "zone_name": "insighthunter.app" }
+  ],
+
+  // Shared D1 — same database as all other Workers
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter-db",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+    }
+  ],
+
+  "vars": {
+    "AUTH_URL":      "https://auth.insighthunter.app",
+    "DASHBOARD_URL": "https://app.insighthunter.app",
+    "ENVIRONMENT":   "production"
+  }
+
+  // No Durable Objects, no Queue, no nodejs_compat.
+  // Replace REPLACE_WITH_D1_DATABASE_ID with real provisioned ID.
+}
