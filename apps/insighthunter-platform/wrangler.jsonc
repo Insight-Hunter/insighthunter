@@ -1,8 +1,8 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "insighthunter-platform",
   "main": "src/index.ts",
   "compatibility_date": "2026-07-29",
-  "compatibility_flags": ["nodejs_compat"],
 
   "observability": {
     "enabled": true,
@@ -16,29 +16,41 @@
     }
   ],
 
+  // Shared D1 — same database as insighthunter-auth
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "insighthunter-db",
-      "database_id": "4c00676f-9023-4f25-a634-17817594ea0b"
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
     }
   ],
 
   "kv_namespaces": [
     {
+      // Shared session store — same KV as insighthunter-auth
       "binding": "KV_SESSIONS",
-      "id": "084631d3b2704097a57e57d89daee600"
+      "id": "REPLACE_WITH_KV_SESSIONS_ID"
     },
     {
+      // Entitlements cache — separate namespace
+      // Create with: wrangler kv namespace create KV_ENTITLEMENTS
       "binding": "KV_ENTITLEMENTS",
-      "id": "8ac9bbaeda4d410db31878ebb8b8a3f1"
+      "id": "REPLACE_WITH_KV_ENTITLEMENTS_ID"
     }
   ],
 
   "vars": {
-    "AUTH_URL": "https://auth.insighthunter.app",
-    "DASHBOARD_URL": "https://app.insighthunter.app"
+    "AUTH_URL":          "https://auth.insighthunter.app",
+    "DASHBOARD_URL":     "https://app.insighthunter.app",
+    "STRIPE_PORTAL_URL": ""
   }
 
-  // wrangler secret put STRIPE_PORTAL_URL --name insighthunter-platform
+  // Secrets — set with wrangler secret put:
+  //   wrangler secret put STRIPE_PORTAL_URL --name insighthunter-platform
+  //
+  // KV + D1 IDs — copy from insighthunter-auth/wrangler.jsonc once provisioned:
+  //   KV_SESSIONS id  = same id as insighthunter-auth KV_SESSIONS
+  //   D1 database_id  = same id as insighthunter-auth DB
+  //   KV_ENTITLEMENTS = new namespace:
+  //     wrangler kv namespace create KV_ENTITLEMENTS --name insighthunter-platform
 }

@@ -1,19 +1,43 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "insighthunter-main",
-  "compatibility_date": "2026-07-25",
-  "observability": { "enabled": true },
-  "kv_namespaces": [
-    {
-      "binding": "KV_SESSIONS",
-      "id": "084631d3b2704097a57e57d89daee600"
-    }
-  ],
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-29",
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
   "routes": [
     { "pattern": "app.insighthunter.app/*", "zone_name": "insighthunter.app" }
   ],
-  "assets": {
-    "directory": "./dist/client",
-    "binding": "ASSETS"
+
+  // Shared D1 — same database as insighthunter-auth
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter-db",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+    }
+  ],
+
+  "kv_namespaces": [
+    {
+      // Shared session KV — same namespace as insighthunter-auth
+      "binding": "KV_SESSIONS",
+      "id": "REPLACE_WITH_KV_SESSIONS_ID"
+    }
+  ],
+
+  "vars": {
+    "AUTH_URL":      "https://auth.insighthunter.app",
+    "DASHBOARD_URL": "https://app.insighthunter.app",
+    "ENVIRONMENT":   "production"
   }
+
+  // Replace REPLACE_WITH_* placeholders with real IDs after provisioning:
+  //   D1:          wrangler d1 create insighthunter-db
+  //   KV_SESSIONS: wrangler kv namespace create KV_SESSIONS
+  //                (or reuse the id from insighthunter-auth — same namespace)
 }

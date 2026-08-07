@@ -3,28 +3,31 @@
   "name": "insighthunter-report",
   "main": "src/index.ts",
   "compatibility_date": "2026-07-29",
+
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1
   },
+
   "routes": [
     { "pattern": "reports.insighthunter.app/*", "zone_name": "insighthunter.app" }
   ],
+
+  // Shared D1 — same database as all other Workers
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "insighthunter-db",
       "database_id": "REPLACE_WITH_D1_DATABASE_ID"
-    },
-    {
-      "binding": "DB_LEDGER",
-      "database_name": "insighthunter-ledger",
-      "database_id": "8dc66f6a-da61-4421-a092-a4845fc0db8d"
     }
   ],
+
   "vars": {
-    "AUTH_URL": "https://auth.insighthunter.app",
+    "AUTH_URL":      "https://auth.insighthunter.app",
     "DASHBOARD_URL": "https://app.insighthunter.app",
-    "ENVIRONMENT": "production"
+    "ENVIRONMENT":   "production"
   }
+
+  // No Durable Objects, no Queue, no nodejs_compat.
+  // Reports are purely read-only queries against shared D1 + invoices tables.
 }
