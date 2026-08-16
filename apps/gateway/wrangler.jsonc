@@ -1,0 +1,57 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "insighthunter-gateway",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-29",
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  // Routes: gateway handles ALL *.insighthunter.app traffic
+  // Auth worker is excluded — it handles its own subdomain directly
+  "routes": [
+    { "pattern": "app.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "platform.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "bookkeeping.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "insights.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "advisor.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "reports.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "payroll.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "scout.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "pbx.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "bizforma.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "notifications.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "finops.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "dispatch.insighthunter.app/*", "zone_name": "insighthunter.app" }
+  ],
+
+  "kv_namespaces": [
+    {
+      // Shared session store — same KV namespace as insighthunter-auth
+      "binding": "SESSION_KV",
+      "id": "88a8b6dd2b464effa9025e3f0020cc5e"
+    },
+    {
+      "binding": "insighthunter_platform_entitlements",
+      "id": "f55ebc7692604c949033c9bbc459d6fd"
+    }
+  ],
+
+  "vars": {
+    "AUTH_URL": "https://auth.insighthunter.app",
+    "DASHBOARD_URL": "https://app.insighthunter.app",
+    "ENVIRONMENT": "production"
+  }
+
+  // The gateway needs only KV_SESSIONS — no D1, no R2.
+  // It reads sessions from KV then proxies; downstream Workers own their data.
+  //
+  // After deploying downstream Workers, update ROUTE_MAP in src/index.ts
+  // with their actual *.workers.dev origins or custom domains.
+  //
+  // Local dev:
+  //   wrangler dev --local  (uses local KV simulation)
+  //   Override ROUTE_MAP origins to http://localhost:878X for each Worker
+}

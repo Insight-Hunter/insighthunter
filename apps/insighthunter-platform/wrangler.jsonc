@@ -21,7 +21,11 @@
     {
       "binding": "DB",
       "database_name": "insighthunter-db",
+<<<<<<< HEAD
+      "database_id": "1b58d27d-77c0-481d-a490-0c043f0e063c"
+=======
       "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+>>>>>>> origin/main
     }
   ],
 
@@ -32,10 +36,16 @@
       "id": "REPLACE_WITH_KV_SESSIONS_ID"
     },
     {
+<<<<<<< HEAD
+      // Entitlements cache — separate KV namespace (create with: wrangler kv namespace create KV_ENTITLEMENTS)
+      "binding": "KV_ENTITLEMENTS",
+      "id": "f55ebc7692604c949033c9bbc459d6fd"
+=======
       // Entitlements cache — separate namespace
       // Create with: wrangler kv namespace create KV_ENTITLEMENTS
       "binding": "KV_ENTITLEMENTS",
       "id": "REPLACE_WITH_KV_ENTITLEMENTS_ID"
+>>>>>>> origin/main
     }
   ],
 
@@ -46,11 +56,19 @@
   }
 
   // Secrets — set with wrangler secret put:
+<<<<<<< HEAD
+  // wrangler secret put STRIPE_PORTAL_URL --name insighthunter-platform
+=======
   //   wrangler secret put STRIPE_PORTAL_URL --name insighthunter-platform
+>>>>>>> origin/main
   //
   // KV + D1 IDs — copy from insighthunter-auth/wrangler.jsonc once provisioned:
   //   KV_SESSIONS id  = same id as insighthunter-auth KV_SESSIONS
   //   D1 database_id  = same id as insighthunter-auth DB
+<<<<<<< HEAD
+  //   KV_ENTITLEMENTS = new namespace, create with:
+=======
   //   KV_ENTITLEMENTS = new namespace:
+>>>>>>> origin/main
   //     wrangler kv namespace create KV_ENTITLEMENTS --name insighthunter-platform
 }

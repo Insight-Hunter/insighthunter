@@ -1,20 +1,22 @@
-import { Hono } from 'hono';
-import { html } from 'hono/html';
-import { serveStatic } from 'hono/cloudflare-workers';
+import { Hono } from "hono";
+import { html } from "hono/html";
 
 const app = new Hono();
 
 // Security headers middleware
-app.use('*', async (c, next) => {
+app.use("*", async (c, next) => {
   await next();
-  c.header('X-Frame-Options', 'DENY');
-  c.header('X-Content-Type-Options', 'nosniff');
-  c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
-  c.header('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;");
-  c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  c.header("X-Frame-Options", "DENY");
+  c.header("X-Content-Type-Options", "nosniff");
+  c.header("Referrer-Policy", "strict-origin-when-cross-origin");
+  c.header(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;",
+  );
+  c.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
 });
 
-app.get('/', (c) => {
+app.get("/", (c) => {
   return c.html(html`<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -201,6 +203,6 @@ app.get('/', (c) => {
 </html>`);
 });
 
-app.get('/health', (c) => c.json({ status: 'ok', app: 'marketing', ts: Date.now() }));
+app.get("/health", (c) => c.json({ status: "ok", app: "marketing", ts: Date.now() }));
 
 export default app;

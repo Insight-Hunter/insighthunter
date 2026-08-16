@@ -5,10 +5,10 @@ export interface DocumentMeta {
   id: string;
   case_id: string;
   org_id: string;
-  doc_type: string;   // articles_of_org | ein_letter | operating_agreement | boi | annual_report
+  doc_type: string; // articles_of_org | ein_letter | operating_agreement | boi | annual_report
   filename: string;
   r2_key: string;
-  status: string;     // pending | ready | archived
+  status: string; // pending | ready | archived
   created_at: string;
 }
 
@@ -16,7 +16,7 @@ export async function uploadDocument(
   bucket: R2Bucket,
   key: string,
   body: ArrayBuffer,
-  contentType: string
+  contentType: string,
 ) {
   await bucket.put(key, body, {
     httpMetadata: { contentType },
@@ -27,7 +27,7 @@ export async function uploadDocument(
 export async function getSignedDownloadUrl(
   bucket: R2Bucket,
   key: string,
-  expiresInSeconds = 3600
+  expiresInSeconds = 3600,
 ): Promise<string> {
   // R2 presigned URLs via Workers
   const obj = await bucket.get(key);

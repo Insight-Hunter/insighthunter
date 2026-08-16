@@ -9,7 +9,7 @@ export class Currency extends ValueObject<{ code: string }> {
 
   static create(code: string): Currency {
     const upper = code.toUpperCase();
-    if (!SUPPORTED.has(upper)) throw new Error('Unsupported currency: ${code}');
+    if (!SUPPORTED.has(upper)) throw new Error("Unsupported currency: ${code}");
     return new Currency(upper);
   }
 

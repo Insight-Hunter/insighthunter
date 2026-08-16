@@ -11,7 +11,7 @@ export interface SendEmailBinding {
   }): Promise<void>;
 }
 
-export type NotificationSeverity = 'info' | 'warning' | 'critical';
+export type NotificationSeverity = "info" | "warning" | "critical";
 
 // Send transactional email via Cloudflare Email Service binding
 // The binding is injected from env (SEND_EMAIL) — no API key needed
@@ -27,8 +27,8 @@ export async function sendEmail(opts: {
     await opts.binding.send({
       to: [{ email: opts.to }],
       from: {
-        email: opts.from ?? 'noreply@insighthunter.app',
-        name: opts.fromName ?? 'InsightHunter',
+        email: opts.from ?? "noreply@insighthunter.app",
+        name: opts.fromName ?? "InsightHunter",
       },
       subject: opts.subject,
       html: opts.html,
@@ -45,12 +45,14 @@ export async function createInAppNotification(
   userId: string,
   title: string,
   message: string,
-  severity: NotificationSeverity = 'info',
+  severity: NotificationSeverity = "info",
   appId?: string,
   link?: string,
 ): Promise<void> {
   await db
-    .prepare('INSERT INTO notifications (id, org_id, user_id, title, message, severity, app_id, link) VALUES (?,?,?,?,?,?,?,?)')
+    .prepare(
+      "INSERT INTO notifications (id, org_id, user_id, title, message, severity, app_id, link) VALUES (?,?,?,?,?,?,?,?)",
+    )
     .bind(crypto.randomUUID(), orgId, userId, title, message, severity, appId ?? null, link ?? null)
     .run();
 }
@@ -59,17 +61,32 @@ export async function getUnreadNotifications(
   db: D1Database,
   userId: string,
   orgId: string,
-): Promise<{ id: string; title: string; message: string; severity: string; link: string | null; created_at: number }[]> {
+): Promise<
+  {
+    id: string;
+    title: string;
+    message: string;
+    severity: string;
+    link: string | null;
+    created_at: number;
+  }[]
+> {
   const { results } = await db
-    .prepare('SELECT id, title, message, severity, link, created_at FROM notifications WHERE user_id = ? AND org_id = ? AND read_at IS NULL ORDER BY created_at DESC LIMIT 20')
+    .prepare(
+      "SELECT id, title, message, severity, link, created_at FROM notifications WHERE user_id = ? AND org_id = ? AND read_at IS NULL ORDER BY created_at DESC LIMIT 20",
+    )
     .bind(userId, orgId)
     .all();
   return results as never;
 }
 
-export async function markNotificationRead(db: D1Database, notificationId: string, userId: string): Promise<void> {
+export async function markNotificationRead(
+  db: D1Database,
+  notificationId: string,
+  userId: string,
+): Promise<void> {
   await db
-    .prepare('UPDATE notifications SET read_at = unixepoch() WHERE id = ? AND user_id = ?')
+    .prepare("UPDATE notifications SET read_at = unixepoch() WHERE id = ? AND user_id = ?")
     .bind(notificationId, userId)
     .run();
 }

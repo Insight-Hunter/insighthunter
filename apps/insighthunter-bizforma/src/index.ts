@@ -3,15 +3,15 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { timing } from "hono/timing";
-import type { BizformaEnv } from "./types.js";
 import { requireAuth } from "./middleware/auth.js";
-import { formation } from "./routes/formation.js";
+import { dispatchUpcomingReminders, processReminderBatch } from "./queues/reminder-consumer.js";
+import type { ReminderJob } from "./queues/reminder-consumer.js";
+import { ai } from "./routes/ai.js";
 import { compliance } from "./routes/compliance.js";
 import { dashboard } from "./routes/dashboard.js";
-import { ai } from "./routes/ai.js";
+import { formation } from "./routes/formation.js";
 import { wizard } from "./routes/wizard.js";
-import { processReminderBatch, dispatchUpcomingReminders } from "./queues/reminder-consumer.js";
-import type { ReminderJob } from "./queues/reminder-consumer.js";
+import type { BizformaEnv } from "./types.js";
 
 const app = new Hono<{ Bindings: BizformaEnv }>();
 
@@ -32,7 +32,7 @@ app.use(
     allowMethods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
     maxAge: 86400,
-  })
+  }),
 );
 
 app.get("/health", (c) =>
@@ -42,7 +42,7 @@ app.get("/health", (c) =>
     version: "0.3.0",
     timestamp: new Date().toISOString(),
     routes: ["/api/formation", "/api/compliance", "/api/dashboard", "/api/ai", "/api/wizard"],
-  })
+  }),
 );
 
 app.get("/", (c) => c.redirect("https://bizforma.insighthunter.app", 302));
@@ -72,7 +72,7 @@ async function scheduled(event: ScheduledEvent, env: BizformaEnv): Promise<void>
 
 async function queue(
   batch: MessageBatch<{ type: string; doc_id?: string; r2_key?: string } | ReminderJob>,
-  env: BizformaEnv
+  env: BizformaEnv,
 ): Promise<void> {
   const queueName = batch.queue;
 
@@ -81,8 +81,10 @@ async function queue(
       const job = msg.body as { type: string; doc_id: string; r2_key: string };
       console.log(`[pdf-queue] Processing ${job.type} for doc ${job.doc_id}`);
       await env.DB.prepare(
-        "UPDATE bizforma_documents SET status = 'ready', updated_at = datetime('now') WHERE id = ?"
-      ).bind(job.doc_id).run();
+        "UPDATE bizforma_documents SET status = 'ready', updated_at = datetime('now') WHERE id = ?",
+      )
+        .bind(job.doc_id)
+        .run();
       msg.ack();
     }
   }

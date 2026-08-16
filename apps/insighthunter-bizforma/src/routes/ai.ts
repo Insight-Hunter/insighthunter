@@ -18,14 +18,12 @@ ai.post("/advise", async (c) => {
 
   if (!question) return c.json({ error: "question required" }, 400);
 
-  const contextStr = context
-    ? `Business context: ${JSON.stringify(context)}\n\n`
-    : "";
+  const contextStr = context ? `Business context: ${JSON.stringify(context)}\n\n` : "";
 
   const response = await c.env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user",   content: `${contextStr}${question}` },
+      { role: "user", content: `${contextStr}${question}` },
     ],
     max_tokens: 512,
   });
@@ -67,14 +65,18 @@ Respond with JSON: { "recommendation": "...", "reason": "...", "pros": [...], "c
   const response = await c.env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user",   content: prompt },
+      { role: "user", content: prompt },
     ],
     max_tokens: 400,
   });
 
   const raw = (response as { response?: string }).response ?? "{}";
   let parsed: unknown = {};
-  try { parsed = JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0] ?? "{}"); } catch { parsed = { recommendation: raw }; }
+  try {
+    parsed = JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0] ?? "{}");
+  } catch {
+    parsed = { recommendation: raw };
+  }
 
   return c.json(parsed);
 });
@@ -85,14 +87,18 @@ ai.get("/compliance-summary/:caseId", async (c) => {
   const orgId = c.get("orgId");
 
   const formationCase = await c.env.DB.prepare(
-    "SELECT * FROM bizforma_cases WHERE id = ?1 AND org_id = ?2"
-  ).bind(caseId, orgId).first<{ entity_type: string; state: string; business_name: string }>();
+    "SELECT * FROM bizforma_cases WHERE id = ?1 AND org_id = ?2",
+  )
+    .bind(caseId, orgId)
+    .first<{ entity_type: string; state: string; business_name: string }>();
 
   if (!formationCase) return c.json({ error: "Case not found" }, 404);
 
   const events = await c.env.DB.prepare(
-    "SELECT * FROM bizforma_compliance_events WHERE case_id = ?1 ORDER BY due_date ASC LIMIT 10"
-  ).bind(caseId).all();
+    "SELECT * FROM bizforma_compliance_events WHERE case_id = ?1 ORDER BY due_date ASC LIMIT 10",
+  )
+    .bind(caseId)
+    .all();
 
   const prompt = `Summarize upcoming compliance obligations for:
 Entity: ${formationCase.entity_type} in ${formationCase.state}
@@ -104,7 +110,7 @@ Provide a brief plain-language summary of what the owner needs to do and when.`;
   const response = await c.env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user",   content: prompt },
+      { role: "user", content: prompt },
     ],
     max_tokens: 350,
   });

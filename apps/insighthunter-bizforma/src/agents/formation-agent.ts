@@ -17,9 +17,12 @@ export class FormationAgent extends DurableObject<BizformaEnv> {
     const url = new URL(request.url);
 
     switch (url.pathname) {
-      case "/init":    return this.handleInit(request);
-      case "/advance": return this.handleAdvance(request);
-      case "/status":  return this.handleStatus();
+      case "/init":
+        return this.handleInit(request);
+      case "/advance":
+        return this.handleAdvance(request);
+      case "/status":
+        return this.handleStatus();
       default:
         return new Response("Not found", { status: 404 });
     }
@@ -31,7 +34,8 @@ export class FormationAgent extends DurableObject<BizformaEnv> {
     }
     const { caseId, orgId } = await request.json<{ caseId: string; orgId: string }>();
     this.state = {
-      caseId, orgId,
+      caseId,
+      orgId,
       step: "intake",
       history: [{ ts: new Date().toISOString(), event: "agent_initialized" }],
       createdAt: new Date().toISOString(),
@@ -42,7 +46,7 @@ export class FormationAgent extends DurableObject<BizformaEnv> {
 
   private async handleAdvance(request: Request): Promise<Response> {
     if (!this.state) {
-      this.state = await this.ctx.storage.get<AgentState>("state") ?? null;
+      this.state = (await this.ctx.storage.get<AgentState>("state")) ?? null;
     }
     if (!this.state) return Response.json({ error: "Not initialized" }, { status: 400 });
 
@@ -56,19 +60,19 @@ export class FormationAgent extends DurableObject<BizformaEnv> {
 
   private async handleStatus(): Promise<Response> {
     if (!this.state) {
-      this.state = await this.ctx.storage.get<AgentState>("state") ?? null;
+      this.state = (await this.ctx.storage.get<AgentState>("state")) ?? null;
     }
     return Response.json({ state: this.state });
   }
 
   private nextStep(current: string, event: string): string {
     const flow: Record<string, Record<string, string>> = {
-      intake:      { submit: "name_check" },
-      name_check:  { approved: "document_prep", rejected: "intake" },
+      intake: { submit: "name_check" },
+      name_check: { approved: "document_prep", rejected: "intake" },
       document_prep: { ready: "filing" },
-      filing:      { submitted: "pending_state", rejected: "document_prep" },
+      filing: { submitted: "pending_state", rejected: "document_prep" },
       pending_state: { approved: "active", rejected: "filing" },
-      active:      {},
+      active: {},
     };
     return flow[current]?.[event] ?? current;
   }

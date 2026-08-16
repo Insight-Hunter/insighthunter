@@ -23,7 +23,7 @@ declare module "hono" {
 
 export async function requireAuth(
   c: Context<{ Bindings: BizformaEnv }>,
-  next: Next
+  next: Next,
 ): Promise<Response | void> {
   const authHeader = c.req.header("Authorization");
   const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
@@ -34,10 +34,10 @@ export async function requireAuth(
   if (!payload) return c.json({ error: "Unauthorized", code: "INVALID_TOKEN" }, 401);
 
   c.set("userId", payload.sub);
-  c.set("orgId",  payload.org);
-  c.set("role",   payload.role);
-  c.set("email",  payload.email);
-  c.set("name",   payload.name ?? payload.email);
+  c.set("orgId", payload.org);
+  c.set("role", payload.role);
+  c.set("email", payload.email);
+  c.set("name", payload.name ?? payload.email);
 
   await next();
 }
@@ -50,11 +50,14 @@ async function verifyJWT(token: string, secret: string): Promise<JWTPayload | nu
     const [h, p, s] = parts;
     const enc = new TextEncoder();
     const key = await crypto.subtle.importKey(
-      "raw", enc.encode(secret),
-      { name: "HMAC", hash: "SHA-256" }, false, ["verify"]
+      "raw",
+      enc.encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["verify"],
     );
-    const sig = Uint8Array.from(
-      atob(s.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)
+    const sig = Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), (c) =>
+      c.charCodeAt(0),
     );
     const valid = await crypto.subtle.verify("HMAC", key, sig, enc.encode(`${h}.${p}`));
     if (!valid) return null;
@@ -62,5 +65,7 @@ async function verifyJWT(token: string, secret: string): Promise<JWTPayload | nu
     const payload = JSON.parse(atob(p)) as JWTPayload;
     if (payload.exp < Math.floor(Date.now() / 1000)) return null;
     return payload;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }

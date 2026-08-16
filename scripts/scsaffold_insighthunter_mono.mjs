@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 
 const ROOT = process.argv[2] || process.cwd();
 
@@ -12,14 +12,14 @@ function ensureFile(path, content) {
   ensureDir(dirname(path));
 
   if (!existsSync(path)) {
-    writeFileSync(path, content, 'utf8');
+    writeFileSync(path, content, "utf8");
     console.log(`created: ${path}`);
     return;
   }
 
-  const current = readFileSync(path, 'utf8');
+  const current = readFileSync(path, "utf8");
   if (!current.trim()) {
-    writeFileSync(path, content, 'utf8');
+    writeFileSync(path, content, "utf8");
     console.log(`filled-empty: ${path}`);
     return;
   }
@@ -28,7 +28,7 @@ function ensureFile(path, content) {
 }
 
 const files = {
-  'package.json': `{
+  "package.json": `{
   "name": "insighthunter",
   "private": true,
   "packageManager": "pnpm@10.0.0",
@@ -40,11 +40,11 @@ const files = {
   }
 }
 `,
-  'pnpm-workspace.yaml': `packages:
+  "pnpm-workspace.yaml": `packages:
   - apps/*
   - packages/*
 `,
-  'tsconfig.base.json': `{
+  "tsconfig.base.json": `{
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -58,7 +58,7 @@ const files = {
   }
 }
 `,
-  'turbo.json': `{
+  "turbo.json": `{
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "build": {
@@ -75,7 +75,7 @@ const files = {
   }
 }
 `,
-  'apps/insighthunter-main/package.json': `{
+  "apps/insighthunter-main/package.json": `{
   "name": "insighthunter-main",
   "version": "0.1.0",
   "private": true,
@@ -97,7 +97,7 @@ const files = {
   }
 }
 `,
-  'apps/insighthunter-main/wrangler.jsonc': `{
+  "apps/insighthunter-main/wrangler.jsonc": `{
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "insighthunter-main",
   "main": "src/index.ts",
@@ -110,7 +110,7 @@ const files = {
   }
 }
 `,
-  'apps/insighthunter-main/astro.config.mjs': `import { defineConfig } from 'astro/config';
+  "apps/insighthunter-main/astro.config.mjs": `import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 
 export default defineConfig({
@@ -118,7 +118,7 @@ export default defineConfig({
   adapter: cloudflare(),
 });
 `,
-  'apps/insighthunter-main/tsconfig.json': `{
+  "apps/insighthunter-main/tsconfig.json": `{
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "preserve"
@@ -126,7 +126,7 @@ export default defineConfig({
   "include": ["src/**/*.ts", "src/**/*.astro"]
 }
 `,
-  'apps/insighthunter-main/src/index.ts': `import { Hono } from 'hono';
+  "apps/insighthunter-main/src/index.ts": `import { Hono } from 'hono';
 
 const app = new Hono();
 
@@ -134,7 +134,7 @@ app.get('/api/health', (c) => c.json({ ok: true, service: 'insighthunter-main' }
 
 export default app;
 `,
-  'apps/insighthunter-main/src/layouts/MarketingLayout.astro': `---
+  "apps/insighthunter-main/src/layouts/MarketingLayout.astro": `---
 export interface Props { title: string; description?: string; }
 const { title, description = 'Insight Hunter' } = Astro.props;
 ---
@@ -151,7 +151,7 @@ const { title, description = 'Insight Hunter' } = Astro.props;
   </body>
 </html>
 `,
-  'apps/insighthunter-main/src/pages/index.astro': `---
+  "apps/insighthunter-main/src/pages/index.astro": `---
 import MarketingLayout from '../layouts/MarketingLayout.astro';
 ---
 <MarketingLayout title="Insight Hunter">
@@ -161,7 +161,7 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
   </main>
 </MarketingLayout>
 `,
-  'apps/insighthunter-main/src/pages/pricing.astro': `---
+  "apps/insighthunter-main/src/pages/pricing.astro": `---
 import MarketingLayout from '../layouts/MarketingLayout.astro';
 ---
 <MarketingLayout title="Pricing | Insight Hunter">
@@ -171,7 +171,7 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
   </main>
 </MarketingLayout>
 `,
-  'apps/insighthunter-main/src/pages/dashboard/index.astro': `---
+  "apps/insighthunter-main/src/pages/dashboard/index.astro": `---
 import MarketingLayout from '../../layouts/MarketingLayout.astro';
 ---
 <MarketingLayout title="Dashboard | Insight Hunter">
@@ -181,12 +181,12 @@ import MarketingLayout from '../../layouts/MarketingLayout.astro';
   </main>
 </MarketingLayout>
 `,
-  'apps/insighthunter-main/migrations/0001_init.sql': `PRAGMA foreign_keys = ON;
+  "apps/insighthunter-main/migrations/0001_init.sql": `PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS organizations (id TEXT PRIMARY KEY, name TEXT NOT NULL, created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS subscriptions (id TEXT PRIMARY KEY, organization_id TEXT NOT NULL, plan_code TEXT NOT NULL, status TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS entitlements (id TEXT PRIMARY KEY, organization_id TEXT NOT NULL, feature_key TEXT NOT NULL, created_at TEXT NOT NULL);
 `,
-  'apps/insighthunter-auth/package.json': `{
+  "apps/insighthunter-auth/package.json": `{
   "name": "insighthunter-auth",
   "version": "0.1.0",
   "private": true,
@@ -205,7 +205,7 @@ CREATE TABLE IF NOT EXISTS entitlements (id TEXT PRIMARY KEY, organization_id TE
   }
 }
 `,
-  'apps/insighthunter-auth/wrangler.jsonc': `{
+  "apps/insighthunter-auth/wrangler.jsonc": `{
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "insighthunter-auth",
   "main": "src/index.ts",
@@ -213,12 +213,12 @@ CREATE TABLE IF NOT EXISTS entitlements (id TEXT PRIMARY KEY, organization_id TE
   "observability": { "enabled": true }
 }
 `,
-  'apps/insighthunter-auth/tsconfig.json': `{
+  "apps/insighthunter-auth/tsconfig.json": `{
   "extends": "../../tsconfig.base.json",
   "include": ["src/**/*.ts"]
 }
 `,
-  'apps/insighthunter-auth/src/index.ts': `import { Hono } from 'hono';
+  "apps/insighthunter-auth/src/index.ts": `import { Hono } from 'hono';
 
 const app = new Hono();
 
@@ -234,7 +234,7 @@ app.get('/session/:token', (c) => c.json({
 
 export default app;
 `,
-  'packages/auth-shared/package.json': `{
+  "packages/auth-shared/package.json": `{
   "name": "@insighthunter/auth-shared",
   "version": "0.1.0",
   "private": true,
@@ -244,7 +244,7 @@ export default app;
   }
 }
 `,
-  'packages/auth-shared/src/index.ts': `export function extractSessionToken(request: Request): string | null {
+  "packages/auth-shared/src/index.ts": `export function extractSessionToken(request: Request): string | null {
   const cookie = request.headers.get('cookie') ?? '';
   const match = cookie.match(/(?:^|;\\s*)(?:session|sessiontoken)=([^;]+)/);
   return match?.[1] ?? null;
@@ -258,7 +258,7 @@ export function getRegisterRedirectUrl(authBaseUrl: string, returnTo: string): s
   return \`\${authBaseUrl.replace(/\\/$/, '')}/register?returnTo=\${encodeURIComponent(returnTo)}\`;
 }
 `,
-  'packages/org-shared/package.json': `{
+  "packages/org-shared/package.json": `{
   "name": "@insighthunter/org-shared",
   "version": "0.1.0",
   "private": true,
@@ -268,14 +268,14 @@ export function getRegisterRedirectUrl(authBaseUrl: string, returnTo: string): s
   }
 }
 `,
-  'packages/org-shared/src/index.ts': `export type Organization = { id: string; name: string };
+  "packages/org-shared/src/index.ts": `export type Organization = { id: string; name: string };
 export type Subscription = { id: string; organizationId: string; planCode: string; status: string };
 export type Entitlement = { id: string; organizationId: string; featureKey: string };
 `,
-  'docs/architecture/README.md': `# Insight Hunter architecture
+  "docs/architecture/README.md": `# Insight Hunter architecture
 
 Monorepo with Astro main site, Cloudflare Worker services, and organization-based entitlements.
-`
+`,
 };
 
 for (const [relativePath, content] of Object.entries(files)) {

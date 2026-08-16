@@ -1,60 +1,25 @@
-import type { MiddlewareHandler } from 'hono';
-import { getSession, type SessionRecord } from './session.js';
+// authz/middleware.ts
+// Hono middleware that short-circuits requests missing gateway identity headers.
+// Mount with: app.use('/*', headerGuard())
+// Unauthenticated browsers are redirected to auth; API clients get 401 JSON.
 
-export type OrganizationRecord = {
-  id: string;
-};
+import type { MiddlewareHandler } from "hono";
+import type { Env } from "../index.js";
+import { fromGatewayHeaders } from "./session.js";
 
-export type MemberRecord = {
-  userId: string;
-  email: string;
-};
+export function headerGuard(): MiddlewareHandler<{ Bindings: Env }> {
+  return async (c, next) => {
+    const session = fromGatewayHeaders(c.req.raw);
 
-export type AppBindings = {
-  AUTH_BASE_URL: string;
-  MAIN_BASE_URL: string;
-};
+    if (!session) {
+      const accept = c.req.header("Accept") ?? "";
+      if (accept.includes("text/html")) {
+        const returnTo = encodeURIComponent(c.req.url);
+        return c.redirect(`${c.env.AUTH_URL}/login?redirect=${returnTo}`, 302);
+      }
+      return c.json({ error: "unauthorized", message: "Valid session required." }, 401);
+    }
 
-export type AppVariables = {
-  session: SessionRecord;
-  organization: OrganizationRecord | null;
-  member: MemberRecord;
-};
-
-type AppEnv = {
-  Bindings: AppBindings;
-  Variables: AppVariables;
-};
-
-function buildLoginUrl(authBaseUrl: string, returnTo: string): string {
-  const base = authBaseUrl.replace(/\/$/, '');
-  return `${base}/login?returnTo=${encodeURIComponent(returnTo)}`;
-}
-
-function toOrganization(session: SessionRecord): OrganizationRecord | null {
-  if (!session.user.orgId) return null;
-  return { id: session.user.orgId };
-}
-
-function toMember(session: SessionRecord): MemberRecord {
-  return {
-    userId: session.user.subject,
-    email: session.user.email ?? '',
+    await next();
   };
 }
-
-export const requireAuth: MiddlewareHandler<AppEnv> = async (c, next) => {
-  const session = await getSession(c.env.AUTH_BASE_URL, c.req.raw);
-
-  if (!session) {
-    const url = new URL(c.req.url);
-    const returnTo = `${c.env.MAIN_BASE_URL.replace(/\/$/, '')}${url.pathname}${url.search}`;
-    return c.redirect(buildLoginUrl(c.env.AUTH_BASE_URL, returnTo), 302);
-  }
-
-  c.set('session', session);
-  c.set('organization', toOrganization(session));
-  c.set('member', toMember(session));
-
-  await next();
-};

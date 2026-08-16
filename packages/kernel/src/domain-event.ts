@@ -24,7 +24,7 @@ export function createDomainEvent<TPayload, TType extends string>(
   input: CreateDomainEventInput<TPayload, TType>,
 ): DomainEvent<TPayload, TType> {
   return {
-    id: input.id ?? ('event_${crypto.randomUUID()}' as EntityId<"event">),
+    id: input.id ?? ("event_${crypto.randomUUID()}" as EntityId<"event">),
     type: input.type,
     aggregateId: input.aggregateId,
     organizationId: input.organizationId,

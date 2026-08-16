@@ -31,7 +31,9 @@ function toFormBody(values: Record<string, string>): string {
   return params.toString();
 }
 
-export async function createStripeCheckoutSession(input: CreateCheckoutSessionInput): Promise<StripeCheckoutSession> {
+export async function createStripeCheckoutSession(
+  input: CreateCheckoutSessionInput,
+): Promise<StripeCheckoutSession> {
   const body = toFormBody({
     mode: "subscription",
     "line_items[0][price]": input.priceId,
@@ -40,24 +42,24 @@ export async function createStripeCheckoutSession(input: CreateCheckoutSessionIn
     cancel_url: input.cancelUrl,
     customer_email: input.customerEmail,
     "metadata[customer_id]": input.customerId,
-    "metadata[plan_code]": input.planCode
+    "metadata[plan_code]": input.planCode,
   });
 
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: {
-      Authorization: 'Bearer ${input.secretKey}',
-      "Content-Type": "application/x-www-form-urlencoded"
+      Authorization: "Bearer ${input.secretKey}",
+      "Content-Type": "application/x-www-form-urlencoded",
     },
-    body
+    body,
   });
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error('Stripe checkout session failed: ${response.status} ${text}');
+    throw new Error("Stripe checkout session failed: ${response.status} ${text}");
   }
 
-  const payload = await response.json() as { id: string; url: string };
+  const payload = (await response.json()) as { id: string; url: string };
   return { id: payload.id, url: payload.url };
 }
 
@@ -76,18 +78,20 @@ export async function verifyStripeWebhookSignature(
 
   const timestamp = timestampPart.slice(2);
   const signature = v1Part.slice(3);
-  const signedPayload = '${timestamp}.${payload}';
+  const signedPayload = "${timestamp}.${payload}";
 
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(webhookSecret),
     { name: "HMAC", hash: "SHA-256" },
     false,
-    ["sign"]
+    ["sign"],
   );
 
   const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(signedPayload));
-  const expected = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  const expected = [...new Uint8Array(digest)]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 
   return timingSafeEqual(expected, signature);
 }

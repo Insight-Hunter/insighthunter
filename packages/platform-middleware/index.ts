@@ -1,7 +1,13 @@
 // packages/platform-middleware/index.ts
 // Auth + org + RBAC gate used by EVERY app Worker
 
-import { verifyToken, canAccess, type TokenPayload, type AppSlug, type Env } from "@insighthunter/auth";
+import {
+  type AppSlug,
+  type Env,
+  type TokenPayload,
+  canAccess,
+  verifyToken,
+} from "@insighthunter/auth";
 
 export interface AuthContext {
   user: TokenPayload;
@@ -13,7 +19,7 @@ export function withAuth(appSlug: AppSlug) {
   return async function authMiddleware(
     request: Request,
     env: Env,
-    next: (ctx: AuthContext) => Promise<Response>
+    next: (ctx: AuthContext) => Promise<Response>,
   ): Promise<Response> {
     const authHeader = request.headers.get("Authorization");
     const cookieToken = getCookieToken(request);
@@ -35,10 +41,13 @@ export function withAuth(appSlug: AppSlug) {
     }
 
     if (!canAccess(payload.role, appSlug)) {
-      return new Response(JSON.stringify({ error: "Forbidden", app: appSlug, role: payload.role }), {
-        status: 403,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ error: "Forbidden", app: appSlug, role: payload.role }),
+        {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     return next({ user: payload, orgId: payload.org, role: payload.role });

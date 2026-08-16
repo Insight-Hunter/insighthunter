@@ -1,15 +1,16 @@
 <script lang="ts">
-  export let title: string = 'Dashboard';
-  export let session: { email?: string; name?: string } = {};
+export const title = "Dashboard";
+export const session: { email?: string; name?: string } = {};
 
-  $: email = session?.email ?? '';
-  $: name = session?.name ?? (email ? email.split('@')[0] : 'Operator');
-  $: initials = name
-    .split(' ')
+$: email = session?.email ?? "";
+$: name = session?.name ?? (email ? email.split("@")[0] : "Operator");
+$: initials =
+  name
+    .split(" ")
     .filter(Boolean)
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
-    .join('') || 'IH';
+    .join("") || "IH";
 </script>
 
 <header class="topbar">

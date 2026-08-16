@@ -1,18 +1,19 @@
 {
   "name": "@insighthunter/gateway",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
-  "type": "module",
+  "main": "src/index.ts",
   "scripts": {
     "dev": "wrangler dev",
-    "build": "wrangler deploy --dry-run",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "deploy": "wrangler deploy",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@insighthunter/auth-shared": "workspace:*",
-    "hono": "^4.6.10"
+    "hono": "^4.4.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250701.0"
+    "@cloudflare/workers-types": "^4.20240725.0",
+    "typescript": "^5.5.0",
+    "wrangler": "^3.65.0"
   }
 }

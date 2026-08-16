@@ -13,7 +13,7 @@ export interface ReminderJob {
 
 export async function processReminderBatch(
   batch: MessageBatch<ReminderJob>,
-  env: BizformaEnv
+  env: BizformaEnv,
 ): Promise<void> {
   for (const msg of batch.messages) {
     const job = msg.body;
@@ -25,12 +25,15 @@ export async function processReminderBatch(
         INSERT OR IGNORE INTO notifications
           (id, org_id, user_id, title, body, type, read, created_at)
         VALUES (?1,?2,?3,?4,?5,'warning',0,datetime('now'))
-      `).bind(
-        crypto.randomUUID(),
-        job.org_id, job.user_id,
-        `Compliance Due: ${job.title}`,
-        `Action required by ${job.due_date}`,
-      ).run();
+      `)
+        .bind(
+          crypto.randomUUID(),
+          job.org_id,
+          job.user_id,
+          `Compliance Due: ${job.title}`,
+          `Action required by ${job.due_date}`,
+        )
+        .run();
 
       env.ANALYTICS.writeDataPoint({
         blobs: [job.org_id, job.event_id, "reminder_sent"],
@@ -53,7 +56,9 @@ export async function dispatchUpcomingReminders(env: BizformaEnv): Promise<void>
     FROM bizforma_compliance_events e
     JOIN bizforma_cases c ON c.id = e.case_id
     WHERE e.status = 'pending' AND e.due_date <= ?1
-  `).bind(cutoff).all<ReminderJob & { user_id: string; org_id: string }>();
+  `)
+    .bind(cutoff)
+    .all<ReminderJob & { user_id: string; org_id: string }>();
 
   const jobs = result.results ?? [];
   console.log(`[reminders] Dispatching ${jobs.length} reminders`);
@@ -61,12 +66,12 @@ export async function dispatchUpcomingReminders(env: BizformaEnv): Promise<void>
   for (const job of jobs) {
     await env.REMINDER_QUEUE.send({
       type: "compliance_reminder",
-      case_id:  job.case_id,
+      case_id: job.case_id,
       event_id: job.id,
-      user_id:  job.user_id,
-      org_id:   job.org_id,
+      user_id: job.user_id,
+      org_id: job.org_id,
       due_date: job.due_date,
-      title:    job.title,
+      title: job.title,
     } as ReminderJob);
   }
 }

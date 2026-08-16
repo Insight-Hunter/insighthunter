@@ -1,10 +1,10 @@
 export function ensureTrailingSlash(value: string): string {
-  return value.endsWith("/") ? value : '${value}/';
+  return value.endsWith("/") ? value : "${value}/";
 }
 export function getLoginRedirectUrl(
   authBaseUrl: string,
   appBaseUrl?: string,
-  callbackPath = "/auth/callback"
+  callbackPath = "/auth/callback",
 ): string {
   const url = new URL("/login", authBaseUrl);
 
@@ -19,7 +19,7 @@ export function getRegisterRedirectUrl(
   authBaseUrl: string,
   appBaseUrl?: string,
   callbackPath = "/auth/callback",
-  plan?: string
+  plan?: string,
 ): string {
   const url = new URL("/register", authBaseUrl);
 
@@ -33,5 +33,3 @@ export function getRegisterRedirectUrl(
 
   return url.toString();
 }
-
-

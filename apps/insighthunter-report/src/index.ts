@@ -2,10 +2,17 @@
 // Deployed at reports.insighthunter.app
 // Auth: reads X-* identity headers injected by apps/gateway.
 
+<<<<<<< HEAD
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { exportRoutes } from "./routes/export.js";
+import { reportRoutes } from "./routes/reports.js";
+=======
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { reportRoutes } from './routes/reports.js';
 import { exportRoutes } from './routes/export.js';
+>>>>>>> origin/main
 
 export type Env = {
   DB: D1Database;
@@ -15,6 +22,31 @@ export type Env = {
 };
 
 export type Session = {
+<<<<<<< HEAD
+  userId: string;
+  orgId: string;
+  email: string;
+  name: string;
+  role: string;
+  orgName: string;
+  orgPlan: string;
+};
+
+export function getSession(req: Request): Session | null {
+  const userId = req.headers.get("X-User-Id");
+  const orgId = req.headers.get("X-Org-Id");
+  const role = req.headers.get("X-User-Role");
+  const email = req.headers.get("X-User-Email");
+  if (!userId || !orgId || !role || !email) return null;
+  return {
+    userId,
+    orgId,
+    role,
+    email,
+    name: req.headers.get("X-User-Name") ?? email,
+    orgName: req.headers.get("X-Org-Name") ?? "My Org",
+    orgPlan: req.headers.get("X-Org-Plan") ?? "starter",
+=======
   userId: string; orgId: string; email: string;
   name: string; role: string; orgName: string; orgPlan: string;
 };
@@ -30,11 +62,37 @@ export function getSession(req: Request): Session | null {
     name:    req.headers.get('X-User-Name')  ?? email,
     orgName: req.headers.get('X-Org-Name')   ?? 'My Org',
     orgPlan: req.headers.get('X-Org-Plan')   ?? 'starter',
+>>>>>>> origin/main
   };
 }
 
 const app = new Hono<{ Bindings: Env }>();
 
+<<<<<<< HEAD
+app.use("*", async (c, next) => {
+  await next();
+  c.header("X-Frame-Options", "DENY");
+  c.header("X-Content-Type-Options", "nosniff");
+  c.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+});
+
+app.use(
+  "/api/*",
+  cors({
+    origin: (o) => (o?.endsWith(".insighthunter.app") ? o : null),
+    credentials: true,
+  }),
+);
+
+app.use("/*", async (c, next) => {
+  if (c.req.path === "/health") return next();
+  const session = getSession(c.req.raw);
+  if (!session) {
+    const isHtml = (c.req.header("Accept") ?? "").includes("text/html");
+    if (isHtml)
+      return c.redirect(`${c.env.AUTH_URL}/login?redirect=${encodeURIComponent(c.req.url)}`, 302);
+    return c.json({ error: "unauthorized" }, 401);
+=======
 app.use('*', async (c, next) => {
   await next();
   c.header('X-Frame-Options', 'DENY');
@@ -54,10 +112,26 @@ app.use('/*', async (c, next) => {
     const isHtml = (c.req.header('Accept') ?? '').includes('text/html');
     if (isHtml) return c.redirect(`${c.env.AUTH_URL}/login?redirect=${encodeURIComponent(c.req.url)}`, 302);
     return c.json({ error: 'unauthorized' }, 401);
+>>>>>>> origin/main
   }
   return next();
 });
 
+<<<<<<< HEAD
+app.get("/health", (c) =>
+  c.json({ ok: true, service: "insighthunter-report", ts: Date.now(), env: c.env.ENVIRONMENT }),
+);
+
+app.route("/api/reports", reportRoutes);
+app.route("/api/export", exportRoutes);
+
+// SSR Dashboard
+app.get("/", async (c) => {
+  const session = getSession(c.req.raw)!;
+  const now = new Date();
+  const fy_start = `${now.getFullYear()}-01-01`;
+  const today = now.toISOString().slice(0, 10);
+=======
 app.get('/health', (c) =>
   c.json({ ok: true, service: 'insighthunter-report', ts: Date.now(), env: c.env.ENVIRONMENT }),
 );
@@ -71,6 +145,7 @@ app.get('/', async (c) => {
   const now = new Date();
   const fy_start = `${now.getFullYear()}-01-01`;
   const today    = now.toISOString().slice(0, 10);
+>>>>>>> origin/main
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -98,6 +173,10 @@ app.get('/', async (c) => {
     .btn:hover{opacity:.85}
     .btn-ghost{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:.45rem .9rem;font-size:.78rem;cursor:pointer;text-decoration:none}
     .btn-ghost:hover{border-color:var(--brand);color:var(--brand)}
+<<<<<<< HEAD
+    /* Report viewer */
+=======
+>>>>>>> origin/main
     #report-view{display:none}
     .report-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
     .report-title{font-size:1.1rem;font-weight:800}
@@ -129,6 +208,10 @@ app.get('/', async (c) => {
     </div>
   </nav>
   <main>
+<<<<<<< HEAD
+    <!-- Report picker -->
+=======
+>>>>>>> origin/main
     <div id="report-picker">
       <h2 style="margin-bottom:1.25rem;font-size:1rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Financial Reports</h2>
       <div class="report-grid">
@@ -153,7 +236,11 @@ app.get('/', async (c) => {
         <div class="report-card" onclick="openReport('trial-balance')">
           <div class="rc-icon">📃</div>
           <div class="rc-title">Trial Balance</div>
+<<<<<<< HEAD
+          <div class="rc-desc">All accounts with their debit and credit totals — confirms double-entry integrity.</div>
+=======
           <div class="rc-desc">All accounts with debit/credit totals — confirms double-entry integrity.</div>
+>>>>>>> origin/main
           <div class="rc-actions">
             <button class="btn" onclick="event.stopPropagation();openReport('trial-balance')">View</button>
             <a class="btn-ghost" href="/api/export/trial-balance?format=csv" target="_blank">CSV</a>
@@ -169,7 +256,11 @@ app.get('/', async (c) => {
           </div>
         </div>
         <div class="report-card" onclick="openReport('ar-aging')">
+<<<<<<< HEAD
+          <div class="rc-icon">🯦</div>
+=======
           <div class="rc-icon">🧾</div>
+>>>>>>> origin/main
           <div class="rc-title">AR Aging</div>
           <div class="rc-desc">Outstanding invoices by age bucket: current, 30, 60, 90+ days.</div>
           <div class="rc-actions">
@@ -178,9 +269,15 @@ app.get('/', async (c) => {
           </div>
         </div>
         <div class="report-card" onclick="openReport('ap-aging')">
+<<<<<<< HEAD
+          <div class="rc-icon">🯧</div>
+          <div class="rc-title">AP Aging</div>
+          <div class="rc-desc">Outstanding bills by age bucket — what you owe and when it\'s due.</div>
+=======
           <div class="rc-icon">📋</div>
           <div class="rc-title">AP Aging</div>
           <div class="rc-desc">Outstanding bills by age bucket — what you owe and when it's due.</div>
+>>>>>>> origin/main
           <div class="rc-actions">
             <button class="btn" onclick="event.stopPropagation();openReport('ap-aging')">View</button>
             <a class="btn-ghost" href="/api/export/ap-aging?format=csv" target="_blank">CSV</a>
@@ -189,6 +286,10 @@ app.get('/', async (c) => {
       </div>
     </div>
 
+<<<<<<< HEAD
+    <!-- Report viewer -->
+=======
+>>>>>>> origin/main
     <div id="report-view">
       <div class="report-header">
         <div>
@@ -218,11 +319,19 @@ app.get('/', async (c) => {
       buildFilters(type);
       loadReport(type);
     }
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
     function closeReport() {
       document.getElementById('report-picker').style.display = 'block';
       document.getElementById('report-view').style.display  = 'none';
       currentReport = null;
     }
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
     function buildFilters(type) {
       const f = document.getElementById('rv-filters');
       if (['profit-loss','cash-flow'].includes(type)) {
@@ -232,25 +341,48 @@ app.get('/', async (c) => {
       } else if (type === 'balance-sheet') {
         f.innerHTML = '<label>As of <input type="date" id="f-asof" value="'+today+'"></label>' +
                       '<button class="btn" onclick="loadReport(currentReport)">Run</button>';
+<<<<<<< HEAD
+      } else {
+        f.innerHTML = '';
+      }
+      // CSV button wires dynamically after filters set
+=======
       } else { f.innerHTML = ''; }
+>>>>>>> origin/main
       document.getElementById('rv-csv-btn').onclick = () => {
         const params = buildParams(type);
         window.open('/api/export/'+type+'?format=csv&'+params);
       };
     }
+<<<<<<< HEAD
+
+    function buildParams(type) {
+      const from  = document.getElementById('f-from')?.value  ?? fyStart;
+      const to    = document.getElementById('f-to')?.value    ?? today;
+      const asof  = document.getElementById('f-asof')?.value  ?? today;
+=======
     function buildParams(type) {
       const from = document.getElementById('f-from')?.value  ?? fyStart;
       const to   = document.getElementById('f-to')?.value    ?? today;
       const asof = document.getElementById('f-asof')?.value  ?? today;
+>>>>>>> origin/main
       if (['profit-loss','cash-flow'].includes(type)) return 'from='+from+'&to='+to;
       if (type === 'balance-sheet') return 'as_of='+asof;
       return '';
     }
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
     const TITLES = {
       'profit-loss':'Profit & Loss','balance-sheet':'Balance Sheet',
       'trial-balance':'Trial Balance','cash-flow':'Cash Flow Statement',
       'ar-aging':'AR Aging','ap-aging':'AP Aging',
     };
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
     async function loadReport(type) {
       document.getElementById('rv-title').textContent = TITLES[type] ?? type;
       document.getElementById('rv-body').innerHTML = '<div class="spinner">Loading…</div>';
@@ -260,19 +392,73 @@ app.get('/', async (c) => {
       document.getElementById('rv-meta').textContent = d.period ?? d.as_of ?? '';
       document.getElementById('rv-body').innerHTML = renderReport(type, d);
     }
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
     function renderReport(type, d) {
       if (type === 'trial-balance') return renderTrialBalance(d);
       if (type === 'profit-loss')   return renderPnl(d);
       if (type === 'balance-sheet') return renderBalanceSheet(d);
       if (type === 'cash-flow')     return renderCashFlow(d);
       if (type === 'ar-aging' || type === 'ap-aging') return renderAging(d);
+<<<<<<< HEAD
+      return '<pre>'+JSON.stringify(d, null, 2)+'</pre>';
+    }
+
+=======
       return '<pre>'+JSON.stringify(d,null,2)+'</pre>';
     }
+>>>>>>> origin/main
     function renderTrialBalance(d) {
       const rows = (d.items ?? []).map(r =>
         '<tr><td>'+r.code+'</td><td>'+r.name+'</td><td>'+r.type+'</td>' +
         '<td class="amount">'+fmt(r.total_debit)+'</td><td class="amount">'+fmt(r.total_credit)+'</td></tr>'
       ).join('');
+<<<<<<< HEAD
+      const td = (d.totals?.debit ?? 0), tc = (d.totals?.credit ?? 0);
+      const balClass = Math.abs(td - tc) < 0.01 ? 'amount-pos' : 'amount-neg';
+      return '<table><thead><tr><th>Code</th><th>Account</th><th>Type</th><th class="amount">Debits</th><th class="amount">Credits</th></tr></thead><tbody>'+rows+
+        '<tr class="total"><td colspan="3">Total</td><td class="amount '+balClass+'">'+fmt(td)+'</td><td class="amount '+balClass+'">'+fmt(tc)+'</td></tr>'+
+        '</tbody></table>';
+    }
+
+    function renderPnl(d) {
+      let html = '<table><thead><tr><th>Account</th><th class="amount">Amount</th></tr></thead><tbody>';
+      html += '<tr class="section-header"><td colspan="2">Revenue</td></tr>';
+      (d.revenue ?? []).forEach(r => html += '<tr><td style="padding-left:2rem">'+r.name+'</td><td class="amount">'+fmt(r.amount)+'</td></tr>');
+      html += '<tr class="subtotal"><td>Total Revenue</td><td class="amount amount-pos">'+fmt(d.total_revenue)+'</td></tr>';
+      html += '<tr class="section-header"><td colspan="2">Expenses</td></tr>';
+      (d.expenses ?? []).forEach(r => html += '<tr><td style="padding-left:2rem">'+r.name+'</td><td class="amount">'+fmt(r.amount)+'</td></tr>');
+      html += '<tr class="subtotal"><td>Total Expenses</td><td class="amount amount-neg">'+fmt(d.total_expenses)+'</td></tr>';
+      const netClass = d.net_income >= 0 ? 'amount-pos' : 'amount-neg';
+      html += '<tr class="total"><td>Net Income</td><td class="amount '+netClass+'">'+fmt(d.net_income)+'</td></tr>';
+      return html + '</tbody></table>';
+    }
+
+    function renderBalanceSheet(d) {
+      let html = '<table><thead><tr><th>Account</th><th class="amount">Balance</th></tr></thead><tbody>';
+      ['assets','liabilities','equity'].forEach(section => {
+        html += '<tr class="section-header"><td colspan="2">'+section.charAt(0).toUpperCase()+section.slice(1)+'</td></tr>';
+        (d[section] ?? []).forEach(r => html += '<tr><td style="padding-left:2rem">'+r.name+'</td><td class="amount">'+fmt(r.balance)+'</td></tr>');
+        html += '<tr class="subtotal"><td>Total '+section.charAt(0).toUpperCase()+section.slice(1)+'</td><td class="amount">'+fmt(d['total_'+section])+'</td></tr>';
+      });
+      return html + '</tbody></table>';
+    }
+
+    function renderCashFlow(d) {
+      let html = '<table><thead><tr><th>Category</th><th class="amount">Amount</th></tr></thead><tbody>';
+      ['operating','investing','financing'].forEach(s => {
+        html += '<tr class="section-header"><td colspan="2">'+s.charAt(0).toUpperCase()+s.slice(1)+' Activities</td></tr>';
+        (d[s] ?? []).forEach(r => html += '<tr><td style="padding-left:2rem">'+r.label+'</td><td class="amount">'+fmt(r.amount)+'</td></tr>');
+        html += '<tr class="subtotal"><td>Net '+s.charAt(0).toUpperCase()+s.slice(1)+'</td><td class="amount">'+fmt(d['net_'+s])+'</td></tr>';
+      });
+      const netClass = d.net_change >= 0 ? 'amount-pos' : 'amount-neg';
+      html += '<tr class="total"><td>Net Change in Cash</td><td class="amount '+netClass+'">'+fmt(d.net_change)+'</td></tr>';
+      return html + '</tbody></table>';
+    }
+
+=======
       const td = d.totals?.debit ?? 0, tc = d.totals?.credit ?? 0;
       const balClass = Math.abs(td-tc) < 0.01 ? 'amount-pos' : 'amount-neg';
       return '<table><thead><tr><th>Code</th><th>Account</th><th>Type</th><th class="amount">Debits</th><th class="amount">Credits</th></tr></thead><tbody>'+rows+
@@ -308,6 +494,7 @@ app.get('/', async (c) => {
       const nc = d.net_change >= 0 ? 'amount-pos' : 'amount-neg';
       return h + '<tr class="total"><td>Net Change in Cash</td><td class="amount '+nc+'">'+fmt(d.net_change)+'</td></tr></tbody></table>';
     }
+>>>>>>> origin/main
     function renderAging(d) {
       const rows = (d.items ?? []).map(r =>
         '<tr><td>'+r.name+'</td><td class="amount">'+fmt(r.current)+'</td><td class="amount">'+fmt(r.days_30)+'</td>' +

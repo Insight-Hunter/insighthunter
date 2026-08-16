@@ -12,8 +12,8 @@ export interface Env {
 }
 
 export interface TokenPayload {
-  sub: string;           // user_id
-  org: string;           // org_id
+  sub: string; // user_id
+  org: string; // org_id
   role: OrgRole;
   email: string;
   iat: number;
@@ -51,10 +51,7 @@ export function canAccess(role: OrgRole, app: AppSlug): boolean {
   return APP_PERMISSIONS[role]?.includes(app) ?? false;
 }
 
-export async function verifyToken(
-  token: string,
-  secret: string
-): Promise<TokenPayload | null> {
+export async function verifyToken(token: string, secret: string): Promise<TokenPayload | null> {
   try {
     const [headerB64, payloadB64, sigB64] = token.split(".");
     if (!headerB64 || !payloadB64 || !sigB64) return null;
@@ -65,12 +62,12 @@ export async function verifyToken(
       encoder.encode(secret),
       { name: "HMAC", hash: "SHA-256" },
       false,
-      ["verify"]
+      ["verify"],
     );
 
     const data = encoder.encode(`${headerB64}.${payloadB64}`);
     const sig = Uint8Array.from(atob(sigB64.replace(/-/g, "+").replace(/_/g, "/")), (c) =>
-      c.charCodeAt(0)
+      c.charCodeAt(0),
     );
     const valid = await crypto.subtle.verify("HMAC", key, sig, data);
     if (!valid) return null;
@@ -86,21 +83,19 @@ export async function verifyToken(
 export async function issueToken(
   payload: Omit<TokenPayload, "iat" | "exp">,
   secret: string,
-  expiresInSeconds = 3600
+  expiresInSeconds = 3600,
 ): Promise<string> {
   const encoder = new TextEncoder();
   const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
   const now = Math.floor(Date.now() / 1000);
-  const body = btoa(
-    JSON.stringify({ ...payload, iat: now, exp: now + expiresInSeconds })
-  );
+  const body = btoa(JSON.stringify({ ...payload, iat: now, exp: now + expiresInSeconds }));
 
   const key = await crypto.subtle.importKey(
     "raw",
     encoder.encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
-    ["sign"]
+    ["sign"],
   );
   const sigBuffer = await crypto.subtle.sign("HMAC", key, encoder.encode(`${header}.${body}`));
   const sig = btoa(String.fromCharCode(...new Uint8Array(sigBuffer)))

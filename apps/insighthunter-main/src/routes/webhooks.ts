@@ -1,5 +1,5 @@
-import { verifyStripeWebhookSignature } from "./../billing/stripe.js";
 import { Hono } from "hono";
+import { verifyStripeWebhookSignature } from "./../billing/stripe.js";
 
 type EnvLike = {
   STRIPE_WEBHOOK_SECRET?: string;
@@ -21,28 +21,19 @@ export const webhooks = new Hono();
 
 export async function handleStripeWebhook(request: Request, env: EnvLike): Promise<Response> {
   const signature =
-    request.headers.get("stripe-signature") ??
-    request.headers.get("Stripe-Signature") ??
-    "";
+    request.headers.get("stripe-signature") ?? request.headers.get("Stripe-Signature") ?? "";
 
   if (!env.STRIPE_WEBHOOK_SECRET) {
-    return new Response(
-      JSON.stringify({ ok: false, error: "Missing STRIPE_WEBHOOK_SECRET" }),
-      {
-        status: 500,
-        headers: { "content-type": "application/json" },
-      },
-    );
+    return new Response(JSON.stringify({ ok: false, error: "Missing STRIPE_WEBHOOK_SECRET" }), {
+      status: 500,
+      headers: { "content-type": "application/json" },
+    });
   }
 
   const body = await request.text();
 
   try {
-    const event = await verifyStripeWebhookSignature(
-      body,
-      signature,
-      env.STRIPE_WEBHOOK_SECRET,
-    );
+    const event = await verifyStripeWebhookSignature(body, signature, env.STRIPE_WEBHOOK_SECRET);
 
     return new Response(
       JSON.stringify({
@@ -57,14 +48,12 @@ export async function handleStripeWebhook(request: Request, env: EnvLike): Promi
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Webhook verification failed";
-    return new Response(
-      JSON.stringify({ ok: false, error: message }),
-      {
-        status: 400,
-        headers: { "content-type": "application/json" },
-      },
-    );
+    return new Response(JSON.stringify({ ok: false, error: message }), {
+      status: 400,
+      headers: { "content-type": "application/json" },
+    });
   }
 }
 
 export default webhooks;
+export const webhooksRoutes = webhooks;

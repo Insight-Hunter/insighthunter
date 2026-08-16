@@ -35,7 +35,16 @@ export async function getAuditLog(
   orgId: string,
   limit = 50,
   offset = 0,
-): Promise<{ id: string; action: string; resource_type: string; user_id: string; created_at: string; ip_address: string | null }[]> {
+): Promise<
+  {
+    id: string;
+    action: string;
+    resource_type: string;
+    user_id: string;
+    created_at: string;
+    ip_address: string | null;
+  }[]
+> {
   const { results } = await db
     .prepare(`
       SELECT al.id, al.action, al.resource_type, al.user_id, al.created_at, al.ip_address

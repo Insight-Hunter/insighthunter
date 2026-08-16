@@ -1,14 +1,32 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import BaseLayout from "../../layouts/BaseLayout.astro";
 const copy = {
-  'bookkeeping': ['Bookkeeping automation', 'Bring bank data, categorization, reconciliation, and close workflows into one operating surface.'],
-  'forecasting': ['Cash-flow forecasting', 'See where cash is heading before it becomes a surprise, with scenario planning and actionable alerts.'],
-  'payroll': ['Payroll workflows', 'Support payroll operations, visibility into employer costs, and finance-ready payroll context.'],
-  'ai-cfo': ['AI CFO guidance', 'Translate financial movement into plain-language operational guidance for owners and advisors.'],
-  'bizforma': ['Business formation', 'Launch and maintain the operating structure a new business needs, from setup through compliance.'],
-  'reporting': ['Operator reporting', 'Package P&L, cash, KPIs, and executive commentary into cleaner reporting loops.']
+  bookkeeping: [
+    "Bookkeeping automation",
+    "Bring bank data, categorization, reconciliation, and close workflows into one operating surface.",
+  ],
+  forecasting: [
+    "Cash-flow forecasting",
+    "See where cash is heading before it becomes a surprise, with scenario planning and actionable alerts.",
+  ],
+  payroll: [
+    "Payroll workflows",
+    "Support payroll operations, visibility into employer costs, and finance-ready payroll context.",
+  ],
+  "ai-cfo": [
+    "AI CFO guidance",
+    "Translate financial movement into plain-language operational guidance for owners and advisors.",
+  ],
+  bizforma: [
+    "Business formation",
+    "Launch and maintain the operating structure a new business needs, from setup through compliance.",
+  ],
+  reporting: [
+    "Operator reporting",
+    "Package P&L, cash, KPIs, and executive commentary into cleaner reporting loops.",
+  ],
 };
-const [title, description] = copy['bookkeeping'];
+const [title, description] = copy["bookkeeping"];
 ---
 <BaseLayout title={title + ' — Insight Hunter'}>
   <section class="section">
