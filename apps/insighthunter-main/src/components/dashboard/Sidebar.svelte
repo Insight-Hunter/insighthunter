@@ -1,16 +1,16 @@
 <script lang="ts">
-  export let session: { email?: string; name?: string } = {};
+export const session: { email?: string; name?: string } = {};
 
-  const nav = [
-    { href: '/dashboard', label: 'Overview', hint: 'CFO command center' },
-    { href: '/advisor', label: 'Advisor', hint: 'AI finance guidance' },
-    { href: '/pricing', label: 'Billing', hint: 'Plans and subscriptions' },
-    { href: '/documents', label: 'Documents', hint: 'Vault and records' },
-    { href: '/compliance', label: 'Compliance', hint: 'Calendar and obligations' }
-  ];
+const nav = [
+  { href: "/dashboard", label: "Overview", hint: "CFO command center" },
+  { href: "/advisor", label: "Advisor", hint: "AI finance guidance" },
+  { href: "/pricing", label: "Billing", hint: "Plans and subscriptions" },
+  { href: "/documents", label: "Documents", hint: "Vault and records" },
+  { href: "/compliance", label: "Compliance", hint: "Calendar and obligations" },
+];
 
-  $: email = session?.email ?? '';
-  $: name = session?.name ?? (email ? email.split('@')[0] : 'Operator');
+$: email = session?.email ?? "";
+$: name = session?.name ?? (email ? email.split("@")[0] : "Operator");
 </script>
 
 <aside class="sidebar">

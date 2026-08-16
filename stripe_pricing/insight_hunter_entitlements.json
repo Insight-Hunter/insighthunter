@@ -4,11 +4,7 @@
   "generated_at": "2026-07-06T13:31:45.472Z",
   "plans": {
     "starter": {
-      "features": [
-        "app.insight_hunter",
-        "compliance.calendar",
-        "documents.vault"
-      ],
+      "features": ["app.insight_hunter", "compliance.calendar", "documents.vault"],
       "feature_details": [
         {
           "feature_code": "app.insight_hunter",

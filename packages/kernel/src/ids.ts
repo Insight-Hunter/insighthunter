@@ -1,6 +1,6 @@
 import { type Brand, brandValue } from "./brand.js";
 
-export type EntityId<TScope extends string> = Brand<string, '${TScope}Id'>;
+export type EntityId<TScope extends string> = Brand<string, "${TScope}Id">;
 export type OrganizationId = EntityId<"organization">;
 export type UserId = EntityId<"user">;
 export type RequestId = EntityId<"request">;
@@ -22,10 +22,10 @@ export function createEntityId<TScope extends string>(
   const trimmed = value.trim();
 
   if (trimmed.length === 0) {
-    throw new Error('${scope} id cannot be empty');
+    throw new Error("${scope} id cannot be empty");
   }
 
-  return brandValue<string, '${TScope}Id'>(trimmed);
+  return brandValue<string, "${TScope}Id">(trimmed);
 }
 
 export function createOrganizationId(value: string): OrganizationId {

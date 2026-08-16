@@ -9,9 +9,7 @@
     "head_sampling_rate": 1
   },
 
-  "routes": [
-    { "pattern": "bookkeeping.insighthunter.app/*", "zone_name": "insighthunter.app" }
-  ],
+  "routes": [{ "pattern": "bookkeeping.insighthunter.app/*", "zone_name": "insighthunter.app" }],
 
   // Shared D1 — same database as all other Workers
   "d1_databases": [
@@ -34,9 +32,7 @@
   // Queue for async CSV parse jobs
   // Create with: wrangler queues create insighthunter-import-queue
   "queues": {
-    "producers": [
-      { "binding": "IMPORT_QUEUE", "queue": "insighthunter-import-queue" }
-    ],
+    "producers": [{ "binding": "IMPORT_QUEUE", "queue": "insighthunter-import-queue" }],
     "consumers": [
       {
         "queue": "insighthunter-import-queue",
@@ -58,9 +54,9 @@
   ],
 
   "vars": {
-    "AUTH_URL":      "https://auth.insighthunter.app",
+    "AUTH_URL": "https://auth.insighthunter.app",
     "DASHBOARD_URL": "https://app.insighthunter.app",
-    "ENVIRONMENT":   "production"
+    "ENVIRONMENT": "production"
   }
 
   // No Durable Objects, no nodejs_compat needed.

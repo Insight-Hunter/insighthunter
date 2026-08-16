@@ -50,7 +50,7 @@
 
   "queues": {
     "producers": [
-      { "binding": "PDF_QUEUE",      "queue": "insighthunter-bizforma-pdf" },
+      { "binding": "PDF_QUEUE", "queue": "insighthunter-bizforma-pdf" },
       { "binding": "REMINDER_QUEUE", "queue": "insighthunter-bizforma-reminders" }
     ],
     "consumers": [
@@ -81,9 +81,7 @@
   },
 
   "durable_objects": {
-    "bindings": [
-      { "name": "FORMATION_AGENT", "class_name": "FormationAgent" }
-    ]
+    "bindings": [{ "name": "FORMATION_AGENT", "class_name": "FormationAgent" }]
   },
 
   "migrations": [

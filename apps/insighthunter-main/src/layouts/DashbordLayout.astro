@@ -1,17 +1,17 @@
 ---
-import Sidebar from '../components/dashboard/Sidebar.svelte';
-import TopBar from '../components/dashboard/TopBar.svelte';
+import Sidebar from "../components/dashboard/Sidebar.svelte";
+import TopBar from "../components/dashboard/TopBar.svelte";
 
 export interface Props {
   title: string;
   description?: string;
 }
 
-const { title, description = 'Insight Hunter workspace' } = Astro.props;
+const { title, description = "Insight Hunter workspace" } = Astro.props;
 const session = Astro.locals.session;
 
 if (!session) {
-  return Astro.redirect('http://auth.insighthunter.app/login');
+  return Astro.redirect("http://auth.insighthunter.app/login");
 }
 ---
 

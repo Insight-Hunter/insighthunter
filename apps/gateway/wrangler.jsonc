@@ -12,26 +12,26 @@
   // Routes: gateway handles ALL *.insighthunter.app traffic
   // Auth worker is excluded — it handles its own subdomain directly
   "routes": [
-    { "pattern": "app.insighthunter.app/*",           "zone_name": "insighthunter.app" },
-    { "pattern": "platform.insighthunter.app/*",      "zone_name": "insighthunter.app" },
-    { "pattern": "bookkeeping.insighthunter.app/*",   "zone_name": "insighthunter.app" },
-    { "pattern": "insights.insighthunter.app/*",      "zone_name": "insighthunter.app" },
-    { "pattern": "advisor.insighthunter.app/*",       "zone_name": "insighthunter.app" },
-    { "pattern": "reports.insighthunter.app/*",       "zone_name": "insighthunter.app" },
-    { "pattern": "payroll.insighthunter.app/*",       "zone_name": "insighthunter.app" },
-    { "pattern": "scout.insighthunter.app/*",         "zone_name": "insighthunter.app" },
-    { "pattern": "pbx.insighthunter.app/*",           "zone_name": "insighthunter.app" },
-    { "pattern": "bizforma.insighthunter.app/*",      "zone_name": "insighthunter.app" },
+    { "pattern": "app.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "platform.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "bookkeeping.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "insights.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "advisor.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "reports.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "payroll.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "scout.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "pbx.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "bizforma.insighthunter.app/*", "zone_name": "insighthunter.app" },
     { "pattern": "notifications.insighthunter.app/*", "zone_name": "insighthunter.app" },
-    { "pattern": "finops.insighthunter.app/*",        "zone_name": "insighthunter.app" },
-    { "pattern": "dispatch.insighthunter.app/*",      "zone_name": "insighthunter.app" }
+    { "pattern": "finops.insighthunter.app/*", "zone_name": "insighthunter.app" },
+    { "pattern": "dispatch.insighthunter.app/*", "zone_name": "insighthunter.app" }
   ],
 
   "kv_namespaces": [
     {
       // Shared session store — same KV namespace as insighthunter-auth
       "binding": "SESSION_KV",
-      "id":   "88a8b6dd2b464effa9025e3f0020cc5e"
+      "id": "88a8b6dd2b464effa9025e3f0020cc5e"
     },
     {
       "binding": "insighthunter_platform_entitlements",

@@ -1,6 +1,6 @@
+import { type Env, type Permission, requireAuth, requirePermission } from "@insighthunter/authz";
 // packages/platform-middleware/src/require-permission.ts
 import type { Context, Next } from "hono";
-import { requireAuth, requirePermission, type Env, type Permission } from "@insighthunter/authz";
 
 export function requireOrgPermission(permission: Permission) {
   return async (c: Context<{ Bindings: Env }>, next: Next) => {
@@ -18,4 +18,3 @@ export function requireOrgPermission(permission: Permission) {
     }
   };
 }
-

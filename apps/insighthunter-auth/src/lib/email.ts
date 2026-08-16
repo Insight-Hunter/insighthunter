@@ -6,7 +6,7 @@ const BASE_URL = "https://auth.insighthunter.app";
 export async function sendVerificationEmail(
   apiKey: string,
   to: string,
-  token: string
+  token: string,
 ): Promise<void> {
   const link = `${BASE_URL}/auth/verify-email?token=${token}`;
   await resendSend(apiKey, {
@@ -19,7 +19,7 @@ export async function sendVerificationEmail(
 export async function sendPasswordResetEmail(
   apiKey: string,
   to: string,
-  token: string
+  token: string,
 ): Promise<void> {
   const link = `${BASE_URL}/auth/reset-password?token=${token}`;
   await resendSend(apiKey, {
@@ -31,7 +31,7 @@ export async function sendPasswordResetEmail(
 
 async function resendSend(
   apiKey: string,
-  opts: { to: string; subject: string; html: string }
+  opts: { to: string; subject: string; html: string },
 ): Promise<void> {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",

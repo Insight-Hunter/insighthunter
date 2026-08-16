@@ -2,13 +2,13 @@
 // Deployed at bookkeeping.insighthunter.app
 // Auth: reads X-* identity headers from apps/gateway.
 
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import { importRoutes } from './routes/imports.js';
-import { transactionRoutes } from './routes/transactions.js';
-import { accountRoutes } from './routes/accounts.js';
-import { reconciliationRoutes } from './routes/reconciliation.js';
-import { handleImportJob } from './queues/import-jobs.js';
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { handleImportJob } from "./queues/import-jobs.js";
+import { accountRoutes } from "./routes/accounts.js";
+import { importRoutes } from "./routes/imports.js";
+import { reconciliationRoutes } from "./routes/reconciliation.js";
+import { transactionRoutes } from "./routes/transactions.js";
 
 export type Env = {
   DB: D1Database;
@@ -21,70 +21,82 @@ export type Env = {
 };
 
 export type Session = {
-  userId:  string;
-  orgId:   string;
-  email:   string;
-  name:    string;
-  role:    string;
+  userId: string;
+  orgId: string;
+  email: string;
+  name: string;
+  role: string;
   orgName: string;
   orgPlan: string;
 };
 
 export function getSession(req: Request): Session | null {
-  const userId = req.headers.get('X-User-Id');
-  const orgId  = req.headers.get('X-Org-Id');
-  const role   = req.headers.get('X-User-Role');
-  const email  = req.headers.get('X-User-Email');
+  const userId = req.headers.get("X-User-Id");
+  const orgId = req.headers.get("X-Org-Id");
+  const role = req.headers.get("X-User-Role");
+  const email = req.headers.get("X-User-Email");
   if (!userId || !orgId || !role || !email) return null;
   return {
-    userId, orgId, role, email,
-    name:    req.headers.get('X-User-Name')  ?? email,
-    orgName: req.headers.get('X-Org-Name')   ?? 'My Org',
-    orgPlan: req.headers.get('X-Org-Plan')   ?? 'starter',
+    userId,
+    orgId,
+    role,
+    email,
+    name: req.headers.get("X-User-Name") ?? email,
+    orgName: req.headers.get("X-Org-Name") ?? "My Org",
+    orgPlan: req.headers.get("X-Org-Plan") ?? "starter",
   };
 }
 
 const app = new Hono<{ Bindings: Env }>();
 
 // Security headers
-app.use('*', async (c, next) => {
+app.use("*", async (c, next) => {
   await next();
-  c.header('X-Frame-Options', 'DENY');
-  c.header('X-Content-Type-Options', 'nosniff');
-  c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  c.header("X-Frame-Options", "DENY");
+  c.header("X-Content-Type-Options", "nosniff");
+  c.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 });
 
 // CORS for API calls from *.insighthunter.app
-app.use('/api/*', cors({
-  origin: (o) => (o?.endsWith('.insighthunter.app') ? o : null),
-  credentials: true,
-}));
+app.use(
+  "/api/*",
+  cors({
+    origin: (o) => (o?.endsWith(".insighthunter.app") ? o : null),
+    credentials: true,
+  }),
+);
 
 // Auth guard — all routes except /health require gateway headers
-app.use('/*', async (c, next) => {
-  if (c.req.path === '/health') return next();
+app.use("/*", async (c, next) => {
+  if (c.req.path === "/health") return next();
   const session = getSession(c.req.raw);
   if (!session) {
-    const isHtml = (c.req.header('Accept') ?? '').includes('text/html');
-    if (isHtml) return c.redirect(`${c.env.AUTH_URL}/login?redirect=${encodeURIComponent(c.req.url)}`, 302);
-    return c.json({ error: 'unauthorized' }, 401);
+    const isHtml = (c.req.header("Accept") ?? "").includes("text/html");
+    if (isHtml)
+      return c.redirect(`${c.env.AUTH_URL}/login?redirect=${encodeURIComponent(c.req.url)}`, 302);
+    return c.json({ error: "unauthorized" }, 401);
   }
   return next();
 });
 
 // Public
-app.get('/health', (c) =>
-  c.json({ ok: true, service: 'insighthunter-bookkeeping', ts: Date.now(), env: c.env.ENVIRONMENT }),
+app.get("/health", (c) =>
+  c.json({
+    ok: true,
+    service: "insighthunter-bookkeeping",
+    ts: Date.now(),
+    env: c.env.ENVIRONMENT,
+  }),
 );
 
 // API routes
-app.route('/api/imports',        importRoutes);
-app.route('/api/transactions',   transactionRoutes);
-app.route('/api/accounts',       accountRoutes);
-app.route('/api/reconciliation', reconciliationRoutes);
+app.route("/api/imports", importRoutes);
+app.route("/api/transactions", transactionRoutes);
+app.route("/api/accounts", accountRoutes);
+app.route("/api/reconciliation", reconciliationRoutes);
 
 // SSR UI
-app.get('/', async (c) => {
+app.get("/", async (c) => {
   const session = getSession(c.req.raw)!;
 
   const html = `<!DOCTYPE html>
@@ -410,13 +422,16 @@ app.get('/', async (c) => {
 // Queue handler — processes CSV import jobs asynchronously
 export default {
   fetch: app.fetch,
-  async queue(batch: MessageBatch<{ importId: string; objectKey: string; orgId: string }>, env: Env): Promise<void> {
+  async queue(
+    batch: MessageBatch<{ importId: string; objectKey: string; orgId: string }>,
+    env: Env,
+  ): Promise<void> {
     for (const msg of batch.messages) {
       try {
         await handleImportJob(msg.body, env);
         msg.ack();
       } catch (err) {
-        console.error('[bookkeeping] queue job failed', err);
+        console.error("[bookkeeping] queue job failed", err);
         msg.retry();
       }
     }

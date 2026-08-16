@@ -1,7 +1,7 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-const items = await getCollection('kb');
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+const items = await getCollection("kb");
 ---
 <BaseLayout title="Knowledge Base — Insight Hunter">
   <section class="section">

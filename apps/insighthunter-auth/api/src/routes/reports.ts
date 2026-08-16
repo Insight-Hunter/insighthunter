@@ -13,16 +13,12 @@ type Env = {
 
 const app = new Hono<Env>();
 
-app.get(
-  "/orgs/:orgId/reports/pnl",
-  requireOrgPermission("reports:read"),
-  async (c) => {
-    return c.json({
-      ok: true,
-      report: "pnl",
-      orgId: c.req.param("orgId"),
-    });
-  },
-);
+app.get("/orgs/:orgId/reports/pnl", requireOrgPermission("reports:read"), async (c) => {
+  return c.json({
+    ok: true,
+    report: "pnl",
+    orgId: c.req.param("orgId"),
+  });
+});
 
 export default app;

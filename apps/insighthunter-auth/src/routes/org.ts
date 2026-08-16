@@ -1,12 +1,12 @@
 // apps/auth/src/routes/org.ts
 // Organization creation, member invitations, role management
 
-import { Hono } from "hono";
-import { verifyToken } from "../lib/tokens";
-import { randomId } from "@insighthunter/kernel";
 import { writeAudit } from "@insighthunter/audit";
-import { sendInviteEmail } from "../lib/email";
 import type { OrgRole } from "@insighthunter/authz";
+import { randomId } from "@insighthunter/kernel";
+import { Hono } from "hono";
+import { sendInviteEmail } from "../lib/email";
+import { verifyToken } from "../lib/tokens";
 
 type Bindings = { DB: D1Database; JWT_SECRET: string; RESEND_API_KEY: string };
 
@@ -26,11 +26,11 @@ orgRoutes.post("/create", async (c) => {
   await c.env.DB.batch([
     c.env.DB.prepare(
       `INSERT INTO organizations (id, name, slug, plan, status)
-       VALUES (?1, ?2, ?3, 'starter', 'active')`
+       VALUES (?1, ?2, ?3, 'starter', 'active')`,
     ).bind(orgId, name, slugClean),
     c.env.DB.prepare(
       `INSERT INTO org_members (id, org_id, user_id, role, status, joined_at)
-       VALUES (?1, ?2, ?3, 'owner', 'active', datetime('now'))`
+       VALUES (?1, ?2, ?3, 'owner', 'active', datetime('now'))`,
     ).bind(randomId("mbr"), orgId, user.sub),
   ]);
 
@@ -60,8 +60,10 @@ orgRoutes.post("/invite", async (c) => {
   // In production use D1 invitations table
   await c.env.DB.prepare(
     `INSERT OR IGNORE INTO org_members (id, org_id, user_id, role, status, invited_by)
-     VALUES (?1, ?2, ?3, ?4, 'invited', ?5)`
-  ).bind(randomId("mbr"), caller.org, email, role, caller.sub).run();
+     VALUES (?1, ?2, ?3, ?4, 'invited', ?5)`,
+  )
+    .bind(randomId("mbr"), caller.org, email, role, caller.sub)
+    .run();
 
   await writeAudit(c.env.DB, {
     org_id: caller.org,

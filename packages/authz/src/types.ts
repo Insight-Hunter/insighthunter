@@ -1,27 +1,32 @@
 // Core session and org types shared across all InsightHunter Workers
 
-export type OrgRole =
-  | 'owner'
-  | 'admin'
-  | 'finance_manager'
-  | 'analyst'
-  | 'bookkeeper'
-  | 'viewer';
+export type OrgRole = "owner" | "admin" | "finance_manager" | "analyst" | "bookkeeper" | "viewer";
 
-export type OrgPlan = 'starter' | 'growth' | 'enterprise';
+export type OrgPlan = "starter" | "growth" | "enterprise";
 
 export type Permission =
-  | 'org:read' | 'org:update'
-  | 'members:read' | 'members:invite' | 'members:update'
-  | 'billing:read' | 'billing:update'
-  | 'reports:read' | 'reports:export'
-  | 'forecast:read' | 'forecast:write'
-  | 'transactions:read' | 'transactions:write'
-  | 'documents:read' | 'documents:write'
-  | 'payroll:read' | 'payroll:write'
-  | 'bookkeeping:read' | 'bookkeeping:write'
-  | 'audit:read'
-  | 'settings:read' | 'settings:write';
+  | "org:read"
+  | "org:update"
+  | "members:read"
+  | "members:invite"
+  | "members:update"
+  | "billing:read"
+  | "billing:update"
+  | "reports:read"
+  | "reports:export"
+  | "forecast:read"
+  | "forecast:write"
+  | "transactions:read"
+  | "transactions:write"
+  | "documents:read"
+  | "documents:write"
+  | "payroll:read"
+  | "payroll:write"
+  | "bookkeeping:read"
+  | "bookkeeping:write"
+  | "audit:read"
+  | "settings:read"
+  | "settings:write";
 
 export interface SessionPrincipal {
   userId: string;

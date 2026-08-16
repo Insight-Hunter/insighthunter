@@ -2,9 +2,9 @@
 // Async queue consumer: reads CSV/OFX from R2, parses rows, writes to import_rows D1 table.
 // Triggered by IMPORT_QUEUE after a file upload.
 
-import type { Env } from '../index.js';
-import { parseCsv } from '../services/csv-parser.js';
-import { normalizeBankRow } from '../services/bank-statement-normalizer.js';
+import type { Env } from "../index.js";
+import { normalizeBankRow } from "../services/bank-statement-normalizer.js";
+import { parseCsv } from "../services/csv-parser.js";
 
 export async function handleImportJob(
   body: { importId: string; objectKey: string; orgId: string },
@@ -13,11 +13,19 @@ export async function handleImportJob(
   const { importId, objectKey, orgId } = body;
 
   // Update status to processing
-  await env.KV_IMPORT_STATUS.put(`import:${importId}`, JSON.stringify({ status: 'processing', rowCount: 0 }), { expirationTtl: 3600 });
+  await env.KV_IMPORT_STATUS.put(
+    `import:${importId}`,
+    JSON.stringify({ status: "processing", rowCount: 0 }),
+    { expirationTtl: 3600 },
+  );
 
   const object = await env.IMPORTS.get(objectKey);
   if (!object) {
-    await env.KV_IMPORT_STATUS.put(`import:${importId}`, JSON.stringify({ status: 'error', error: 'File not found in R2' }), { expirationTtl: 3600 });
+    await env.KV_IMPORT_STATUS.put(
+      `import:${importId}`,
+      JSON.stringify({ status: "error", error: "File not found in R2" }),
+      { expirationTtl: 3600 },
+    );
     return;
   }
 
@@ -27,9 +35,17 @@ export async function handleImportJob(
   try {
     parsedRows = await parseCsv(text);
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Parse error';
-    await env.KV_IMPORT_STATUS.put(`import:${importId}`, JSON.stringify({ status: 'error', error: msg }), { expirationTtl: 3600 });
-    await env.DB.prepare(`UPDATE import_sessions SET status = 'error', updated_at = datetime('now') WHERE id = ?1`).bind(importId).run();
+    const msg = err instanceof Error ? err.message : "Parse error";
+    await env.KV_IMPORT_STATUS.put(
+      `import:${importId}`,
+      JSON.stringify({ status: "error", error: msg }),
+      { expirationTtl: 3600 },
+    );
+    await env.DB.prepare(
+      `UPDATE import_sessions SET status = 'error', updated_at = datetime('now') WHERE id = ?1`,
+    )
+      .bind(importId)
+      .run();
     return;
   }
 
@@ -42,16 +58,19 @@ export async function handleImportJob(
         source_date, source_description, source_amount,
         normalized_date, normalized_description, normalized_amount,
         category, confidence, review_status, created_at
-      ) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,'pending',datetime('now'))`
+      ) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,'pending',datetime('now'))`,
     ).bind(
-      crypto.randomUUID(), importId, orgId, i + 1,
-      norm.sourceDate      ?? null,
+      crypto.randomUUID(),
+      importId,
+      orgId,
+      i + 1,
+      norm.sourceDate ?? null,
       norm.sourceDescription ?? null,
-      norm.sourceAmount    ?? null,
-      norm.normalizedDate  ?? null,
+      norm.sourceAmount ?? null,
+      norm.normalizedDate ?? null,
       norm.normalizedDescription ?? null,
       norm.normalizedAmount ?? null,
-      norm.category        ?? 'Uncategorized',
+      norm.category ?? "Uncategorized",
       norm.confidence,
     );
   });
@@ -62,13 +81,16 @@ export async function handleImportJob(
   }
 
   // Update import session
-  await env.DB.prepare(`UPDATE import_sessions SET status = 'parsed', row_count = ?1, updated_at = datetime('now') WHERE id = ?2`)
-    .bind(parsedRows.length, importId).run();
+  await env.DB.prepare(
+    `UPDATE import_sessions SET status = 'parsed', row_count = ?1, updated_at = datetime('now') WHERE id = ?2`,
+  )
+    .bind(parsedRows.length, importId)
+    .run();
 
   // Update KV status for poll endpoint
   await env.KV_IMPORT_STATUS.put(
     `import:${importId}`,
-    JSON.stringify({ status: 'parsed', rowCount: parsedRows.length }),
+    JSON.stringify({ status: "parsed", rowCount: parsedRows.length }),
     { expirationTtl: 3600 },
   );
 }

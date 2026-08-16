@@ -1,7 +1,5 @@
 export function extractAuthToken(request: Request): string | null {
-  const authHeader =
-    request.headers.get("authorization") ??
-    request.headers.get("Authorization");
+  const authHeader = request.headers.get("authorization") ?? request.headers.get("Authorization");
 
   if (!authHeader) return null;
 

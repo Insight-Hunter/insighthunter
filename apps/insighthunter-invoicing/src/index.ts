@@ -2,16 +2,16 @@
 // Deployed at invoicing.insighthunter.app
 // Auth: reads X-* identity headers injected by apps/gateway.
 
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import { invoiceRoutes } from './routes/invoices.js';
-import { clientRoutes } from './routes/clients.js';
-import { paymentRoutes } from './routes/payments.js';
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { clientRoutes } from "./routes/clients.js";
+import { invoiceRoutes } from "./routes/invoices.js";
+import { paymentRoutes } from "./routes/payments.js";
 
 export type Env = {
   DB: D1Database;
   INVOICE_PDFS: R2Bucket;
-  BROWSER: Fetcher;           // Cloudflare Browser Rendering binding
+  BROWSER: Fetcher; // Cloudflare Browser Rendering binding
   AUTH_URL: string;
   DASHBOARD_URL: string;
   APP_URL: string;
@@ -19,86 +19,97 @@ export type Env = {
 };
 
 export type Session = {
-  userId:  string;
-  orgId:   string;
-  email:   string;
-  name:    string;
-  role:    string;
+  userId: string;
+  orgId: string;
+  email: string;
+  name: string;
+  role: string;
   orgName: string;
   orgPlan: string;
 };
 
 export function getSession(req: Request): Session | null {
-  const userId = req.headers.get('X-User-Id');
-  const orgId  = req.headers.get('X-Org-Id');
-  const role   = req.headers.get('X-User-Role');
-  const email  = req.headers.get('X-User-Email');
+  const userId = req.headers.get("X-User-Id");
+  const orgId = req.headers.get("X-Org-Id");
+  const role = req.headers.get("X-User-Role");
+  const email = req.headers.get("X-User-Email");
   if (!userId || !orgId || !role || !email) return null;
   return {
-    userId, orgId, role, email,
-    name:    req.headers.get('X-User-Name')  ?? email,
-    orgName: req.headers.get('X-Org-Name')   ?? 'My Org',
-    orgPlan: req.headers.get('X-Org-Plan')   ?? 'starter',
+    userId,
+    orgId,
+    role,
+    email,
+    name: req.headers.get("X-User-Name") ?? email,
+    orgName: req.headers.get("X-Org-Name") ?? "My Org",
+    orgPlan: req.headers.get("X-Org-Plan") ?? "starter",
   };
 }
 
 const app = new Hono<{ Bindings: Env }>();
 
 // Security headers
-app.use('*', async (c, next) => {
+app.use("*", async (c, next) => {
   await next();
-  c.header('X-Frame-Options', 'DENY');
-  c.header('X-Content-Type-Options', 'nosniff');
-  c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  c.header("X-Frame-Options", "DENY");
+  c.header("X-Content-Type-Options", "nosniff");
+  c.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 });
 
-app.use('/api/*', cors({
-  origin: (o) => (o?.endsWith('.insighthunter.app') ? o : null),
-  credentials: true,
-}));
+app.use(
+  "/api/*",
+  cors({
+    origin: (o) => (o?.endsWith(".insighthunter.app") ? o : null),
+    credentials: true,
+  }),
+);
 
 // Auth guard
-app.use('/*', async (c, next) => {
-  if (c.req.path === '/health') return next();
+app.use("/*", async (c, next) => {
+  if (c.req.path === "/health") return next();
   const session = getSession(c.req.raw);
   if (!session) {
-    const isHtml = (c.req.header('Accept') ?? '').includes('text/html');
-    if (isHtml) return c.redirect(`${c.env.AUTH_URL}/login?redirect=${encodeURIComponent(c.req.url)}`, 302);
-    return c.json({ error: 'unauthorized' }, 401);
+    const isHtml = (c.req.header("Accept") ?? "").includes("text/html");
+    if (isHtml)
+      return c.redirect(`${c.env.AUTH_URL}/login?redirect=${encodeURIComponent(c.req.url)}`, 302);
+    return c.json({ error: "unauthorized" }, 401);
   }
   return next();
 });
 
-app.get('/health', (c) =>
-  c.json({ ok: true, service: 'insighthunter-invoicing', ts: Date.now(), env: c.env.ENVIRONMENT }),
+app.get("/health", (c) =>
+  c.json({ ok: true, service: "insighthunter-invoicing", ts: Date.now(), env: c.env.ENVIRONMENT }),
 );
 
 // PDF download — streams PDF from R2
-app.get('/invoices/:id/pdf', async (c) => {
+app.get("/invoices/:id/pdf", async (c) => {
   const session = getSession(c.req.raw);
-  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  if (!session) return c.json({ error: "unauthorized" }, 401);
 
-  const invoiceId = c.req.param('id');
+  const invoiceId = c.req.param("id");
   const key = `pdfs/${session.orgId}/${invoiceId}.pdf`;
   const obj = await c.env.INVOICE_PDFS.get(key);
-  if (!obj) return c.json({ error: 'PDF not found — generate it first via POST /api/invoices/:id/pdf' }, 404);
+  if (!obj)
+    return c.json(
+      { error: "PDF not found — generate it first via POST /api/invoices/:id/pdf" },
+      404,
+    );
 
   return new Response(obj.body, {
     headers: {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="invoice-${invoiceId}.pdf"`,
-      'Cache-Control': 'private, max-age=300',
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="invoice-${invoiceId}.pdf"`,
+      "Cache-Control": "private, max-age=300",
     },
   });
 });
 
 // API routes
-app.route('/api/invoices', invoiceRoutes);
-app.route('/api/clients',  clientRoutes);
-app.route('/api/payments', paymentRoutes);
+app.route("/api/invoices", invoiceRoutes);
+app.route("/api/clients", clientRoutes);
+app.route("/api/payments", paymentRoutes);
 
 // SSR Dashboard
-app.get('/', async (c) => {
+app.get("/", async (c) => {
   const session = getSession(c.req.raw)!;
 
   // Summary stats
@@ -111,10 +122,15 @@ app.get('/', async (c) => {
       SUM(total_amount) FILTER (WHERE status = 'paid')
         FILTER (WHERE strftime('%Y-%m', paid_at) = strftime('%Y-%m', 'now')) AS paid_mtd
     FROM invoices WHERE org_id = ?1
-  `).bind(session.orgId).first<{
-    drafts: number; sent: number; overdue: number;
-    ar_balance: number; paid_mtd: number;
-  }>();
+  `)
+    .bind(session.orgId)
+    .first<{
+      drafts: number;
+      sent: number;
+      overdue: number;
+      ar_balance: number;
+      paid_mtd: number;
+    }>();
 
   const recent = await c.env.DB.prepare(`
     SELECT i.id, i.number, i.status, i.issue_date, i.due_date,
@@ -122,33 +138,49 @@ app.get('/', async (c) => {
     FROM invoices i
     LEFT JOIN clients c ON i.client_id = c.id
     WHERE i.org_id = ?1 ORDER BY i.created_at DESC LIMIT 10
-  `).bind(session.orgId).all<{
-    id: string; number: string; status: string; issue_date: string;
-    due_date: string; total_amount: number; amount_paid: number; client_name: string;
-  }>();
+  `)
+    .bind(session.orgId)
+    .all<{
+      id: string;
+      number: string;
+      status: string;
+      issue_date: string;
+      due_date: string;
+      total_amount: number;
+      amount_paid: number;
+      client_name: string;
+    }>();
 
-  const fmt = (v: number | null) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v ?? 0);
+  const fmt = (v: number | null) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(v ?? 0);
   const statusBadge = (s: string) => {
     const map: Record<string, string> = {
-      draft: 'badge-gray', sent: 'badge-blue', paid: 'badge-green',
-      overdue: 'badge-red', void: 'badge-gray',
+      draft: "badge-gray",
+      sent: "badge-blue",
+      paid: "badge-green",
+      overdue: "badge-red",
+      void: "badge-gray",
     };
-    return `<span class="badge ${map[s] ?? 'badge-gray'}">${s}</span>`;
+    return `<span class="badge ${map[s] ?? "badge-gray"}">${s}</span>`;
   };
 
-  const rows = (recent.results ?? []).map(inv => `
+  const rows = (recent.results ?? [])
+    .map(
+      (inv) => `
     <tr>
       <td><a href="/invoices/${inv.id}" style="color:var(--brand);text-decoration:none">${inv.number}</a></td>
-      <td>${inv.client_name ?? '—'}</td>
-      <td>${inv.issue_date ?? '—'}</td>
-      <td>${inv.due_date ?? '—'}</td>
+      <td>${inv.client_name ?? "—"}</td>
+      <td>${inv.issue_date ?? "—"}</td>
+      <td>${inv.due_date ?? "—"}</td>
       <td>${fmt(inv.total_amount)}</td>
       <td>${fmt(inv.amount_paid)}</td>
       <td>${statusBadge(inv.status)}</td>
       <td>
         <a href="/invoices/${inv.id}/pdf" style="color:var(--brand);font-size:.75rem">PDF</a>
       </td>
-    </tr>`).join('');
+    </tr>`,
+    )
+    .join("");
 
   const html = `<!DOCTYPE html>
 <html lang="en">

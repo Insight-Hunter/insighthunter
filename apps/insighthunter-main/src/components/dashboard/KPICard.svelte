@@ -1,24 +1,19 @@
 <script lang="ts">
-  export let title: string = '';
-  export let label: string = '';
-  export let value: string = '';
-  export let delta: string = '';
-  export let change: string = '';
-  export let tone: 'up' | 'down' | 'neutral' = 'neutral';
-  export let positive: boolean | null = null;
-  export let icon: string = '';
+export const title = "";
+export const label = "";
+export const value = "";
+export const delta = "";
+export const change = "";
+export const tone: "up" | "down" | "neutral" = "neutral";
+export const positive: boolean | null = null;
+export const icon = "";
 
-  $: resolvedLabel = label || title || 'Metric';
-  $: resolvedDelta = delta || change || '';
-  $: resolvedTone =
-    positive === true ? 'up' :
-    positive === false ? 'down' :
-    tone;
+$: resolvedLabel = label || title || "Metric";
+$: resolvedDelta = delta || change || "";
+$: resolvedTone = positive === true ? "up" : positive === false ? "down" : tone;
 
-  $: toneClass =
-    resolvedTone === 'up' ? 'tone-up' :
-    resolvedTone === 'down' ? 'tone-down' :
-    'tone-neutral';
+$: toneClass =
+  resolvedTone === "up" ? "tone-up" : resolvedTone === "down" ? "tone-down" : "tone-neutral";
 </script>
 
 <article class="kpi-card">

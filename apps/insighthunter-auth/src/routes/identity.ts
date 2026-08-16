@@ -1,12 +1,12 @@
 // apps/auth/src/routes/identity.ts
 // Core identity endpoints: register, login, logout
 
-import { Hono } from "hono";
-import { hashPassword, verifyPassword } from "../lib/password";
-import { issueToken } from "../lib/tokens";
-import { sendVerificationEmail } from "../lib/email";
 import { writeAudit } from "@insighthunter/audit";
 import { randomId } from "@insighthunter/kernel";
+import { Hono } from "hono";
+import { sendVerificationEmail } from "../lib/email";
+import { hashPassword, verifyPassword } from "../lib/password";
+import { issueToken } from "../lib/tokens";
 
 type Bindings = {
   DB: D1Database;
@@ -30,9 +30,9 @@ identityRoutes.post("/register", async (c) => {
   }
 
   // Check duplicate
-  const existing = await c.env.DB.prepare(
-    "SELECT id FROM users WHERE email = ?1"
-  ).bind(email.toLowerCase()).first();
+  const existing = await c.env.DB.prepare("SELECT id FROM users WHERE email = ?1")
+    .bind(email.toLowerCase())
+    .first();
 
   if (existing) {
     return c.json({ error: "Email already registered" }, 409);
@@ -45,11 +45,11 @@ identityRoutes.post("/register", async (c) => {
   await c.env.DB.batch([
     c.env.DB.prepare(
       `INSERT INTO users (id, email, name, password_hash, email_verified, created_at)
-       VALUES (?1, ?2, ?3, ?4, 0, datetime('now'))`
+       VALUES (?1, ?2, ?3, ?4, 0, datetime('now'))`,
     ).bind(userId, email.toLowerCase(), name, passwordHash),
     c.env.DB.prepare(
       `INSERT INTO email_verifications (user_id, token, expires_at)
-       VALUES (?1, ?2, datetime('now', '+24 hours'))`
+       VALUES (?1, ?2, datetime('now', '+24 hours'))`,
     ).bind(userId, verifyToken),
   ]);
 
@@ -67,15 +67,17 @@ identityRoutes.post("/login", async (c) => {
 
   const user = await c.env.DB.prepare(
     `SELECT id, email, name, password_hash, email_verified, mfa_enabled
-     FROM users WHERE email = ?1`
-  ).bind(email.toLowerCase()).first<{
-    id: string;
-    email: string;
-    name: string;
-    password_hash: string;
-    email_verified: number;
-    mfa_enabled: number;
-  }>();
+     FROM users WHERE email = ?1`,
+  )
+    .bind(email.toLowerCase())
+    .first<{
+      id: string;
+      email: string;
+      name: string;
+      password_hash: string;
+      email_verified: number;
+      mfa_enabled: number;
+    }>();
 
   if (!user || !(await verifyPassword(password, user.password_hash))) {
     return c.json({ error: "Invalid credentials" }, 401);
@@ -94,8 +96,10 @@ identityRoutes.post("/login", async (c) => {
 
   // Get user's primary org + role
   const member = await c.env.DB.prepare(
-    `SELECT org_id, role FROM org_members WHERE user_id = ?1 AND status = 'active' LIMIT 1`
-  ).bind(user.id).first<{ org_id: string; role: string }>();
+    `SELECT org_id, role FROM org_members WHERE user_id = ?1 AND status = 'active' LIMIT 1`,
+  )
+    .bind(user.id)
+    .first<{ org_id: string; role: string }>();
 
   const token = await issueToken(
     {
@@ -104,7 +108,7 @@ identityRoutes.post("/login", async (c) => {
       role: (member?.role ?? "read_only") as never,
       email: user.email,
     },
-    c.env.JWT_SECRET
+    c.env.JWT_SECRET,
   );
 
   await writeAudit(c.env.DB, {

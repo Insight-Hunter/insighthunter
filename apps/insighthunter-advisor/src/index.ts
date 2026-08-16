@@ -19,7 +19,7 @@ app.get("/briefing", async (c) => {
 
   const prompt = [
     "You are InsightHunter Advisor, a concise financial analyst.",
-    'Generate a 2-sentence briefing for organization ${orgId}.',
+    "Generate a 2-sentence briefing for organization ${orgId}.",
     "Focus on cash flow and outstanding items.",
   ].join(" ");
 

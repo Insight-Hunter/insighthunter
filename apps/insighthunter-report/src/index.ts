@@ -2,10 +2,10 @@
 // Deployed at reports.insighthunter.app
 // Auth: reads X-* identity headers injected by apps/gateway.
 
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import { reportRoutes } from './routes/reports.js';
-import { exportRoutes } from './routes/export.js';
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { exportRoutes } from "./routes/export.js";
+import { reportRoutes } from "./routes/reports.js";
 
 export type Env = {
   DB: D1Database;
@@ -15,58 +15,70 @@ export type Env = {
 };
 
 export type Session = {
-  userId: string; orgId: string; email: string;
-  name: string; role: string; orgName: string; orgPlan: string;
+  userId: string;
+  orgId: string;
+  email: string;
+  name: string;
+  role: string;
+  orgName: string;
+  orgPlan: string;
 };
 
 export function getSession(req: Request): Session | null {
-  const userId = req.headers.get('X-User-Id');
-  const orgId  = req.headers.get('X-Org-Id');
-  const role   = req.headers.get('X-User-Role');
-  const email  = req.headers.get('X-User-Email');
+  const userId = req.headers.get("X-User-Id");
+  const orgId = req.headers.get("X-Org-Id");
+  const role = req.headers.get("X-User-Role");
+  const email = req.headers.get("X-User-Email");
   if (!userId || !orgId || !role || !email) return null;
   return {
-    userId, orgId, role, email,
-    name:    req.headers.get('X-User-Name')  ?? email,
-    orgName: req.headers.get('X-Org-Name')   ?? 'My Org',
-    orgPlan: req.headers.get('X-Org-Plan')   ?? 'starter',
+    userId,
+    orgId,
+    role,
+    email,
+    name: req.headers.get("X-User-Name") ?? email,
+    orgName: req.headers.get("X-Org-Name") ?? "My Org",
+    orgPlan: req.headers.get("X-Org-Plan") ?? "starter",
   };
 }
 
 const app = new Hono<{ Bindings: Env }>();
 
-app.use('*', async (c, next) => {
+app.use("*", async (c, next) => {
   await next();
-  c.header('X-Frame-Options', 'DENY');
-  c.header('X-Content-Type-Options', 'nosniff');
-  c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  c.header("X-Frame-Options", "DENY");
+  c.header("X-Content-Type-Options", "nosniff");
+  c.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 });
 
-app.use('/api/*', cors({
-  origin: (o) => (o?.endsWith('.insighthunter.app') ? o : null),
-  credentials: true,
-}));
+app.use(
+  "/api/*",
+  cors({
+    origin: (o) => (o?.endsWith(".insighthunter.app") ? o : null),
+    credentials: true,
+  }),
+);
 
-app.use('/*', async (c, next) => {
-  if (c.req.path === '/health') return next();
+app.use("/*", async (c, next) => {
+  if (c.req.path === "/health") return next();
   const session = getSession(c.req.raw);
   if (!session) {
-    const isHtml = (c.req.header('Accept') ?? '').includes('text/html');
-    if (isHtml) return c.redirect(`${c.env.AUTH_URL}/login?redirect=${encodeURIComponent(c.req.url)}`, 302);
-    return c.json({ error: 'unauthorized' }, 401);
+    const isHtml = (c.req.header("Accept") ?? "").includes("text/html");
+    if (isHtml)
+      return c.redirect(`${c.env.AUTH_URL}/login?redirect=${encodeURIComponent(c.req.url)}`, 302);
+    return c.json({ error: "unauthorized" }, 401);
   }
   return next();
 });
 
-app.get('/health', (c) =>
-  c.json({ ok: true, service: 'insighthunter-report', ts: Date.now(), env: c.env.ENVIRONMENT }),
+app.get("/health", (c) =>
+  c.json({ ok: true, service: "insighthunter-report", ts: Date.now(), env: c.env.ENVIRONMENT }),
 );
 
-app.route('/api/reports', reportRoutes);
-app.route('/api/export',  exportRoutes);
+app.route("/api/reports", reportRoutes);
+app.route("/api/export", exportRoutes);
 
 // SSR Dashboard
-app.get('/', async (c) => {
+app.get("/", async (c) => {
   const session = getSession(c.req.raw)!;
   const now = new Date();
   const fy_start = `${now.getFullYear()}-01-01`;

@@ -24,7 +24,7 @@ export async function getEntityRecommendation(
     annual_revenue?: number;
     employees?: number;
     raise_investment?: boolean;
-  }
+  },
 ): Promise<{ recommendation: string; rationale: string; pros: string[]; cons: string[] }> {
   const key = cacheKey("entity", params as Record<string, unknown>);
   const cached = await env.CACHE.get(key);
@@ -65,7 +65,7 @@ export async function getNameSuggestions(
     state: string;
     entity_type: string;
     industry?: string;
-  }
+  },
 ): Promise<{ suggestions: string[]; tips: string[] }> {
   const key = cacheKey("names", { ...params, keywords: params.keywords.sort().join(",") });
   const cached = await env.CACHE.get(key);
@@ -103,7 +103,7 @@ export async function getOperatingAgreementClauses(
     state: string;
     owners: number;
     business_name: string;
-  }
+  },
 ): Promise<{ clauses: Array<{ section: string; content: string }> }> {
   const key = cacheKey("oa_clauses", params as Record<string, unknown>);
   const cached = await env.CACHE.get(key);
@@ -142,9 +142,14 @@ function buildFallbackRecommendation(params: {
 
   return {
     recommendation: rec,
-    rationale: "Fallback recommendation generated because AI parsing failed. This is a general-purpose suggestion based on the provided inputs.",
+    rationale:
+      "Fallback recommendation generated because AI parsing failed. This is a general-purpose suggestion based on the provided inputs.",
     pros: ["Simple to form", "Flexible taxation", "Widely used for small businesses"],
-    cons: ["May require additional tax filings", "State fees still apply", "Not ideal for every funding plan"],
+    cons: [
+      "May require additional tax filings",
+      "State fees still apply",
+      "Not ideal for every funding plan",
+    ],
   };
 }
 

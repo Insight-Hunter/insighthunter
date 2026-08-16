@@ -1,5 +1,5 @@
-import { Hono } from 'hono';
-import { fromGatewayHeaders } from '../authz/session.js';
+import { Hono } from "hono";
+import { fromGatewayHeaders } from "../authz/session.js";
 
 type Env = {
   Bindings: {
@@ -9,11 +9,11 @@ type Env = {
 
 const onboarding = new Hono<Env>();
 
-onboarding.get('/api/onboarding', async (c) => {
+onboarding.get("/api/onboarding", async (c) => {
   const session = fromGatewayHeaders(c.req.raw);
 
   if (!session) {
-    return c.json({ ok: false, error: 'unauthenticated' }, 401);
+    return c.json({ ok: false, error: "unauthenticated" }, 401);
   }
 
   return c.json({
@@ -21,7 +21,7 @@ onboarding.get('/api/onboarding', async (c) => {
     onboarding: {
       userId: session.userId,
       email: session.email,
-      status: 'ready',
+      status: "ready",
     },
   });
 });

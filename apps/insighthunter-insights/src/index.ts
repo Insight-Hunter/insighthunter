@@ -2,8 +2,8 @@
 // Deployed at insights.insighthunter.app
 // Auth: reads X-* identity headers from apps/gateway — no KV lookup here.
 
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
+import { Hono } from "hono";
+import { cors } from "hono/cors";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -15,11 +15,11 @@ type Env = {
 };
 
 type Session = {
-  userId:  string;
-  orgId:   string;
-  email:   string;
-  name:    string;
-  role:    string;
+  userId: string;
+  orgId: string;
+  email: string;
+  name: string;
+  role: string;
   orgName: string;
   orgSlug: string;
   orgPlan: string;
@@ -28,17 +28,20 @@ type Session = {
 // ── Session helper ───────────────────────────────────────────────────────────
 
 function getSession(req: Request): Session | null {
-  const userId  = req.headers.get('X-User-Id');
-  const orgId   = req.headers.get('X-Org-Id');
-  const role    = req.headers.get('X-User-Role');
-  const email   = req.headers.get('X-User-Email');
+  const userId = req.headers.get("X-User-Id");
+  const orgId = req.headers.get("X-Org-Id");
+  const role = req.headers.get("X-User-Role");
+  const email = req.headers.get("X-User-Email");
   if (!userId || !orgId || !role || !email) return null;
   return {
-    userId,  orgId, role, email,
-    name:    req.headers.get('X-User-Name')  ?? email,
-    orgName: req.headers.get('X-Org-Name')   ?? 'My Org',
-    orgSlug: req.headers.get('X-Org-Slug')   ?? '',
-    orgPlan: req.headers.get('X-Org-Plan')   ?? 'starter',
+    userId,
+    orgId,
+    role,
+    email,
+    name: req.headers.get("X-User-Name") ?? email,
+    orgName: req.headers.get("X-Org-Name") ?? "My Org",
+    orgSlug: req.headers.get("X-Org-Slug") ?? "",
+    orgPlan: req.headers.get("X-Org-Plan") ?? "starter",
   };
 }
 
@@ -53,13 +56,19 @@ function getSession(req: Request): Session | null {
 //   Net Income = Revenue - Expenses
 //   Cash      = SUM(debit - credit) on ASSET accounts with code LIKE '1%'
 
-type KPIRow = { label: string; value: number; prev_value: number; unit: 'currency' | 'percent' | 'days'; trend: 'up' | 'down' | 'flat' };
+type KPIRow = {
+  label: string;
+  value: number;
+  prev_value: number;
+  unit: "currency" | "percent" | "days";
+  trend: "up" | "down" | "flat";
+};
 
 async function getKPIs(db: D1Database, orgId: string): Promise<KPIRow[]> {
   // Current period: this calendar month
-  const now   = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]!;
-  const prev  = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0]!;
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0]!;
+  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split("T")[0]!;
 
   const sql = `
     SELECT
@@ -74,43 +83,79 @@ async function getKPIs(db: D1Database, orgId: string): Promise<KPIRow[]> {
     GROUP BY a.type`;
 
   const [cur, prv] = await Promise.all([
-    db.prepare(sql).bind(orgId, start).all<{ account_type: string; total_debit: number; total_credit: number }>(),
-    db.prepare(sql).bind(orgId, prev).all<{ account_type: string; total_debit: number; total_credit: number }>(),
+    db
+      .prepare(sql)
+      .bind(orgId, start)
+      .all<{ account_type: string; total_debit: number; total_credit: number }>(),
+    db
+      .prepare(sql)
+      .bind(orgId, prev)
+      .all<{ account_type: string; total_debit: number; total_credit: number }>(),
   ]);
 
   const agg = (rows: typeof cur.results, type: string) =>
-    rows?.find(r => r.account_type === type) ?? { total_debit: 0, total_credit: 0 };
+    rows?.find((r) => r.account_type === type) ?? { total_debit: 0, total_credit: 0 };
 
-  const rev    = agg(cur.results, 'REVENUE');  const prevRev  = agg(prv.results, 'REVENUE');
-  const exp    = agg(cur.results, 'EXPENSE');  const prevExp  = agg(prv.results, 'EXPENSE');
-  const asset  = agg(cur.results, 'ASSET');
+  const rev = agg(cur.results, "REVENUE");
+  const prevRev = agg(prv.results, "REVENUE");
+  const exp = agg(cur.results, "EXPENSE");
+  const prevExp = agg(prv.results, "EXPENSE");
+  const asset = agg(cur.results, "ASSET");
 
-  const revenue   = rev.total_credit - rev.total_debit;
-  const expenses  = exp.total_debit - exp.total_credit;
+  const revenue = rev.total_credit - rev.total_debit;
+  const expenses = exp.total_debit - exp.total_credit;
   const netIncome = revenue - expenses;
-  const cash      = asset.total_debit - asset.total_credit;
-  const burnRate  = expenses > 0 ? expenses : 0;
-  const runway    = burnRate > 0 ? Math.round((cash / burnRate) * 30) : 999; // days
+  const cash = asset.total_debit - asset.total_credit;
+  const burnRate = expenses > 0 ? expenses : 0;
+  const runway = burnRate > 0 ? Math.round((cash / burnRate) * 30) : 999; // days
 
-  const pRevenue  = prevRev.total_credit - prevRev.total_debit;
+  const pRevenue = prevRev.total_credit - prevRev.total_debit;
   const pExpenses = prevExp.total_debit - prevExp.total_credit;
-  const pNet      = pRevenue - pExpenses;
+  const pNet = pRevenue - pExpenses;
 
-  const trend = (cur: number, prv: number): 'up' | 'down' | 'flat' =>
-    cur > prv * 1.01 ? 'up' : cur < prv * 0.99 ? 'down' : 'flat';
+  const trend = (cur: number, prv: number): "up" | "down" | "flat" =>
+    cur > prv * 1.01 ? "up" : cur < prv * 0.99 ? "down" : "flat";
 
   return [
-    { label: 'Revenue',       value: revenue,   prev_value: pRevenue,  unit: 'currency', trend: trend(revenue, pRevenue) },
-    { label: 'Expenses',      value: expenses,  prev_value: pExpenses, unit: 'currency', trend: trend(expenses, pExpenses) },
-    { label: 'Net Income',    value: netIncome, prev_value: pNet,      unit: 'currency', trend: trend(netIncome, pNet) },
-    { label: 'Cash Balance',  value: cash,      prev_value: cash,      unit: 'currency', trend: 'flat' },
-    { label: 'Monthly Burn',  value: burnRate,  prev_value: pExpenses, unit: 'currency', trend: trend(burnRate, pExpenses) },
-    { label: 'Runway',        value: runway,    prev_value: runway,    unit: 'days',     trend: 'flat' },
+    {
+      label: "Revenue",
+      value: revenue,
+      prev_value: pRevenue,
+      unit: "currency",
+      trend: trend(revenue, pRevenue),
+    },
+    {
+      label: "Expenses",
+      value: expenses,
+      prev_value: pExpenses,
+      unit: "currency",
+      trend: trend(expenses, pExpenses),
+    },
+    {
+      label: "Net Income",
+      value: netIncome,
+      prev_value: pNet,
+      unit: "currency",
+      trend: trend(netIncome, pNet),
+    },
+    { label: "Cash Balance", value: cash, prev_value: cash, unit: "currency", trend: "flat" },
+    {
+      label: "Monthly Burn",
+      value: burnRate,
+      prev_value: pExpenses,
+      unit: "currency",
+      trend: trend(burnRate, pExpenses),
+    },
+    { label: "Runway", value: runway, prev_value: runway, unit: "days", trend: "flat" },
   ];
 }
 
-async function getCashFlow(db: D1Database, orgId: string): Promise<{ month: string; inflow: number; outflow: number; net: number }[]> {
-  const rows = await db.prepare(`
+async function getCashFlow(
+  db: D1Database,
+  orgId: string,
+): Promise<{ month: string; inflow: number; outflow: number; net: number }[]> {
+  const rows = await db
+    .prepare(`
     SELECT
       strftime('%Y-%m', je.posted_at) AS month,
       SUM(CASE WHEN a.type = 'REVENUE' THEN jl.credit - jl.debit ELSE 0 END) AS inflow,
@@ -125,11 +170,11 @@ async function getCashFlow(db: D1Database, orgId: string): Promise<{ month: stri
     .bind(orgId)
     .all<{ month: string; inflow: number; outflow: number }>();
 
-  return (rows.results ?? []).map(r => ({
-    month:   r.month,
-    inflow:  r.inflow  ?? 0,
+  return (rows.results ?? []).map((r) => ({
+    month: r.month,
+    inflow: r.inflow ?? 0,
     outflow: r.outflow ?? 0,
-    net:     (r.inflow ?? 0) - (r.outflow ?? 0),
+    net: (r.inflow ?? 0) - (r.outflow ?? 0),
   }));
 }
 
@@ -139,7 +184,8 @@ async function getPnL(
   from: string,
   to: string,
 ): Promise<{ account: string; type: string; debit: number; credit: number; net: number }[]> {
-  const rows = await db.prepare(`
+  const rows = await db
+    .prepare(`
     SELECT
       a.name  AS account,
       a.type  AS type,
@@ -158,14 +204,12 @@ async function getPnL(
     .bind(orgId, from, to)
     .all<{ account: string; type: string; code: string; debit: number; credit: number }>();
 
-  return (rows.results ?? []).map(r => ({
+  return (rows.results ?? []).map((r) => ({
     account: r.account,
-    type:    r.type,
-    debit:   r.debit  ?? 0,
-    credit:  r.credit ?? 0,
-    net: r.type === 'REVENUE'
-      ? (r.credit ?? 0) - (r.debit ?? 0)
-      : (r.debit  ?? 0) - (r.credit ?? 0),
+    type: r.type,
+    debit: r.debit ?? 0,
+    credit: r.credit ?? 0,
+    net: r.type === "REVENUE" ? (r.credit ?? 0) - (r.debit ?? 0) : (r.debit ?? 0) - (r.credit ?? 0),
   }));
 }
 
@@ -177,45 +221,62 @@ async function computeAndStoreHealthScore(
   const cf = await getCashFlow(db, orgId);
   const recent = cf.slice(-3);
 
-  const avgInflow  = recent.length ? recent.reduce((s, r) => s + r.inflow,  0) / recent.length : 0;
+  const avgInflow = recent.length ? recent.reduce((s, r) => s + r.inflow, 0) / recent.length : 0;
   const avgOutflow = recent.length ? recent.reduce((s, r) => s + r.outflow, 0) / recent.length : 0;
-  const avgNet     = avgInflow - avgOutflow;
+  const avgNet = avgInflow - avgOutflow;
 
   // Compute 6 metric scores (0–100)
-  const cashScore       = Math.min(100, Math.max(0, avgNet >= 0 ? 70 + Math.min(30, avgNet / 1000) : Math.max(0, 70 + avgNet / 1000)));
-  const revenueGrowth   = cf.length >= 2 ? ((cf[cf.length-1]?.inflow ?? 0) - (cf[cf.length-2]?.inflow ?? 0)) / Math.max(1, cf[cf.length-2]?.inflow ?? 1) * 100 : 0;
-  const growthScore     = Math.min(100, Math.max(0, 50 + revenueGrowth));
-  const burnScore       = avgOutflow > 0 ? Math.min(100, Math.max(0, 100 - (avgOutflow / Math.max(1, avgInflow)) * 100)) : 80;
-  const debtScore       = 70; // placeholder until liabilities tracked
+  const cashScore = Math.min(
+    100,
+    Math.max(0, avgNet >= 0 ? 70 + Math.min(30, avgNet / 1000) : Math.max(0, 70 + avgNet / 1000)),
+  );
+  const revenueGrowth =
+    cf.length >= 2
+      ? (((cf[cf.length - 1]?.inflow ?? 0) - (cf[cf.length - 2]?.inflow ?? 0)) /
+          Math.max(1, cf[cf.length - 2]?.inflow ?? 1)) *
+        100
+      : 0;
+  const growthScore = Math.min(100, Math.max(0, 50 + revenueGrowth));
+  const burnScore =
+    avgOutflow > 0
+      ? Math.min(100, Math.max(0, 100 - (avgOutflow / Math.max(1, avgInflow)) * 100))
+      : 80;
+  const debtScore = 70; // placeholder until liabilities tracked
   const concentrationScore = 65; // placeholder until customer data tracked
   const complianceScore = 80; // placeholder until compliance module live
 
   const breakdown: Record<string, number> = {
-    cash_position:          Math.round(cashScore),
-    revenue_growth:         Math.round(growthScore),
-    debt_risk:              Math.round(debtScore),
-    payroll_burden:         Math.round(burnScore),
+    cash_position: Math.round(cashScore),
+    revenue_growth: Math.round(growthScore),
+    debt_risk: Math.round(debtScore),
+    payroll_burden: Math.round(burnScore),
     customer_concentration: Math.round(concentrationScore),
-    compliance_status:      Math.round(complianceScore),
+    compliance_status: Math.round(complianceScore),
   };
 
   const weights: Record<string, number> = {
-    cash_position: 25, revenue_growth: 20, debt_risk: 20,
-    payroll_burden: 15, customer_concentration: 10, compliance_status: 10,
+    cash_position: 25,
+    revenue_growth: 20,
+    debt_risk: 20,
+    payroll_burden: 15,
+    customer_concentration: 10,
+    compliance_status: 10,
   };
 
   const score = Math.round(
-    Object.entries(weights).reduce((s, [k, w]) => s + (breakdown[k] ?? 0) * w, 0) / 100
+    Object.entries(weights).reduce((s, [k, w]) => s + (breakdown[k] ?? 0) * w, 0) / 100,
   );
-  const label = score >= 85 ? 'Excellent' : score >= 70 ? 'Good' : score >= 50 ? 'Fair' : 'Needs Attention';
+  const label =
+    score >= 85 ? "Excellent" : score >= 70 ? "Good" : score >= 50 ? "Fair" : "Needs Attention";
 
   // Upsert metrics into D1 for dashboard consumption
   const now = new Date().toISOString();
   const stmts = Object.entries(breakdown).map(([key, val]) =>
-    db.prepare(`INSERT INTO org_health_metrics (id, org_id, metric_key, metric_value, recorded_at)
+    db
+      .prepare(`INSERT INTO org_health_metrics (id, org_id, metric_key, metric_value, recorded_at)
                 VALUES (?1, ?2, ?3, ?4, ?5)
                 ON CONFLICT(org_id, metric_key) DO UPDATE SET metric_value=?4, recorded_at=?5`)
-      .bind(crypto.randomUUID(), orgId, key, val, now)
+      .bind(crypto.randomUUID(), orgId, key, val, now),
   );
   await db.batch(stmts);
 
@@ -227,81 +288,89 @@ async function computeAndStoreHealthScore(
 const app = new Hono<{ Bindings: Env }>();
 
 // Security headers
-app.use('*', async (c, next) => {
+app.use("*", async (c, next) => {
   await next();
-  c.header('X-Frame-Options', 'DENY');
-  c.header('X-Content-Type-Options', 'nosniff');
-  c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  c.header("X-Frame-Options", "DENY");
+  c.header("X-Content-Type-Options", "nosniff");
+  c.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 });
 
 // CORS for API routes called from app.insighthunter.app
-app.use('/api/*', cors({
-  origin: (o) => (o?.endsWith('.insighthunter.app') ? o : null),
-  credentials: true,
-}));
+app.use(
+  "/api/*",
+  cors({
+    origin: (o) => (o?.endsWith(".insighthunter.app") ? o : null),
+    credentials: true,
+  }),
+);
 
 // ── Auth guard ─────────────────────────────────────────────────────────────
 
-app.use('/*', async (c, next) => {
-  if (c.req.path === '/health') return next();
+app.use("/*", async (c, next) => {
+  if (c.req.path === "/health") return next();
   const session = getSession(c.req.raw);
   if (!session) {
-    const isHtml = (c.req.header('Accept') ?? '').includes('text/html');
-    if (isHtml) return c.redirect(`${c.env.AUTH_URL}/login?redirect=${encodeURIComponent(c.req.url)}`, 302);
-    return c.json({ error: 'unauthorized' }, 401);
+    const isHtml = (c.req.header("Accept") ?? "").includes("text/html");
+    if (isHtml)
+      return c.redirect(`${c.env.AUTH_URL}/login?redirect=${encodeURIComponent(c.req.url)}`, 302);
+    return c.json({ error: "unauthorized" }, 401);
   }
   return next();
 });
 
 // ── Public ────────────────────────────────────────────────────────────────────
 
-app.get('/health', (c) =>
-  c.json({ ok: true, service: 'insighthunter-insights', ts: Date.now(), env: c.env.ENVIRONMENT }),
+app.get("/health", (c) =>
+  c.json({ ok: true, service: "insighthunter-insights", ts: Date.now(), env: c.env.ENVIRONMENT }),
 );
 
 // ── API Routes ────────────────────────────────────────────────────────────────
 
 // GET /api/kpis — 6 core KPIs for current month vs prior month
-app.get('/api/kpis', async (c) => {
+app.get("/api/kpis", async (c) => {
   const session = getSession(c.req.raw)!;
   const kpis = await getKPIs(c.env.DB, session.orgId);
-  return c.json({ orgId: session.orgId, period: 'MTD', kpis });
+  return c.json({ orgId: session.orgId, period: "MTD", kpis });
 });
 
 // GET /api/cashflow?months=12 — monthly cash in/out/net
-app.get('/api/cashflow', async (c) => {
+app.get("/api/cashflow", async (c) => {
   const session = getSession(c.req.raw)!;
   const data = await getCashFlow(c.env.DB, session.orgId);
   return c.json({ orgId: session.orgId, cashflow: data });
 });
 
 // GET /api/pnl?from=YYYY-MM-DD&to=YYYY-MM-DD — P&L by account
-app.get('/api/pnl', async (c) => {
+app.get("/api/pnl", async (c) => {
   const session = getSession(c.req.raw)!;
-  const now   = new Date();
-  const from  = c.req.query('from') ?? new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]!;
-  const to    = c.req.query('to')   ?? now.toISOString().split('T')[0]!;
+  const now = new Date();
+  const from =
+    c.req.query("from") ??
+    new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0]!;
+  const to = c.req.query("to") ?? now.toISOString().split("T")[0]!;
   const lines = await getPnL(c.env.DB, session.orgId, from, to);
 
-  const revenue  = lines.filter(l => l.type === 'REVENUE').reduce((s, l) => s + l.net, 0);
-  const expenses = lines.filter(l => l.type === 'EXPENSE').reduce((s, l) => s + l.net, 0);
+  const revenue = lines.filter((l) => l.type === "REVENUE").reduce((s, l) => s + l.net, 0);
+  const expenses = lines.filter((l) => l.type === "EXPENSE").reduce((s, l) => s + l.net, 0);
 
   return c.json({
-    orgId: session.orgId, from, to,
+    orgId: session.orgId,
+    from,
+    to,
     summary: { revenue, expenses, netIncome: revenue - expenses },
     lines,
   });
 });
 
 // GET /api/health-score — compute + store 6-factor business health score
-app.get('/api/health-score', async (c) => {
+app.get("/api/health-score", async (c) => {
   const session = getSession(c.req.raw)!;
-  const result  = await computeAndStoreHealthScore(c.env.DB, session.orgId);
+  const result = await computeAndStoreHealthScore(c.env.DB, session.orgId);
   return c.json({ orgId: session.orgId, ...result });
 });
 
 // GET /api/summary — all KPIs + health score in one call (used by dashboard)
-app.get('/api/summary', async (c) => {
+app.get("/api/summary", async (c) => {
   const session = getSession(c.req.raw)!;
   const [kpis, cashflow, health] = await Promise.all([
     getKPIs(c.env.DB, session.orgId),
@@ -313,9 +382,9 @@ app.get('/api/summary', async (c) => {
 
 // ── SSR Dashboard UI ───────────────────────────────────────────────────────────
 
-app.get('/', async (c) => {
+app.get("/", async (c) => {
   const session = getSession(c.req.raw)!;
-  const firstName = session.name.split(' ')[0] ?? session.name;
+  const firstName = session.name.split(" ")[0] ?? session.name;
 
   const html = `<!DOCTYPE html>
 <html lang="en">

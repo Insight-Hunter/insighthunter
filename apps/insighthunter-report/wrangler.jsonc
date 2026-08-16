@@ -9,9 +9,7 @@
     "head_sampling_rate": 1
   },
 
-  "routes": [
-    { "pattern": "reports.insighthunter.app/*", "zone_name": "insighthunter.app" }
-  ],
+  "routes": [{ "pattern": "reports.insighthunter.app/*", "zone_name": "insighthunter.app" }],
 
   // Shared D1 — same database as all other Workers
   "d1_databases": [
@@ -23,9 +21,9 @@
   ],
 
   "vars": {
-    "AUTH_URL":      "https://auth.insighthunter.app",
+    "AUTH_URL": "https://auth.insighthunter.app",
     "DASHBOARD_URL": "https://app.insighthunter.app",
-    "ENVIRONMENT":   "production"
+    "ENVIRONMENT": "production"
   }
 
   // No Durable Objects, no Queue, no nodejs_compat.

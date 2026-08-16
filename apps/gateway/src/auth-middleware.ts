@@ -2,8 +2,8 @@
 // Standalone session validation helper — imported by index.ts and any
 // future gateway sub-routes that need direct session access.
 
-export type OrgRole = 'owner' | 'admin' | 'member' | 'viewer';
-export type OrgPlan = 'starter' | 'growth' | 'pro' | 'enterprise';
+export type OrgRole = "owner" | "admin" | "member" | "viewer";
+export type OrgPlan = "starter" | "growth" | "pro" | "enterprise";
 
 export interface IHSession {
   sessionId: string;
@@ -33,7 +33,7 @@ export async function resolveSession(
   const sessionId = match?.[1];
   if (!sessionId) return null;
 
-  const session = await kv.get(`session:${sessionId}`, 'json') as IHSession | null;
+  const session = (await kv.get(`session:${sessionId}`, "json")) as IHSession | null;
   if (!session) return null;
   if (session.expiresAt < Math.floor(Date.now() / 1000)) return null;
   return session;
@@ -44,31 +44,34 @@ export async function resolveSession(
  * Call this before forwarding any proxied request downstream.
  */
 export function injectIdentityHeaders(headers: Headers, session: IHSession): void {
-  headers.set('X-User-Id',    session.userId);
-  headers.set('X-Org-Id',     session.orgId);
-  headers.set('X-User-Email', session.email);
-  headers.set('X-User-Name',  session.name);
-  headers.set('X-User-Role',  session.role);
-  headers.set('X-Org-Plan',   session.plan);
-  headers.set('X-Org-Slug',   session.orgSlug);
-  headers.set('X-Org-Name',   session.orgName);
-  headers.set('X-Gateway',    'insighthunter-gateway');
+  headers.set("X-User-Id", session.userId);
+  headers.set("X-Org-Id", session.orgId);
+  headers.set("X-User-Email", session.email);
+  headers.set("X-User-Name", session.name);
+  headers.set("X-User-Role", session.role);
+  headers.set("X-Org-Plan", session.plan);
+  headers.set("X-Org-Slug", session.orgSlug);
+  headers.set("X-Org-Name", session.orgName);
+  headers.set("X-Gateway", "insighthunter-gateway");
 }
 
 /**
  * Returns true if the request Accept header prefers HTML (browser navigation).
  */
 export function isBrowserRequest(req: Request): boolean {
-  return (req.headers.get('Accept') ?? '').includes('text/html');
+  return (req.headers.get("Accept") ?? "").includes("text/html");
 }
 
 /**
  * Plan hierarchy rank — higher = more features.
  */
 export const PLAN_RANK: Record<OrgPlan, number> = {
-  starter: 0, growth: 1, pro: 2, enterprise: 3,
+  starter: 0,
+  growth: 1,
+  pro: 2,
+  enterprise: 3,
 };
 
 export function planSufficient(userPlan: OrgPlan, required: OrgPlan[]): boolean {
-  return required.some(r => PLAN_RANK[userPlan] >= PLAN_RANK[r]);
+  return required.some((r) => PLAN_RANK[userPlan] >= PLAN_RANK[r]);
 }

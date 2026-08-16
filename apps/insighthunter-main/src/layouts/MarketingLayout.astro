@@ -7,15 +7,15 @@ export interface Props {
   logoutUrl?: string;
 }
 
-const loginUrl = 'https://auth.insighthunter.app/login';
-const signupUrl = 'https://auth.insighthunter.app/signup';
+const loginUrl = "https://auth.insighthunter.app/login";
+const signupUrl = "https://auth.insighthunter.app/signup";
 
 const {
   title,
-  description = 'Insight Hunter — finance intelligence for growing businesses',
+  description = "Insight Hunter — finance intelligence for growing businesses",
   isAuthenticated = false,
-  dashboardUrl = '/dashboard',
-  logoutUrl = 'https://auth.insighthunter.app/logout',
+  dashboardUrl = "/dashboard",
+  logoutUrl = "https://auth.insighthunter.app/logout",
 } = Astro.props;
 ---
 

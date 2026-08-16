@@ -2,11 +2,11 @@
 // Deployed at payroll.insighthunter.app
 // Auth: reads X-* identity headers injected by apps/gateway.
 
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import { employeeRoutes } from './routes/employees.js';
-import { payrollRunRoutes } from './routes/payroll-runs.js';
-import { deductionRoutes } from './routes/deductions.js';
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { deductionRoutes } from "./routes/deductions.js";
+import { employeeRoutes } from "./routes/employees.js";
+import { payrollRunRoutes } from "./routes/payroll-runs.js";
 
 export type Env = {
   DB: D1Database;
@@ -16,59 +16,71 @@ export type Env = {
 };
 
 export type Session = {
-  userId: string; orgId: string; email: string;
-  name: string; role: string; orgName: string; orgPlan: string;
+  userId: string;
+  orgId: string;
+  email: string;
+  name: string;
+  role: string;
+  orgName: string;
+  orgPlan: string;
 };
 
 export function getSession(req: Request): Session | null {
-  const userId = req.headers.get('X-User-Id');
-  const orgId  = req.headers.get('X-Org-Id');
-  const role   = req.headers.get('X-User-Role');
-  const email  = req.headers.get('X-User-Email');
+  const userId = req.headers.get("X-User-Id");
+  const orgId = req.headers.get("X-Org-Id");
+  const role = req.headers.get("X-User-Role");
+  const email = req.headers.get("X-User-Email");
   if (!userId || !orgId || !role || !email) return null;
   return {
-    userId, orgId, role, email,
-    name:    req.headers.get('X-User-Name')  ?? email,
-    orgName: req.headers.get('X-Org-Name')   ?? 'My Org',
-    orgPlan: req.headers.get('X-Org-Plan')   ?? 'starter',
+    userId,
+    orgId,
+    role,
+    email,
+    name: req.headers.get("X-User-Name") ?? email,
+    orgName: req.headers.get("X-Org-Name") ?? "My Org",
+    orgPlan: req.headers.get("X-Org-Plan") ?? "starter",
   };
 }
 
 const app = new Hono<{ Bindings: Env }>();
 
-app.use('*', async (c, next) => {
+app.use("*", async (c, next) => {
   await next();
-  c.header('X-Frame-Options', 'DENY');
-  c.header('X-Content-Type-Options', 'nosniff');
-  c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  c.header("X-Frame-Options", "DENY");
+  c.header("X-Content-Type-Options", "nosniff");
+  c.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 });
 
-app.use('/api/*', cors({
-  origin: (o) => (o?.endsWith('.insighthunter.app') ? o : null),
-  credentials: true,
-}));
+app.use(
+  "/api/*",
+  cors({
+    origin: (o) => (o?.endsWith(".insighthunter.app") ? o : null),
+    credentials: true,
+  }),
+);
 
-app.use('/*', async (c, next) => {
-  if (c.req.path === '/health') return next();
+app.use("/*", async (c, next) => {
+  if (c.req.path === "/health") return next();
   const session = getSession(c.req.raw);
   if (!session) {
-    const isHtml = (c.req.header('Accept') ?? '').includes('text/html');
-    if (isHtml) return c.redirect(`${c.env.AUTH_URL}/login?redirect=${encodeURIComponent(c.req.url)}`, 302);
-    return c.json({ error: 'unauthorized' }, 401);
+    const isHtml = (c.req.header("Accept") ?? "").includes("text/html");
+    if (isHtml)
+      return c.redirect(`${c.env.AUTH_URL}/login?redirect=${encodeURIComponent(c.req.url)}`, 302);
+    return c.json({ error: "unauthorized" }, 401);
   }
   return next();
 });
 
-app.get('/health', (c) =>
-  c.json({ ok: true, service: 'insighthunter-payroll', ts: Date.now(), env: c.env.ENVIRONMENT }),
+app.get("/health", (c) =>
+  c.json({ ok: true, service: "insighthunter-payroll", ts: Date.now(), env: c.env.ENVIRONMENT }),
 );
 
-app.route('/api/employees',    employeeRoutes);
-app.route('/api/payroll-runs', payrollRunRoutes);
-app.route('/api/deductions',   deductionRoutes);
+app.route("/api/employees", employeeRoutes);
+app.route("/api/payroll-runs", payrollRunRoutes);
+app.route("/api/deductions", deductionRoutes);
 
 // SSR Dashboard
-app.get('/', async (c) => {
+app.get("/", async (c) => {
   const session = getSession(c.req.raw)!;
 
   // Summary stats
@@ -77,39 +89,59 @@ app.get('/', async (c) => {
       COUNT(*) FILTER (WHERE status = 'active') AS active_employees,
       COUNT(*) FILTER (WHERE status = 'inactive') AS inactive_employees
     FROM employees WHERE org_id = ?1
-  `).bind(session.orgId).first<{ active_employees: number; inactive_employees: number }>();
+  `)
+    .bind(session.orgId)
+    .first<{ active_employees: number; inactive_employees: number }>();
 
   const recentRuns = await c.env.DB.prepare(`
     SELECT id, period_start, period_end, status, total_gross, total_net, employee_count, approved_at
     FROM payroll_runs WHERE org_id = ?1
     ORDER BY created_at DESC LIMIT 6
-  `).bind(session.orgId).all<{
-    id: string; period_start: string; period_end: string;
-    status: string; total_gross: number; total_net: number;
-    employee_count: number; approved_at: string | null;
-  }>();
+  `)
+    .bind(session.orgId)
+    .all<{
+      id: string;
+      period_start: string;
+      period_end: string;
+      status: string;
+      total_gross: number;
+      total_net: number;
+      employee_count: number;
+      approved_at: string | null;
+    }>();
 
-  const fmt = (v: number | null) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v ?? 0);
+  const fmt = (v: number | null) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(v ?? 0);
   const statusBadge = (s: string) => {
-    const m: Record<string, string> = { draft: 'badge-gray', pending: 'badge-blue', approved: 'badge-green', void: 'badge-red' };
-    return `<span class="badge ${m[s] ?? 'badge-gray'}">${s}</span>`;
+    const m: Record<string, string> = {
+      draft: "badge-gray",
+      pending: "badge-blue",
+      approved: "badge-green",
+      void: "badge-red",
+    };
+    return `<span class="badge ${m[s] ?? "badge-gray"}">${s}</span>`;
   };
 
-  const runRows = (recentRuns.results ?? []).map(r =>
-    `<tr>
+  const runRows = (recentRuns.results ?? [])
+    .map(
+      (r) =>
+        `<tr>
       <td>${r.period_start} – ${r.period_end}</td>
       <td>${r.employee_count}</td>
       <td>${fmt(r.total_gross)}</td>
       <td>${fmt(r.total_net)}</td>
       <td>${statusBadge(r.status)}</td>
-      <td>${r.approved_at ? r.approved_at.slice(0,10) : '—'}</td>
+      <td>${r.approved_at ? r.approved_at.slice(0, 10) : "—"}</td>
       <td>
-        ${r.status === 'draft' || r.status === 'pending'
-          ? `<button class="btn-sm" onclick="approveRun('${r.id}')">Approve</button>`
-          : ''}
+        ${
+          r.status === "draft" || r.status === "pending"
+            ? `<button class="btn-sm" onclick="approveRun('${r.id}')">Approve</button>`
+            : ""
+        }
       </td>
-    </tr>`
-  ).join('');
+    </tr>`,
+    )
+    .join("");
 
   const html = `<!DOCTYPE html>
 <html lang="en">
