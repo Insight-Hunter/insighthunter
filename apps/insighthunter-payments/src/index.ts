@@ -25,8 +25,12 @@ const PRICE_IDS: Record<Exclude<OrgPlan, "starter">, string> = {
   enterprise: "",
 };
 
+<<<<<<< HEAD
 const BIZFORMA_PRICE_ID = "price_1U4y2fF3gri2YoH216cteUPm"; // one-time BizForma filing fee
 const ENTERPRISE_PRODUCT_ID = "prod_V58JbAis1iFEZS";
+=======
+const BIZFORMA_PRICE_ID = 'price_1U4y2fF3gri2YoH216cteUPm'; // one-time BizForma filing fee
+>>>>>>> 555271160f5d68fa5a56d39e1430755242ccacfc
 
 const ADDON_PRICE_IDS = {
   bizforma: BIZFORMA_PRICE_ID,
