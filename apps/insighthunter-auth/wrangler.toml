@@ -1,12 +1,11 @@
 name = "insighthunter-auth"
 main = "src/index.ts"
-compatibility_date = "2026-07-06"
+compatibility_date = "2026-07-25"
 compatibility_flags = ["nodejs_compat"]
 
 [[routes]]
-pattern = "auth.insighthunter.app"
+pattern = "auth.insighthunter.app/*"
 zone_name = "insighthunter.app"
-custom_domain = true
 
 [observability]
 enabled = true
@@ -17,13 +16,6 @@ binding = "DB"
 database_name = "insighthunter-auth-db"
 database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
 
-[vars]
-APP_BASE_URL = "https://auth.insighthunter.app"
-
-[dev]
-port = 8787
-local_protocol = "http"
-
 [[kv_namespaces]]
 binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
@@ -31,6 +23,19 @@ id = "60e34ba310ca40c79edec05470c7a271"
 [[kv_namespaces]]
 binding = "AUTH_KV"
 id = "8ac9bbaeda4d410db31878ebb8b8a3f1"
+
+[[send_email]]
+name = "SEND_EMAIL"
+destination_address = "noreply@insighthunter.app"
+
+[vars]
+APP_BASE_URL = "https://auth.insighthunter.app"
+DASHBOARD_URL = "https://app.insighthunter.app"
+MARKETING_URL = "https://insighthunter.app"
+
+[dev]
+port = 8787
+local_protocol = "http"
 
 # Secrets (set via wrangler secret put):
 # JWT_SECRET

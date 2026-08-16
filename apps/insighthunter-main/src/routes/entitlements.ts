@@ -1,46 +1,26 @@
-// apps/insighthunter-main/src/authz/entitlements.ts
+import { Hono } from 'hono';
+import { fromGatewayHeaders } from '../authz/session.js';
+import { listOrganizationEntitlements, organizationHasEntitlement } from '../authz/entitlements.js';
+import type { Env } from '../index.js';
 
-export type EntitlementRow = {
-  feature_key: string;
-  status: string;
-  source: string | null;
-  expires_at: string | null;
-  metadata_json: string | null;
-};
+const entitlements = new Hono<{ Bindings: Env }>();
 
-export async function listOrganizationEntitlements(
-  db: D1Database,
-  organizationId: string,
-): Promise<EntitlementRow[]> {
-  const result = await db
-    .prepare(
-      `SELECT feature_key, status, source, expires_at, metadata_json
-       FROM entitlements
-       WHERE organization_id = ?
-       ORDER BY feature_key ASC`,
-    )
-    .bind(organizationId)
-    .all<EntitlementRow>();
+entitlements.get('/api/entitlements', async (c) => {
+  const session = fromGatewayHeaders(c.req.raw);
+  if (!session) return c.json({ ok: false, error: 'unauthenticated' }, 401);
 
-  return result.results ?? [];
-}
+  const rows = await listOrganizationEntitlements(c.env.DB, session.orgId);
+  return c.json({ ok: true, entitlements: rows });
+});
 
-export async function organizationHasEntitlement(
-  db: D1Database,
-  organizationId: string,
-  featureKey: string,
-): Promise<boolean> {
-  const row = await db
-    .prepare(
-      `SELECT feature_key
-       FROM entitlements
-       WHERE organization_id = ?
-         AND feature_key = ?
-         AND status = 'active'
-       LIMIT 1`,
-    )
-    .bind(organizationId, featureKey)
-    .first<{ feature_key: string }>();
+entitlements.get('/api/entitlements/:featureKey', async (c) => {
+  const session = fromGatewayHeaders(c.req.raw);
+  if (!session) return c.json({ ok: false, error: 'unauthenticated' }, 401);
 
-  return Boolean(row?.feature_key);
-}
+  const featureKey = c.req.param('featureKey');
+  const has = await organizationHasEntitlement(c.env.DB, session.orgId, featureKey);
+  return c.json({ ok: true, featureKey, entitled: has });
+});
+
+export const entitlementsRoutes = entitlements;
+export default entitlements;

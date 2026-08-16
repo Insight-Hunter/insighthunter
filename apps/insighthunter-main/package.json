@@ -4,20 +4,25 @@
   "private": true,
   "type": "module",
   "scripts": {
-     "dev":          "astro dev",
-     "build":        "astro build",
-     "deploy:worker": "wrangler deploy",
-     "deploy:site":  "astro build && wrangler pages deploy dist --project-name insighthunter-marketing",
-     "deploy":       "pnpm deploy:worker",
-     "preview":      "wrangler dev",
-     "typecheck":    "tsc -p tsconfig.json --noEmit"
+    "dev": "astro dev",
+    "build": "astro build",
+    "deploy:worker": "wrangler deploy",
+    "deploy:site": "astro build && wrangler pages deploy dist --project-name insighthunter-marketing",
+    "deploy": "pnpm deploy:worker",
+    "preview": "wrangler dev",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
-
   "dependencies": {
+    "@astrojs/cloudflare": "^14.2.1",
+    "@astrojs/mdx": "^7.0.5",
+    "@astrojs/sitemap": "^3.7.3",
     "@insighthunter/auth-shared": "workspace:*",
-    "hono": "^4.6.10"
+    "astro": "^7.2.2",
+    "hono": "^4.6.10",
+    "sitemap ": "link:@astrojs/sitemap "
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250701.0"
+    "@cloudflare/workers-types": "^5.20260816.1",
+    "wrangler": "^4.123.0"
   }
 }

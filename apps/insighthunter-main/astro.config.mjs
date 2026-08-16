@@ -7,10 +7,11 @@ export default defineConfig({
   site: 'https://insighthunter.app',
   output: 'server',
   adapter: cloudflare({
-    mode: 'advanced',          // ← outputs dist/_worker.js (single Worker file)
+    mode: 'advanced',
+    imageService: 'passthrough',
     platformProxy: {
       enabled: true,
-      configPath: './wrangler.toml'   // ← points at the correct file now
+      configPath: './wrangler.toml'
     }
   }),
   integrations: [mdx(), sitemap()],

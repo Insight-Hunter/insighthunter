@@ -68,3 +68,4 @@ export async function handleStripeWebhook(request: Request, env: EnvLike): Promi
 }
 
 export default webhooks;
+export const webhooksRoutes = webhooks;
