@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { getCookie } from "hono/cookie";
 import { cors } from "hono/cors";
 import { html } from "hono/html";
 

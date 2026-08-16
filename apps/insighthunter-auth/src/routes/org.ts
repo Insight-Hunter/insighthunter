@@ -5,7 +5,6 @@ import { writeAudit } from "@insighthunter/audit";
 import type { OrgRole } from "@insighthunter/authz";
 import { randomId } from "@insighthunter/kernel";
 import { Hono } from "hono";
-import { sendInviteEmail } from "../lib/email";
 import { verifyToken } from "../lib/tokens";
 
 type Bindings = { DB: D1Database; JWT_SECRET: string; RESEND_API_KEY: string };
