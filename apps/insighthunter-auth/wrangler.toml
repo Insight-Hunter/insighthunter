@@ -37,6 +37,14 @@ MARKETING_URL = "https://insighthunter.app"
 port = 8787
 local_protocol = "http"
 
+[[durable_objects.bindings]]
+name = "USER_VAULT"
+class_name = "UserVault"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["UserVault"]
+
 # Secrets (set via wrangler secret put):
 # JWT_SECRET
 # RESEND_API_KEY
