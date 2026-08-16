@@ -8,7 +8,7 @@
     "build": "astro build",
     "deploy:worker": "wrangler deploy",
     "deploy:site": "astro build && wrangler pages deploy dist --project-name insighthunter-marketing",
-    "deploy": "pnpm deploy:worker",
+    "deploy": "pnpm deploy:worker && pnpm deploy:site",
     "preview": "wrangler dev",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
@@ -18,8 +18,7 @@
     "@astrojs/sitemap": "^3.7.3",
     "@insighthunter/auth-shared": "workspace:*",
     "astro": "^7.2.2",
-    "hono": "^4.6.10",
-    "sitemap ": "link:@astrojs/sitemap "
+    "hono": "^4.6.10"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260816.1",
