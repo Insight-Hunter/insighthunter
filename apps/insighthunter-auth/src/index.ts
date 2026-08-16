@@ -1,105 +1,216 @@
-// apps/insighthunter-auth/src/index.ts
-import { Hono } from "hono";
-import { cors } from "hono/cors";
+import { hashPassword, verifyPassword, signSession, verifySession } from "./crypto";
+import type { Env, LoginRequest, RegisterRequest, UserRecord } from "./types";
 
-export interface Env {
-  DB: D1Database;
-  SESSIONS: KVNamespace;
-  AUTH_KV: KVNamespace;
-  JWT_SECRET: string;
-  USER_VAULT: DurableObjectNamespace;
-}
+export { UserVault } from "./vault";
 
-async function hashPassword(password: string): Promise<string> {
-  const enc = new TextEncoder().encode(password);
-  const hash = await crypto.subtle.digest("SHA-256", enc);
-  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
-}
+const SESSION_TTL_MS = 1000 * 60 * 60 * 12; // 12h
+const RATE_LIMIT_WINDOW_S = 60;
+const RATE_LIMIT_MAX = 10; // per IP per window, per route
 
-async function signJWT(payload: Record<string, unknown>, secret: string): Promise<string> {
-  const key = await crypto.subtle.importKey(
-    "raw", new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
-  );
-  const header = { alg: "HS256", typ: "JWT" };
-  const enc = (o: unknown) => btoa(JSON.stringify(o)).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
-  const data = `${enc(header)}.${enc({ ...payload, iat: Date.now() })}`;
-  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(data));
-  const b64sig = btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
-  return `${data}.${b64sig}`;
-}
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    const cors = corsHeaders(env, request);
 
-const app = new Hono<{ Bindings: Env }>();
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers: cors });
+    }
 
-app.use("*", cors({
-  origin: ["https://insighthunter.app", "https://app.insighthunter.app"],
-  credentials: true,
-}));
+    try {
+      const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
 
-app.post("/register", async (c) => {
-  const { email, password, tier } = await c.req.json();
-  if (!email || !password) return c.json({ error: "email and password required" }, 400);
+      if (url.pathname === "/register" && request.method === "POST") {
+        if (await isRateLimited(env, `register:${ip}`)) return tooManyRequests(cors);
+        return withCors(await handleRegister(request, env), cors);
+      }
 
-  const existing = await c.env.DB.prepare("SELECT id FROM users WHERE email = ?").bind(email).first();
-  if (existing) return c.json({ error: "email already registered" }, 409);
+      if (url.pathname === "/login" && request.method === "POST") {
+        if (await isRateLimited(env, `login:${ip}`)) return tooManyRequests(cors);
+        return withCors(await handleLogin(request, env, ip), cors);
+      }
+
+      if (url.pathname === "/logout" && request.method === "POST") {
+        return withCors(await handleLogout(request, env), cors);
+      }
+
+      if (url.pathname === "/session/verify" && request.method === "GET") {
+        return withCors(await handleVerify(request, env), cors);
+      }
+
+      return withCors(new Response("Not found", { status: 404 }), cors);
+    } catch (err) {
+      console.error("auth worker error:", err);
+      return withCors(
+        Response.json({ error: "internal_error" }, { status: 500 }),
+        cors
+      );
+    }
+  },
+} satisfies ExportedHandler<Env>;
+
+async function handleRegister(request: Request, env: Env): Promise<Response> {
+  const body = (await request.json()) as RegisterRequest;
+  const email = body.email?.trim().toLowerCase();
+  const password = body.password;
+  const tier = body.tier ?? "startup";
+
+  if (!email || !isValidEmail(email)) {
+    return Response.json({ error: "invalid_email" }, { status: 400 });
+  }
+  if (!password || password.length < 10) {
+    return Response.json(
+      { error: "weak_password", detail: "minimum 10 characters" },
+      { status: 400 }
+    );
+  }
+  if (!["startup", "standard", "pro"].includes(tier)) {
+    return Response.json({ error: "invalid_tier" }, { status: 400 });
+  }
+
+  const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?")
+    .bind(email)
+    .first();
+  if (existing) {
+    return Response.json({ error: "email_in_use" }, { status: 409 });
+  }
 
   const userId = crypto.randomUUID();
   const passwordHash = await hashPassword(password);
-  const vaultDoId = c.env.USER_VAULT.newUniqueId().toString();
+  const vaultDoId = env.USER_VAULT.newUniqueId().toString();
+  const now = Date.now();
 
-  await c.env.DB.prepare(
-    "INSERT INTO users (id, email, password_hash, tier, vault_do_id, created_at) VALUES (?, ?, ?, ?, ?, ?)"
-  ).bind(userId, email, passwordHash, tier ?? "startup", vaultDoId, Date.now()).run();
+  await env.DB.prepare(
+    `INSERT INTO users (id, email, password_hash, tier, status, vault_do_id, created_at, updated_at)
+     VALUES (?, ?, ?, ?, 'active', ?, ?, ?)`
+  )
+    .bind(userId, email, passwordHash, tier, vaultDoId, now, now)
+    .run();
 
-  const token = await signJWT({ userId, email }, c.env.JWT_SECRET);
-  const expiresAt = Date.now() + 1000 * 60 * 60 * 24 * 7;
-  await c.env.SESSIONS.put(token, JSON.stringify({ userId, email }), { expirationTtl: 60 * 60 * 24 * 7 });
+  await env.DB.prepare(
+    `INSERT INTO audit_log (user_id, event, created_at) VALUES (?, 'register', ?)`
+  )
+    .bind(userId, now)
+    .run();
 
-  return c.json({ userId, email, tier: tier ?? "startup", token, expiresAt });
-});
+  const token = await signSession(
+    { userId, email, tier, issuedAt: now, expiresAt: now + SESSION_TTL_MS },
+    env.SESSION_SECRET
+  );
+  await env.SESSIONS.put(`session:${token}`, userId, {
+    expirationTtl: SESSION_TTL_MS / 1000,
+  });
 
-app.post("/login", async (c) => {
-  const { email, password } = await c.req.json();
-  const user = await c.env.DB.prepare("SELECT * FROM users WHERE email = ?").bind(email).first();
-  if (!user) return c.json({ error: "invalid credentials" }, 401);
+  return Response.json(
+    { userId, email, tier, token, expiresAt: now + SESSION_TTL_MS },
+    { status: 201 }
+  );
+}
 
-  const passwordHash = await hashPassword(password);
-  if (passwordHash !== user.password_hash) return c.json({ error: "invalid credentials" }, 401);
-
-  const token = await signJWT({ userId: user.id, email }, c.env.JWT_SECRET);
-  const expiresAt = Date.now() + 1000 * 60 * 60 * 24 * 7;
-  await c.env.SESSIONS.put(token, JSON.stringify({ userId: user.id, email }), { expirationTtl: 60 * 60 * 24 * 7 });
-
-  return c.json({ userId: user.id, email, tier: user.tier, token, expiresAt });
-});
-
-app.get("/session", async (c) => {
-  const auth = c.req.header("Authorization");
-  const token = auth?.replace("Bearer ", "");
-  if (!token) return c.json({ error: "No token" }, 401);
-
-  const session = await c.env.SESSIONS.get(token);
-  if (!session) return c.json({ valid: false }, 401);
-
-  const { userId, email } = JSON.parse(session);
-  return c.json({ valid: true, userId, email });
-});
-
-app.post("/logout", async (c) => {
-  const auth = c.req.header("Authorization");
-  const token = auth?.replace("Bearer ", "");
-  if (token) await c.env.SESSIONS.delete(token);
-  return c.json({ ok: true });
-});
-
-export default app;
-
-export class UserVault {
-  state: DurableObjectState;
-  constructor(state: DurableObjectState) {
-    this.state = state;
+async function handleLogin(request: Request, env: Env, ip: string): Promise<Response> {
+  const body = (await request.json()) as LoginRequest;
+  const email = body.email?.trim().toLowerCase();
+  const password = body.password;
+  if (!email || !password) {
+    return Response.json({ error: "missing_credentials" }, { status: 400 });
   }
-  async fetch(request: Request): Promise<Response> {
-    return new Response("UserVault storage ready", { status: 200 });
+
+  const user = await env.DB.prepare("SELECT * FROM users WHERE email = ?")
+    .bind(email)
+    .first<UserRecord>();
+
+  const now = Date.now();
+
+  if (!user || user.status !== "active" || !(await verifyPassword(password, user.password_hash))) {
+    await env.DB.prepare(
+      `INSERT INTO audit_log (user_id, event, ip, created_at) VALUES (?, 'login_failed', ?, ?)`
+    )
+      .bind(user?.id ?? null, ip, now)
+      .run();
+    return Response.json({ error: "invalid_credentials" }, { status: 401 });
   }
+
+  const token = await signSession(
+    { userId: user.id, email: user.email, tier: user.tier, issuedAt: now, expiresAt: now + SESSION_TTL_MS },
+    env.SESSION_SECRET
+  );
+  await env.SESSIONS.put(`session:${token}`, user.id, {
+    expirationTtl: SESSION_TTL_MS / 1000,
+  });
+  await env.DB.prepare(
+    `INSERT INTO audit_log (user_id, event, ip, created_at) VALUES (?, 'login', ?, ?)`
+  )
+    .bind(user.id, ip, now)
+    .run();
+
+  return Response.json({
+    userId: user.id,
+    email: user.email,
+    tier: user.tier,
+    token,
+    expiresAt: now + SESSION_TTL_MS,
+  });
+}
+
+async function handleLogout(request: Request, env: Env): Promise<Response> {
+  const token = bearerToken(request);
+  if (!token) return Response.json({ error: "missing_token" }, { status: 400 });
+  await env.SESSIONS.delete(`session:${token}`);
+  return Response.json({ loggedOut: true });
+}
+
+async function handleVerify(request: Request, env: Env): Promise<Response> {
+  const token = bearerToken(request);
+  if (!token) return Response.json({ error: "missing_token" }, { status: 401 });
+
+  const payload = await verifySession(token, env.SESSION_SECRET);
+  if (!payload) return Response.json({ error: "invalid_or_expired" }, { status: 401 });
+
+  // Confirm the token hasn't been revoked (logout) via KV lookup.
+  const stillValid = await env.SESSIONS.get(`session:${token}`);
+  if (!stillValid) return Response.json({ error: "session_revoked" }, { status: 401 });
+
+  return Response.json({ valid: true, ...payload });
+}
+
+function bearerToken(request: Request): string | null {
+  const header = request.headers.get("Authorization");
+  if (!header?.startsWith("Bearer ")) return null;
+  return header.slice("Bearer ".length);
+}
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+async function isRateLimited(env: Env, key: string): Promise<boolean> {
+  const countRaw = await env.SESSIONS.get(`ratelimit:${key}`);
+  const count = countRaw ? parseInt(countRaw, 10) : 0;
+  if (count >= RATE_LIMIT_MAX) return true;
+  await env.SESSIONS.put(`ratelimit:${key}`, String(count + 1), {
+    expirationTtl: RATE_LIMIT_WINDOW_S,
+  });
+  return false;
+}
+
+function corsHeaders(env: Env, request: Request): HeadersInit {
+  const origin = request.headers.get("Origin");
+  const allowed = origin === env.ALLOWED_ORIGIN ? origin : env.ALLOWED_ORIGIN;
+  return {
+    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Credentials": "true",
+  };
+}
+
+function withCors(response: Response, cors: HeadersInit): Response {
+  const merged = new Headers(response.headers);
+  for (const [k, v] of Object.entries(cors as Record<string, string>)) {
+    merged.set(k, v);
+  }
+  return new Response(response.body, { status: response.status, headers: merged });
+}
+
+function tooManyRequests(cors: HeadersInit): Response {
+  return withCors(Response.json({ error: "rate_limited" }, { status: 429 }), cors);
 }

@@ -1,200 +1,252 @@
-import { Hono } from "hono";
-import { cors } from "hono/cors";
-import Stripe from "stripe";
+import { ACCOUNT_TIERS, MODULE_ADDONS } from "./catalog";
+import {
+  createBillingPortalSession,
+  createSubscriptionCheckoutSession,
+  getOrCreateCustomer,
+  verifyStripeSignature,
+} from "./stripe";
+import type { CheckoutRequest, Env, SessionPayload } from "./types";
 
-type OrgPlan = "starter" | "growth" | "pro" | "enterprise";
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const url = new URL(request.url);
+    const cors = corsHeaders(env, request);
 
-type Bindings = {
-  DB: D1Database;
-  KV_ENTITLEMENTS: KVNamespace;
-  STRIPE_SECRET_KEY: string;
-  STRIPE_WEBHOOK_SECRET: string;
-  DASHBOARD_URL: string; // https://app.insighthunter.app
-};
+    if (request.method === "OPTIONS") return new Response(null, { headers: cors });
 
-interface CheckoutBody {
-  orgId: string;
-  email: string;
-  plan: Exclude<OrgPlan, "starter">; // starter is free, no checkout needed
+    try {
+      if (url.pathname === "/catalog" && request.method === "GET") {
+        return withCors(
+          Response.json({ accountTiers: ACCOUNT_TIERS, moduleAddons: MODULE_ADDONS }),
+          cors
+        );
+      }
+
+      if (url.pathname === "/checkout" && request.method === "POST") {
+        return withCors(await handleCheckout(request, env), cors);
+      }
+
+      if (url.pathname === "/portal" && request.method === "POST") {
+        return withCors(await handlePortal(request, env), cors);
+      }
+
+      if (url.pathname === "/webhook" && request.method === "POST") {
+        // No CORS on webhook — Stripe calls this server-to-server.
+        return handleWebhook(request, env);
+      }
+
+      return withCors(new Response("Not found", { status: 404 }), cors);
+    } catch (err) {
+      console.error("payments worker error:", err);
+      return withCors(Response.json({ error: "internal_error" }, { status: 500 }), cors);
+    }
+  },
+} satisfies ExportedHandler<Env>;
+
+async function handleCheckout(request: Request, env: Env): Promise<Response> {
+  const session = await requireSession(request, env);
+  if (!session) return Response.json({ error: "unauthorized" }, { status: 401 });
+
+  const body = (await request.json()) as CheckoutRequest;
+  const catalog = body.type === "account_tier" ? ACCOUNT_TIERS : MODULE_ADDONS;
+  const entry = (catalog as Record<string, (typeof ACCOUNT_TIERS)["pro"]>)[body.value];
+
+  if (!entry) return Response.json({ error: "unknown_catalog_item" }, { status: 400 });
+  if (entry.monthlyUsd === 0) {
+    return Response.json({ error: "free_tier_no_checkout_needed" }, { status: 400 });
+  }
+
+  const priceId = (env as unknown as Record<string, string>)[entry.priceEnvKey];
+  if (!priceId) {
+    console.error(`Missing Stripe price id for env key ${entry.priceEnvKey}`);
+    return Response.json({ error: "pricing_not_configured" }, { status: 500 });
+  }
+
+  const user = await env.DB.prepare(
+    "SELECT stripe_customer_id FROM users WHERE id = ?"
+  )
+    .bind(session.userId)
+    .first<{ stripe_customer_id: string | null }>();
+
+  const customerId = await getOrCreateCustomer(
+    env,
+    session.userId,
+    session.email,
+    user?.stripe_customer_id ?? null
+  );
+
+  if (!user?.stripe_customer_id) {
+    await env.DB.prepare("UPDATE users SET stripe_customer_id = ? WHERE id = ?")
+      .bind(customerId, session.userId)
+      .run();
+  }
+
+  const checkoutSession = await createSubscriptionCheckoutSession(env, {
+    customerId,
+    priceId,
+    userId: session.userId,
+    type: body.type,
+    value: body.value,
+    successUrl: `${env.APP_BASE_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancelUrl: `${env.APP_BASE_URL}/billing/cancelled`,
+  });
+
+  return Response.json({ checkoutUrl: checkoutSession.url });
 }
 
-const PRICE_IDS: Record<Exclude<OrgPlan, "starter">, string> = {
-  growth: "price_1U4y2cF3gri2YoH2cj78jVYx",
-  pro: "price_1U4y2dF3gri2YoH2XSmaR1RE",
-  // enterprise has no self-serve Price ID — product prod_V58JbAis1iFEZS is invoiced manually
-  enterprise: "",
-};
+async function handlePortal(request: Request, env: Env): Promise<Response> {
+  const session = await requireSession(request, env);
+  if (!session) return Response.json({ error: "unauthorized" }, { status: 401 });
 
-<<<<<<< HEAD
-const BIZFORMA_PRICE_ID = "price_1U4y2fF3gri2YoH216cteUPm"; // one-time BizForma filing fee
-const ENTERPRISE_PRODUCT_ID = "prod_V58JbAis1iFEZS";
-=======
-const BIZFORMA_PRICE_ID = 'price_1U4y2fF3gri2YoH216cteUPm'; // one-time BizForma filing fee
->>>>>>> 555271160f5d68fa5a56d39e1430755242ccacfc
+  const user = await env.DB.prepare(
+    "SELECT stripe_customer_id FROM users WHERE id = ?"
+  )
+    .bind(session.userId)
+    .first<{ stripe_customer_id: string | null }>();
 
-const ADDON_PRICE_IDS = {
-  bizforma: BIZFORMA_PRICE_ID,
-  scout: "price_1U4yQ1F3gri2YoH2f92zGg4I",
-  extraSeat: "price_1U4yR2F3gri2YoH2rCTwcAGV",
-  payroll: "price_1U4ydIF3gri2YoH2nM6f3EtU",
-  pbxSeat: "price_1U4ydTF3gri2YoH2wffhEcxz",
-  pbxUsage: "price_1U4ydUF3gri2YoH2IYFJbrvq",
-} as const;
-
-const USAGE_METERS = {
-  payroll: {
-    meterId: "mtr_test_61VEMZ54T16CvSGWl41F3gri2YoH21qq",
-    eventName: "payroll_employee_count",
-  },
-  pbx: { meterId: "mtr_test_61VEMa0BG5zOSyQfe41F3gri2YoH2MCu", eventName: "pbx_minutes_used" },
-} as const;
-
-const app = new Hono<{ Bindings: Bindings }>();
-
-app.use(
-  "*",
-  cors({
-    origin: (origin) =>
-      origin && (origin.endsWith(".insighthunter.app") || origin === "https://insighthunter.app")
-        ? origin
-        : null,
-    allowMethods: ["GET", "POST"],
-  }),
-);
-
-app.get("/health", (c) => c.json({ service: "payments", ok: true }));
-
-app.post("/usage", async (c) => {
-  const body = await c.req
-    .json<{ stripeCustomerId: string; type: "payroll" | "pbx"; value: number }>()
-    .catch(() => null);
-  if (!body?.stripeCustomerId || !body?.type || typeof body.value !== "number") {
-    return c.json({ error: "stripeCustomerId, type, and numeric value required" }, 400);
-  }
-  const meter = USAGE_METERS[body.type];
-  if (!meter) return c.json({ error: "invalid usage type" }, 400);
-
-  const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
-  const event = await stripe.billing.meterEvents.create({
-    event_name: meter.eventName,
-    payload: {
-      stripe_customer_id: body.stripeCustomerId,
-      value: String(body.value),
-    },
-  });
-  return c.json({ received: true, eventId: event.identifier });
-});
-
-// Create a Checkout Session for a plan upgrade
-app.post("/checkout", async (c) => {
-  const body = await c.req.json<CheckoutBody>().catch(() => null);
-  if (!body?.orgId || !body?.email || !body?.plan || !(body.plan in PRICE_IDS)) {
-    return c.json({ error: "orgId, email, and valid plan required" }, 400);
-  }
-  if (body.plan === "enterprise") {
-    return c.json(
-      {
-        error: "Enterprise is custom-quoted. Contact sales instead of checkout.",
-        contactUrl: "https://insighthunter.app/contact-sales",
-      },
-      400,
-    );
+  if (!user?.stripe_customer_id) {
+    return Response.json({ error: "no_billing_account" }, { status: 400 });
   }
 
-  const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
+  const portalSession = await createBillingPortalSession(
+    env,
+    user.stripe_customer_id,
+    `${env.APP_BASE_URL}/dashboard/billing`
+  );
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    customer_email: body.email,
-    line_items: [{ price: PRICE_IDS[body.plan], quantity: 1 }],
-    success_url: `${c.env.DASHBOARD_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${c.env.DASHBOARD_URL}/billing/cancel`,
-    client_reference_id: body.orgId,
-    metadata: { orgId: body.orgId, plan: body.plan },
-  });
+  return Response.json({ portalUrl: portalSession.url });
+}
 
-  return c.json({ url: session.url });
-});
+async function handleWebhook(request: Request, env: Env): Promise<Response> {
+  const signature = request.headers.get("Stripe-Signature");
+  const payload = await request.text();
 
-// Stripe webhook — source of truth for entitlement writes
-app.post("/webhook", async (c) => {
-  const sig = c.req.header("stripe-signature");
-  const rawBody = await c.req.text();
-  if (!sig) return c.json({ error: "missing signature" }, 400);
-
-  const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
-  let event: Stripe.Event;
-  try {
-    event = await stripe.webhooks.constructEventAsync(rawBody, sig, c.env.STRIPE_WEBHOOK_SECRET);
-  } catch (err) {
-    return c.json({ error: `signature verification failed: ${(err as Error).message}` }, 400);
+  if (!signature || !(await verifyStripeSignature(payload, signature, env.STRIPE_WEBHOOK_SECRET))) {
+    return new Response("invalid signature", { status: 400 });
   }
+
+  const event = JSON.parse(payload);
+
+  // Idempotency: Stripe may redeliver events.
+  const already = await env.DB.prepare(
+    "SELECT id FROM billing_events WHERE stripe_event_id = ?"
+  )
+    .bind(event.id)
+    .first();
+  if (already) return new Response("ok (duplicate)", { status: 200 });
+
+  const now = Date.now();
+  let userId: string | null = null;
 
   switch (event.type) {
     case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const orgId = session.client_reference_id;
-      const plan = session.metadata?.plan as OrgPlan | undefined;
-      if (orgId && plan) {
-        await c.env.DB.prepare(
-          `UPDATE organizations SET plan = ?, stripe_customer_id = ?, stripe_subscription_id = ? WHERE id = ?`,
-        )
-          .bind(plan, session.customer as string, session.subscription as string, orgId)
-          .run();
-        await c.env.KV_ENTITLEMENTS.put(orgId, JSON.stringify({ plan, updatedAt: Date.now() }));
+      const session = event.data.object;
+      userId = session.metadata?.userId ?? null;
+      if (userId) await grantEntitlement(env, userId, session);
+      break;
+    }
+    case "customer.subscription.updated": {
+      const sub = event.data.object;
+      userId = sub.metadata?.userId ?? null;
+      if (userId && sub.status !== "active") {
+        await revokeEntitlement(env, sub);
       }
       break;
     }
     case "customer.subscription.deleted": {
-      const sub = event.data.object as Stripe.Subscription;
-      const row = await c.env.DB.prepare(
-        `SELECT id FROM organizations WHERE stripe_subscription_id = ?`,
-      )
-        .bind(sub.id)
-        .first<{ id: string }>();
-      if (row) {
-        await c.env.DB.prepare(`UPDATE organizations SET plan = 'starter' WHERE id = ?`)
-          .bind(row.id)
-          .run();
-        await c.env.KV_ENTITLEMENTS.put(
-          row.id,
-          JSON.stringify({ plan: "starter", updatedAt: Date.now() }),
-        );
-      }
+      const sub = event.data.object;
+      userId = sub.metadata?.userId ?? null;
+      if (userId) await revokeEntitlement(env, sub);
       break;
     }
+    default:
+      break; // ignore other event types
   }
 
-  return c.json({ received: true });
-});
+  await env.DB.prepare(
+    `INSERT INTO billing_events (stripe_event_id, event_type, user_id, raw_payload, received_at)
+     VALUES (?, ?, ?, ?, ?)`
+  )
+    .bind(event.id, event.type, userId, payload, now)
+    .run();
 
-app.post("/addon-checkout", async (c) => {
-  const body = await c.req
-    .json<{
-      orgId: string;
-      email: string;
-      addon: keyof typeof ADDON_PRICE_IDS;
-      quantity?: number;
-    }>()
-    .catch(() => null);
-  if (!body?.orgId || !body?.email || !body?.addon || !(body.addon in ADDON_PRICE_IDS)) {
-    return c.json({ error: "orgId, email, and valid addon required" }, 400);
+  return new Response("ok", { status: 200 });
+}
+
+async function grantEntitlement(env: Env, userId: string, session: any): Promise<void> {
+  const type = session.metadata?.type;
+  const value = session.metadata?.value;
+  const subscriptionId = session.subscription as string | undefined;
+  const now = Date.now();
+
+  if (type === "account_tier") {
+    await env.DB.prepare(
+      "UPDATE users SET tier = ?, stripe_subscription_id = ?, updated_at = ? WHERE id = ?"
+    )
+      .bind(value, subscriptionId ?? null, now, userId)
+      .run();
+  } else if (type === "module_addon") {
+    await env.DB.prepare(
+      `INSERT INTO entitlements (user_id, module, tier, status, granted_at, stripe_subscription_id)
+       VALUES (?, ?, 'active', 'active', ?, ?)
+       ON CONFLICT(user_id, module) DO UPDATE SET
+         status = 'active', granted_at = excluded.granted_at,
+         stripe_subscription_id = excluded.stripe_subscription_id`
+    )
+      .bind(userId, value, now, subscriptionId ?? null)
+      .run();
   }
+}
 
-  const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
-  const isOneTime = body.addon === "bizforma";
+async function revokeEntitlement(env: Env, subscription: any): Promise<void> {
+  const userId = subscription.metadata?.userId;
+  const type = subscription.metadata?.type;
+  const value = subscription.metadata?.value;
+  const now = Date.now();
+  if (!userId) return;
 
-  const session = await stripe.checkout.sessions.create({
-    mode: isOneTime ? "payment" : "subscription",
-    customer_email: body.email,
-    line_items: [{ price: ADDON_PRICE_IDS[body.addon], quantity: body.quantity ?? 1 }],
-    success_url: `${c.env.DASHBOARD_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${c.env.DASHBOARD_URL}/billing/cancel`,
-    client_reference_id: body.orgId,
-    metadata: { orgId: body.orgId, addon: body.addon },
+  if (type === "account_tier") {
+    // Downgrade to free tier — do not delete the account.
+    await env.DB.prepare(
+      "UPDATE users SET tier = 'startup', updated_at = ? WHERE id = ?"
+    )
+      .bind(now, userId)
+      .run();
+  } else if (type === "module_addon" && value) {
+    await env.DB.prepare(
+      "UPDATE entitlements SET status = 'cancelled' WHERE user_id = ? AND module = ?"
+    )
+      .bind(userId, value)
+      .run();
+  }
+}
+
+async function requireSession(request: Request, env: Env): Promise<SessionPayload | null> {
+  const header = request.headers.get("Authorization");
+  if (!header?.startsWith("Bearer ")) return null;
+  const token = header.slice("Bearer ".length);
+
+  const res = await fetch(env.AUTH_VERIFY_URL, {
+    headers: { Authorization: `Bearer ${token}` },
   });
+  if (!res.ok) return null;
+  const data = (await res.json()) as SessionPayload & { valid: boolean };
+  return data.valid ? data : null;
+}
 
-  return c.json({ url: session.url });
-});
+function corsHeaders(env: Env, request: Request): HeadersInit {
+  const origin = request.headers.get("Origin");
+  const allowed = origin === env.ALLOWED_ORIGIN ? origin : env.ALLOWED_ORIGIN;
+  return {
+    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Credentials": "true",
+  };
+}
 
-export default app;
+function withCors(response: Response, cors: HeadersInit): Response {
+  const merged = new Headers(response.headers);
+  for (const [k, v] of Object.entries(cors as Record<string, string>)) merged.set(k, v);
+  return new Response(response.body, { status: response.status, headers: merged });
+}
