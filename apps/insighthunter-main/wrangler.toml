@@ -29,6 +29,10 @@ database_name = "insighthunter-main"
 database_id   = "04854880-81f5-4c02-b555-905a34492b92"
 
 [[kv_namespaces]]
+binding = "SESSION"
+id = "98e830f284eb4c58b372d8fc34497146"
+
+[[kv_namespaces]]
 binding    = "SESSION_KV"
 id         = "88a8b6dd2b464effa9025e3f0020cc5e"
 preview_id = "9705276c312c48a7a83270766c1a1c9e"

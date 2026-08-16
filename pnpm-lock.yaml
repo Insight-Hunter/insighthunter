@@ -217,9 +217,6 @@ importers:
       hono:
         specifier: ^4.6.10
         version: 4.13.2
-      sitemap :
-        specifier: link:@astrojs/sitemap 
-        version: link:@astrojs/sitemap 
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^5.20260816.1

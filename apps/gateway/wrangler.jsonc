@@ -30,8 +30,12 @@
   "kv_namespaces": [
     {
       // Shared session store — same KV namespace as insighthunter-auth
-      "binding": "KV_SESSIONS",
-      "id": "REPLACE_WITH_KV_SESSIONS_ID"
+      "binding": "SESSION_KV",
+      "id":   "88a8b6dd2b464effa9025e3f0020cc5e"
+    },
+    {
+      "binding": "insighthunter_platform_entitlements",
+      "id": "f55ebc7692604c949033c9bbc459d6fd"
     }
   ],
 
