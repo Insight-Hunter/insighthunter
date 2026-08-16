@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { serveStatic } from "hono/cloudflare-workers";
 import { html } from "hono/html";
 
 const app = new Hono();
