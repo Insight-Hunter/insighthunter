@@ -6,11 +6,12 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://insighthunter.app',
   output: 'server',
-  adapter: cloudflare(),
-  integrations: [mdx(), sitemap()],
-  markdown: {
-    shikiConfig: {
-      theme: 'github-dark'
+  adapter: cloudflare({
+    mode: 'advanced',          // ← outputs dist/_worker.js (single Worker file)
+    platformProxy: {
+      enabled: true,
+      configPath: './wrangler.toml'   // ← points at the correct file now
     }
-  }
+  }),
+  integrations: [mdx(), sitemap()],
 });

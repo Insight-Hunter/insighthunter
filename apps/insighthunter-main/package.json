@@ -4,11 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
-    "build": "wrangler deploy --dry-run",
-    "deploy": "wrangler deploy",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+     "dev":          "astro dev",
+     "build":        "astro build",
+     "deploy:worker": "wrangler deploy",
+     "deploy:site":  "astro build && wrangler pages deploy dist --project-name insighthunter-marketing",
+     "deploy":       "pnpm deploy:worker",
+     "preview":      "wrangler dev",
+     "typecheck":    "tsc -p tsconfig.json --noEmit"
   },
+
   "dependencies": {
     "@insighthunter/auth-shared": "workspace:*",
     "hono": "^4.6.10"
