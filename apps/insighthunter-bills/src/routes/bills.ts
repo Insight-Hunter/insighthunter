@@ -6,12 +6,6 @@ import { writeBillJournalEntry } from '../services/bill-journal-writer.js';
 
 export const billRoutes = new Hono<{ Bindings: Env }>();
 
-function computeStatus(balanceDue: number, dueDate: string, paid: number) {
-  if (balanceDue <= 0.005) return 'paid';
-  if (paid > 0) return new Date(dueDate) < new Date() ? 'overdue' : 'scheduled';
-  return new Date(dueDate) < new Date() ? 'overdue' : 'received';
-}
-
 billRoutes.get('/', async (c) => {
   const session = getSession(c.req.raw);
   if (!session) return c.json({ error: 'unauthorized' }, 401);
