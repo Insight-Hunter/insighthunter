@@ -1,106 +1,43 @@
 ---
-import Sidebar from "../components/dashboard/Sidebar.svelte";
-import TopBar from "../components/dashboard/TopBar.svelte";
+// src/layouts/DashboardLayout.astro
+import '../styles/global.css';
+import { getSession } from '@insighthunter/auth-shared';
+import type { IHSession } from '@insighthunter/auth-shared';
 
-export interface Props {
-  title: string;
-  description?: string;
-}
-
-const { title, description = "Insight Hunter workspace" } = Astro.props;
-const session = Astro.locals.session;
-
-if (!session) {
-  return Astro.redirect("http://auth.insighthunter.app/login");
-}
+const { title = 'Dashboard', session } = Astro.props;
+const planLabel = session.plan === 'enterprise' ? 'Enterprise' : session.plan === 'growth' ? 'Growth' : 'Starter';
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>{title} | Insight Hunter</title>
-    <meta name="description" content={description} />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="icon" href="/favicon.svg" />
   </head>
   <body>
-    <div class="app-shell">
-      <aside class="rail">
-        <Sidebar session={session} />
-      </aside>
-
-      <div class="main-region">
-        <TopBar title={title} session={session} />
-        <main class="page-region">
-          <slot />
-        </main>
+    <nav>
+      <div class="logo">Insight Hunter</div>
+      <div class="nav-right">
+        <span>{session.user?.email}</span>
+        <span class="badge">{planLabel}</span>
+        <a href="/auth/logout">Logout</a>
       </div>
-    </div>
+    </nav>
+    <main>
+      <slot />
+    </main>
+    <style>
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+      :root{--brand:#0ea5e9;--dark:#0f172a;--nav:#0a1120;--card:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--border:#334155}
+      body{font-family:system-ui,sans-serif;background:var(--dark);color:var(--text);min-height:100vh}
+      nav{background:var(--nav);border-bottom:1px solid var(--border);padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+      .logo{font-size:1.2rem;font-weight:900;color:var(--brand)}
+      .nav-right{display:flex;align-items:center;gap:1rem;font-size:.85rem;color:var(--muted)}
+      .nav-right a{color:var(--brand);text-decoration:none;font-weight:600}
+      .badge{display:inline-block;background:#0ea5e920;color:var(--brand);border:1px solid #0ea5e940;border-radius:6px;padding:.15rem .5rem;font-size:.7rem;font-weight:700}
+      main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem}
+    </style>
   </body>
 </html>
-
-<style>
-  :global(:root) {
-    color-scheme: dark;
-    --bg: #08111f;
-    --panel: #101b2e;
-    --panel-2: #132138;
-    --line: rgba(255,255,255,0.08);
-    --text: #f4f7fb;
-    --muted: #93a4bd;
-    --accent: #59a7ff;
-    --shadow: 0 24px 64px rgba(0,0,0,0.28);
-  }
-
-  :global(*) {
-    box-sizing: border-box;
-  }
-
-  :global(html),
-  :global(body) {
-    margin: 0;
-    min-height: 100%;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: radial-gradient(circle at top, rgba(88,140,255,0.08), transparent 30%), var(--bg);
-    color: var(--text);
-  }
-
-  .app-shell {
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: 280px minmax(0, 1fr);
-  }
-
-  .rail {
-    border-right: 1px solid var(--line);
-    background: rgba(7, 14, 26, 0.9);
-    backdrop-filter: blur(18px);
-  }
-
-  .main-region {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .page-region {
-    flex: 1;
-    padding: 24px;
-    overflow-x: hidden;
-  }
-
-  @media (max-width: 980px) {
-    .app-shell {
-      grid-template-columns: 1fr;
-    }
-
-    .rail {
-      border-right: 0;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .page-region {
-      padding: 18px;
-    }
-  }
-</style>

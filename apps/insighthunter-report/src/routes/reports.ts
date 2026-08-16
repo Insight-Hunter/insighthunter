@@ -2,6 +2,7 @@
 // All financial report endpoints — derived from shared D1 journal data.
 // Reports: trial-balance, profit-loss, balance-sheet, cash-flow, ar-aging, ap-aging.
 
+<<<<<<< HEAD
 import { Hono } from "hono";
 import type { Env } from "../index.js";
 import { getSession } from "../index.js";
@@ -12,6 +13,18 @@ export const reportRoutes = new Hono<{ Bindings: Env }>();
 reportRoutes.get("/trial-balance", async (c) => {
   const session = getSession(c.req.raw);
   if (!session) return c.json({ error: "unauthorized" }, 401);
+=======
+import { Hono } from 'hono';
+import type { Env } from '../index.js';
+import { getSession } from '../index.js';
+
+export const reportRoutes = new Hono<{ Bindings: Env }>();
+
+// ── Trial Balance ─────────────────────────────────────────────────────────────
+reportRoutes.get('/trial-balance', async (c) => {
+  const session = getSession(c.req.raw);
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+>>>>>>> origin/main
 
   const { results } = await c.env.DB.prepare(`
     SELECT a.code, a.name, a.type,
@@ -24,9 +37,13 @@ reportRoutes.get("/trial-balance", async (c) => {
     WHERE a.organization_id = ?1
     GROUP BY a.id, a.code, a.name, a.type
     ORDER BY a.code ASC
+<<<<<<< HEAD
   `)
     .bind(session.orgId)
     .all<{ code: string; name: string; type: string; total_debit: number; total_credit: number }>();
+=======
+  `).bind(session.orgId).all<{ code: string; name: string; type: string; total_debit: number; total_credit: number }>();
+>>>>>>> origin/main
 
   const totals = (results ?? []).reduce(
     (acc, r) => ({ debit: acc.debit + r.total_debit, credit: acc.credit + r.total_credit }),
@@ -36,6 +53,7 @@ reportRoutes.get("/trial-balance", async (c) => {
   return c.json({ items: results ?? [], totals });
 });
 
+<<<<<<< HEAD
 // ── Profit & Loss ───────────────────────────────────────────────────────────────────
 reportRoutes.get("/profit-loss", async (c) => {
   const session = getSession(c.req.raw);
@@ -43,6 +61,15 @@ reportRoutes.get("/profit-loss", async (c) => {
 
   const from = c.req.query("from") ?? `${new Date().getFullYear()}-01-01`;
   const to = c.req.query("to") ?? new Date().toISOString().slice(0, 10);
+=======
+// ── Profit & Loss ─────────────────────────────────────────────────────────────
+reportRoutes.get('/profit-loss', async (c) => {
+  const session = getSession(c.req.raw);
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const from = c.req.query('from') ?? `${new Date().getFullYear()}-01-01`;
+  const to   = c.req.query('to')   ?? new Date().toISOString().slice(0, 10);
+>>>>>>> origin/main
 
   const { results } = await c.env.DB.prepare(`
     SELECT a.name, a.type,
@@ -56,6 +83,7 @@ reportRoutes.get("/profit-loss", async (c) => {
       AND a.type IN ('REVENUE', 'EXPENSE')
     GROUP BY a.id, a.name, a.type
     ORDER BY a.type DESC, a.name ASC
+<<<<<<< HEAD
   `)
     .bind(session.orgId, from, to)
     .all<{ name: string; type: string; amount: number }>();
@@ -85,6 +113,26 @@ reportRoutes.get("/balance-sheet", async (c) => {
   if (!session) return c.json({ error: "unauthorized" }, 401);
 
   const as_of = c.req.query("as_of") ?? new Date().toISOString().slice(0, 10);
+=======
+  `).bind(session.orgId, from, to).all<{ name: string; type: string; amount: number }>();
+
+  const revenue  = (results ?? []).filter(r => r.type === 'REVENUE');
+  const expenses = (results ?? []).filter(r => r.type === 'EXPENSE').map(r => ({ ...r, amount: Math.abs(r.amount) }));
+
+  const total_revenue  = revenue.reduce((s, r) => s + r.amount, 0);
+  const total_expenses = expenses.reduce((s, r) => s + r.amount, 0);
+  const net_income = total_revenue - total_expenses;
+
+  return c.json({ period: `${from} — ${to}`, revenue, expenses, total_revenue, total_expenses, net_income });
+});
+
+// ── Balance Sheet ─────────────────────────────────────────────────────────────
+reportRoutes.get('/balance-sheet', async (c) => {
+  const session = getSession(c.req.raw);
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const as_of = c.req.query('as_of') ?? new Date().toISOString().slice(0, 10);
+>>>>>>> origin/main
 
   const { results } = await c.env.DB.prepare(`
     SELECT a.name, a.type,
@@ -98,6 +146,7 @@ reportRoutes.get("/balance-sheet", async (c) => {
       AND a.type IN ('ASSET', 'LIABILITY', 'EQUITY')
     GROUP BY a.id, a.name, a.type
     ORDER BY a.type, a.name
+<<<<<<< HEAD
   `)
     .bind(session.orgId, as_of)
     .all<{ name: string; type: string; balance: number }>();
@@ -130,6 +179,31 @@ reportRoutes.get("/cash-flow", async (c) => {
   const to = c.req.query("to") ?? new Date().toISOString().slice(0, 10);
 
   // Cash inflows (credits on asset accounts)
+=======
+  `).bind(session.orgId, as_of).all<{ name: string; type: string; balance: number }>();
+
+  const assets      = (results ?? []).filter(r => r.type === 'ASSET');
+  const liabilities = (results ?? []).filter(r => r.type === 'LIABILITY').map(r => ({ ...r, balance: Math.abs(r.balance) }));
+  const equity      = (results ?? []).filter(r => r.type === 'EQUITY').map(r => ({ ...r, balance: Math.abs(r.balance) }));
+
+  return c.json({
+    as_of,
+    assets, liabilities, equity,
+    total_assets:      assets.reduce((s, r) => s + r.balance, 0),
+    total_liabilities: liabilities.reduce((s, r) => s + r.balance, 0),
+    total_equity:      equity.reduce((s, r) => s + r.balance, 0),
+  });
+});
+
+// ── Cash Flow (indirect method approximation) ─────────────────────────────────
+reportRoutes.get('/cash-flow', async (c) => {
+  const session = getSession(c.req.raw);
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const from = c.req.query('from') ?? `${new Date().getFullYear()}-01-01`;
+  const to   = c.req.query('to')   ?? new Date().toISOString().slice(0, 10);
+
+>>>>>>> origin/main
   const cashInRows = await c.env.DB.prepare(`
     SELECT COALESCE(SUM(jl.credit), 0) AS cash_in,
            COALESCE(SUM(jl.debit),  0) AS cash_out
@@ -140,6 +214,7 @@ reportRoutes.get("/cash-flow", async (c) => {
       AND a.organization_id  = ?1
       AND je.posted_at BETWEEN ?2 AND ?3
       AND a.type = 'ASSET' AND a.code LIKE '1%'
+<<<<<<< HEAD
   `)
     .bind(session.orgId, from, to)
     .first<{ cash_in: number; cash_out: number }>();
@@ -154,6 +229,19 @@ reportRoutes.get("/cash-flow", async (c) => {
     operating: [
       { label: "Revenue collected", amount: revenue_collected },
       { label: "Expenses paid", amount: -expenses_paid },
+=======
+  `).bind(session.orgId, from, to).first<{ cash_in: number; cash_out: number }>();
+
+  const revenue_collected = cashInRows?.cash_in  ?? 0;
+  const expenses_paid     = cashInRows?.cash_out ?? 0;
+  const net_operating     = revenue_collected - expenses_paid;
+
+  return c.json({
+    period: `${from} — ${to}`,
+    operating: [
+      { label: 'Revenue collected', amount:  revenue_collected },
+      { label: 'Expenses paid',     amount: -expenses_paid },
+>>>>>>> origin/main
     ],
     investing: [],
     financing: [],
@@ -164,10 +252,17 @@ reportRoutes.get("/cash-flow", async (c) => {
   });
 });
 
+<<<<<<< HEAD
 // ── AR Aging ────────────────────────────────────────────────────────────────────────
 reportRoutes.get("/ar-aging", async (c) => {
   const session = getSession(c.req.raw);
   if (!session) return c.json({ error: "unauthorized" }, 401);
+=======
+// ── AR Aging ──────────────────────────────────────────────────────────────────
+reportRoutes.get('/ar-aging', async (c) => {
+  const session = getSession(c.req.raw);
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+>>>>>>> origin/main
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -184,6 +279,7 @@ reportRoutes.get("/ar-aging", async (c) => {
     WHERE i.org_id = ?1 AND i.status IN ('sent','overdue')
     GROUP BY c.id, c.name
     ORDER BY total DESC
+<<<<<<< HEAD
   `)
     .bind(session.orgId, today)
     .all<{
@@ -194,10 +290,17 @@ reportRoutes.get("/ar-aging", async (c) => {
       days_90_plus: number;
       total: number;
     }>();
+=======
+  `).bind(session.orgId, today).all<{
+    name: string; current: number; days_30: number;
+    days_60: number; days_90_plus: number; total: number;
+  }>();
+>>>>>>> origin/main
 
   return c.json({ as_of: today, items: results ?? [] });
 });
 
+<<<<<<< HEAD
 // ── AP Aging (stub — wires to bills module when built) ──────────────────────────────
 reportRoutes.get("/ap-aging", async (c) => {
   const session = getSession(c.req.raw);
@@ -205,4 +308,12 @@ reportRoutes.get("/ap-aging", async (c) => {
   const today = new Date().toISOString().slice(0, 10);
   // Returns empty until insighthunter-bills module is built
   return c.json({ as_of: today, items: [], note: "Requires bills module — coming soon" });
+=======
+// ── AP Aging (stub — wires to bills module when built) ────────────────────────
+reportRoutes.get('/ap-aging', async (c) => {
+  const session = getSession(c.req.raw);
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  const today = new Date().toISOString().slice(0, 10);
+  return c.json({ as_of: today, items: [], note: 'Requires bills module — coming soon' });
+>>>>>>> origin/main
 });
