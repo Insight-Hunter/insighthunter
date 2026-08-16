@@ -2,7 +2,7 @@
 import { Hono } from 'hono';
 import type { Env } from '../index.js';
 import { getSession } from '../index.js';
-import { writeBillJournalEntry, writeBillPaymentJournalEntry } from '../services/bill-journal-writer.js';
+import { writeBillJournalEntry } from '../services/bill-journal-writer.js';
 
 export const billRoutes = new Hono<{ Bindings: Env }>();
 
