@@ -1,21 +1,31 @@
 // src/middleware.ts
 import { defineMiddleware } from 'astro:middleware';
 
-// Safely load authGuard — falls back to passthrough if not resolved at edge
-let guard: ((ctx: Parameters<ReturnType<typeof defineMiddleware>>[0], next: Parameters<ReturnType<typeof defineMiddleware>>[1]) => Promise<Response>) | null = null;
-try {
-  const mod = await import('@insighthunter/auth-shared');
-  if (typeof mod.authGuard === 'function') {
-    const instance = mod.authGuard();
-    guard = instance;
-  }
-} catch {
-  // auth-shared not available — passthrough (safe for public marketing pages)
-}
+const PROTECTED_PREFIXES = ['/dashboard'];
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  if (guard) {
-    return guard(context, next);
+  const path = context.url.pathname;
+  const needsAuth = PROTECTED_PREFIXES.some((p) => path.startsWith(p));
+
+  if (!needsAuth) {
+    return next();
   }
+
+  const sessionCookie = context.cookies.get('ih_session')?.value;
+  if (!sessionCookie) {
+    return context.redirect('https://auth.insighthunter.app/login');
+  }
+
+  try {
+    const res = await fetch('https://auth.insighthunter.app/session', {
+      headers: { Authorization: `Bearer ${sessionCookie}` },
+    });
+    if (!res.ok) {
+      return context.redirect('https://auth.insighthunter.app/login');
+    }
+  } catch {
+    return context.redirect('https://auth.insighthunter.app/login');
+  }
+
   return next();
 });
