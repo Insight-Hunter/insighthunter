@@ -1,25 +1,138 @@
 ---
-import { pricing } from "../data/site";
-import BaseLayout from "../layouts/BaseLayout.astro";
+import Layout from '../layouts/Layout.astro';
 ---
-<BaseLayout title="Pricing — Insight Hunter">
-  <section class="section">
-    <div class="container">
-      <div class="eyebrow">Pricing</div>
-      <h1 class="page-title">Transparent plans for operators who need clarity.</h1>
-      <p class="lead">Use Lite to get started, Standard to replace fragmented finance tooling, and Pro when you need a broader operating system.</p>
-      <div class="grid cards-3" style="margin-top:2rem;">
-        {pricing.map((plan) => (
-          <article class="card" style={plan.featured ? 'border-color: var(--primary);' : ''}>
-            <h2>{plan.name}</h2>
-            <div class="metric">{plan.price}<span style="font-size:1rem; color:var(--muted);">{plan.cadence}</span></div>
-            <p>{plan.description}</p>
-            <ul>
-              {plan.bullets.map((item) => <li>{item}</li>)}
-            </ul>
-          </article>
-        ))}
+<Layout title="Pricing" description="Startup is free. Standard and Pro unlock reports, advisory, payroll, and more.">
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">Simple, honest pricing</p>
+      <h1>Pick a tier. Add modules as you grow.</h1>
+      <p class="section-lead">
+        No setup fees, no annual lock-in. Cancel or change plans anytime from
+        your dashboard.
+      </p>
+    </div>
+  </section>
+
+  <section class="ruled">
+    <div class="wrap">
+      <div id="tier-grid" class="tier-grid" aria-live="polite">
+        <p class="mono loading-note">Loading current pricing…</p>
       </div>
     </div>
   </section>
-</BaseLayout>
+
+  <section class="ruled">
+    <div class="wrap">
+      <p class="eyebrow">Add-ons</p>
+      <h2>Module add-ons</h2>
+      <p class="section-lead">Available on Standard and Pro. Add or remove anytime.</p>
+      <div id="addon-list" class="addon-list"></div>
+    </div>
+  </section>
+
+  <style>
+    .page-hero { padding: 64px 0 40px; }
+    .section-lead { font-size: 1.08rem; max-width: 68ch; }
+    .loading-note { color: var(--moss); }
+
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 12px;
+    }
+    .tier-card {
+      background: var(--paper-bright);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+    }
+    .tier-card.featured {
+      border-color: var(--amber);
+      box-shadow: 0 0 0 1px var(--amber);
+    }
+    .tier-name { font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--moss); margin-bottom: 10px; }
+    .tier-price { font-family: var(--font-mono); font-size: 2.2rem; margin-bottom: 4px; }
+    .tier-price .period { font-size: 0.9rem; color: var(--moss); }
+    .tier-includes { list-style: none; padding: 0; margin: 20px 0; flex: 1; }
+    .tier-includes li {
+      font-size: 0.9rem;
+      padding: 8px 0;
+      border-top: 1px solid var(--line);
+      color: var(--ink-soft);
+    }
+    .tier-includes li:first-child { border-top: none; }
+
+    .addon-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      margin-top: 24px;
+    }
+    .addon-row {
+      background: var(--paper-bright);
+      padding: 22px 26px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .addon-price { font-family: var(--font-mono); font-size: 1rem; color: var(--moss); white-space: nowrap; }
+
+    @media (max-width: 860px) {
+      .tier-grid { grid-template-columns: 1fr; }
+      .addon-list { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <script define:vars={{ paymentsApi: import.meta.env.PUBLIC_PAYMENTS_API_URL }}>
+    async function loadCatalog() {
+      const tierGrid = document.getElementById('tier-grid');
+      const addonList = document.getElementById('addon-list');
+      try {
+        const res = await fetch(`${paymentsApi}/catalog`);
+        if (!res.ok) throw new Error('catalog fetch failed');
+        const { accountTiers, moduleAddons } = await res.json();
+
+        tierGrid.innerHTML = Object.values(accountTiers)
+          .map((tier) => {
+            const featured = tier.id === 'standard';
+            return `
+              <div class="tier-card ${featured ? 'featured' : ''}">
+                <div class="tier-name">${tier.displayName}</div>
+                <div class="tier-price">${tier.monthlyUsd === 0 ? 'Free' : `$${tier.monthlyUsd}<span class="period"> /mo</span>`}</div>
+                <ul class="tier-includes">
+                  ${tier.includes.map((item) => `<li>${item}</li>`).join('')}
+                </ul>
+                <a class="btn ${featured ? 'btn-primary' : 'btn-ghost'}" href="/signup?tier=${tier.id}">
+                  ${tier.monthlyUsd === 0 ? 'Start free' : `Choose ${tier.displayName}`}
+                </a>
+              </div>
+            `;
+          })
+          .join('');
+
+        addonList.innerHTML = Object.values(moduleAddons)
+          .map(
+            (addon) => `
+              <div class="addon-row">
+                <div>
+                  <strong>${addon.displayName}</strong>
+                  <p style="margin:4px 0 0;font-size:0.85rem;">${addon.includes[0]}</p>
+                </div>
+                <div class="addon-price">$${addon.monthlyUsd}/mo</div>
+              </div>
+            `
+          )
+          .join('');
+      } catch (err) {
+        tierGrid.innerHTML = `<p class="mono loading-note">Couldn't load live pricing right now — refresh, or contact support if this persists.</p>`;
+      }
+    }
+    loadCatalog();
+  </script>
+</Layout>

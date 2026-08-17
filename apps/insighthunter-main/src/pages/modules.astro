@@ -1,0 +1,97 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { MODULES } from '../data/modules';
+---
+<Layout title="Modules" description="Bookkeeping, reports, insights, BizForma, payroll, and business phone — every module inside Insight Hunter.">
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">The full trail</p>
+      <h1>Every module, in plain terms.</h1>
+      <p class="section-lead">
+        Each module works standalone, and better together — bookkeeping data
+        feeds reports, reports feed insights. Tier requirements are noted next
+        to each.
+      </p>
+    </div>
+  </section>
+
+  <section class="ruled">
+    <div class="wrap module-list">
+      {MODULES.map((mod, i) => (
+        <article id={mod.slug} class="module-row">
+          <div class="module-index mono">{String(i + 1).padStart(2, '0')}</div>
+          <div class="module-body">
+            <div class="module-head">
+              <h2>{mod.name}</h2>
+              <span class="tier-tag mono">Requires {mod.minTier}+</span>
+            </div>
+            <p class="module-tagline">{mod.tagline}</p>
+            <p>{mod.description}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="ruled dark cta-section">
+    <div class="wrap cta-inner">
+      <div>
+        <p class="eyebrow" style="color: var(--amber);">Ready when you are</p>
+        <h2>Start with what you need. Add the rest later.</h2>
+      </div>
+      <a href="/pricing" class="btn btn-on-dark">See pricing</a>
+    </div>
+  </section>
+
+  <style>
+    .page-hero { padding: 64px 0 40px; }
+    .section-lead { font-size: 1.08rem; max-width: 68ch; }
+
+    .module-list { display: flex; flex-direction: column; }
+    .module-row {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 24px;
+      padding: 40px 0;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 100px;
+    }
+    .module-row:first-child { border-top: none; }
+    .module-index { color: var(--moss); font-size: 0.9rem; padding-top: 6px; }
+    .module-head {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .module-head h2 { margin: 0; }
+    .tier-tag {
+      font-size: 0.72rem;
+      color: var(--ink);
+      background: var(--amber-soft);
+      border: 1px solid var(--amber);
+      padding: 3px 9px;
+      border-radius: 3px;
+      text-transform: capitalize;
+    }
+    .module-tagline {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: var(--moss);
+      margin-top: 8px;
+    }
+
+    .cta-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    @media (max-width: 640px) {
+      .module-row { grid-template-columns: 1fr; }
+      .module-index { padding-top: 0; }
+    }
+  </style>
+</Layout>
