@@ -1,7 +1,6 @@
 // apps/insighthunter-main — Dashboard shell (app.insighthunter.app)
 // Auth is handled upstream by apps/gateway which injects X-* identity headers.
 // This Worker trusts those headers; no KV session lookup needed here.
-<<<<<<< HEAD
 
 import { Hono } from "hono";
 import { headerGuard } from "./authz/middleware.js";
@@ -144,71 +143,10 @@ app.get("/", async (c) => {
       desc: "Org settings, members & billing",
       plans: ["starter", "growth", "pro", "enterprise"],
     },
-=======
-
-import { Hono } from 'hono';
-import { headerGuard } from './authz/middleware.js';
-import { dashboardRoutes } from './routes/dashboard.js';
-import { entitlementsRoutes } from './routes/entitlements.js';
-import { onboardingRoutes } from './routes/onboarding.js';
-import { webhooksRoutes } from './routes/webhooks.js';
-
-export type Env = {
-  DB: D1Database;
-  KV_SESSIONS: KVNamespace;
-  AUTH_URL: string;       // https://auth.insighthunter.app
-  DASHBOARD_URL: string;  // https://app.insighthunter.app
-  ENVIRONMENT: string;
-};
-
-const app = new Hono<{ Bindings: Env }>();
-
-// ── Security headers ──────────────────────────────────────────────────────────
-app.use('*', async (c, next) => {
-  await next();
-  c.header('X-Frame-Options', 'DENY');
-  c.header('X-Content-Type-Options', 'nosniff');
-  c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-  c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
-});
-
-// ── Public ────────────────────────────────────────────────────────────────────
-app.get('/health', (c) =>
-  c.json({ ok: true, service: 'insighthunter-main', ts: Date.now(), env: c.env.ENVIRONMENT }),
-);
-
-// ── Auth guard — all routes below require gateway headers ─────────────────────
-app.use('/*', headerGuard());
-
-// ── Dashboard UI (SSR HTML) ───────────────────────────────────────────────────
-app.get('/', async (c) => {
-  const name    = c.req.header('X-User-Name')  ?? 'there';
-  const role    = c.req.header('X-User-Role')  ?? 'member';
-  const orgName = c.req.header('X-Org-Name')   ?? 'My Org';
-  const plan    = c.req.header('X-Org-Plan')   ?? 'starter';
-
-  const firstName = name.split(' ')[0] ?? name;
-  const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
-
-  const APP_TILES = [
-    { slug: 'insights',      name: 'Insights',       icon: '📊', url: 'https://insights.insighthunter.app',      desc: 'Financial KPIs & AI forecasting',           plans: ['starter','growth','pro','enterprise'] },
-    { slug: 'bookkeeping',   name: 'Bookkeeping',    icon: '📒', url: 'https://bookkeeping.insighthunter.app',   desc: 'Bank feeds, transactions & reconciliation',  plans: ['growth','pro','enterprise'] },
-    { slug: 'advisor',       name: 'Advisor',        icon: '🤖', url: 'https://advisor.insighthunter.app',       desc: 'AI-driven CFO advisory',                    plans: ['growth','pro','enterprise'] },
-    { slug: 'reports',       name: 'Reports',        icon: '📄', url: 'https://reports.insighthunter.app',       desc: 'Automated financial reports',               plans: ['growth','pro','enterprise'] },
-    { slug: 'payroll',       name: 'Payroll',        icon: '💰', url: 'https://payroll.insighthunter.app',       desc: 'Payroll & contractor payments',             plans: ['pro','enterprise'] },
-    { slug: 'scout',         name: 'Scout',          icon: '🔍', url: 'https://scout.insighthunter.app',         desc: 'Business intelligence & signals',           plans: ['pro','enterprise'] },
-    { slug: 'bizforma',      name: 'BizForma',       icon: '🏛️', url: 'https://bizforma.insighthunter.app',      desc: 'Entity formation & compliance',             plans: ['growth','pro','enterprise'] },
-    { slug: 'pbx',           name: 'PBX',            icon: '📞', url: 'https://pbx.insighthunter.app',           desc: 'Business phone & call analytics',           plans: ['pro','enterprise'] },
-    { slug: 'finops',        name: 'FinOps',         icon: '⚙️', url: 'https://finops.insighthunter.app',        desc: 'Cost optimization & tracking',             plans: ['pro','enterprise'] },
-    { slug: 'dispatch',      name: 'Dispatch',       icon: '🚚', url: 'https://dispatch.insighthunter.app',      desc: 'Operations & task dispatch',               plans: ['starter','growth','pro','enterprise'] },
-    { slug: 'notifications', name: 'Notifications',  icon: '🔔', url: 'https://notifications.insighthunter.app', desc: 'Alerts & team notifications',              plans: ['starter','growth','pro','enterprise'] },
-    { slug: 'platform',      name: 'Settings',       icon: '⚙️', url: 'https://platform.insighthunter.app',      desc: 'Org settings, members & billing',          plans: ['starter','growth','pro','enterprise'] },
->>>>>>> origin/main
   ];
 
   const PLAN_RANK: Record<string, number> = { starter: 0, growth: 1, pro: 2, enterprise: 3 };
   const userRank = PLAN_RANK[plan] ?? 0;
-<<<<<<< HEAD
   const accessible = APP_TILES.filter((t) => t.plans.some((p) => (PLAN_RANK[p] ?? 0) <= userRank));
   const locked = APP_TILES.filter((t) => !accessible.includes(t));
 
@@ -216,15 +154,6 @@ app.get('/', async (c) => {
     `<a class="tile${isLocked ? " tile-locked" : ""}" href="${isLocked ? "https://platform.insighthunter.app/billing" : t.url}">
       <div class="tile-icon">${t.icon}</div>
       <div class="tile-name">${t.name}${isLocked ? ' <span class="lock">🔒</span>' : ""}</div>
-=======
-  const accessible = APP_TILES.filter(t => t.plans.some(p => (PLAN_RANK[p] ?? 0) <= userRank));
-  const locked     = APP_TILES.filter(t => !accessible.includes(t));
-
-  const tileHtml = (t: typeof APP_TILES[0], isLocked: boolean) =>
-    `<a class="tile${isLocked ? ' tile-locked' : ''}" href="${isLocked ? 'https://platform.insighthunter.app/billing' : t.url}">
-      <div class="tile-icon">${t.icon}</div>
-      <div class="tile-name">${t.name}${isLocked ? ' <span class="lock">🔒</span>' : ''}</div>
->>>>>>> origin/main
       <div class="tile-desc">${t.desc}</div>
     </a>`;
 
@@ -294,13 +223,8 @@ app.get('/', async (c) => {
 
     <div class="section-label">Your Applications</div>
     <div class="grid">
-<<<<<<< HEAD
       ${accessible.map((t) => tileHtml(t, false)).join("")}
       ${locked.map((t) => tileHtml(t, true)).join("")}
-=======
-      ${accessible.map(t => tileHtml(t, false)).join('')}
-      ${locked.map(t => tileHtml(t, true)).join('')}
->>>>>>> origin/main
     </div>
 
     <div class="dash-panels">
@@ -316,45 +240,32 @@ app.get('/', async (c) => {
   </main>
 
   <script>
-<<<<<<< HEAD
     // Async-fetch dashboard data after SSR shell renders
-=======
->>>>>>> origin/main
     (async () => {
       try {
         const res = await fetch('/api/dashboard', { credentials: 'include' });
         if (!res.ok) return;
         const d = await res.json();
 
-<<<<<<< HEAD
+
         // Health score
-=======
->>>>>>> origin/main
+
         if (d.healthScore) {
           document.getElementById('hs').textContent = d.healthScore.score;
           document.getElementById('hl').textContent = d.healthScore.label;
         }
 
-<<<<<<< HEAD
         // Notifications
         const nList = document.getElementById('notif-list');
         if (d.notifications?.length) {
           nList.innerHTML = d.notifications.map(n =>
             '<li>' + (n.title ?? n.body) + '</li>'
           ).join('');
-=======
-        const nList = document.getElementById('notif-list');
-        if (d.notifications?.length) {
-          nList.innerHTML = d.notifications.map(n => '<li>' + (n.title ?? n.body) + '</li>').join('');
->>>>>>> origin/main
         } else {
           nList.innerHTML = '<li class="empty">No new notifications</li>';
         }
 
-<<<<<<< HEAD
         // Activity
-=======
->>>>>>> origin/main
         const aList = document.getElementById('activity-list');
         if (d.recentActivity?.length) {
           aList.innerHTML = d.recentActivity.map(a =>
@@ -373,27 +284,15 @@ app.get('/', async (c) => {
 });
 
 // ── Upgrade redirect ──────────────────────────────────────────────────────────
-<<<<<<< HEAD
 app.get("/upgrade", (c) => {
   const feature = c.req.query("feature") ?? "";
-=======
-app.get('/upgrade', (c) => {
-  const feature = c.req.query('feature') ?? '';
->>>>>>> origin/main
   return c.redirect(`https://platform.insighthunter.app/billing?upgrade=${feature}`, 302);
 });
 
 // ── API routes ────────────────────────────────────────────────────────────────
-<<<<<<< HEAD
 app.route("/api/dashboard", dashboardRoutes);
 app.route("/api/entitlements", entitlementsRoutes);
 app.route("/api/onboarding", onboardingRoutes);
 app.route("/api/webhooks", webhooksRoutes);
-=======
-app.route('/api/dashboard',    dashboardRoutes);
-app.route('/api/entitlements', entitlementsRoutes);
-app.route('/api/onboarding',   onboardingRoutes);
-app.route('/api/webhooks',     webhooksRoutes);
->>>>>>> origin/main
 
 export default app;
