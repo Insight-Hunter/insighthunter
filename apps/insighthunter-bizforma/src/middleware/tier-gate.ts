@@ -1,52 +1,33 @@
-// middleware/tier-gate.ts — Standard/Pro plan or bizforma_compliance addon gate
+// middleware/tier-gate.ts — Standard/Pro plan gate (reads X-Org-Plan from gateway)
+// NOTE: bizforma_compliance addon bypass from the legacy worker is NOT implemented
+// here because apps/gateway has no addon field in its session model yet (only
+// session.plan -> X-Org-Plan). Re-add the bypass once addons ship platform-wide.
 import type { Context, Next } from "hono";
 import type { BizformaEnv } from "../types.js";
 
-interface EntitlementAddon {
-  module: string;
-  status: string;
-}
+type OrgPlan = "startup" | "standard" | "pro";
 
-interface EntitlementsResponse {
-  accountTier: "startup" | "standard" | "pro";
-  addons: EntitlementAddon[];
-}
+const TIER_RANK: Record<OrgPlan, number> = { startup: 0, standard: 1, pro: 2 };
 
-const TIER_RANK = { startup: 0, standard: 1, pro: 2 } as const;
+function rankOf(plan: string): number {
+  return plan in TIER_RANK ? TIER_RANK[plan as OrgPlan] : -1;
+}
 
 export async function requireBizformaTier(
   c: Context<{ Bindings: BizformaEnv }>,
   next: Next,
 ): Promise<Response | void> {
-  const authHeader = c.req.header("Authorization");
-  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
-  if (!token) return c.json({ error: "Unauthorized", code: "MISSING_TOKEN" }, 401);
+  const orgPlan = c.get("orgPlan");
 
-  const entitlements = await fetchEntitlements(c.env, token);
-  const hasBizformaAddon = entitlements?.addons.some(
-    (a) => a.module === "bizforma_compliance" && a.status === "active",
-  );
-
-  if (!entitlements || (TIER_RANK[entitlements.accountTier] < TIER_RANK.standard && !hasBizformaAddon)) {
+  if (!orgPlan || rankOf(orgPlan) < TIER_RANK.standard) {
     return c.json(
       {
         error: "upgrade_required",
-        detail: "BizForma requires the Standard plan or above, or the BizForma Compliance add-on.",
+        detail: "BizForma requires the Standard plan or above.",
       },
       403,
     );
   }
 
   await next();
-}
-
-async function fetchEntitlements(
-  env: BizformaEnv,
-  token: string,
-): Promise<EntitlementsResponse | null> {
-  const res = await fetch(`${env.AUTH_URL}/entitlements`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return null;
-  return (await res.json()) as EntitlementsResponse;
 }
