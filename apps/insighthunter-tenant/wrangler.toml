@@ -14,3 +14,6 @@ ENVIRONMENT = "development"
 binding = "DB"
 database_name = "insighthunter-dispatch"
 database_id = "2a0331eb-4775-4ad2-9126-0560336486df"
+
+[dev]
+inspector_port = 9245

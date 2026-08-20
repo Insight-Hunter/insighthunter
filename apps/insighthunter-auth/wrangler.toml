@@ -50,3 +50,6 @@ new_classes = ["UserVault"]
 # RESEND_API_KEY
 # STRIPE_SECRET_KEY
 # STRIPE_WEBHOOK_SECRET
+
+[dev]
+inspector_port = 9232

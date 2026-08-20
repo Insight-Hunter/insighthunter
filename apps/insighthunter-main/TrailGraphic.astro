@@ -1,0 +1,87 @@
+---
+---
+<div class="trail-graphic" role="img" aria-label="Topographic contour lines resolving into a rising financial trend line, annotated with a field note reading Found: plus 18 percent margin, March">
+  <svg viewBox="0 0 600 440" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+    <!-- Contour lines: layered wavy paths, fading as they rise into the chart -->
+    <g stroke="rgba(20,35,31,0.16)" fill="none" stroke-width="1.2">
+      <path d="M-10 380 Q 80 350 160 380 T 320 375 T 480 385 T 620 370" />
+      <path d="M-10 340 Q 90 310 170 335 T 330 328 T 490 340 T 620 322" />
+      <path d="M-10 300 Q 100 268 190 292 T 340 282 T 500 296 T 620 276" />
+      <path d="M-10 258 Q 110 224 200 250 T 350 236 T 510 250 T 620 230" />
+    </g>
+    <g stroke="rgba(107,143,113,0.28)" fill="none" stroke-width="1.2">
+      <path d="M-10 216 Q 120 178 210 206 T 360 190 T 520 204 T 620 182" />
+      <path d="M-10 174 Q 130 132 220 162 T 370 144 T 530 158 T 620 134" />
+    </g>
+
+    <!-- The trend line the contours resolve into -->
+    <path
+      d="M20 360 C 100 350, 150 300, 210 270 S 320 190, 380 150 S 480 90, 560 60"
+      fill="none"
+      stroke="var(--ink)"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      class="trend-path"
+    />
+
+    <!-- Data point marker -->
+    <circle cx="380" cy="150" r="5" fill="var(--amber)" stroke="var(--ink)" stroke-width="1.5" />
+
+    <!-- Origin marker -->
+    <circle cx="20" cy="360" r="3.5" fill="var(--ink)" opacity="0.5" />
+  </svg>
+
+  <div class="field-note">
+    <span class="note-pin" aria-hidden="true"></span>
+    Found: <strong>+18% margin</strong>, March
+  </div>
+</div>
+
+<style>
+  .trail-graphic {
+    position: relative;
+    width: 100%;
+  }
+  .trail-graphic svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .trend-path {
+    stroke-dasharray: 900;
+    stroke-dashoffset: 900;
+    animation: draw-trail 1.6s ease-out 0.2s forwards;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .trend-path { animation: none; stroke-dashoffset: 0; }
+  }
+  @keyframes draw-trail {
+    to { stroke-dashoffset: 0; }
+  }
+  .field-note {
+    position: absolute;
+    top: 26%;
+    left: 58%;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    background: var(--amber-soft);
+    border: 1px solid var(--amber);
+    color: var(--ink);
+    padding: 7px 12px;
+    border-radius: 3px;
+    transform: rotate(-2deg);
+    white-space: nowrap;
+    box-shadow: 2px 3px 0 rgba(20, 35, 31, 0.08);
+  }
+  .note-pin {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--clay);
+    margin-right: 6px;
+  }
+  @media (max-width: 780px) {
+    .field-note { left: 46%; top: 18%; font-size: 0.7rem; }
+  }
+</style>

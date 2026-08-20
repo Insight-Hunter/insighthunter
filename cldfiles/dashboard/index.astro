@@ -1,0 +1,139 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TrailGraphic from '../components/TrailGraphic.astro';
+import { MODULES } from '../data/modules';
+---
+<Layout title="CFO-grade clarity, built for small business">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Financial software for owners, not accountants</p>
+        <h1>Track down the signal<br />in your numbers.</h1>
+        <p class="hero-sub">
+          Insight Hunter brings bookkeeping, reporting, and CFO-level advisory
+          into one dashboard — priced for a business that doesn't have a
+          finance department yet.
+        </p>
+        <div class="hero-actions">
+          <a href="/pricing" class="btn btn-primary">Start free — no card required</a>
+          <a href="/modules" class="btn btn-ghost">See what's included</a>
+        </div>
+        <p class="hero-fine mono">Startup tier is free, forever. Upgrade when you're ready.</p>
+      </div>
+      <div class="hero-visual">
+        <TrailGraphic />
+      </div>
+    </div>
+  </section>
+
+  <section class="ruled">
+    <div class="wrap">
+      <p class="eyebrow">The problem</p>
+      <h2>Most small businesses fly blind between tax seasons.</h2>
+      <p class="section-lead">
+        QuickBooks gives you a ledger. A bookkeeper costs $500+/month before
+        they've told you anything you didn't already know. Insight Hunter
+        does both jobs — the recordkeeping and the "so what does this mean" —
+        without the overhead of either.
+      </p>
+    </div>
+  </section>
+
+  <section class="ruled modules-section">
+    <div class="wrap">
+      <p class="eyebrow">What's inside</p>
+      <h2>Six modules. One dashboard.</h2>
+      <div class="module-grid">
+        {MODULES.map((mod) => (
+          <a href={`/modules#${mod.slug}`} class="module-card">
+            <div class="module-card-top">
+              <h3>{mod.name}</h3>
+              <span class="tier-tag mono">{mod.minTier}+</span>
+            </div>
+            <p>{mod.tagline}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="ruled dark cta-section">
+    <div class="wrap cta-inner">
+      <div>
+        <p class="eyebrow" style="color: var(--amber);">Get started</p>
+        <h2>Your first month of clarity is free.</h2>
+        <p>No card required for the Startup tier. Upgrade the day you need reports, advisory, or payroll.</p>
+      </div>
+      <a href="/pricing" class="btn btn-on-dark">See pricing</a>
+    </div>
+  </section>
+
+  <style>
+    .hero {
+      padding-top: 72px;
+      padding-bottom: 96px;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: center;
+    }
+    .hero-sub { font-size: 1.12rem; }
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      margin: 28px 0 18px;
+      flex-wrap: wrap;
+    }
+    .hero-fine { font-size: 0.8rem; color: var(--moss); }
+
+    .section-lead { font-size: 1.08rem; max-width: 68ch; }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      margin-top: 36px;
+    }
+    .module-card {
+      background: var(--paper-bright);
+      padding: 28px;
+      text-decoration: none;
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: background 0.15s ease;
+    }
+    .module-card:hover { background: #fff; }
+    .module-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .module-card h3 { margin: 0; font-size: 1.2rem; }
+    .module-card p { margin: 0; font-size: 0.92rem; }
+    .tier-tag {
+      font-size: 0.7rem;
+      color: var(--moss);
+      text-transform: capitalize;
+    }
+
+    .cta-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+    .cta-inner p { max-width: 44ch; }
+
+    @media (max-width: 860px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .module-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</Layout>

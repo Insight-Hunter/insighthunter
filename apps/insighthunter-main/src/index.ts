@@ -34,7 +34,8 @@ app.get("/health", (c) =>
 );
 
 // ── Auth guard — all routes below require gateway headers ─────────────────────
-app.use("/*", headerGuard());
+app.use("/dashboard/*", headerGuard());
+app.use("/api/*", headerGuard());
 
 // ── Dashboard UI (SSR HTML) ───────────────────────────────────────────────────
 app.get("/", async (c) => {

@@ -1,6 +1,6 @@
 ---
 // src/pages/dashboard/index.astro
-import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import DashboardLayout from '../../layouts/DashbordLayout.astro';
 import { getSession } from '@insighthunter/auth-shared';
 import type { IHSession } from '@insighthunter/auth-shared';
 
@@ -9,18 +9,18 @@ export const prerender = false;
 const session: IHSession = getSession(Astro);
 
 const APP_TILES = [
-  { id: 'insights',     label: 'Insights',     icon: '📊', url: 'https://insights.insighthunter.app',     desc: 'Financial KPIs & forecasting' },
-  { id: 'bookkeeping',  label: 'Bookkeeping',  icon: '📒', url: 'https://bookkeeping.insighthunter.app',  desc: 'Transactions & reconciliation' },
-  { id: 'payroll',      label: 'Payroll',      icon: '💰', url: 'https://payroll.insighthunter.app',      desc: 'Payroll & tax estimates' },
-  { id: 'advisor',      label: 'Advisor',      icon: '🤖', url: 'https://advisor.insighthunter.app',      desc: 'AI-powered CFO assistant' },
-  { id: 'bizforma',     label: 'BizForma',     icon: '🏛️', url: 'https://bizforma.insighthunter.app',     desc: 'Entity & compliance management' },
-  { id: 'pbx',          label: 'PBX',          icon: '📞', url: 'https://pbx.insighthunter.app',          desc: 'Business phone & call analytics' },
-  { id: 'reports',      label: 'Reports',      icon: '📄', url: 'https://reports.insighthunter.app',      desc: 'Automated financial reports' },
-  { id: 'ledger',       label: 'Ledger',       icon: '🗂️', url: 'https://ledger.insighthunter.app',       desc: 'General ledger & chart of accounts' },
-  { id: 'finops',       label: 'FinOps',       icon: '⚙️', url: 'https://finops.insighthunter.app',       desc: 'Cost optimization & tracking' },
-  { id: 'scout',        label: 'Scout',        icon: '🔍', url: 'https://scout.insighthunter.app',        desc: 'Business intelligence & signals' },
-  { id: 'dispatch',     label: 'Dispatch',     icon: '🚚', url: 'https://dispatch.insighthunter.app',     desc: 'Operations & task dispatch' },
-  { id: 'notifications',label: 'Notifications',icon: '🔔', url: 'https://notifications.insighthunter.app',desc: 'Alerts & team notifications' },
+  { id: 'insights',      label: 'Insights',      mono: 'IN', url: 'https://insights.insighthunter.app',      desc: 'Financial KPIs & forecasting' },
+  { id: 'bookkeeping',   label: 'Bookkeeping',    mono: 'BK', url: 'https://bookkeeping.insighthunter.app',   desc: 'Transactions & reconciliation' },
+  { id: 'payroll',       label: 'Payroll',        mono: 'PR', url: 'https://payroll.insighthunter.app',       desc: 'Payroll & tax estimates' },
+  { id: 'advisor',       label: 'Advisor',        mono: 'AI', url: 'https://advisor.insighthunter.app',       desc: 'AI-powered CFO assistant' },
+  { id: 'bizforma',      label: 'BizForma',       mono: 'BF', url: 'https://bizforma.insighthunter.app',      desc: 'Entity & compliance management' },
+  { id: 'pbx',           label: 'PBX',            mono: 'PX', url: 'https://pbx.insighthunter.app',           desc: 'Business phone & call analytics' },
+  { id: 'reports',       label: 'Reports',        mono: 'RP', url: 'https://reports.insighthunter.app',       desc: 'Automated financial reports' },
+  { id: 'ledger',        label: 'Ledger',         mono: 'LG', url: 'https://ledger.insighthunter.app',        desc: 'General ledger & chart of accounts' },
+  { id: 'finops',        label: 'FinOps',         mono: 'FO', url: 'https://finops.insighthunter.app',        desc: 'Cost optimization & tracking' },
+  { id: 'scout',         label: 'Scout',          mono: 'SC', url: 'https://scout.insighthunter.app',         desc: 'Business intelligence & signals' },
+  { id: 'dispatch',      label: 'Dispatch',       mono: 'DP', url: 'https://dispatch.insighthunter.app',      desc: 'Operations & task dispatch' },
+  { id: 'notifications',  label: 'Notifications', mono: 'NT', url: 'https://notifications.insighthunter.app', desc: 'Alerts & team notifications' },
 ] as const;
 
 const planLabel = session.plan === 'enterprise' ? 'Enterprise' : session.plan === 'growth' ? 'Growth' : 'Starter';
@@ -38,9 +38,9 @@ const planLabel = session.plan === 'enterprise' ? 'Enterprise' : session.plan ==
 
   <h2 class="section-title">Your Apps</h2>
   <div class="grid">
-    {APP_TILES.map(tile => (
+    {APP_TILES.map((tile, i) => (
       <a class="tile" href={tile.url}>
-        <div class="tile-icon">{tile.icon}</div>
+        <div class="tile-mono" style={`--accent: ${i % 2 === 0 ? 'var(--brand)' : 'var(--brand-2)'}`}>{tile.mono}</div>
         <div class="tile-label">{tile.label}</div>
         <div class="tile-desc">{tile.desc}</div>
       </a>
@@ -52,12 +52,18 @@ const planLabel = session.plan === 'enterprise' ? 'Enterprise' : session.plan ==
     .welcome h1{font-size:1.75rem;font-weight:800;margin-bottom:.25rem}
     .welcome p{color:var(--muted)}
     .health{display:inline-flex;align-items:center;gap:.5rem;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.5rem 1rem;font-size:.85rem;margin-top:1rem}
-    .health .score{font-size:1.25rem;font-weight:900;color:#22c55e}
+    .health .score{font-size:1.25rem;font-weight:900;color:var(--brand)}
     .section-title{font-size:1rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2.5rem}
     .tile{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;text-decoration:none;color:var(--text);transition:border-color .15s,transform .15s;display:block}
     .tile:hover{border-color:var(--brand);transform:translateY(-2px)}
-    .tile-icon{font-size:2rem;margin-bottom:.75rem}
+    .tile-mono{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:40px;height:40px;border-radius:8px;
+      font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:700;font-size:.85rem;
+      color:var(--dark);background:var(--accent);
+      margin-bottom:.75rem;
+    }
     .tile-label{font-weight:700;font-size:1rem;margin-bottom:.25rem}
     .tile-desc{font-size:.8rem;color:var(--muted);line-height:1.4}
   </style>

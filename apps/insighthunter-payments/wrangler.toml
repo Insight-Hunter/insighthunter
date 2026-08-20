@@ -26,3 +26,6 @@ DASHBOARD_URL = "https://app.insighthunter.app"
 # Secrets (set via wrangler secret put):
 # STRIPE_SECRET_KEY
 # STRIPE_WEBHOOK_SECRET
+
+[dev]
+inspector_port = 9241

@@ -9,3 +9,6 @@ enabled = true
 APP_NAME = "insighthunter-gateway"
 AUTH_BASE_URL = "https://auth.insighthunter.app"
 GATEWAY_BASE_URL = "https://gateway.insighthunter.app"
+
+[dev]
+inspector_port = 9230
