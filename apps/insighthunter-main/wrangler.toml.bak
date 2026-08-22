@@ -1,5 +1,5 @@
 name = "insighthunter-main"
-main = "./dist/server/virtual_astro_middleware.mjs"
+main = "./dist/server/entry.mjs"
 compatibility_date = "2026-08-01"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = false

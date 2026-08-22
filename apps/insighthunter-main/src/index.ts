@@ -51,7 +51,7 @@ app.get("/", async (c) => {
     {
       slug: "insights",
       name: "Insights",
-      icon: "📊",
+      icon: ".",
       url: "https://insights.insighthunter.app",
       desc: "Financial KPIs & AI forecasting",
       plans: ["starter", "growth", "pro", "enterprise"],
@@ -59,7 +59,7 @@ app.get("/", async (c) => {
     {
       slug: "bookkeeping",
       name: "Bookkeeping",
-      icon: "📒",
+      icon: ".",
       url: "https://bookkeeping.insighthunter.app",
       desc: "Bank feeds, transactions & reconciliation",
       plans: ["growth", "pro", "enterprise"],
@@ -67,7 +67,7 @@ app.get("/", async (c) => {
     {
       slug: "advisor",
       name: "Advisor",
-      icon: "🤖",
+      icon: ".",
       url: "https://advisor.insighthunter.app",
       desc: "AI-driven CFO advisory",
       plans: ["growth", "pro", "enterprise"],
@@ -75,7 +75,7 @@ app.get("/", async (c) => {
     {
       slug: "reports",
       name: "Reports",
-      icon: "📄",
+      icon: ".",
       url: "https://reports.insighthunter.app",
       desc: "Automated financial reports",
       plans: ["growth", "pro", "enterprise"],
@@ -83,7 +83,7 @@ app.get("/", async (c) => {
     {
       slug: "payroll",
       name: "Payroll",
-      icon: "💰",
+      icon: ".",
       url: "https://payroll.insighthunter.app",
       desc: "Payroll & contractor payments",
       plans: ["pro", "enterprise"],
@@ -91,7 +91,7 @@ app.get("/", async (c) => {
     {
       slug: "scout",
       name: "Scout",
-      icon: "🔍",
+      icon: ".",
       url: "https://scout.insighthunter.app",
       desc: "Business intelligence & signals",
       plans: ["pro", "enterprise"],
@@ -99,7 +99,7 @@ app.get("/", async (c) => {
     {
       slug: "bizforma",
       name: "BizForma",
-      icon: "🏛️",
+      icon: ".",
       url: "https://bizforma.insighthunter.app",
       desc: "Entity formation & compliance",
       plans: ["growth", "pro", "enterprise"],
@@ -107,7 +107,7 @@ app.get("/", async (c) => {
     {
       slug: "pbx",
       name: "PBX",
-      icon: "📞",
+      icon: ".",
       url: "https://pbx.insighthunter.app",
       desc: "Business phone & call analytics",
       plans: ["pro", "enterprise"],
@@ -115,7 +115,7 @@ app.get("/", async (c) => {
     {
       slug: "finops",
       name: "FinOps",
-      icon: "⚙️",
+      icon: ".",
       url: "https://finops.insighthunter.app",
       desc: "Cost optimization & tracking",
       plans: ["pro", "enterprise"],
@@ -123,7 +123,7 @@ app.get("/", async (c) => {
     {
       slug: "dispatch",
       name: "Dispatch",
-      icon: "🚚",
+      icon: ".",
       url: "https://dispatch.insighthunter.app",
       desc: "Operations & task dispatch",
       plans: ["starter", "growth", "pro", "enterprise"],
@@ -131,7 +131,7 @@ app.get("/", async (c) => {
     {
       slug: "notifications",
       name: "Notifications",
-      icon: "🔔",
+      icon: ".",
       url: "https://notifications.insighthunter.app",
       desc: "Alerts & team notifications",
       plans: ["starter", "growth", "pro", "enterprise"],
@@ -139,7 +139,7 @@ app.get("/", async (c) => {
     {
       slug: "platform",
       name: "Settings",
-      icon: "⚙️",
+      icon: ".",
       url: "https://platform.insighthunter.app",
       desc: "Org settings, members & billing",
       plans: ["starter", "growth", "pro", "enterprise"],
@@ -213,7 +213,7 @@ app.get("/", async (c) => {
   </nav>
   <main>
     <div class="welcome">
-      <h1>Welcome back, ${firstName} 👋</h1>
+      <h1>Welcome back, ${firstName} </h1>
       <p>${orgName} &nbsp;·&nbsp; ${role}</p>
       <div class="health-bar">
         <span>Business Health Score</span>
