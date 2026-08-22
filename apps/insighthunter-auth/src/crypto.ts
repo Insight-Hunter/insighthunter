@@ -1,6 +1,6 @@
 import type { SessionPayload } from "./types.js";
 
-const PBKDF2_ITERATIONS = 210_000; // OWASP 2024+ recommendation for PBKDF2-SHA256
+const PBKDF2_ITERATIONS = 100_000; // Workers Web Crypto caps PBKDF2 at 100,000 iterations
 
 /** Hash a password with PBKDF2-SHA256. Returns "iterations:saltHex:hashHex". */
 export async function hashPassword(password: string): Promise<string> {

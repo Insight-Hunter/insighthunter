@@ -36,6 +36,7 @@ MARKETING_URL = "https://insighthunter.app"
 [dev]
 port = 8787
 local_protocol = "http"
+inspector_port = 9232
 
 [[durable_objects.bindings]]
 name = "USER_VAULT"
@@ -51,5 +52,3 @@ new_classes = ["UserVault"]
 # STRIPE_SECRET_KEY
 # STRIPE_WEBHOOK_SECRET
 
-[dev]
-inspector_port = 9232
