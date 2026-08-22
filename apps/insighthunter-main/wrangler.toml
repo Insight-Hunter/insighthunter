@@ -1,5 +1,5 @@
 name = "insighthunter-main"
-main = "./dist/_worker.js/index.js"
+main = "./dist/server/entry.mjs"
 compatibility_date = "2026-08-01"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = false
@@ -10,7 +10,7 @@ routes = [
 ]
 
 [assets]
-directory = "./dist"
+directory = "./dist/client"
 binding = "ASSETS"
 
 [observability]
