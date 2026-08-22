@@ -20,7 +20,7 @@
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   --radius: 6px;
-};
+}
 
 .btn {
   display: inline-flex;
