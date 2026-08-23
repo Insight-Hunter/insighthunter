@@ -1,4 +1,4 @@
-import type { Env } from "./types";
+import type { Env } from "./types.js";
 
 const STRIPE_API = "https://api.stripe.com/v1";
 
@@ -33,15 +33,16 @@ async function stripeRequest(
   path: string,
   body?: Record<string, unknown>
 ): Promise<any> {
-  const res = await fetch(`${STRIPE_API}${path}`, {
+  const request: RequestInit = {
     method,
     headers: {
       Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
       "Content-Type": "application/x-www-form-urlencoded",
       "Stripe-Version": "2024-06-20",
     },
-    body: body ? formEncode(body).join("&") : undefined,
-  });
+  };
+  if (body) request.body = formEncode(body).join("&");
+  const res = await fetch(`${STRIPE_API}${path}`, request);
   const json = await res.json();
   if (!res.ok) {
     throw new Error(`Stripe API error (${res.status}): ${JSON.stringify(json)}`);

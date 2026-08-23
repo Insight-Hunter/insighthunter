@@ -29,8 +29,11 @@ export async function verifyPassword(
   stored: string
 ): Promise<boolean> {
   const [iterStr, saltHex, hashHex] = stored.split(":");
+  if (!iterStr || !saltHex || !hashHex) return false;
   const iterations = parseInt(iterStr, 10);
+  if (!Number.isSafeInteger(iterations) || iterations < 1) return false;
   const salt = fromHex(saltHex);
+  if (!salt || !/^[0-9a-f]{64}$/i.test(hashHex)) return false;
   const keyMaterial = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(password),
@@ -38,8 +41,9 @@ export async function verifyPassword(
     false,
     ["deriveBits"]
   );
+  const normalizedSalt = Uint8Array.from(salt);
   const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
+    { name: "PBKDF2", salt: normalizedSalt.buffer, iterations, hash: "SHA-256" },
     keyMaterial,
     256
   );
@@ -66,8 +70,8 @@ export async function verifySession(
   const expected = await hmac(body, secret);
   if (!timingSafeEqual(sig, expected)) return null;
   try {
-    const payload: SessionPayload = JSON.parse(atob(fromBase64url(body)));
-    if (payload.expiresAt < Date.now()) return null;
+    const payload: unknown = JSON.parse(atob(fromBase64url(body)));
+    if (!isSessionPayload(payload) || payload.expiresAt < Date.now()) return null;
     return payload;
   } catch {
     return null;
@@ -89,9 +93,10 @@ async function hmac(data: string, secret: string): Promise<string> {
 function toHex(bytes: Uint8Array): string {
   return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
-function fromHex(hex: string): Uint8Array {
+function fromHex(hex: string): Uint8Array | null {
+  if (!/^(?:[0-9a-f]{2})+$/i.test(hex)) return null;
   const out = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.substr(i * 2, 2), 16);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
   return out;
 }
 function base64url(str: string): string {
@@ -105,4 +110,14 @@ function timingSafeEqual(a: string, b: string): boolean {
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return diff === 0;
+}
+
+function isSessionPayload(value: unknown): value is SessionPayload {
+  if (!value || typeof value !== "object") return false;
+  const payload = value as Record<string, unknown>;
+  return typeof payload["userId"] === "string"
+    && typeof payload["email"] === "string"
+    && (payload["tier"] === "startup" || payload["tier"] === "standard" || payload["tier"] === "pro")
+    && typeof payload["issuedAt"] === "number"
+    && typeof payload["expiresAt"] === "number";
 }
