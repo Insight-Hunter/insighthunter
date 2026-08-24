@@ -89,7 +89,7 @@ export const pricing = [
   },
   {
     name: "Insight Pro",
-    price: "$129",
+    price: "$149",
     cadence: "/mo",
     description: "For operators who need a more complete finance operating layer.",
     cta: "Choose Pro",
