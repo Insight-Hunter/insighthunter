@@ -13,7 +13,7 @@ importers:
     dependencies:
       astro:
         specifier: ^7.2.2
-        version: 7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.4)(tsx@4.22.4)
+        version: 7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@25.9.4)(tsx@4.22.4)
       hono:
         specifier: ^4.13.2
         version: 4.13.2
@@ -220,10 +220,10 @@ importers:
     dependencies:
       '@astrojs/cloudflare':
         specifier: ^14.2.1
-        version: 14.2.3(@types/node@25.9.4)(astro@7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@25.9.4)(tsx@4.22.4))(esbuild@0.28.1)(tsx@4.22.4)(wrangler@4.125.0(@cloudflare/workers-types@5.20260816.1))
+        version: 14.2.3(@types/node@25.9.4)(astro@7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.4)(tsx@4.22.4))(esbuild@0.28.1)(tsx@4.22.4)(wrangler@4.125.0(@cloudflare/workers-types@5.20260816.1))
       '@astrojs/mdx':
         specifier: ^7.0.5
-        version: 7.0.5(@astrojs/markdown-satteri@0.3.5)(astro@7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@25.9.4)(tsx@4.22.4))
+        version: 7.0.5(@astrojs/markdown-satteri@0.3.5)(astro@7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.4)(tsx@4.22.4))
       '@astrojs/sitemap':
         specifier: ^3.7.3
         version: 3.7.3
@@ -232,7 +232,7 @@ importers:
         version: link:../../packages/authz
       astro:
         specifier: ^7.2.2
-        version: 7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@25.9.4)(tsx@4.22.4)
+        version: 7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.4)(tsx@4.22.4)
       hono:
         specifier: ^4.6.10
         version: 4.12.27
@@ -259,6 +259,18 @@ importers:
       wrangler:
         specifier: ^4.21.0
         version: 4.107.0(@cloudflare/workers-types@4.20260702.1)
+
+  apps/insighthunter-payments:
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20260620.0
+        version: 4.20260702.1
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      wrangler:
+        specifier: ^4.21.0
+        version: 4.125.0(@cloudflare/workers-types@4.20260702.1)
 
   apps/insighthunter-payroll:
     dependencies:
@@ -3574,12 +3586,12 @@ packages:
 
 snapshots:
 
-  '@astrojs/cloudflare@14.2.3(@types/node@25.9.4)(astro@7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@25.9.4)(tsx@4.22.4))(esbuild@0.28.1)(tsx@4.22.4)(wrangler@4.125.0(@cloudflare/workers-types@5.20260816.1))':
+  '@astrojs/cloudflare@14.2.3(@types/node@25.9.4)(astro@7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.4)(tsx@4.22.4))(esbuild@0.28.1)(tsx@4.22.4)(wrangler@4.125.0(@cloudflare/workers-types@5.20260816.1))':
     dependencies:
       '@astrojs/internal-helpers': 0.10.4
       '@astrojs/underscore-redirects': 1.0.4
       '@cloudflare/vite-plugin': 1.53.1(vite@8.2.1(@types/node@25.9.4)(esbuild@0.28.1)(tsx@4.22.4))(wrangler@4.125.0(@cloudflare/workers-types@5.20260816.1))
-      astro: 7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@25.9.4)(tsx@4.22.4)
+      astro: 7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.4)(tsx@4.22.4)
       piccolore: 0.1.3
       vite: 8.2.1(@types/node@25.9.4)(esbuild@0.28.1)(tsx@4.22.4)
       wrangler: 4.125.0(@cloudflare/workers-types@5.20260816.1)
@@ -3735,13 +3747,13 @@ snapshots:
       hast-util-from-html: 2.0.3
       satteri: 0.9.5
 
-  '@astrojs/mdx@7.0.5(@astrojs/markdown-satteri@0.3.5)(astro@7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@25.9.4)(tsx@4.22.4))':
+  '@astrojs/mdx@7.0.5(@astrojs/markdown-satteri@0.3.5)(astro@7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.4)(tsx@4.22.4))':
     dependencies:
       '@astrojs/internal-helpers': 0.10.2
       '@astrojs/markdown-remark': 7.2.2
       '@mdx-js/mdx': 3.1.1
       acorn: 8.18.0
-      astro: 7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@25.9.4)(tsx@4.22.4)
+      astro: 7.2.2(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.4)(tsx@4.22.4)
       es-module-lexer: 2.3.1
       estree-util-visit: 2.0.0
       hast-util-to-html: 9.0.5
@@ -7041,6 +7053,23 @@ snapshots:
       workerd: 1.20260811.1
     optionalDependencies:
       '@cloudflare/workers-types': 5.20260823.1
+      fsevents: 2.3.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  wrangler@4.125.0(@cloudflare/workers-types@4.20260702.1):
+    dependencies:
+      '@cloudflare/kv-asset-handler': 0.5.0
+      '@cloudflare/unenv-preset': 2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260820.1)
+      blake3-wasm: 2.1.5
+      esbuild: 0.28.1
+      miniflare: 5.20260820.0-alpha
+      path-to-regexp: 6.3.0
+      unenv: 2.0.0-rc.24
+      workerd: 1.20260820.1
+    optionalDependencies:
+      '@cloudflare/workers-types': 4.20260702.1
       fsevents: 2.3.3
     transitivePeerDependencies:
       - bufferutil
