@@ -36,8 +36,8 @@ ALLOWED_ORIGIN = "https://insighthunter.app"
 APP_BASE_URL = "https://app.insighthunter.app"
 
 # Replace each placeholder with its matching LIVE recurring Stripe Price ID before deploy.
-STRIPE_PRICE_STANDARD = "price_STANDARD_ID"
-STRIPE_PRICE_PRO = "price_PRO_ID"
+STRIPE_PRICE_STANDARD = "price_1TBfZoF3gri2YoH2g9u0mqkI"
+STRIPE_PRICE_PRO = "price_1TBfZoF3gri2YoH2qpiUybBY"
 STRIPE_PRICE_PAYROLL = "price_PAYROLL_ID"
 STRIPE_PRICE_PBX = "price_PBX_ID"
 STRIPE_PRICE_INSIGHTS_PRO = "price_INSIGHTS_PRO_ID"
