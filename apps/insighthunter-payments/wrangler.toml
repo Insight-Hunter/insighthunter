@@ -29,3 +29,16 @@ DASHBOARD_URL = "https://app.insighthunter.app"
 
 [dev]
 inspector_port = 9241
+
+# Revenue-flow service endpoints
+AUTH_VERIFY_URL = "https://auth.insighthunter.app/session/verify"
+ALLOWED_ORIGIN = "https://insighthunter.app"
+APP_BASE_URL = "https://app.insighthunter.app"
+
+# Replace each placeholder with its matching LIVE recurring Stripe Price ID before deploy.
+STRIPE_PRICE_STANDARD = "REPLACE_WITH_LIVE_STANDARD_PRICE_ID"
+STRIPE_PRICE_PRO = "REPLACE_WITH_LIVE_PRO_PRICE_ID"
+STRIPE_PRICE_PAYROLL = "REPLACE_WITH_LIVE_PAYROLL_PRICE_ID"
+STRIPE_PRICE_PBX = "REPLACE_WITH_LIVE_PBX_PRICE_ID"
+STRIPE_PRICE_INSIGHTS_PRO = "REPLACE_WITH_LIVE_INSIGHTS_PRO_PRICE_ID"
+STRIPE_PRICE_BIZFORMA_COMPLIANCE = "REPLACE_WITH_LIVE_BIZFORMA_COMPLIANCE_PRICE_ID"
