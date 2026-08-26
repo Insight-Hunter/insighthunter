@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
-    "build": "wrangler deploy --dry-run",
-    "deploy": "wrangler deploy",
+    "dev": "wrangler dev --config wrangler.toml",
+    "build": "wrangler deploy --dry-run --config wrangler.toml",
+    "deploy": "wrangler deploy --config wrangler.toml",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

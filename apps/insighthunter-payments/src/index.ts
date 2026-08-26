@@ -1,11 +1,11 @@
-import { ACCOUNT_TIERS, MODULE_ADDONS } from "./catalog";
+import { ACCOUNT_TIERS, MODULE_ADDONS } from "./catalog.js";
 import {
   createBillingPortalSession,
   createSubscriptionCheckoutSession,
   getOrCreateCustomer,
   verifyStripeSignature,
-} from "./stripe";
-import type { CheckoutRequest, Env, SessionPayload } from "./types";
+} from "./stripe.js";
+import type { CheckoutRequest, Env, SessionPayload } from "./types.js";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {

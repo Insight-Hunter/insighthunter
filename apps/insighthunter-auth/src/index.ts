@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { hashPassword, verifyPassword, signSession, verifySession } from "./crypto.js";
+=======
+import { hashPassword, signSession, verifyPassword, verifySession } from "./crypto.js";
+>>>>>>> e566403f3db36f0151e85086cae6cc727f3aab23
 import type { Env, LoginRequest, RegisterRequest, UserRecord } from "./types.js";
 
 export { UserVault } from "./vault.js";
@@ -6,6 +10,7 @@ export { UserVault } from "./vault.js";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 12; // 12h
 const RATE_LIMIT_WINDOW_S = 60;
 const RATE_LIMIT_MAX = 10; // per IP per window, per route
+const MAX_REQUEST_BYTES = 16 * 1024;
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -49,7 +54,8 @@ export default {
 } satisfies ExportedHandler<Env>;
 
 async function handleRegister(request: Request, env: Env): Promise<Response> {
-  const body = (await request.json()) as RegisterRequest;
+  const body = await jsonBody<RegisterRequest>(request);
+  if (!body) return Response.json({ error: "invalid_json" }, { status: 400 });
   const email = body.email?.trim().toLowerCase();
   const password = body.password;
   const tier = body.tier ?? "startup";
@@ -79,12 +85,20 @@ async function handleRegister(request: Request, env: Env): Promise<Response> {
   const vaultDoId = env.USER_VAULT.newUniqueId().toString();
   const now = Date.now();
 
-  await env.DB.prepare(
-    `INSERT INTO users (id, email, password_hash, tier, status, vault_do_id, created_at, updated_at)
-     VALUES (?, ?, ?, ?, 'active', ?, ?, ?)`
-  )
-    .bind(userId, email, passwordHash, tier, vaultDoId, now, now)
-    .run();
+  try {
+    await env.DB.prepare(
+      `INSERT INTO users (id, email, password_hash, tier, status, vault_do_id, created_at, updated_at)
+       VALUES (?, ?, ?, ?, 'active', ?, ?, ?)`
+    )
+      .bind(userId, email, passwordHash, tier, vaultDoId, now, now)
+      .run();
+  } catch (error) {
+    // The preflight lookup is not sufficient under concurrent registrations.
+    if (isUniqueConstraint(error)) {
+      return Response.json({ error: "email_in_use" }, { status: 409 });
+    }
+    throw error;
+  }
 
   await env.DB.prepare(
     `INSERT INTO audit_log (user_id, event, created_at) VALUES (?, 'register', ?)`
@@ -96,7 +110,7 @@ async function handleRegister(request: Request, env: Env): Promise<Response> {
     { userId, email, tier, issuedAt: now, expiresAt: now + SESSION_TTL_MS },
     env.SESSION_SECRET
   );
-  await env.SESSIONS.put(`session:${token}`, userId, {
+  await env.SESSIONS.put(await sessionKey(token), userId, {
     expirationTtl: SESSION_TTL_MS / 1000,
   });
 
@@ -107,7 +121,8 @@ async function handleRegister(request: Request, env: Env): Promise<Response> {
 }
 
 async function handleLogin(request: Request, env: Env, ip: string): Promise<Response> {
-  const body = (await request.json()) as LoginRequest;
+  const body = await jsonBody<LoginRequest>(request);
+  if (!body) return Response.json({ error: "invalid_json" }, { status: 400 });
   const email = body.email?.trim().toLowerCase();
   const password = body.password;
   if (!email || !password) {
@@ -133,7 +148,7 @@ async function handleLogin(request: Request, env: Env, ip: string): Promise<Resp
     { userId: user.id, email: user.email, tier: user.tier, issuedAt: now, expiresAt: now + SESSION_TTL_MS },
     env.SESSION_SECRET
   );
-  await env.SESSIONS.put(`session:${token}`, user.id, {
+  await env.SESSIONS.put(await sessionKey(token), user.id, {
     expirationTtl: SESSION_TTL_MS / 1000,
   });
   await env.DB.prepare(
@@ -154,7 +169,7 @@ async function handleLogin(request: Request, env: Env, ip: string): Promise<Resp
 async function handleLogout(request: Request, env: Env): Promise<Response> {
   const token = bearerToken(request);
   if (!token) return Response.json({ error: "missing_token" }, { status: 400 });
-  await env.SESSIONS.delete(`session:${token}`);
+  await env.SESSIONS.delete(await sessionKey(token));
   return Response.json({ loggedOut: true });
 }
 
@@ -166,7 +181,7 @@ async function handleVerify(request: Request, env: Env): Promise<Response> {
   if (!payload) return Response.json({ error: "invalid_or_expired" }, { status: 401 });
 
   // Confirm the token hasn't been revoked (logout) via KV lookup.
-  const stillValid = await env.SESSIONS.get(`session:${token}`);
+  const stillValid = await env.SESSIONS.get(await sessionKey(token));
   if (!stillValid) return Response.json({ error: "session_revoked" }, { status: 401 });
 
   return Response.json({ valid: true, ...payload });
@@ -176,6 +191,34 @@ function bearerToken(request: Request): string | null {
   const header = request.headers.get("Authorization");
   if (!header?.startsWith("Bearer ")) return null;
   return header.slice("Bearer ".length);
+}
+
+async function jsonBody<T>(request: Request): Promise<T | null> {
+  const contentLength = Number(request.headers.get("Content-Length") ?? "0");
+  if (!Number.isFinite(contentLength) || contentLength > MAX_REQUEST_BYTES) return null;
+  if (!request.headers.get("Content-Type")?.toLowerCase().startsWith("application/json")) {
+    return null;
+  }
+
+  try {
+    const body: unknown = await request.json();
+    return body !== null && typeof body === "object" && !Array.isArray(body) ? (body as T) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function sessionKey(token: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
+  return `session:${toHex(new Uint8Array(digest))}`;
+}
+
+function toHex(bytes: Uint8Array): string {
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function isUniqueConstraint(error: unknown): boolean {
+  return error instanceof Error && /unique constraint failed/i.test(error.message);
 }
 
 function isValidEmail(email: string): boolean {
@@ -192,25 +235,25 @@ async function isRateLimited(env: Env, key: string): Promise<boolean> {
   return false;
 }
 
-function corsHeaders(env: Env, request: Request): HeadersInit {
+function corsHeaders(env: Env, request: Request): Headers {
   const origin = request.headers.get("Origin");
-  const allowed = origin === env.ALLOWED_ORIGIN ? origin : env.ALLOWED_ORIGIN;
-  return {
-    "Access-Control-Allow-Origin": allowed,
+  const headers = new Headers({
     "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Access-Control-Allow-Credentials": "true",
-  };
+    Vary: "Origin",
+  });
+  if (origin === env.ALLOWED_ORIGIN) headers.set("Access-Control-Allow-Origin", origin);
+  return headers;
 }
 
-function withCors(response: Response, cors: HeadersInit): Response {
+function withCors(response: Response, cors: Headers): Response {
   const merged = new Headers(response.headers);
-  for (const [k, v] of Object.entries(cors as Record<string, string>)) {
+  for (const [k, v] of cors) {
     merged.set(k, v);
   }
   return new Response(response.body, { status: response.status, headers: merged });
 }
 
-function tooManyRequests(cors: HeadersInit): Response {
+function tooManyRequests(cors: Headers): Response {
   return withCors(Response.json({ error: "rate_limited" }, { status: 429 }), cors);
 }

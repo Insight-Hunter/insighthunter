@@ -9,7 +9,7 @@ Object. Deployed at `auth.insighthunter.app`.
 ```bash
 npm install
 npx wrangler d1 create insighthunter-auth-db      # copy id into wrangler.toml
-npx wrangler kv namespace create SESSIONS          # copy id into wrangler.toml
+npx wrangler kv namespace create SESSIONS         # copy id into wrangler.toml
 npx wrangler d1 execute insighthunter-auth-db --file=./schema.sql
 npx wrangler secret put SESSION_SECRET             # paste a long random value
 ```
@@ -68,21 +68,6 @@ Logout:
 ```bash
 curl -X POST http://localhost:8787/logout \
   -H "Authorization: Bearer eyJ...body.sig"
-```
-
-## package.json (types only, no runtime deps)
-
-```json
-{
-  "name": "insighthunter-auth",
-  "private": true,
-  "type": "module",
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250801.0",
-    "wrangler": "^3.90.0",
-    "typescript": "^5.6.0"
-  }
-}
 ```
 
 ## How module workers use this

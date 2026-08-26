@@ -1,0 +1,19 @@
+name = "insighthunter-dashboard"
+main = "src/index.ts"
+compatibility_date = "2026-08-23"
+
+[[routes]]
+pattern = "app.insighthunter.app/*"
+zone_name = "insighthunter.app"
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[[services]]
+binding = "AUTH_SERVICE"
+service = "insighthunter-auth"
+
+[vars]
+AUTH_ORIGIN = "https://auth.insighthunter.app"
+MARKETING_ORIGIN = "https://insighthunter.app"
