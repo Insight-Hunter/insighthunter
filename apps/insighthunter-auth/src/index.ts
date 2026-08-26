@@ -1,7 +1,7 @@
-import { hashPassword, verifyPassword, signSession, verifySession } from "./crypto";
-import type { Env, LoginRequest, RegisterRequest, UserRecord } from "./types";
+import { hashPassword, verifyPassword, signSession, verifySession } from "./crypto.js";
+import type { Env, LoginRequest, RegisterRequest, UserRecord } from "./types.js";
 
-export { UserVault } from "./vault";
+export { UserVault } from "./vault.js";
 
 const SESSION_TTL_MS = 1000 * 60 * 60 * 12; // 12h
 const RATE_LIMIT_WINDOW_S = 60;

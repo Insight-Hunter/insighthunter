@@ -32,6 +32,7 @@ destination_address = "noreply@insighthunter.app"
 APP_BASE_URL = "https://auth.insighthunter.app"
 DASHBOARD_URL = "https://app.insighthunter.app"
 MARKETING_URL = "https://insighthunter.app"
+ALLOWED_ORIGIN = "https://insighthunter.app"
 
 [dev]
 port = 8787
@@ -51,4 +52,3 @@ new_classes = ["UserVault"]
 # RESEND_API_KEY
 # STRIPE_SECRET_KEY
 # STRIPE_WEBHOOK_SECRET
-

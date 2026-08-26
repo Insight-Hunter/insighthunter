@@ -22,6 +22,18 @@ id = "f55ebc7692604c949033c9bbc459d6fd"
 
 [vars]
 DASHBOARD_URL = "https://app.insighthunter.app"
+AUTH_VERIFY_URL = "https://auth.insighthunter.app/session/verify"
+ALLOWED_ORIGIN = "https://insighthunter.app"
+APP_BASE_URL = "https://app.insighthunter.app"
+
+# Stripe Price IDs are identifiers, not credentials. Keep the Stripe secret
+# and webhook signing secret in `wrangler secret`, never in this file.
+STRIPE_PRICE_STANDARD = "price_1TBfZoF3gri2YoH2g9u0mqkI"
+STRIPE_PRICE_PRO = "price_1TBfZoF3gri2YoH2qpiUybBY"
+STRIPE_PRICE_PAYROLL = "price_PAYROLL_ID"
+STRIPE_PRICE_PBX = "price_PBX_ID"
+STRIPE_PRICE_INSIGHTS_PRO = "price_INSIGHTS_PRO_ID"
+STRIPE_PRICE_BIZFORMA_COMPLIANCE = "price_BIZFORMA_ID"
 
 # Secrets (set via wrangler secret put):
 # STRIPE_SECRET_KEY
@@ -29,16 +41,3 @@ DASHBOARD_URL = "https://app.insighthunter.app"
 
 [dev]
 inspector_port = 9241
-
-# Revenue-flow service endpoints
-AUTH_VERIFY_URL = "https://auth.insighthunter.app/session/verify"
-ALLOWED_ORIGIN = "https://insighthunter.app"
-APP_BASE_URL = "https://app.insighthunter.app"
-
-# Replace each placeholder with its matching LIVE recurring Stripe Price ID before deploy.
-STRIPE_PRICE_STANDARD = "price_1TBfZoF3gri2YoH2g9u0mqkI"
-STRIPE_PRICE_PRO = "price_1TBfZoF3gri2YoH2qpiUybBY"
-STRIPE_PRICE_PAYROLL = "price_PAYROLL_ID"
-STRIPE_PRICE_PBX = "price_PBX_ID"
-STRIPE_PRICE_INSIGHTS_PRO = "price_INSIGHTS_PRO_ID"
-STRIPE_PRICE_BIZFORMA_COMPLIANCE = "price_BIZFORMA_ID"

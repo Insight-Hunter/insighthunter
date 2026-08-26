@@ -29,7 +29,11 @@ export async function verifyPassword(
   stored: string
 ): Promise<boolean> {
   const [iterStr, saltHex, hashHex] = stored.split(":");
-  const iterations = parseInt(iterStr, 10);
+  if (!iterStr || !saltHex || !hashHex) return false;
+  const iterations = Number.parseInt(iterStr, 10);
+  if (!Number.isSafeInteger(iterations) || iterations < 1 || iterations > PBKDF2_ITERATIONS) {
+    return false;
+  }
   const salt = fromHex(saltHex);
   const keyMaterial = await crypto.subtle.importKey(
     "raw",
