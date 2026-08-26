@@ -132,7 +132,7 @@ app.get("/", (c) => {
   </div>
   <div class="app-card">
     <div class="app-icon">🏢</div>
-    <h3>BizForma</h3>
+    <h3>Business Formation Assistant</h3>
     <p>Business formation, entity management, EIN tracking, compliance reminders, and annual filings.</p>
   </div>
   <div class="app-card">
@@ -184,7 +184,7 @@ app.get("/", (c) => {
     <div class="price">$149<span>/mo</span></div>
     <ul class="price-features">
       <li>All Growth Features</li>
-      <li>BizForma + PBX + Reports</li>
+      <li>Business Formation Assistant + PBX + Reports</li>
       <li>White Label</li>
       <li>Unlimited Users</li>
       <li>SOC2 Controls</li>

@@ -47,7 +47,7 @@ export const ACCOUNT_TIERS: Record<AccountTier, CatalogEntry> = {
     includes: [
       "Unlimited bookkeeping & bank connections",
       "Financial reports (P&L, balance sheet, cash flow)",
-      "BizForma compliance reminders",
+      "Business Formation Assistant compliance reminders",
       "Basic AI insights",
       "Email support",
     ],
@@ -90,7 +90,7 @@ export const MODULE_ADDONS: Record<ModuleAddon, CatalogEntry> = {
   },
   bizforma_compliance: {
     id: "bizforma_compliance",
-    displayName: "BizForma Ongoing Compliance",
+    displayName: "Business Formation Assistant Ongoing Compliance",
     monthlyUsd: 20,
     priceEnvKey: "STRIPE_PRICE_BIZFORMA_COMPLIANCE",
     includes: ["Ongoing filing reminders", "Registered agent document handling"],

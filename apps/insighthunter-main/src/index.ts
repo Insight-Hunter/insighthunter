@@ -98,7 +98,7 @@ app.get("/", async (c) => {
     },
     {
       slug: "bizforma",
-      name: "BizForma",
+      name: "Business Formation Assistant",
       icon: ".",
       url: "https://bizforma.insighthunter.app",
       desc: "Entity formation & compliance",
