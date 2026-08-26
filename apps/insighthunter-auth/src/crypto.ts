@@ -30,15 +30,10 @@ export async function verifyPassword(
 ): Promise<boolean> {
   const [iterStr, saltHex, hashHex] = stored.split(":");
   if (!iterStr || !saltHex || !hashHex) return false;
-<<<<<<< HEAD
   const iterations = Number.parseInt(iterStr, 10);
   if (!Number.isSafeInteger(iterations) || iterations < 1 || iterations > PBKDF2_ITERATIONS) {
     return false;
   }
-=======
-  const iterations = parseInt(iterStr, 10);
-  if (!Number.isSafeInteger(iterations) || iterations < 1) return false;
->>>>>>> e566403f3db36f0151e85086cae6cc727f3aab23
   const salt = fromHex(saltHex);
   if (!salt || !/^[0-9a-f]{64}$/i.test(hashHex)) return false;
   const keyMaterial = await crypto.subtle.importKey(

@@ -92,6 +92,7 @@ import Layout from '../layouts/Layout.astro';
       gap: 16px;
     }
     .addon-price { font-family: var(--font-mono); font-size: 1rem; color: var(--moss); white-space: nowrap; }
+    .addon-action { margin-top: 10px; display: inline-flex; }
 
     @media (max-width: 860px) {
       .tier-grid { grid-template-columns: 1fr; }
@@ -134,7 +135,12 @@ import Layout from '../layouts/Layout.astro';
                   <strong>${addon.displayName}</strong>
                   <p style="margin:4px 0 0;font-size:0.85rem;">${addon.includes[0]}</p>
                 </div>
-                <div class="addon-price">$${addon.monthlyUsd}/mo</div>
+                <div>
+                  <div class="addon-price">$${addon.monthlyUsd}/mo</div>
+                  <a class="btn btn-ghost addon-action" href="/signup?tier=${['payroll', 'pbx'].includes(addon.id) ? 'pro' : 'standard'}">
+                    Start with ${['payroll', 'pbx'].includes(addon.id) ? 'Pro' : 'Standard'}
+                  </a>
+                </div>
               </div>
             `
           )

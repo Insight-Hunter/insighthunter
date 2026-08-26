@@ -52,6 +52,14 @@ export default {
       });
     }
 
+    if (url.pathname === "/billing/success") {
+      return Response.redirect(new URL("/dashboard", url).toString(), 303);
+    }
+
+    if (url.pathname === "/billing/cancelled") {
+      return Response.redirect(new URL("/pricing", env.MARKETING_ORIGIN).toString(), 303);
+    }
+
     const token = bearerToken(request) ?? cookieToken(request);
     const session = token ? await verifySession(token, env) : null;
     if (!session) return redirectToLogin(request, env);

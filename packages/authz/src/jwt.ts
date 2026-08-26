@@ -128,7 +128,7 @@ export async function verifyRS256(token: string, jwksUrl: string): Promise<JWTVe
   } catch (err) {
     return { valid: false, error: err instanceof Error ? err.message : "unknown_error" };
   }
-
+}
 import type { AuthenticatedUser, Jwk, JwksDocument, JwtPayload } from "./types.js";
 
 type JwtHeader = {

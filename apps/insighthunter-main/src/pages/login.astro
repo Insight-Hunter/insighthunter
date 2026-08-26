@@ -40,6 +40,7 @@ import Layout from '../layouts/Layout.astro';
       try {
         const res = await fetch(`${authApi}/login`, {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: form.email.value.trim(), password: form.password.value }),
         });

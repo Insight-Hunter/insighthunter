@@ -60,6 +60,7 @@ import Layout from '../layouts/Layout.astro';
       try {
         const res = await fetch(`${authApi}/register`, {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password, tier: 'startup' }),
         });
