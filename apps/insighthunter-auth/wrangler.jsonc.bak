@@ -1,0 +1,28 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "insighthunter-auth",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-25",
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "insighthunter-db",
+      "database_id": "4c00676f-9023-4f25-a634-17817594ea0b"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV_SESSIONS",
+      "id": "084631d3b2704097a57e57d89daee600"
+    }
+  ],
+  "vars": {
+    "APP_BASE_URL": "https://auth.insighthunter.app",
+    "DASHBOARD_URL": "https://app.insighthunter.app",
+    "MARKETING_URL": "https://insighthunter.app"
+  },
+  "routes": [
+    { "pattern": "auth.insighthunter.app/*", "zone_name": "insighthunter.app" }
+  ]
+}

@@ -8,7 +8,9 @@
     "enabled": true,
     "head_sampling_rate": 1
   },
-
+  "dev": {
+    "inspector_port": 9247
+  },
   "routes": [
     {
       "pattern": "platform.insighthunter.app/*",

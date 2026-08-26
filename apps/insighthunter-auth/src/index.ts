@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+import { hashPassword, verifyPassword, signSession, verifySession } from "./crypto.js";
+=======
 import { hashPassword, signSession, verifyPassword, verifySession } from "./crypto.js";
+>>>>>>> e566403f3db36f0151e85086cae6cc727f3aab23
 import type { Env, LoginRequest, RegisterRequest, UserRecord } from "./types.js";
 
 export { UserVault } from "./vault.js";

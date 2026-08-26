@@ -9,3 +9,6 @@ enabled = true
 [vars]
 APP_NAME = "insighthunter-payroll"
 ENVIRONMENT = "development"
+
+[dev]
+inspector_port = 9242

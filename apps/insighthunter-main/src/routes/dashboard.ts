@@ -73,7 +73,7 @@ const ALL_APPS: AppDef[] = [
   },
   {
     slug: "bizforma",
-    name: "BizForma",
+    name: "Business Formation Assistant",
     description: "Business formation & compliance tracking",
     url: "https://bizforma.insighthunter.app",
     icon: "🏛️",

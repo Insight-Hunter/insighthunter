@@ -1,6 +1,6 @@
 import type { SessionPayload } from "./types.js";
 
-const PBKDF2_ITERATIONS = 210_000; // OWASP 2024+ recommendation for PBKDF2-SHA256
+const PBKDF2_ITERATIONS = 100_000; // Workers Web Crypto caps PBKDF2 at 100,000 iterations
 
 /** Hash a password with PBKDF2-SHA256. Returns "iterations:saltHex:hashHex". */
 export async function hashPassword(password: string): Promise<string> {
@@ -30,8 +30,15 @@ export async function verifyPassword(
 ): Promise<boolean> {
   const [iterStr, saltHex, hashHex] = stored.split(":");
   if (!iterStr || !saltHex || !hashHex) return false;
+<<<<<<< HEAD
+  const iterations = Number.parseInt(iterStr, 10);
+  if (!Number.isSafeInteger(iterations) || iterations < 1 || iterations > PBKDF2_ITERATIONS) {
+    return false;
+  }
+=======
   const iterations = parseInt(iterStr, 10);
   if (!Number.isSafeInteger(iterations) || iterations < 1) return false;
+>>>>>>> e566403f3db36f0151e85086cae6cc727f3aab23
   const salt = fromHex(saltHex);
   if (!salt || !/^[0-9a-f]{64}$/i.test(hashHex)) return false;
   const keyMaterial = await crypto.subtle.importKey(

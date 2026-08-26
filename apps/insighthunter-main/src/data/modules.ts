@@ -33,7 +33,7 @@ export const MODULES: Module[] = [
   },
   {
     slug: "bizforma",
-    name: "BizForma",
+    name: "Business Formation Assistant",
     minTier: "standard",
     tagline: "Business formation and ongoing compliance.",
     description:

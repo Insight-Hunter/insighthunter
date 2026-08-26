@@ -4,6 +4,7 @@ import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { timing } from "hono/timing";
 import { requireAuth } from "./middleware/auth.js";
+import { requireBizformaTier } from "./middleware/tier-gate.js";
 import { dispatchUpcomingReminders, processReminderBatch } from "./queues/reminder-consumer.js";
 import type { ReminderJob } from "./queues/reminder-consumer.js";
 import { ai } from "./routes/ai.js";
@@ -12,6 +13,8 @@ import { dashboard } from "./routes/dashboard.js";
 import { formation } from "./routes/formation.js";
 import { wizard } from "./routes/wizard.js";
 import type { BizformaEnv } from "./types.js";
+
+
 
 const app = new Hono<{ Bindings: BizformaEnv }>();
 
@@ -47,7 +50,8 @@ app.get("/health", (c) =>
 
 app.get("/", (c) => c.redirect("https://bizforma.insighthunter.app", 302));
 
-app.use("/api/*", requireAuth);
+app.use("/api/*", requireAuth, requireBizformaTier);
+
 
 app.route("/api/formation", formation);
 app.route("/api/compliance", compliance);

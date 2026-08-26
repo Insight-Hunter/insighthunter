@@ -15,3 +15,6 @@ APP_URL = "https://bizforma.insighthunter.app"
 [[migrations]]
 tag = "v2-remove-durable-objects"
 deleted_classes = ["ComplianceAgent", "FormationAgent"]
+
+[dev]
+inspector_port = 9233

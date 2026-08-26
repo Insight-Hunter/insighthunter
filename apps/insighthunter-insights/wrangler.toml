@@ -13,3 +13,6 @@ ENVIRONMENT = "development"
 [[migrations]]
 tag = "v2-remove-durable-objects"
 deleted_classes = ["CfoAgent"]
+
+[dev]
+inspector_port = 9237

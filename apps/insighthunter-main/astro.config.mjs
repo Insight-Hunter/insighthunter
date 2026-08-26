@@ -10,7 +10,7 @@ export default defineConfig({
     mode: "advanced",
     imageService: "passthrough",
     platformProxy: {
-      enabled: true,
+      enabled: process.argv.includes("dev"),
       configPath: "./wrangler.toml",
     },
   }),

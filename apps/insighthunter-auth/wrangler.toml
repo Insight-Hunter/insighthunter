@@ -28,6 +28,7 @@ ALLOWED_ORIGIN = "https://insighthunter.app"
 [dev]
 port = 8787
 local_protocol = "http"
+inspector_port = 9232
 
 [[durable_objects.bindings]]
 name = "USER_VAULT"
@@ -38,4 +39,7 @@ tag = "v1"
 new_classes = ["UserVault"]
 
 # Secrets (set via wrangler secret put):
-# SESSION_SECRET
+# JWT_SECRET
+# RESEND_API_KEY
+# STRIPE_SECRET_KEY
+# STRIPE_WEBHOOK_SECRET

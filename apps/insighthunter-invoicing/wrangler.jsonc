@@ -9,6 +9,10 @@
     "head_sampling_rate": 1
   },
 
+  "dev": {
+    "inspector_port": 9248
+  },
+
   "routes": [{ "pattern": "invoicing.insighthunter.app/*", "zone_name": "insighthunter.app" }],
 
   // Shared D1 — same database as all other Workers
@@ -41,6 +45,7 @@
     "APP_URL": "https://invoicing.insighthunter.app",
     "ENVIRONMENT": "production"
   }
+
 
   // No Durable Objects, no nodejs_compat.
   // Replace REPLACE_WITH_D1_DATABASE_ID with real provisioned ID.

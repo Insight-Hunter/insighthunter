@@ -13,7 +13,7 @@ interface AgentState {
 export class FormationAgent extends DurableObject<BizformaEnv> {
   private state: AgentState | null = null;
 
-  async fetch(request: Request): Promise<Response> {
+  override async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
 
     switch (url.pathname) {

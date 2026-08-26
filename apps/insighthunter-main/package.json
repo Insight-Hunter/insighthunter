@@ -22,10 +22,10 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260816.1",
-    "wrangler": "^4.123.0",
-    "@astrojs/cloudflare": "^12.6.13",
+    "wrangler": "^4.125.0",
+    "@astrojs/cloudflare": "^14.2.1",
     "@astrojs/mdx": "^4.3.14",
     "@astrojs/sitemap": "^3.13.3",
-    "astro": "^5.18.2"
+    "astro": "^7.2.2"
   }
 }

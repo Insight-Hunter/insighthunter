@@ -14,3 +14,6 @@ LEDGER_URL = "https://ledger.insighthunter.app"
 
 [ai]
 binding = "AI"
+
+[dev]
+inspector_port = 9231

@@ -57,9 +57,9 @@ async function handleCheckout(request: Request, env: Env): Promise<Response> {
   }
 
   const priceId = (env as unknown as Record<string, string>)[entry.priceEnvKey];
-  if (!priceId) {
+  if (!priceId || !priceId.startsWith("price_") || priceId.endsWith("_ID")) {
     console.error(`Missing Stripe price id for env key ${entry.priceEnvKey}`);
-    return Response.json({ error: "pricing_not_configured" }, { status: 500 });
+    return Response.json({ error: "plan_not_available" }, { status: 503 });
   }
 
   const user = await env.DB.prepare(
