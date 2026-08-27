@@ -61,10 +61,10 @@ export async function verifyHS256(token: string, secret: string): Promise<JWTVer
       ["verify"]
     );
 
-    const signingInput = encoder.encode('${headerB64}.${payloadB64}');
-    const signature = base64UrlDecode(signatureB64);
+    const signingInput = encoder.encode(`${headerB64}.${payloadB64}`);
+    const cacheKey = `${jwksUrl}:${Headers.kid ?? "default"}`;
 
-    const valid = await crypto.subtle.verify("HMAC", cryptoKey, signature, signingInput);
+    const valid = await crypto.subtle.verify("HMAC", cryptoKey, signatureB64, signingInput);
     if (!valid) return { valid: false, error: "invalid_signature" };
 
     const payload = decodeJWTPayload(token);
