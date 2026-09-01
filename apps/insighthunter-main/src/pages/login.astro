@@ -11,7 +11,7 @@ import Layout from '../layouts/Layout.astro';
         <form id="login-form">
           <label>
             Email
-            <input type="email" name="email" required autocomplete="email" />
+      sig       <input type="email" name="email" required autocomplete="email" />
           </label>
           <label>
             Password
@@ -40,6 +40,7 @@ import Layout from '../layouts/Layout.astro';
       try {
         const res = await fetch(`${authApi}/login`, {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: form.email.value.trim(), password: form.password.value }),
         });

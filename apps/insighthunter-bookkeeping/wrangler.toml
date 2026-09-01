@@ -1,26 +1,47 @@
 name = "insighthunter-bookkeeping"
-main = "src/bookkeeping-worker.ts"
-compatibility_date = "2026-08-01"
-workers_dev = false
-
-routes = [
-  { pattern = "bookkeeping.insighthunter.app/*", zone_name = "insighthunter.app" }
-]
+main = "src/index.ts"
+compatibility_date = "2026-07-08"
 
 [observability]
 enabled = true
+head_sampling_rate = 1
 
-[[durable_objects.bindings]]
-name = "LEDGER"
-class_name = "BookkeepingLedger"
+[[routes]]
+pattern = "bookkeeping.insighthunter.app/*"
+zone_name = "insighthunter.app"
 
-[[migrations]]
-tag = "v1"
-new_sqlite_classes = ["BookkeepingLedger"]
+# Shared D1 database. Use organization_id on every tenant-owned row and
+# validate the organization context from verified auth claims.
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-bookkeeping"
+database_id = "1fe17233-e32a-4428-86dd-e5f4146db0aa"
 
-[ai]
-binding = "AI"
+
+# R2 storage for raw bank-import source files such as CSV and OFX.
+[[r2_buckets]]
+binding = "IMPORTS"
+bucket_name = "insighthunter-imports"
+
+# Async ingestion pipeline: API Worker produces import jobs; this Worker
+# consumes and processes them. Provision queue and DLQ before deployment.
+[[queues.producers]]
+binding = "IMPORT_QUEUE"
+queue = "insighthunter-import-queue"
+
+[[queues.consumers]]
+queue = "insighthunter-import-queue"
+max_batch_size = 10
+max_batch_timeout = 30
+max_retries = 3
+dead_letter_queue = "insighthunter-import-dlq"
+
+# Import-status polling cache. Provision before deployment.
+[[kv_namespaces]]
+binding = "KV_IMPORT_STATUS"
+id = "b694951a306e42f68de14b3bd80edb11"
 
 [vars]
-AUTH_API_URL = "https://auth.insighthunter.app"
-ALLOWED_ORIGIN = "https://app.insighthunter.app"
+AUTH_URL = "https://auth.insighthunter.app"
+DASHBOARD_URL = "https://app.insighthunter.app"
+ENVIRONMENT = "production"

@@ -608,8 +608,8 @@ enabled = true
 
 [[d1_databases]]
 binding = "DB"
-database_name = "insighthunter_main"
-database_id = "REPLACE_WITH_MAIN_DB_ID"
+database_name = "insighthunter-main"
+database_id = "04854880-81f5-4c02-b555-905a34492b92"
 
 [vars]
 APP_NAME = "insighthunter-main"

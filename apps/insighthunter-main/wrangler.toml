@@ -16,6 +16,13 @@ binding = "ASSETS"
 [observability]
 enabled = true
 
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-main"
+database_id = "04854880-81f5-4c02-b555-905a34492b92"
+migrations_dir = "migrations"
+
+
 # Public runtime config — no secrets here, these are read by client-side
 # scripts (pricing/signup/login pages) via import.meta.env at build time.
 [vars]
