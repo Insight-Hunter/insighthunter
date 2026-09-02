@@ -1,0 +1,30 @@
+---
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import { getSignupUrl } from '../../lib/urls';
+---
+
+<MarketingLayout title="Form with confidence. Stay organized after launch. | Insight Hunter" description="BizForma organizes formation tasks, compliance deadlines, and essential business documents in a guided workflow.">
+  <section class="wrap module-page">
+    <p class="eyebrow">BizForma</p>
+    <h1>Form with confidence. Stay organized after launch.</h1>
+    <p class="lead">BizForma organizes formation tasks, compliance deadlines, and essential business documents in a guided workflow.</p>
+
+    <div class="module-grid">
+      <article><h2>Formation guidance</h2><p>Understand the essential sequence of business setup decisions.</p></article>
+      <article><h2>Compliance visibility</h2><p>Keep filing, renewal, and organizational deadlines visible.</p></article>
+      <article><h2>Document organization</h2><p>Maintain an accessible record of key business materials.</p></article>
+    </div>
+
+    <a class="btn btn-primary" href={getSignupUrl('bizforma')}>Get started</a>
+  </section>
+</MarketingLayout>
+
+<style>
+  .module-page { padding-block: 5rem; }
+  .lead { max-width: 65ch; color: var(--ink-soft); font-size: 1.1rem; }
+  .module-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0; }
+  article { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 1.5rem; }
+  article h2 { font-size: 1.2rem; }
+  article p { color: var(--ink-soft); }
+  @media (max-width: 760px) { .module-grid { grid-template-columns: 1fr; } }
+</style>

@@ -17,11 +17,9 @@ database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
 
 [vars]
 DASHBOARD_URL = "https://app.insighthunter.app"
-<<<<<<< HEAD
 AUTH_VERIFY_URL = "https://auth.insighthunter.app/session/verify"
 ALLOWED_ORIGIN = "https://insighthunter.app"
 APP_BASE_URL = "https://app.insighthunter.app"
-
 # Stripe Price IDs are identifiers, not credentials. Keep the Stripe secret
 # and webhook signing secret in `wrangler secret`, never in this file.
 STRIPE_PRICE_STANDARD = "price_1TBfZoF3gri2YoH2g9u0mqkI"
@@ -30,7 +28,6 @@ STRIPE_PRICE_PAYROLL = "price_PAYROLL_ID"
 STRIPE_PRICE_PBX = "price_PBX_ID"
 STRIPE_PRICE_INSIGHTS_PRO = "price_INSIGHTS_PRO_ID"
 STRIPE_PRICE_BIZFORMA_COMPLIANCE = "price_BIZFORMA_ID"
-=======
 APP_BASE_URL = "https://app.insighthunter.app"
 AUTH_VERIFY_URL = "https://auth.insighthunter.app/session/verify"
 ALLOWED_ORIGIN = "https://insighthunter.app"

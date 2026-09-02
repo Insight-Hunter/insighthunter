@@ -1,58 +1,68 @@
-export interface Module {
+export type InsightHunterTier = 'Startup' | 'Standard' | 'Pro';
+
+export interface InsightHunterModule {
   slug: string;
   name: string;
-  minTier: "startup" | "standard" | "pro";
   tagline: string;
   description: string;
+  minTier: InsightHunterTier;
 }
 
-export const MODULES: Module[] = [
+export const MODULES: InsightHunterModule[] = [
   {
-    slug: "bookkeeping",
-    name: "Bookkeeping",
-    minTier: "startup",
-    tagline: "Transactions and reconciliation, automated.",
-    description:
-      "Bank and card feeds auto-categorize transactions, flag anomalies, and keep your books reconciled without manual data entry.",
+    slug: 'bookkeeping',
+    name: 'Bookkeeping',
+    tagline: 'Clean books without the busywork.',
+    description: 'Connect transactions, categorize activity, reconcile accounts, and maintain an audit-ready general ledger with service options that scale from self-service to expert support.',
+    minTier: 'Startup',
   },
   {
-    slug: "reports",
-    name: "Reports",
-    minTier: "startup",
-    tagline: "P&L, cash flow, and balance sheet — always current.",
-    description:
-      "Standard financial statements generated automatically from your bookkeeping data, exportable as PDF or CSV.",
+    slug: 'reports',
+    name: 'Reports',
+    tagline: 'Financial statements that tell the truth quickly.',
+    description: 'Generate profit and loss, balance sheet, cash-flow, aging, and management reports with current data and clear export-ready formatting.',
+    minTier: 'Startup',
   },
   {
-    slug: "insights",
-    name: "Insights",
-    minTier: "standard",
-    tagline: "AI CFO-grade advisory, on demand.",
-    description:
-      "Cash flow forecasting, margin analysis, and plain-English recommendations powered by your real financial data.",
+    slug: 'insights',
+    name: 'Insights',
+    tagline: 'Turn accounting activity into next actions.',
+    description: 'Monitor KPIs, cash trends, operating signals, and forward-looking financial opportunities through an accessible CFO-style advisory workspace.',
+    minTier: 'Standard',
   },
   {
-    slug: "bizforma",
-    name: "Business Formation Assistant",
-    minTier: "standard",
-    tagline: "Business formation and ongoing compliance.",
-    description:
-      "Entity selection guidance, EIN application support, state registration, and a compliance calendar so you never miss a filing.",
+    slug: 'bizforma',
+    name: 'Business Formation Assistant',
+    tagline: 'Form, organize, and keep your business compliant.',
+    description: 'Choose an entity structure, prepare formation workflows, track annual filings, and manage recurring compliance obligations in one guided workspace.',
+    minTier: 'Startup',
   },
   {
-    slug: "payroll",
-    name: "Payroll",
-    minTier: "pro",
-    tagline: "Run payroll without the compliance headache.",
-    description:
-      "Tiered payroll processing with tax withholding, direct deposit, and filings handled through a white-label payroll partner.",
+    slug: 'payroll',
+    name: 'Payroll',
+    tagline: 'Pay people accurately and stay on schedule.',
+    description: 'Coordinate payroll processing, tax estimates, payroll records, and workforce reporting through tiered services and trusted payroll-provider integrations.',
+    minTier: 'Standard',
   },
   {
-    slug: "pbx",
-    name: "PBX",
-    minTier: "pro",
-    tagline: "A business phone system, built in.",
-    description:
-      "Voice, SMS, voicemail, and automated messages for customer communication — no separate phone vendor required.",
+    slug: 'pbx',
+    name: 'PBX',
+    tagline: 'Your customer conversations, organized.',
+    description: 'Manage business calls, voicemail, SMS, automations, and communication activity through an integrated customer communication hub.',
+    minTier: 'Pro',
+  },
+  {
+    slug: 'ledger',
+    name: 'Ledger',
+    tagline: 'The accounting foundation beneath every decision.',
+    description: 'Maintain your chart of accounts, journal entries, reconciliations, and financial controls with traceable business records.',
+    minTier: 'Standard',
+  },
+  {
+    slug: 'advisor',
+    name: 'Advisor',
+    tagline: 'Practical financial guidance when decisions cannot wait.',
+    description: 'Use AI-assisted financial analysis to investigate variances, assess cash needs, and prepare decision-ready recommendations for your business.',
+    minTier: 'Pro',
   },
 ];

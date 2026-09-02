@@ -10,4 +10,4 @@
 
 '''bash
 cd apps/insighthunter-main
-wrangler d1 execute insighthunter_main --file=schema.sql
+wrangler d1 execute insighthunter-main --file=schema.sql
