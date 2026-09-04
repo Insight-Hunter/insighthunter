@@ -1,6 +1,16 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { registerUrl, type Plan } from "../lib/auth-links";
+
+const requestedPlan = Astro.url.searchParams.get("plan");
+const plan: Plan =
+  requestedPlan === "standard" || requestedPlan === "pro"
+    ? requestedPlan
+    : "lite";
+
+return Astro.redirect(registerUrl(plan), 302);
 ---
+
 <Layout title="Create your account">
   <section class="auth-section">
     <div class="wrap auth-wrap">

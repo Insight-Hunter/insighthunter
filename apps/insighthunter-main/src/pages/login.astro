@@ -1,4 +1,6 @@
 ---
+import { loginUrl } from "../lib/auth-links";
+return Astro.redirect(loginUrl(), 302);
 import Layout from '../layouts/Layout.astro';
 ---
 <Layout title="Log in">

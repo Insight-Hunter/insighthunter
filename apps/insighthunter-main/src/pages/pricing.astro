@@ -1,6 +1,20 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { registerUrl } from "../lib/auth-links";
 ---
+
+<a class="btn btn-primary" href={registerUrl("lite")}>
+  Start free
+</a>
+
+<a class="btn btn-primary" href={registerUrl("standard")}>
+  Start 14-day trial
+</a>
+
+<a class="btn btn-primary" href={registerUrl("pro")}>
+  Start 14-day trial
+</a>
+
 <Layout title="Pricing" description="Startup is free. Standard and Pro unlock reports, advisory, payroll, and more.">
   <section class="page-hero">
     <div class="wrap">
