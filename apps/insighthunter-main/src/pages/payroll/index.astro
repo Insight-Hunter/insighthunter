@@ -1,0 +1,30 @@
+---
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import { getSignupUrl } from '../../lib/urls';
+---
+
+<MarketingLayout title="Payroll support when your business is ready to hire. | Insight Hunter" description="Insight Hunter is building payroll support through qualified partners, connected to cash planning and financial visibility.">
+  <section class="wrap module-page">
+    <p class="eyebrow">Payroll</p>
+    <h1>Payroll support when your business is ready to hire.</h1>
+    <p class="lead">Insight Hunter is building payroll support through qualified partners, connected to cash planning and financial visibility.</p>
+
+    <div class="module-grid">
+      <article><h2>Partner-led delivery</h2><p>Use established payroll systems through qualified providers.</p></article>
+      <article><h2>Cash-aware planning</h2><p>Understand payroll impact on runway and operating commitments.</p></article>
+      <article><h2>One operating view</h2><p>Keep payroll awareness connected to your wider financial picture.</p></article>
+    </div>
+
+    <a class="btn btn-primary" href={getSignupUrl('startup')}>Get started</a>
+  </section>
+</MarketingLayout>
+
+<style>
+  .module-page { padding-block: 5rem; }
+  .lead { max-width: 65ch; color: var(--ink-soft); font-size: 1.1rem; }
+  .module-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0; }
+  article { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 1.5rem; }
+  article h2 { font-size: 1.2rem; }
+  article p { color: var(--ink-soft); }
+  @media (max-width: 760px) { .module-grid { grid-template-columns: 1fr; } }
+</style>

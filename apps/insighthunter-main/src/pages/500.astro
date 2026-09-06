@@ -1,0 +1,17 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+---
+
+<MarketingLayout title="Something went wrong | Insight Hunter" description="An unexpected error occurred.">
+  <section class="wrap page">
+    <p class="eyebrow">Error 500</p>
+    <h1>Something went wrong.</h1>
+    <p>Please try again in a moment. If the issue continues, contact Insight Hunter support.</p>
+    <a class="btn btn-primary" href="/">Return home</a>
+  </section>
+</MarketingLayout>
+
+<style>
+  .page { padding-block: 7rem; }
+  .page p { max-width: 56ch; color: var(--ink-soft); }
+</style>

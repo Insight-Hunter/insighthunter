@@ -1,139 +1,1037 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import TrailGraphic from '../components/TrailGraphic.astro';
+import HeroGlow from '../components/HeroGlow.astro';
 import { MODULES } from '../data/modules';
+import HowItWorks from "../components/HowItWorks.astro";
+
+const authBaseUrl = 'https://auth.insighthunter.app';
+const dashboardUrl = 'https://app.insighthunter.app/dashboard';
+
+const plans = [
+  {
+    name: 'Startup',
+    monthly: 0,
+    annual: 0,
+    description: 'For owners who need a clear financial starting point.',
+    cta: 'Start free',
+    href: `${authBaseUrl}/signup?plan=startup`,
+    features: [
+      'Financial snapshot dashboard',
+      'CSV import',
+      'Core KPI monitoring',
+      'Starter financial reports',
+    ],
+  },
+  {
+    name: 'Standard',
+    monthly: 79,
+    annual: 63,
+    description: 'For growing businesses that need forecasts, alerts, and recurring reporting.',
+    cta: 'Choose Standard',
+    href: `${authBaseUrl}/signup?plan=standard`,
+    featured: true,
+    features: [
+      'Everything in Startup',
+      'Cash-flow forecasting',
+      'KPI alerts and trends',
+      'Scheduled financial reports',
+      'Priority support',
+    ],
+  },
+  {
+    name: 'Pro',
+    monthly: 199,
+    annual: 159,
+    description: 'For advisors and businesses that need deeper insight and client-ready outputs.',
+    cta: 'Choose Pro',
+    href: `${authBaseUrl}/signup?plan=pro`,
+    features: [
+      'Everything in Standard',
+      'Advanced financial insights',
+      'Client-ready PDF exports',
+      'Multi-business workflows',
+      'Priority onboarding',
+    ],
+  },
+];
+
+const addons = [
+  {
+    title: 'Bookkeeping',
+    description:
+      'Add software-supported bookkeeping tools or managed services as your operation grows.',
+    href: '/bookkeeping',
+    availability: 'Available by plan',
+  },
+  {
+    title: 'BizForma',
+    description:
+      'Form your business, organize compliance tasks, and keep critical deadlines visible.',
+    href: '/bizforma',
+    availability: 'Available as an add-on',
+  },
+  {
+    title: 'Payroll',
+    description:
+      'Activate integrated payroll support through a trusted service partner when you hire.',
+    href: '/payroll',
+    availability: 'Coming soon',
+  },
+  {
+    title: 'Advisor Reports',
+    description:
+      'Create polished reporting packages for owners, lenders, stakeholders, and clients.',
+    href: '/reports',
+    availability: 'Available by plan',
+  },
+];
+
+const softwareApplicationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Insight Hunter',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  url: 'https://insighthunter.app/',
+  description:
+    'AI-powered financial dashboards, cash-flow forecasting, reporting, and practical insights for small businesses, bookkeepers, accountants, and fractional CFOs.',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+    description: 'Insight Hunter Startup plan',
+  },
+};
+
+const productSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: 'Insight Hunter Financial Operations Add-ons',
+  brand: {
+    '@type': 'Brand',
+    name: 'Insight Hunter',
+  },
+  description:
+    'Optional bookkeeping, business formation, payroll, reporting, and financial-advisory services for Insight Hunter subscribers.',
+  offers: {
+    '@type': 'AggregateOffer',
+    priceCurrency: 'USD',
+    lowPrice: '0',
+    availability: 'https://schema.org/InStock',
+  },
+};
 ---
-<Layout title="CFO-grade clarity, built for small business">
-  <section class="hero">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <p class="eyebrow">Financial software for owners, not accountants</p>
-        <h1>Track down the signal<br />in your numbers.</h1>
-        <p class="hero-sub">
-          Insight Hunter brings bookkeeping, reporting, and CFO-level advisory
-          into one dashboard — priced for a business that doesn't have a
-          finance department yet.
-        </p>
-        <div class="hero-actions">
-          <a href="/pricing" class="btn btn-primary">Start free — no card required</a>
-          <a href="/modules" class="btn btn-ghost">See what's included</a>
+
+<Layout
+  title="Insight Hunter | AI Financial Insights for Small Business"
+  description="Turn financial data into clear dashboards, cash-flow forecasts, reports, and next steps with Insight Hunter."
+>
+  <Fragment slot="head">
+    <meta
+      property="og:title"
+      content="Insight Hunter | Your AI Financial Command Center"
+    />
+    <meta
+      property="og:description"
+      content="Financial dashboards, cash-flow forecasting, reporting, and practical insights for small businesses."
+    />
+    <meta property="og:url" content="https://insighthunter.app/" />
+    <meta property="og:type" content="website" />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(softwareApplicationSchema)}
+    />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(productSchema)}
+    />
+  </Fragment>
+
+  <main>
+    <!-- STAGE 1: HERO — Attention -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">The CFO you can't afford, automated</p>
+
+          <h1 id="hero-title">
+            Stop guessing.<br />
+            <span class="grad-text">Start knowing.</span>
+          </h1>
+
+          <p class="hero-sub">
+            Insight Hunter turns financial data into clear dashboards, cash-flow
+            forecasts, reports, and next steps—so you can make decisions before
+            the opportunity, margin, or cash disappears.
+          </p>
+
+          <div class="hero-actions">
+            <a
+              href={`${authBaseUrl}/signup?plan=startup`}
+              class="btn btn-primary"
+            >
+              Start free — no card required
+            </a>
+
+            <a href="#how-it-works" class="btn btn-ghost">
+              See how it works
+            </a>
+          </div>
+
+          <p class="hero-fine mono">
+            Free forever on Startup. No sales call required.
+          </p>
         </div>
-        <p class="hero-fine mono">Startup tier is free, forever. Upgrade when you're ready.</p>
-      </div>
-      <div class="hero-visual">
-        <TrailGraphic />
-      </div>
-    </div>
-  </section>
 
-  <section class="ruled">
-    <div class="wrap">
-      <p class="eyebrow">The problem</p>
-      <h2>Most small businesses fly blind between tax seasons.</h2>
-      <p class="section-lead">
-        QuickBooks gives you a ledger. A bookkeeper costs $500+/month before
-        they've told you anything you didn't already know. Insight Hunter
-        does both jobs — the recordkeeping and the "so what does this mean" —
-        without the overhead of either.
-      </p>
-    </div>
-  </section>
+        <div class="hero-visual" aria-hidden="true">
+          <HeroGlow />
+        </div>
+      </div>
+    </section>
 
-  <section class="ruled modules-section">
-    <div class="wrap">
-      <p class="eyebrow">What's inside</p>
-      <h2>Six modules. One dashboard.</h2>
-      <div class="module-grid">
-        {MODULES.map((mod) => (
-          <a href={`/modules#${mod.slug}`} class="module-card">
-            <div class="module-card-top">
-              <h3>{mod.name}</h3>
-              <span class="tier-tag mono">{mod.minTier}+</span>
+    <!-- STAGE 2: PAIN — Interest -->
+    <section class="ruled pain-section" aria-labelledby="problem-title">
+      <div class="wrap">
+        <p class="eyebrow">The problem with “good enough” books</p>
+
+        <h2 id="problem-title">
+          By the time your report lands, the number is already stale.
+        </h2>
+
+        <p class="section-lead">
+          A ledger tells you what happened. Traditional reporting often tells you
+          weeks later. Insight Hunter helps you see what is changing now—margin
+          drift, runway shrinkage, cash gaps, and operating pressure—while you
+          can still do something about it.
+        </p>
+      </div>
+    </section>
+
+    <!-- STAGE 3: PROOF — Consideration -->
+    <section class="ruled stat-bar" aria-label="Insight Hunter highlights">
+      <div class="wrap stat-grid">
+        <div class="stat">
+          <span class="stat-num mono">Always on</span>
+          <span class="stat-label">
+            Financial visibility built for decisions you make every day
+          </span>
+        </div>
+
+        <div class="stat">
+          <span class="stat-num mono">6 modules</span>
+          <span class="stat-label">
+            Bookkeeping, payroll, reporting, advisory, compliance, and communications
+          </span>
+        </div>
+
+        <div class="stat">
+          <span class="stat-num mono">$0/mo</span>
+          <span class="stat-label">
+            Startup is free forever—upgrade only when you need more
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 4: FEATURES — Consideration -->
+    <section id="features" class="ruled" aria-labelledby="features-title">
+      <div class="wrap">
+        <p class="eyebrow">Your financial command center</p>
+
+        <h2 id="features-title">
+          Know what happened, what is changing, and what to do next.
+        </h2>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <span class="feature-num grad-text mono">01</span>
+            <h3>See cash clearly</h3>
+            <p>
+              Monitor cash position, income, expenses, margins, and core KPIs
+              from a single decision-ready dashboard.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <span class="feature-num grad-text mono">02</span>
+            <h3>Forecast before it hurts</h3>
+            <p>
+              Identify upcoming cash gaps, runway pressure, and operating risks
+              through practical forward-looking projections.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <span class="feature-num grad-text mono">03</span>
+            <h3>Turn data into action</h3>
+            <p>
+              Generate P&amp;L reports, stakeholder-ready exports, alerts, and
+              AI-guided insights without rebuilding spreadsheets every month.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 5: HOW IT WORKS -->
+    <section
+      id="how-it-works"
+      class="ruled how-it-works"
+      aria-labelledby="how-it-works-title"
+    >
+      <div class="wrap">
+        <div class="how-heading">
+          <p class="eyebrow">Simple by design</p>
+
+          <h2 id="how-it-works-title">
+            From financial data to a clearer next move.
+          </h2>
+
+          <p class="section-lead">
+            Built for business owners, bookkeepers, accountants, and fractional
+            CFOs who need clarity without the complexity of enterprise software.
+          </p>
+        </div>
+
+        <ol class="steps-grid">
+          <li class="step-card">
+            <div class="step-top">
+              <span class="step-number mono">01</span>
+
+              <span class="step-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path
+                    d="M12 16V3m0 0-4 4m4-4 4 4M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
             </div>
-            <p>{mod.tagline}</p>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
 
-  <section class="ruled dark cta-section">
-    <div class="wrap cta-inner">
-      <div>
-        <p class="eyebrow" style="color: var(--amber);">Get started</p>
-        <h2>Your first month of clarity is free.</h2>
-        <p>No card required for the Startup tier. Upgrade the day you need reports, advisory, or payroll.</p>
+            <h3>Connect or upload</h3>
+
+            <p>
+              Start with a CSV today, then connect supported financial systems as
+              your business and plan grow.
+            </p>
+          </li>
+
+          <li class="step-card">
+            <div class="step-top">
+              <span class="step-number mono">02</span>
+
+              <span class="step-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect
+                    x="3"
+                    y="3"
+                    width="18"
+                    height="18"
+                    rx="2"
+                    stroke-width="1.8"
+                  />
+                  <path
+                    d="M7 16v-3m5 3V8m5 8v-5"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </span>
+            </div>
+
+            <h3>See the full picture</h3>
+
+            <p>
+              Review dashboards, operating KPIs, reports, and cash-flow forecasts
+              in one secure financial command center.
+            </p>
+          </li>
+
+          <li class="step-card">
+            <div class="step-top">
+              <span class="step-number mono">03</span>
+
+              <span class="step-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path
+                    d="M9 18h6m-5 3h4m-7-6a7 7 0 1 1 10 0c-.9.7-1.4 1.7-1.6 2.8H8.6C8.4 16.7 7.9 15.7 7 15Z"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </div>
+
+            <h3>Act with confidence</h3>
+
+            <p>
+              Use alerts and guided insights to prioritize the next financial
+              decision for your business.
+            </p>
+          </li>
+        </ol>
       </div>
-      <a href="/pricing" class="btn btn-on-dark">See pricing</a>
-    </div>
-  </section>
+    </section>
+
+    <!-- STAGE 6: PRICING — Conversion -->
+    <section id="pricing" class="ruled pricing-section" aria-labelledby="pricing-title">
+      <div class="wrap">
+        <div class="pricing-heading">
+          <p class="eyebrow">Plans that grow with you</p>
+
+          <h2 id="pricing-title">
+            Start free. Upgrade when your business needs more clarity.
+          </h2>
+
+          <div class="billing-toggle" role="group" aria-label="Billing frequency">
+            <button
+              type="button"
+              class="billing-button is-active"
+              data-billing="monthly"
+              aria-pressed="true"
+            >
+              Monthly
+            </button>
+
+            <button
+              type="button"
+              class="billing-button"
+              data-billing="annual"
+              aria-pressed="false"
+            >
+              Annual <span>Save 20%</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pricing-grid">
+          {
+            plans.map((plan) => (
+              <article class:list={['price-card', { 'price-card-featured': plan.featured }]}>
+                {plan.featured && (
+                  <p class="price-badge mono">Most popular</p>
+                )}
+
+                <h3>{plan.name}</h3>
+                <p class="price-description">{plan.description}</p>
+
+                <p class="price">
+                  <span
+                    class="price-value mono"
+                    data-price
+                    data-monthly={plan.monthly}
+                    data-annual={plan.annual}
+                  >
+                    ${plan.monthly}
+                  </span>
+                  <span class="price-period">/month</span>
+                </p>
+
+                <a
+                  class:list={[
+                    'btn',
+                    plan.featured ? 'btn-primary' : 'btn-ghost',
+                  ]}
+                  href={plan.href}
+                >
+                  {plan.cta}
+                </a>
+
+                <ul class="plan-features">
+                  {plan.features.map((feature) => <li>{feature}</li>)}
+                </ul>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 7: ADD-ONS — AOV / Expansion -->
+    <section id="addons" class="ruled addons-section" aria-labelledby="addons-title">
+      <div class="wrap">
+        <p class="eyebrow">Build your operating stack</p>
+
+        <h2 id="addons-title">
+          Add only the services your business actually needs.
+        </h2>
+
+        <p class="section-lead">
+          Insight Hunter stays focused on financial clarity while connecting you
+          with practical services for bookkeeping, business formation, payroll,
+          reporting, and advisory work.
+        </p>
+
+        <div class="addon-grid">
+          {
+            addons.map((addon) => (
+              <article class="addon-card">
+                <p class="addon-status mono">{addon.availability}</p>
+                <h3>{addon.title}</h3>
+                <p>{addon.description}</p>
+                <a href={addon.href}>Explore {addon.title} <span aria-hidden="true">→</span></a>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 8: TRUST — Social proof without fabricated claims -->
+    <section class="ruled trust-section" aria-labelledby="trust-title">
+      <div class="wrap">
+        <p class="eyebrow">Designed for real financial work</p>
+
+        <h2 id="trust-title">
+          Built for the people responsible for keeping a business financially healthy.
+        </h2>
+
+        <div class="trust-grid">
+          <article>
+            <h3>Business owners</h3>
+            <p>Get faster answers before an expense, payroll run, or opportunity becomes a cash problem.</p>
+          </article>
+
+          <article>
+            <h3>Bookkeepers</h3>
+            <p>Deliver cleaner recurring reporting workflows and give clients context alongside the numbers.</p>
+          </article>
+
+          <article>
+            <h3>Accountants &amp; CFOs</h3>
+            <p>Scale advisory conversations with more consistent monitoring, forecasts, and client-ready reporting.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 9: EXISTING USER GATEWAY -->
+    <section class="ruled portal-section" aria-labelledby="portal-title">
+      <div class="wrap portal-inner">
+        <div>
+          <p class="eyebrow" style="color: var(--amber);">
+            Already an Insight Hunter customer?
+          </p>
+
+          <h2 id="portal-title">Go straight to your Command Center.</h2>
+
+          <p>
+            Access your financial dashboards, reports, services, billing, and
+            account settings securely.
+          </p>
+        </div>
+
+        <a
+          href={`${authBaseUrl}/login?returnTo=${encodeURIComponent(dashboardUrl)}`}
+          class="btn btn-on-dark"
+        >
+          Login to Command Center
+        </a>
+      </div>
+    </section>
+
+    <!-- STAGE 10: FINAL CTA -->
+    <section class="ruled dark cta-section" aria-labelledby="final-cta-title">
+      <div class="wrap cta-inner">
+        <div>
+          <p class="eyebrow" style="color: var(--amber);">
+            Your books, illuminated
+          </p>
+
+          <h2 id="final-cta-title">
+            Set up in minutes. See clearer numbers today.
+          </h2>
+
+          <p>
+            No card required for Startup. Upgrade when forecasting, reporting,
+            payroll, or advisory support begins paying for itself.
+          </p>
+        </div>
+
+        <a
+          href={`${authBaseUrl}/signup?plan=startup`}
+          class="btn btn-on-dark"
+        >
+          Claim your free dashboard
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <script is:inline>
+    const billingButtons = document.querySelectorAll('[data-billing]');
+    const priceValues = document.querySelectorAll('[data-price]');
+
+    billingButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const billing = button.dataset.billing;
+
+        billingButtons.forEach((item) => {
+          const isActive = item === button;
+          item.classList.toggle('is-active', isActive);
+          item.setAttribute('aria-pressed', String(isActive));
+        });
+
+        priceValues.forEach((price) => {
+          const value =
+            billing === 'annual'
+              ? price.dataset.annual
+              : price.dataset.monthly;
+
+          price.textContent = `$${value}`;
+        });
+      });
+    });
+  </script>
 
   <style>
     .hero {
       padding-top: 72px;
       padding-bottom: 96px;
+      background: var(--paper);
     }
+
     .hero-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1.05fr 0.95fr;
       gap: 56px;
       align-items: center;
     }
-    .hero-sub { font-size: 1.12rem; }
+
+    .hero-sub {
+      max-width: 58ch;
+      font-size: 1.12rem;
+    }
+
     .hero-actions {
       display: flex;
+      flex-wrap: wrap;
       gap: 14px;
       margin: 28px 0 18px;
-      flex-wrap: wrap;
     }
-    .hero-fine { font-size: 0.8rem; color: var(--moss); }
 
-    .section-lead { font-size: 1.08rem; max-width: 68ch; }
+    .hero-fine {
+      font-size: 0.8rem;
+      color: var(--moss);
+    }
 
-    .module-grid {
+    .grad-text {
+      background: linear-gradient(90deg, var(--amber), var(--moss));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .pain-section {
+      background: var(--paper);
+    }
+
+    .section-lead {
+      max-width: 68ch;
+      font-size: 1.08rem;
+    }
+
+    .stat-bar {
+      background: var(--panel);
+    }
+
+    .stat-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--line);
-      border: 1px solid var(--line);
-      margin-top: 36px;
+      gap: 32px;
     }
-    .module-card {
-      background: var(--paper-bright);
-      padding: 28px;
-      text-decoration: none;
-      color: var(--ink);
+
+    .stat {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      transition: background 0.15s ease;
-    }
-    .module-card:hover { background: #fff; }
-    .module-card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-    }
-    .module-card h3 { margin: 0; font-size: 1.2rem; }
-    .module-card p { margin: 0; font-size: 0.92rem; }
-    .tier-tag {
-      font-size: 0.7rem;
-      color: var(--moss);
-      text-transform: capitalize;
+      gap: 6px;
     }
 
-    .cta-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
+    .stat-num {
+      color: var(--amber);
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .stat-label {
+      max-width: 30ch;
+      color: var(--ink-soft);
+      font-size: 0.88rem;
+    }
+
+    .feature-grid,
+    .steps-grid,
+    .pricing-grid,
+    .addon-grid,
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 24px;
     }
-    .cta-inner p { max-width: 44ch; }
+
+    .feature-grid {
+      margin-top: 32px;
+    }
+
+    .feature-card,
+    .step-card,
+    .price-card,
+    .addon-card,
+    .trust-grid article {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+
+    .feature-card {
+      padding: 28px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .feature-card:hover,
+    .addon-card:hover {
+      border-color: var(--amber);
+      transform: translateY(-2px);
+    }
+
+    .feature-num {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .feature-card h3,
+    .step-card h3,
+    .addon-card h3,
+    .trust-grid h3 {
+      margin: 12px 0 8px;
+      font-size: 1.15rem;
+    }
+
+    .feature-card p,
+    .step-card p,
+    .addon-card p,
+    .trust-grid p {
+      margin: 0;
+      font-size: 0.92rem;
+    }
+
+    .how-heading,
+    .pricing-heading {
+      max-width: 68ch;
+    }
+
+    .steps-grid {
+      margin: 32px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .step-card {
+      position: relative;
+      min-height: 260px;
+      padding: 28px;
+      background: var(--paper);
+    }
+
+    .step-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .step-number {
+      color: var(--amber);
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .step-icon {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--moss);
+    }
+
+    .step-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .step-card h3 {
+      margin-top: 42px;
+    }
+
+    .pricing-section {
+      background: var(--panel);
+    }
+
+    .billing-toggle {
+      display: inline-flex;
+      gap: 4px;
+      margin-top: 24px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper);
+    }
+
+    .billing-button {
+      padding: 9px 14px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--ink-soft);
+      font: inherit;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .billing-button span {
+      color: var(--moss);
+    }
+
+    .billing-button.is-active {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .pricing-grid {
+      margin-top: 32px;
+      align-items: stretch;
+    }
+
+    .price-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 28px;
+      background: var(--paper);
+    }
+
+    .price-card-featured {
+      border-color: var(--amber);
+      box-shadow: 0 16px 40px rgb(27 33 27 / 10%);
+    }
+
+    .price-badge {
+      position: absolute;
+      top: -12px;
+      right: 20px;
+      margin: 0;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--amber);
+      color: var(--ink);
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .price-card h3 {
+      margin: 0;
+      font-size: 1.45rem;
+    }
+
+    .price-description {
+      min-height: 4.5em;
+      margin: 10px 0 0;
+      color: var(--ink-soft);
+      font-size: 0.92rem;
+    }
+
+    .price {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      margin: 24px 0;
+    }
+
+    .price-value {
+      color: var(--ink);
+      font-size: 2.65rem;
+      font-weight: 700;
+    }
+
+    .price-period {
+      color: var(--ink-soft);
+      font-size: 0.86rem;
+    }
+
+    .plan-features {
+      display: grid;
+      gap: 11px;
+      margin: 24px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .plan-features li {
+      position: relative;
+      padding-left: 20px;
+      color: var(--ink-soft);
+      font-size: 0.88rem;
+    }
+
+    .plan-features li::before {
+      position: absolute;
+      left: 0;
+      color: var(--moss);
+      content: '✓';
+      font-weight: 800;
+    }
+
+    .addons-section {
+      background: var(--paper);
+    }
+
+    .addon-grid {
+      grid-template-columns: repeat(4, 1fr);
+      margin-top: 32px;
+    }
+
+    .addon-card {
+      display: flex;
+      min-height: 250px;
+      flex-direction: column;
+      padding: 24px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .addon-status {
+      margin: 0;
+      color: var(--moss);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .addon-card a {
+      margin-top: auto;
+      padding-top: 20px;
+      color: var(--ink);
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .addon-card a:hover {
+      color: var(--moss);
+    }
+
+    .trust-section {
+      background: var(--panel);
+    }
+
+    .trust-grid {
+      margin-top: 32px;
+    }
+
+    .trust-grid article {
+      padding: 24px;
+      background: var(--paper);
+    }
+
+    .portal-section {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .portal-inner,
+    .cta-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .portal-inner h2,
+    .cta-inner h2 {
+      color: var(--paper);
+    }
+
+    .portal-inner p,
+    .cta-inner p {
+      max-width: 50ch;
+      color: color-mix(in srgb, var(--paper) 76%, transparent);
+    }
+
+    .cta-section {
+      background: var(--ink);
+    }
+
+    @media (max-width: 960px) {
+      .addon-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
 
     @media (max-width: 860px) {
-      .hero-grid { grid-template-columns: 1fr; }
-      .module-grid { grid-template-columns: 1fr; }
+      .hero-grid,
+      .stat-grid,
+      .feature-grid,
+      .steps-grid,
+      .pricing-grid,
+      .trust-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding-top: 48px;
+        padding-bottom: 64px;
+      }
+
+      .hero-visual {
+        display: none;
+      }
+
+      .step-card,
+      .price-description,
+      .addon-card {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .addon-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions .btn,
+      .portal-inner .btn,
+      .cta-inner .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .billing-toggle {
+        width: 100%;
+      }
+
+      .billing-button {
+        flex: 1;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .feature-card,
+      .addon-card {
+        transition: none;
+      }
+
+      .feature-card:hover,
+      .addon-card:hover {
+        transform: none;
+      }
     }
   </style>
 </Layout>
