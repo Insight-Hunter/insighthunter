@@ -106,6 +106,46 @@ smoke test; the committed `wrangler.jsonc` uses `compatibility_date =
    two marketing surfaces is a product/infra decision outside this task's
    scope.
 
+## Automated code review feedback addressed
+
+Three rounds of automated review (code review + CodeQL) were run via
+`parallel_validation`. CodeQL found 0 alerts in every round. Code review
+findings and fixes:
+
+1. Bot (honeypot) detection ran after the rate-limit check, letting bot
+   submissions consume a real client's rate-limit budget. **Fixed**:
+   validation/honeypot is now checked before the rate limiter is touched.
+2. Honeypot detection overwrote `errors.message`, conflating bot rejection
+   with genuine field validation. **Fixed**: `ValidationResult` now has a
+   distinct `bot: boolean` field.
+3. Bot-detected submissions returned HTTP 422 (identical to real validation
+   errors), signaling detection to automated scripts. **Fixed**: bots now
+   receive the same silent `200` success response as real submissions,
+   without being rate-limited or persisted.
+4. Validated contact submissions were discarded after validation while
+   still showing a "success" message, which was misleading since nothing
+   was retained. **Fixed**: added `src/lib/leads.ts` (`recordLead`),
+   persisting genuine submissions to a new `LEADS` KV namespace (90-day
+   TTL) — a lightweight, dependency-free holding area rather than an
+   invented external email/CRM integration.
+5. The rate limiter's KV read-then-write is not atomic, so under
+   concurrency more than `MAX_REQUESTS_PER_WINDOW` requests can pass
+   (under-throttling, not just eventual-consistency lag). **Accepted as a
+   documented limitation** (comment in `src/lib/rate-limit.ts`): a Durable
+   Object counter would close this gap but isn't justified to protect a
+   public lead-gen form; revisit if abuse is observed.
+6. `clientKeyFrom` fell back to the literal string `"unknown"` when
+   `CF-Connecting-IP` was absent (local dev / non-Cloudflare test
+   environments), which would put all such clients in one shared
+   rate-limit bucket. **Fixed**: falls back to a `User-Agent`-derived key
+   instead, with no behavior change in production where the IP header is
+   always present.
+7. The JSON-LD `SoftwareApplication` offers (`Startup`/`Standard`/`Pro`)
+   were hardcoded separately from the pricing page's plan names/prices
+   (`Scout`/`Hunter`/`Apex`), risking drift. **Fixed**: extracted a single
+   `PLANS` source of truth (`src/lib/plans.ts`) consumed by both
+   `src/pages/pricing.ts` and `src/lib/seo.ts`.
+
 ## Out of scope / untouched (by design)
 
 - `apps/insighthunter-main`, `apps/insighthunter-auth`,

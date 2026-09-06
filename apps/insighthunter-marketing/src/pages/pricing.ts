@@ -1,6 +1,7 @@
 import { html } from "hono/html";
 import type { Env } from "../env.js";
 import { signupUrl } from "../lib/links.js";
+import { PLANS } from "../lib/plans.js";
 
 export function pricingBody(env: Pick<Env, "AUTH_ORIGIN">) {
   return html`
@@ -12,45 +13,19 @@ export function pricingBody(env: Pick<Env, "AUTH_ORIGIN">) {
 <section aria-labelledby="pricing-grid-heading">
   <h2 id="pricing-grid-heading">Choose Your Plan</h2>
   <div class="pricing-grid">
-    <div class="price-card">
-      <h3>Scout</h3>
-      <p>For indie operators who need the core monitoring tools.</p>
-      <div class="price">$0<span>/mo</span></div>
+    ${PLANS.map(
+      (plan, index) => html`
+    <div class="price-card${index === 1 ? " featured" : ""}">
+      ${index === 1 ? html`<span class="badge-ribbon">Most Popular</span>` : ""}
+      <h3>${plan.name}</h3>
+      <p>${plan.tagline}</p>
+      <div class="price">$${String(plan.priceUsd)}<span>/mo</span></div>
       <ul class="price-features">
-        <li>Autonomous trend monitoring (1 market)</li>
-        <li>Weekly digest email</li>
-        <li>1 user seat</li>
-        <li>30-day data history</li>
+        ${plan.features.map((feature) => html`<li>${feature}</li>`)}
       </ul>
-      <a class="btn btn-primary" style="text-align:center;" href="${signupUrl(env, "startup")}" rel="nofollow">Start Free Trial</a>
-    </div>
-    <div class="price-card featured">
-      <span class="badge-ribbon">Most Popular</span>
-      <h3>Hunter</h3>
-      <p>For scaling companies that need automated alerts and predictive models.</p>
-      <div class="price">$49<span>/mo</span></div>
-      <ul class="price-features">
-        <li>Everything in Scout</li>
-        <li>Competitor anomaly alerts</li>
-        <li>Predictive demand scopes</li>
-        <li>5 user seats + roles</li>
-        <li>Unlimited data history</li>
-      </ul>
-      <a class="btn btn-primary" style="text-align:center;" href="${signupUrl(env, "standard")}" rel="nofollow">Start Free Trial</a>
-    </div>
-    <div class="price-card">
-      <h3>Apex</h3>
-      <p>For enterprise operations that need full API access and dedicated nodes.</p>
-      <div class="price">$149<span>/mo</span></div>
-      <ul class="price-features">
-        <li>Everything in Hunter</li>
-        <li>Full API access</li>
-        <li>Dedicated scanning nodes</li>
-        <li>Unlimited user seats</li>
-        <li>Priority support</li>
-      </ul>
-      <a class="btn btn-primary" style="text-align:center;" href="${signupUrl(env, "pro")}" rel="nofollow">Start Free Trial</a>
-    </div>
+      <a class="btn btn-primary" style="text-align:center;" href="${signupUrl(env, plan.planId)}" rel="nofollow">Start Free Trial</a>
+    </div>`,
+    )}
   </div>
 </section>
 

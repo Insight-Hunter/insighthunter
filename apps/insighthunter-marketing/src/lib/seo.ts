@@ -1,3 +1,5 @@
+import { PLANS } from "./plans.js";
+
 export interface SeoMeta {
   title: string;
   description: string;
@@ -13,11 +15,12 @@ export function softwareApplicationJsonLd(canonicalOrigin: string): string {
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
     url: canonicalOrigin,
-    offers: [
-      { "@type": "Offer", name: "Startup", price: "0", priceCurrency: "USD" },
-      { "@type": "Offer", name: "Standard", price: "49", priceCurrency: "USD" },
-      { "@type": "Offer", name: "Pro", price: "149", priceCurrency: "USD" },
-    ],
+    offers: PLANS.map((plan) => ({
+      "@type": "Offer",
+      name: plan.name,
+      price: String(plan.priceUsd),
+      priceCurrency: "USD",
+    })),
     description:
       "Insight Hunter is a SaaS market intelligence platform for automated data mining and predictive market trend analysis.",
   });
