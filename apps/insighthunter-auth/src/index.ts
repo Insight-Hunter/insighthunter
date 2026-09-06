@@ -1,262 +1,152 @@
-import { hashPassword, verifyPassword, signSession, verifySession } from "./crypto.js";
-import type { Env, LoginRequest, RegisterRequest, UserRecord } from "./types.js";
+import { hashPassword, verifyPassword, signSession, verifySession } from "./crypto";
+import type { Env } from "./types";
 
-export { UserVault } from "./vault.js";
+const APP_ORIGIN = "https://app.insighthunter.app";
+const ALLOWED_PLANS = new Set(["lite", "standard", "pro"]);
+const SESSION_COOKIE = "ih_session";
 
-const SESSION_TTL_MS = 1000 * 60 * 60 * 12; // 12h
-const RATE_LIMIT_WINDOW_S = 60;
-const RATE_LIMIT_MAX = 10; // per IP per window, per route
-const MAX_REQUEST_BYTES = 16 * 1024;
+const securityHeaders: HeadersInit = {
+  "Cache-Control": "no-store",
+  "Content-Security-Policy": "default-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; style-src 'self' 'unsafe-inline';",
+  "Referrer-Policy": "no-referrer",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+};
+
+function html(body: string, status = 200, headers: HeadersInit = {}): Response {
+  return new Response(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Insight Hunter</title><style>body{margin:0;background:#f7f2ec;color:#2b2118;font:16px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.card{box-sizing:border-box;width:min(100% - 2rem,28rem);margin:8vh auto;padding:2rem;background:#fffdf9;border:1px solid #dfd6ce;border-radius:1rem;box-shadow:0 1rem 2.5rem rgb(43 33 24 / .08)}h1{margin:0 0 .5rem;font-size:2rem}p{line-height:1.5;color:#675d55}.field{display:grid;gap:.4rem;margin:1rem 0}input{box-sizing:border-box;width:100%;padding:.75rem;border:1px solid #b9afa5;border-radius:.5rem;font:inherit}button{box-sizing:border-box;width:100%;margin-top:.5rem;padding:.8rem;border:0;border-radius:.5rem;background:#8b5e3c;color:#fff;font:inherit;font-weight:700;cursor:pointer}a{color:#8b5e3c;font-weight:700}.error{padding:.75rem;border-radius:.5rem;background:#fee8e6;color:#8a1c12}</style></head><body>${body}</body></html>`, {
+    status,
+    headers: { "Content-Type": "text/html; charset=UTF-8", ...securityHeaders, ...headers },
+  });
+}
+
+function safeReturnTo(value: string | null): string {
+  if (!value) return `${APP_ORIGIN}/dashboard`;
+  try {
+    const url = new URL(value);
+    if (url.origin === APP_ORIGIN && url.pathname.startsWith("/dashboard")) return url.toString();
+  } catch {
+    // Fall through to the fixed dashboard destination.
+  }
+  return `${APP_ORIGIN}/dashboard`;
+}
+
+function safePlan(value: string | null): string {
+  return value && ALLOWED_PLANS.has(value) ? value : "lite";
+}
+
+function formValue(value: string): string {
+  return value.replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character] ?? character);
+}
+
+function authPage(mode: "login" | "register", returnTo: string, plan: string, error?: string): Response {
+  const isLogin = mode === "login";
+  const action = isLogin ? "/login" : "/register";
+  const alternate = isLogin ? "/register" : "/login";
+  const alternateLabel = isLogin ? "Create an account" : "Log in";
+  const title = isLogin ? "Log in to Insight Hunter" : "Create your Insight Hunter account";
+  const message = isLogin ? "Access your financial dashboard." : `Start with the ${formValue(plan)} plan. You can upgrade later.`;
+  const errorHtml = error ? `<p class="error" role="alert">${formValue(error)}</p>` : "";
+  const planField = isLogin ? "" : `<input type="hidden" name="plan" value="${formValue(plan)}">`;
+  const nameField = isLogin ? "" : `<label class="field">Full name<input name="name" autocomplete="name" required maxlength="120"></label>`;
+
+  return html(`<main class="card"><h1>${title}</h1><p>${message}</p>${errorHtml}<form method="post" action="${action}"><input type="hidden" name="returnTo" value="${formValue(returnTo)}">${planField}${nameField}<label class="field">Email<input type="email" name="email" autocomplete="email" required maxlength="254"></label><label class="field">Password<input type="password" name="password" autocomplete="${isLogin ? "current-password" : "new-password"}" required minlength="12" maxlength="128"></label><button type="submit">${isLogin ? "Log in" : "Create account"}</button></form><p>${isLogin ? "New to Insight Hunter?" : "Already have an account?"} <a href="${alternate}?returnTo=${encodeURIComponent(returnTo)}${isLogin ? `&plan=${encodeURIComponent(plan)}` : ""}">${alternateLabel}</a></p></main>`);
+}
+
+function sessionCookie(token: string): string {
+  return `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800`;
+}
+
+function clearSessionCookie(): string {
+  return `${SESSION_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+}
+
+async function parseForm(request: Request): Promise<{ email: string; password: string; name: string; plan: string; returnTo: string }> {
+  const form = await request.formData();
+  return {
+    email: String(form.get("email") ?? "").trim().toLowerCase(),
+    password: String(form.get("password") ?? ""),
+    name: String(form.get("name") ?? "").trim(),
+    plan: safePlan(String(form.get("plan") ?? "lite")),
+    returnTo: safeReturnTo(String(form.get("returnTo") ?? "")),
+  };
+}
+
+function validEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 254;
+}
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
-    const cors = corsHeaders(env, request);
+    const method = request.method.toUpperCase();
+    const returnTo = safeReturnTo(url.searchParams.get("returnTo"));
+    const plan = safePlan(url.searchParams.get("plan"));
 
-    if (request.method === "OPTIONS") {
-      return new Response(null, { headers: cors });
+    if (method === "GET" && url.pathname === "/health") {
+      return Response.json({ ok: true, service: "insighthunter-auth" }, { headers: securityHeaders });
     }
 
-    try {
-      const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
-
-      if (url.pathname === "/register" && request.method === "POST") {
-        if (await isRateLimited(env, `register:${ip}`)) return tooManyRequests(cors);
-        return withCors(await handleRegister(request, env), cors);
-      }
-
-      if (url.pathname === "/login" && request.method === "POST") {
-        if (await isRateLimited(env, `login:${ip}`)) return tooManyRequests(cors);
-        return withCors(await handleLogin(request, env, ip), cors);
-      }
-
-      if (url.pathname === "/logout" && request.method === "POST") {
-        return withCors(await handleLogout(request, env), cors);
-      }
-
-      if (url.pathname === "/session/verify" && request.method === "GET") {
-        return withCors(await handleVerify(request, env), cors);
-      }
-
-      return withCors(new Response("Not found", { status: 404 }), cors);
-    } catch (err) {
-      console.error("auth worker error:", err);
-      return withCors(
-        Response.json({ error: "internal_error" }, { status: 500 }),
-        cors
-      );
+    if (method === "GET" && url.pathname === "/") {
+      return Response.redirect(new URL(`/login?returnTo=${encodeURIComponent(returnTo)}`, url.origin), 302);
     }
+
+    if (method === "GET" && url.pathname === "/login") {
+      return authPage("login", returnTo, plan);
+    }
+
+    if (method === "GET" && url.pathname === "/register") {
+      return authPage("register", returnTo, plan);
+    }
+
+    if (method === "POST" && url.pathname === "/register") {
+      const { email, password, name, plan: selectedPlan, returnTo: destination } = await parseForm(request);
+      if (!validEmail(email) || password.length < 12 || name.length < 2 || name.length > 120) {
+        return authPage("register", destination, selectedPlan, "Please provide a valid name, email, and a password of at least 12 characters.");
+      }
+
+      const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?1").bind(email).first<{ id: string }>();
+      if (existing) {
+        return authPage("register", destination, selectedPlan, "Unable to create this account. Try logging in or use another email address.");
+      }
+
+      const id = crypto.randomUUID();
+      const passwordHash = await hashPassword(password);
+      await env.DB.prepare("INSERT INTO users (id, email, password_hash, name, plan, created_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)")
+        .bind(id, email, passwordHash, name, selectedPlan, new Date().toISOString())
+        .run();
+
+      const token = await signSession({ sub: id, email }, env);
+      return Response.redirect(destination, 303, { headers: { ...securityHeaders, "Set-Cookie": sessionCookie(token) } });
+    }
+
+    if (method === "POST" && url.pathname === "/login") {
+      const { email, password, returnTo: destination } = await parseForm(request);
+      const user = validEmail(email)
+        ? await env.DB.prepare("SELECT id, email, password_hash FROM users WHERE email = ?1").bind(email).first<{ id: string; email: string; password_hash: string }>()
+        : null;
+      const valid = user ? await verifyPassword(password, user.password_hash) : false;
+      if (!user || !valid) {
+        return authPage("login", destination, plan, "Invalid email or password.");
+      }
+
+      const token = await signSession({ sub: user.id, email: user.email }, env);
+      return Response.redirect(destination, 303, { headers: { ...securityHeaders, "Set-Cookie": sessionCookie(token) } });
+    }
+
+    if (method === "POST" && url.pathname === "/logout") {
+      return Response.redirect(new URL("/login", url.origin), 303, { headers: { ...securityHeaders, "Set-Cookie": clearSessionCookie() } });
+    }
+
+    if (url.pathname === "/session" && method === "GET") {
+      const cookie = request.headers.get("Cookie") ?? "";
+      const token = cookie.split("; ").find((entry) => entry.startsWith(`${SESSION_COOKIE}=`))?.slice(SESSION_COOKIE.length + 1);
+      if (!token) return Response.json({ authenticated: false }, { status: 401, headers: securityHeaders });
+      const session = await verifySession(token, env);
+      if (!session) return Response.json({ authenticated: false }, { status: 401, headers: securityHeaders });
+      return Response.json({ authenticated: true, session }, { headers: securityHeaders });
+    }
+
+    return new Response("Not found", { status: 404, headers: securityHeaders });
   },
-} satisfies ExportedHandler<Env>;
-
-async function handleRegister(request: Request, env: Env): Promise<Response> {
-  const body = await jsonBody<RegisterRequest>(request);
-  if (!body) return Response.json({ error: "invalid_json" }, { status: 400 });
-  const email = body.email?.trim().toLowerCase();
-  const password = body.password;
-  const tier = body.tier ?? "startup";
-
-  if (!email || !isValidEmail(email)) {
-    return Response.json({ error: "invalid_email" }, { status: 400 });
-  }
-  if (!password || password.length < 10) {
-    return Response.json(
-      { error: "weak_password", detail: "minimum 10 characters" },
-      { status: 400 }
-    );
-  }
-  if (!["startup", "standard", "pro"].includes(tier)) {
-    return Response.json({ error: "invalid_tier" }, { status: 400 });
-  }
-
-  const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?")
-    .bind(email)
-    .first();
-  if (existing) {
-    return Response.json({ error: "email_in_use" }, { status: 409 });
-  }
-
-  const userId = crypto.randomUUID();
-  const passwordHash = await hashPassword(password);
-  const vaultDoId = env.USER_VAULT.newUniqueId().toString();
-  const now = Date.now();
-
-  try {
-    await env.DB.prepare(
-      `INSERT INTO users (id, email, password_hash, tier, status, vault_do_id, created_at, updated_at)
-       VALUES (?, ?, ?, ?, 'active', ?, ?, ?)`
-    )
-      .bind(userId, email, passwordHash, tier, vaultDoId, now, now)
-      .run();
-  } catch (error) {
-    // The preflight lookup is not sufficient under concurrent registrations.
-    if (isUniqueConstraint(error)) {
-      return Response.json({ error: "email_in_use" }, { status: 409 });
-    }
-    throw error;
-  }
-
-  await env.DB.prepare(
-    `INSERT INTO audit_log (user_id, event, created_at) VALUES (?, 'register', ?)`
-  )
-    .bind(userId, now)
-    .run();
-
-  const token = await signSession(
-    { userId, email, tier, issuedAt: now, expiresAt: now + SESSION_TTL_MS },
-    env.SESSION_SECRET
-  );
-  await env.SESSIONS.put(await sessionKey(token), userId, {
-    expirationTtl: SESSION_TTL_MS / 1000,
-  });
-
-  return Response.json(
-    { userId, email, tier, token, expiresAt: now + SESSION_TTL_MS },
-    { status: 201, headers: { "Set-Cookie": sessionCookie(token) } }
-  );
-}
-
-async function handleLogin(request: Request, env: Env, ip: string): Promise<Response> {
-  const body = await jsonBody<LoginRequest>(request);
-  if (!body) return Response.json({ error: "invalid_json" }, { status: 400 });
-  const email = body.email?.trim().toLowerCase();
-  const password = body.password;
-  if (!email || !password) {
-    return Response.json({ error: "missing_credentials" }, { status: 400 });
-  }
-
-  const user = await env.DB.prepare("SELECT * FROM users WHERE email = ?")
-    .bind(email)
-    .first<UserRecord>();
-
-  const now = Date.now();
-
-  if (!user || user.status !== "active" || !(await verifyPassword(password, user.password_hash))) {
-    await env.DB.prepare(
-      `INSERT INTO audit_log (user_id, event, ip, created_at) VALUES (?, 'login_failed', ?, ?)`
-    )
-      .bind(user?.id ?? null, ip, now)
-      .run();
-    return Response.json({ error: "invalid_credentials" }, { status: 401 });
-  }
-
-  const token = await signSession(
-    { userId: user.id, email: user.email, tier: user.tier, issuedAt: now, expiresAt: now + SESSION_TTL_MS },
-    env.SESSION_SECRET
-  );
-  await env.SESSIONS.put(await sessionKey(token), user.id, {
-    expirationTtl: SESSION_TTL_MS / 1000,
-  });
-  await env.DB.prepare(
-    `INSERT INTO audit_log (user_id, event, ip, created_at) VALUES (?, 'login', ?, ?)`
-  )
-    .bind(user.id, ip, now)
-    .run();
-
-  return Response.json(
-    {
-      userId: user.id,
-      email: user.email,
-      tier: user.tier,
-      token,
-      expiresAt: now + SESSION_TTL_MS,
-    },
-    { headers: { "Set-Cookie": sessionCookie(token) } }
-  );
-}
-
-async function handleLogout(request: Request, env: Env): Promise<Response> {
-  const token = bearerToken(request);
-  if (!token) return Response.json({ error: "missing_token" }, { status: 400 });
-  await env.SESSIONS.delete(await sessionKey(token));
-  return Response.json({ loggedOut: true });
-}
-
-async function handleVerify(request: Request, env: Env): Promise<Response> {
-  const token = bearerToken(request);
-  if (!token) return Response.json({ error: "missing_token" }, { status: 401 });
-
-  const payload = await verifySession(token, env.SESSION_SECRET);
-  if (!payload) return Response.json({ error: "invalid_or_expired" }, { status: 401 });
-
-  // Confirm the token hasn't been revoked (logout) via KV lookup.
-  const stillValid = await env.SESSIONS.get(await sessionKey(token));
-  if (!stillValid) return Response.json({ error: "session_revoked" }, { status: 401 });
-
-  return Response.json({ valid: true, ...payload });
-}
-
-function bearerToken(request: Request): string | null {
-  const header = request.headers.get("Authorization");
-  if (!header?.startsWith("Bearer ")) return null;
-  return header.slice("Bearer ".length);
-}
-
-function sessionCookie(token: string): string {
-  return `ih_session=${encodeURIComponent(token)}; Domain=.insighthunter.app; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_TTL_MS / 1000}`;
-}
-
-async function jsonBody<T>(request: Request): Promise<T | null> {
-  const contentLength = Number(request.headers.get("Content-Length") ?? "0");
-  if (!Number.isFinite(contentLength) || contentLength > MAX_REQUEST_BYTES) return null;
-  if (!request.headers.get("Content-Type")?.toLowerCase().startsWith("application/json")) {
-    return null;
-  }
-
-  try {
-    const body: unknown = await request.json();
-    return body !== null && typeof body === "object" && !Array.isArray(body) ? (body as T) : null;
-  } catch {
-    return null;
-  }
-}
-
-async function sessionKey(token: string): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
-  return `session:${toHex(new Uint8Array(digest))}`;
-}
-
-function toHex(bytes: Uint8Array): string {
-  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-function isUniqueConstraint(error: unknown): boolean {
-  return error instanceof Error && /unique constraint failed/i.test(error.message);
-}
-
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-async function isRateLimited(env: Env, key: string): Promise<boolean> {
-  const countRaw = await env.SESSIONS.get(`ratelimit:${key}`);
-  const count = countRaw ? parseInt(countRaw, 10) : 0;
-  if (count >= RATE_LIMIT_MAX) return true;
-  await env.SESSIONS.put(`ratelimit:${key}`, String(count + 1), {
-    expirationTtl: RATE_LIMIT_WINDOW_S,
-  });
-  return false;
-}
-
-function corsHeaders(env: Env, request: Request): Headers {
-  const origin = request.headers.get("Origin");
-  const headers = new Headers({
-    "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    Vary: "Origin",
-  });
-  if (origin === env.ALLOWED_ORIGIN) headers.set("Access-Control-Allow-Origin", origin);
-  return headers;
-}
-
-function withCors(response: Response, cors: Headers): Response {
-  const merged = new Headers(response.headers);
-  for (const [k, v] of cors) {
-    merged.set(k, v);
-  }
-  return new Response(response.body, { status: response.status, headers: merged });
-}
-
-function tooManyRequests(cors: Headers): Response {
-  return withCors(Response.json({ error: "rate_limited" }, { status: 429 }), cors);
-}
+};
