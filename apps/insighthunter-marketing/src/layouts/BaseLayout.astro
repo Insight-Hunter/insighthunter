@@ -1,0 +1,19 @@
+---
+import Layout from './Layout.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Insight Hunter',
+  description = 'Financial dashboards, cash-flow forecasting, reports, and practical business insights for small businesses.',
+} = Astro.props;
+---
+
+<Layout title={title} description={description}>
+  <main id="main-content">
+    <slot />
+  </main>
+</Layout>

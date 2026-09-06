@@ -1,0 +1,16 @@
+:root {
+  --ink: #edfaff;
+  --ink-soft: #91a8b8;
+  --paper: #070d12;
+  --panel: #101a21;
+  --line: #2b414d;
+  --moss: #35d6e6;
+  --amber: #ff8a3d;
+  --amber-soft: #ff8a3d1f;
+  --radius: 0;
+  --color-border: #2b414d;
+  --color-surface: #101a21;
+  --color-primary: #ff8a3d;
+  --color-primary-dark: #d95d1e;
+  --wrap: 72rem;
+}

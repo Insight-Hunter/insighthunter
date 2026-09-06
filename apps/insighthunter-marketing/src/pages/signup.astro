@@ -1,0 +1,14 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { registerUrl, type Plan } from "../lib/auth-links";
+
+const requestedPlan = Astro.url.searchParams.get("plan");
+const plan: Plan =
+  requestedPlan === "standard" || requestedPlan === "pro" ? requestedPlan : "lite";
+const returnTo = Astro.url.searchParams.get("returnTo") ?? "/dashboard";
+return Astro.redirect(registerUrl(plan, returnTo), 302);
+---
+
+<Layout title="Create your account">
+  <p>Redirecting to secure account creation...</p>
+</Layout>

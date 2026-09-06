@@ -1,0 +1,99 @@
+---
+import { getLoginUrl, getSignupUrl } from '../../lib/urls';
+---
+
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <div>
+      <a class="brand" href="/">Insight Hunter</a>
+      <p>Financial dashboards, forecasts, reporting, and practical next steps for small business.</p>
+    </div>
+
+    <div>
+      <h2>Platform</h2>
+      <a href="/features">Features</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/integrations">Integrations</a>
+    </div>
+
+    <div>
+      <h2>Services</h2>
+      <a href="/bookkeeping">Bookkeeping</a>
+      <a href="/bizforma">BizForma</a>
+      <a href="/payroll">Payroll</a>
+      <a href="/reports">Reports</a>
+    </div>
+
+    <div>
+      <h2>Account</h2>
+      <a href={getSignupUrl()}>Start free</a>
+      <a href={getLoginUrl()}>Command Center</a>
+      <a href="/security">Security</a>
+      <a href="/legal/privacy">Privacy</a>
+    </div>
+  </div>
+
+  <div class="wrap bottom">
+    <span>© {new Date().getFullYear()} Insight Hunter</span>
+    <a href="/legal/terms">Terms</a>
+    <a href="/legal/cookies">Cookies</a>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: 5rem;
+    border-top: 1px solid var(--line);
+    background: linear-gradient(135deg, #101a21, #0a1117);
+    padding-top: 3rem;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .brand {
+    color: var(--ink);
+    font-weight: 900;
+    text-decoration: none;
+  }
+
+  .footer p,
+  .footer a:not(.brand) {
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+  }
+
+  .footer a:not(.brand) {
+    display: block;
+    margin-bottom: 0.55rem;
+    text-decoration: none;
+  }
+
+  .footer h2 {
+    font-size: 0.9rem;
+    letter-spacing: 0;
+  }
+
+  .bottom {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    border-top: 1px solid var(--line);
+    padding-block: 1.25rem;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+  }
+
+  .bottom a {
+    color: inherit;
+  }
+
+  @media (max-width: 760px) {
+    .footer-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

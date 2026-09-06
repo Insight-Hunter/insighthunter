@@ -1,0 +1,11 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { loginUrl } from "../lib/auth-links";
+
+const returnTo = Astro.url.searchParams.get("returnTo") ?? "/dashboard";
+return Astro.redirect(loginUrl(returnTo), 302);
+---
+
+<Layout title="Log in">
+  <p>Redirecting to secure sign in...</p>
+</Layout>

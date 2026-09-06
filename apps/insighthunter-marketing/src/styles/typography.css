@@ -1,0 +1,29 @@
+body {
+  color: var(--ink);
+  font-family: "SFMono-Regular", "Roboto Mono", Consolas, monospace;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--ink);
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+h1 {
+  font-size: clamp(2.75rem, 7vw, 5.5rem);
+}
+
+h2 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+}

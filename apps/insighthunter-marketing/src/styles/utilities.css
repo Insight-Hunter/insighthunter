@@ -1,0 +1,48 @@
+.wrap {
+  width: min(calc(100% - 2rem), var(--wrap));
+  margin-inline: auto;
+}
+
+.eyebrow {
+  margin-bottom: 0.8rem;
+  color: var(--moss);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.btn {
+  display: inline-flex;
+  min-height: 2.9rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.btn-primary {
+  border-color: var(--amber);
+  background: var(--amber);
+  color: #160c06;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+  color: #fff4ec;
+}
+
+.btn-ghost {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--moss);
+}
+
+.btn-ghost:hover {
+  border-color: var(--moss);
+  background: rgb(53 214 230 / 0.08);
+}

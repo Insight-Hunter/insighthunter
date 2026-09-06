@@ -1,0 +1,31 @@
+@import "./tokens.css";
+@import "./reset.css";
+@import "./typography.css";
+@import "./utilities.css";
+
+body {
+  position: relative;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+body::before {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background:
+    linear-gradient(115deg, rgb(255 255 255 / 0.045), transparent 28%, rgb(53 214 230 / 0.035) 52%, transparent 76%),
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.018) 0, rgb(255 255 255 / 0.018) 1px, transparent 1px, transparent 5px),
+    radial-gradient(circle at 72% 8%, rgb(53 214 230 / 0.12), transparent 32rem);
+  opacity: 0.9;
+}
+
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}

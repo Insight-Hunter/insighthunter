@@ -1,0 +1,71 @@
+---
+import { getLoginUrl, getSignupUrl } from '../../lib/urls';
+---
+
+<header class="header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">Insight Hunter</a>
+
+    <nav aria-label="Primary navigation">
+      <a href="/features">Features</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/resources">Resources</a>
+      <a href="/about">About</a>
+    </nav>
+
+    <div class="actions">
+      <a href={getLoginUrl()}>Login</a>
+      <a class="btn btn-primary" href={getSignupUrl()}>Start free</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    z-index: 20;
+    top: 0;
+    border-bottom: 1px solid var(--line);
+    background: rgb(7 13 18 / 92%);
+    backdrop-filter: blur(12px);
+  }
+
+  .header-inner {
+    display: flex;
+    min-height: 4.5rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .brand {
+    color: var(--ink);
+    font-weight: 900;
+    text-decoration: none;
+  }
+
+  nav,
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+  }
+
+  nav a,
+  .actions > a:not(.btn) {
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  @media (max-width: 700px) {
+    nav {
+      display: none;
+    }
+
+    .actions > a:not(.btn) {
+      display: none;
+    }
+  }
+</style>
