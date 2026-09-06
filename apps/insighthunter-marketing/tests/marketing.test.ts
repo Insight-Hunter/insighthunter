@@ -11,6 +11,7 @@ const baseEnv: Env = {
   APP_ORIGIN: "https://app.insighthunter.app",
   CONTACT_TO_EMAIL: "sales@insighthunter.app",
   RATE_LIMIT: createFakeKv(),
+  LEADS: createFakeKv(),
 };
 
 function createFakeKv(): KVNamespace {
@@ -20,7 +21,12 @@ function createFakeKv(): KVNamespace {
     put: async (key: string, value: string) => {
       store.set(key, value);
     },
+    __store: store,
   } as unknown as KVNamespace;
+}
+
+async function kvKeyCount(kv: KVNamespace): Promise<number> {
+  return (kv as unknown as { __store: Map<string, string> }).__store.size;
 }
 
 describe("CTA links", () => {
@@ -121,7 +127,8 @@ describe("contact form", () => {
     expect(result.errors.message).toBeUndefined();
   });
 
-  it("submits successfully end-to-end via the worker", async () => {
+  it("submits successfully end-to-end via the worker and persists the lead", async () => {
+    const env = { ...baseEnv, LEADS: createFakeKv() };
     const form = new FormData();
     form.set("name", "Jordan Rivera");
     form.set("email", "jordan@example.com");
@@ -129,10 +136,11 @@ describe("contact form", () => {
     form.set("message", "We'd like a demo of the Hunter plan.");
     const res = await app.fetch(
       new Request("https://insighthunter.app/contact", { method: "POST", body: form }),
-      baseEnv,
+      env,
     );
     expect(res.status).toBe(200);
     expect(await res.text()).toContain("Thanks");
+    expect(await kvKeyCount(env.LEADS)).toBe(1);
   });
 
   it("rate-limits repeated submissions from the same client", async () => {
@@ -145,8 +153,8 @@ describe("contact form", () => {
     expect(limited).toBe(true);
   });
 
-  it("rejects bot submissions without consuming the rate-limit budget", async () => {
-    const env = { ...baseEnv, RATE_LIMIT: createFakeKv() };
+  it("rejects bot submissions without consuming the rate-limit budget or writing a lead", async () => {
+    const env = { ...baseEnv, RATE_LIMIT: createFakeKv(), LEADS: createFakeKv() };
 
     for (let i = 0; i < 20; i++) {
       const spamForm = new FormData();
@@ -154,11 +162,15 @@ describe("contact form", () => {
       spamForm.set("email", "bot@example.com");
       spamForm.set("message", "This is a spam submission from a bot.");
       spamForm.set("website", "http://spam.example");
-      await app.fetch(
+      const spamRes = await app.fetch(
         new Request("https://insighthunter.app/contact", { method: "POST", body: spamForm }),
         env,
       );
+      // Bots get the same 200 success response as real users so detection
+      // isn't signaled back to the script, but nothing is persisted.
+      expect(spamRes.status).toBe(200);
     }
+    expect(await kvKeyCount(env.LEADS)).toBe(0);
 
     // A real request right after 20 bot attempts should not be rate-limited,
     // since bot submissions never increment the counter.
@@ -171,5 +183,6 @@ describe("contact form", () => {
       env,
     );
     expect(res.status).toBe(200);
+    expect(await kvKeyCount(env.LEADS)).toBe(1);
   });
 });

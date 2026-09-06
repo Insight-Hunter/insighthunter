@@ -36,8 +36,10 @@ never the misspelled `insighthutner.app`.
 
 ## Isolation boundary
 
-- No database, KV (other than the contact-form rate limiter), or Durable
-  Object binding holds tenant, financial, or session data.
+- No database, KV, or Durable Object binding holds tenant, financial, or
+  session data. The only KV bindings are `RATE_LIMIT` (contact-form
+  throttling) and `LEADS` (validated contact submissions awaiting sales
+  follow-up, retained 90 days) — neither ever holds tenant or billing data.
 - Sign-in and account creation happen exclusively on `insighthunter-auth`.
 - The authenticated dashboard (`insighthunter-dashboard`) is a separate
   Worker; this app only links to it, it never renders authenticated views.
@@ -67,10 +69,16 @@ pnpm --filter @insighthunter/marketing build        # wrangler deploy --dry-run
 - `RATE_LIMIT` (KV) — fixed-window rate limiter for the contact form only.
   Replace `REPLACE_WITH_KV_NAMESPACE_ID` / `REPLACE_WITH_KV_PREVIEW_NAMESPACE_ID`
   with real namespace ids before deploying.
+- `LEADS` (KV) — holds validated contact-form submissions for sales
+  follow-up (90-day TTL). Replace `REPLACE_WITH_LEADS_KV_NAMESPACE_ID` /
+  `REPLACE_WITH_LEADS_KV_PREVIEW_NAMESPACE_ID` with real namespace ids before
+  deploying. This is a lightweight holding area, not a CRM — see the
+  validation report for the recommended follow-up (real email/CRM delivery).
 - `vars.CANONICAL_ORIGIN`, `vars.AUTH_ORIGIN`, `vars.APP_ORIGIN` — the three
   origins that differ per environment (production vs. preview/staging).
-- `vars.CONTACT_TO_EMAIL` — informational only; no outbound email is wired up
-  yet (see the validation report).
+- `vars.CONTACT_TO_EMAIL` — the mailbox the sales team monitors for the
+  `LEADS` namespace above; informational until a real delivery integration
+  reads from it (see the validation report).
 
 No `routes` entry is defined — `insighthunter.app` is currently routed to
 `apps/insighthunter-main`. Cutting the production domain over to this Worker

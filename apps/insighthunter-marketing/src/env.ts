@@ -5,10 +5,12 @@ export interface Env {
   AUTH_ORIGIN: string;
   /** Origin of the authenticated dashboard (Command Center). */
   APP_ORIGIN: string;
-  /** Mailbox that receives contact form notifications (not stored server-side). */
+  /** Mailbox the sales team monitors for contact-form follow-up (informational; see LEADS). */
   CONTACT_TO_EMAIL: string;
   /** Used to rate-limit the public contact form. No PII is ever stored in it. */
   RATE_LIMIT: KVNamespace;
+  /** Holding area for validated contact-form leads pending sales follow-up. */
+  LEADS: KVNamespace;
 }
 
 export type PlanId = "startup" | "standard" | "pro";

@@ -3,6 +3,7 @@ import { html } from "hono/html";
 import type { Env } from "./env.js";
 import { CLIENT_SCRIPT } from "./lib/client-script.js";
 import { renderPage } from "./lib/layout.js";
+import { recordLead } from "./lib/leads.js";
 import { clientKeyFrom, isRateLimited } from "./lib/rate-limit.js";
 import { requestLog, securityHeaders } from "./lib/security.js";
 import { addOnsProductJsonLd, softwareApplicationJsonLd } from "./lib/seo.js";
@@ -206,10 +207,11 @@ app.post("/contact", async (c) => {
   const result = validateContactForm(form);
 
   // Bots that trip the honeypot are rejected immediately without touching
-  // the rate limiter, so they can't burn through a shared client's (e.g.
-  // NAT/office network) legitimate submission budget.
+  // the rate limiter (so they can't burn through a shared client's, e.g.
+  // NAT/office network, legitimate submission budget) and are shown the same
+  // success response as a real submission so detection logic isn't signaled
+  // back to the automated script.
   if (result.bot) {
-    c.status(422);
     return c.html(
       renderPage({
         env: c.env,
@@ -218,7 +220,7 @@ app.post("/contact", async (c) => {
           description: "Get in touch with the Insight Hunter team.",
           path: "/contact",
         },
-        body: contactBody({ errors: { message: "Submission rejected." } }),
+        body: contactBody({ success: true }),
       }),
     );
   }
@@ -254,10 +256,11 @@ app.post("/contact", async (c) => {
     );
   }
 
-  // Intentionally not logged: request logging only records
-  // method/path/status/duration (see lib/security.ts). Delivery to
-  // CONTACT_TO_EMAIL is a future integration point (e.g. an email-sending
-  // binding) — not wired here to avoid inventing an unused binding.
+  // Persisted to LEADS (see lib/leads.ts) so the success message below is
+  // accurate — the submission is held for sales follow-up rather than
+  // discarded. Request logging still only records
+  // method/path/status/duration (see lib/security.ts), never form contents.
+  await recordLead(c.env, result.value);
 
   return c.html(
     renderPage({

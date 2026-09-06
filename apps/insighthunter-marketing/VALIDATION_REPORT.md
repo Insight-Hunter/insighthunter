@@ -59,13 +59,15 @@ smoke test; the committed `wrangler.jsonc` uses `compatibility_date =
   `wrangler deploy --dry-run` (used for `pnpm build`) does not start the
   runtime and succeeds. Real deploys from a Wrangler version that ships a
   newer `workerd` will not hit this.
-- No outbound email integration exists yet for contact-form notifications
-  (no email-sending binding, e.g. MailChannels/Workers Email Routing, was
-  added). Adding one was out of scope (it would add an external dependency
-  not required to satisfy the stated CTA/SEO/security requirements) — the
-  submission is validated, rate-limited, and acknowledged to the user, but
-  delivery to `CONTACT_TO_EMAIL` is a documented follow-up, not silently
-  faked.
+- No outbound email integration exists for contact-form notifications (no
+  email-sending binding, e.g. MailChannels/Workers Email Routing, was
+  added — that would be an external dependency not required to satisfy the
+  stated CTA/SEO/security requirements). Instead, validated submissions are
+  persisted to a dedicated `LEADS` KV namespace (90-day TTL,
+  `src/lib/leads.ts`) so the success message shown to users is accurate
+  (something is retained for sales follow-up) rather than silently
+  discarding the data. Wiring `LEADS` up to real email/CRM delivery reading
+  `CONTACT_TO_EMAIL` remains a documented follow-up.
 
 ## Conflicts with the existing marketing/dashboard/auth split (flagged, not silently violated)
 

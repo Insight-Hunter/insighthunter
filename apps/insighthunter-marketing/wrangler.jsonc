@@ -22,6 +22,11 @@
       "binding": "RATE_LIMIT",
       "id": "REPLACE_WITH_KV_NAMESPACE_ID",
       "preview_id": "REPLACE_WITH_KV_PREVIEW_NAMESPACE_ID"
+    },
+    {
+      "binding": "LEADS",
+      "id": "REPLACE_WITH_LEADS_KV_NAMESPACE_ID",
+      "preview_id": "REPLACE_WITH_LEADS_KV_PREVIEW_NAMESPACE_ID"
     }
   ],
 
