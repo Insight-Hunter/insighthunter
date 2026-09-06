@@ -17,9 +17,14 @@ const MAX_REQUESTS_PER_WINDOW = 5;
  * 2. The read-then-write here is not atomic: concurrent requests in the
  *    same window can both read the same `current` value and both proceed,
  *    which can under-throttle (allow slightly more than
- *    MAX_REQUESTS_PER_WINDOW) rather than over-throttle. A Durable Object
- *    counter would close this gap but is not justified for a public
- *    lead-gen form; revisit if abuse is observed in practice.
+ *    MAX_REQUESTS_PER_WINDOW) rather than over-throttle. In practice the
+ *    over-count is bounded by how many concurrent POST /contact requests
+ *    a single client can realistically fire within one KV round-trip
+ *    (a handful, not an unbounded flood), and honeypot + validation still
+ *    reject non-conforming/bot payloads regardless of this counter. A
+ *    Durable Object counter would close the gap entirely but is not
+ *    justified for a public lead-gen form; revisit if real abuse (as
+ *    opposed to this theoretical race) is observed in practice.
  */
 export async function isRateLimited(
   env: Pick<Env, "RATE_LIMIT">,

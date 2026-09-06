@@ -145,6 +145,13 @@ findings and fixes:
    (`Scout`/`Hunter`/`Apex`), risking drift. **Fixed**: extracted a single
    `PLANS` source of truth (`src/lib/plans.ts`) consumed by both
    `src/pages/pricing.ts` and `src/lib/seo.ts`.
+8. The same `/contact` SEO metadata object was duplicated five times
+   across the GET and POST handlers. **Fixed**: extracted a single
+   `CONTACT_SEO` constant in `src/index.ts`.
+9. No test asserted the actual shape of a persisted lead record
+   (name/email/company/message/`receivedAt`), only that one key was
+   written. **Fixed**: the "submits successfully" test now asserts the
+   full record shape and that `receivedAt` is a valid timestamp.
 
 ## Out of scope / untouched (by design)
 

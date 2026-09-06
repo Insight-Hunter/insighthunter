@@ -22,6 +22,12 @@ import {
 } from "./pages/resources.js";
 import { securityBody } from "./pages/security.js";
 
+const CONTACT_SEO = {
+  title: "Contact Sales — Insight Hunter",
+  description: "Get in touch with the Insight Hunter team.",
+  path: "/contact",
+} as const;
+
 const app = new Hono<{ Bindings: Env }>();
 
 app.use("*", requestLog());
@@ -192,11 +198,7 @@ app.get("/contact", (c) =>
   c.html(
     renderPage({
       env: c.env,
-      seo: {
-        title: "Contact Sales — Insight Hunter",
-        description: "Get in touch with the Insight Hunter team.",
-        path: "/contact",
-      },
+      seo: CONTACT_SEO,
       body: contactBody({}),
     }),
   ),
@@ -215,11 +217,7 @@ app.post("/contact", async (c) => {
     return c.html(
       renderPage({
         env: c.env,
-        seo: {
-          title: "Contact Sales — Insight Hunter",
-          description: "Get in touch with the Insight Hunter team.",
-          path: "/contact",
-        },
+        seo: CONTACT_SEO,
         body: contactBody({ success: true }),
       }),
     );
@@ -231,11 +229,7 @@ app.post("/contact", async (c) => {
     return c.html(
       renderPage({
         env: c.env,
-        seo: {
-          title: "Contact Sales — Insight Hunter",
-          description: "Get in touch with the Insight Hunter team.",
-          path: "/contact",
-        },
+        seo: CONTACT_SEO,
         body: contactBody({ rateLimited: true }),
       }),
     );
@@ -246,11 +240,7 @@ app.post("/contact", async (c) => {
     return c.html(
       renderPage({
         env: c.env,
-        seo: {
-          title: "Contact Sales — Insight Hunter",
-          description: "Get in touch with the Insight Hunter team.",
-          path: "/contact",
-        },
+        seo: CONTACT_SEO,
         body: contactBody({ errors: result.errors, value: result.value }),
       }),
     );
@@ -265,11 +255,7 @@ app.post("/contact", async (c) => {
   return c.html(
     renderPage({
       env: c.env,
-      seo: {
-        title: "Contact Sales — Insight Hunter",
-        description: "Get in touch with the Insight Hunter team.",
-        path: "/contact",
-      },
+      seo: CONTACT_SEO,
       body: contactBody({ success: true }),
     }),
   );

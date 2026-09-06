@@ -29,6 +29,12 @@ async function kvKeyCount(kv: KVNamespace): Promise<number> {
   return (kv as unknown as { __store: Map<string, string> }).__store.size;
 }
 
+function kvValues(kv: KVNamespace): unknown[] {
+  return Array.from((kv as unknown as { __store: Map<string, string> }).__store.values()).map(
+    (value) => JSON.parse(value),
+  );
+}
+
 describe("CTA links", () => {
   it("builds the exact required signup URL for each plan", () => {
     expect(signupUrl(baseEnv, "startup")).toBe(
@@ -141,6 +147,15 @@ describe("contact form", () => {
     expect(res.status).toBe(200);
     expect(await res.text()).toContain("Thanks");
     expect(await kvKeyCount(env.LEADS)).toBe(1);
+    const [lead] = kvValues(env.LEADS) as Array<Record<string, unknown>>;
+    expect(lead).toMatchObject({
+      name: "Jordan Rivera",
+      email: "jordan@example.com",
+      company: "Example Co",
+      message: "We'd like a demo of the Hunter plan.",
+    });
+    expect(typeof lead?.receivedAt).toBe("string");
+    expect(Number.isNaN(Date.parse(lead?.receivedAt as string))).toBe(false);
   });
 
   it("rate-limits repeated submissions from the same client", async () => {
