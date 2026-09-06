@@ -19,7 +19,9 @@ export interface TenantProvisioningRecord extends TenantProvisioningRequest {
   readonly failureCode?: string;
 }
 
-const VALID_TRANSITIONS: Readonly<Record<TenantProvisioningStatus, readonly TenantProvisioningStatus[]>> = {
+const VALID_TRANSITIONS: Readonly<
+  Record<TenantProvisioningStatus, readonly TenantProvisioningStatus[]>
+> = {
   requested: ["provisioning", "failed"],
   provisioning: ["ready", "failed"],
   ready: [],
@@ -40,15 +42,21 @@ export function transitionProvisioningStatus(
   failureCode?: string,
 ): TenantProvisioningRecord {
   if (!canTransitionProvisioningStatus(record.status, nextStatus)) {
-    throw new TypeError(`Invalid tenant provisioning transition: ${record.status} -> ${nextStatus}`);
+    throw new TypeError(
+      `Invalid tenant provisioning transition: ${record.status} -> ${nextStatus}`,
+    );
   }
 
   if (nextStatus === "failed" && !failureCode) {
-    throw new TypeError("A failure code is required when provisioning fails.");
+    throw new TypeError(
+      "A failure code is required when tenant provisioning fails.",
+    );
   }
 
   if (nextStatus !== "failed" && failureCode) {
-    throw new TypeError("A failure code is only valid for failed provisioning.");
+    throw new TypeError(
+      "A failure code is only valid for failed tenant provisioning.",
+    );
   }
 
   return {
@@ -60,6 +68,8 @@ export function transitionProvisioningStatus(
   };
 }
 
-export function canAcceptFinancialData(status: TenantProvisioningStatus): boolean {
+export function canAcceptFinancialData(
+  status: TenantProvisioningStatus,
+): boolean {
   return status === "ready";
 }

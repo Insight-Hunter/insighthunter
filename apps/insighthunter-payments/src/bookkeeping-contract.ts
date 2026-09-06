@@ -50,18 +50,13 @@ export interface VerifiedWebhookEvent {
   readonly currentPeriodEnd: string | null;
 }
 
-export interface TenantProvisioningRequest {
-  readonly tenantId: string;
-  readonly requestedBy: string;
-  readonly correlationId: string;
-  readonly sourceEventId: string;
-}
-
 const OPAQUE_ID_PATTERN = /^[a-zA-Z0-9_-]{16,128}$/;
 
 function requireOpaqueId(value: string, field: string): string {
   if (!OPAQUE_ID_PATTERN.test(value)) {
-    throw new TypeError(`${field} must be an opaque identifier between 16 and 128 characters.`);
+    throw new TypeError(
+      `${field} must be an opaque identifier between 16 and 128 characters.`,
+    );
   }
 
   return value;
@@ -69,6 +64,7 @@ function requireOpaqueId(value: string, field: string): string {
 
 function requireHttpsUrl(value: string, field: string): string {
   const url = new URL(value);
+
   if (url.protocol !== "https:") {
     throw new TypeError(`${field} must use HTTPS.`);
   }
@@ -80,7 +76,9 @@ export function getBookkeepingPriceId(
   plan: BookkeepingPlan,
   config: BookkeepingCheckoutConfig,
 ): string {
-  const priceId = plan === "standard" ? config.standardPriceId : config.proBooksPriceId;
+  const priceId =
+    plan === "standard" ? config.standardPriceId : config.proBooksPriceId;
+
   if (!priceId || priceId.trim().length < 3) {
     throw new TypeError(`No Stripe price is configured for ${plan}.`);
   }
@@ -118,5 +116,8 @@ export function shouldRequestTenantProvisioning(
     return false;
   }
 
-  return event.subscriptionStatus === null || ["active", "trialing"].includes(event.subscriptionStatus);
+  return (
+    event.subscriptionStatus === null ||
+    ["active", "trialing"].includes(event.subscriptionStatus)
+  );
 }

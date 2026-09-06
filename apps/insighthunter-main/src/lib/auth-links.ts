@@ -3,8 +3,9 @@ export type Plan = "lite" | "standard" | "pro";
 const AUTH_ORIGIN = "https://auth.insighthunter.app";
 const APP_ORIGIN = "https://app.insighthunter.app";
 
-function dashboardUrl(path = "/dashboard"): string {
-  return new URL(path, APP_ORIGIN).toString();
+function returnTo(path = "/dashboard"): string {
+  return `${APP_ORIGIN}${path}`;
+
 }
 
 export function loginUrl(path = "/dashboard"): string {
