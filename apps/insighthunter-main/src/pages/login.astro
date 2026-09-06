@@ -1,5 +1,59 @@
 ---
 import { loginUrl } from "../lib/auth-links";
 
-return Astro.redirect(loginUrl(), 302);
----
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorNote.textContent = '';
+      const submitBtn = form.querySelector('.submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Logging in…';
+
+      try {
+        const res = await fetch(`${authApi}/login`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: form.email.value.trim(), password: form.password.value }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error === 'invalid_credentials' ? 'Incorrect email or password.' : 'Something went wrong.');
+
+        window.location.href = `${appBaseUrl}/dashboard?token=${encodeURIComponent(data.token)}`;
+      } catch (err) {
+        errorNote.textContent = err.message || 'Something went wrong. Try again.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Log in';
+      }
+    });
+  </script>
+
+  <style>
+    .auth-section { padding: 72px 0 120px; }
+    .auth-wrap { display: flex; justify-content: center; }
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--paper-bright);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 40px;
+    }
+    form { display: flex; flex-direction: column; gap: 18px; margin-top: 20px; }
+    label { display: flex; flex-direction: column; gap: 6px; font-size: 0.88rem; color: var(--ink-soft); }
+    input {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: #fff;
+      color: var(--ink);
+    }
+    input:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
+    .submit-btn { width: 100%; justify-content: center; margin-top: 6px; }
+    .submit-btn:disabled { opacity: 0.6; cursor: default; transform: none; }
+    .error-note { color: var(--clay); font-size: 0.86rem; margin: 0; min-height: 1em; }
+    .alt-action { font-size: 0.88rem; margin-top: 22px; text-align: center; }
+    .alt-action a { color: var(--moss); }
+  </style>
+</Layout>

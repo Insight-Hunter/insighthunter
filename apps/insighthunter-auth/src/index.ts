@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { hashPassword, verifyPassword, signSession, verifySession } from "./crypto.js";
-=======
-import { hashPassword, signSession, verifyPassword, verifySession } from "./crypto.js";
->>>>>>> e566403f3db36f0151e85086cae6cc727f3aab23
 import type { Env, LoginRequest, RegisterRequest, UserRecord } from "./types.js";
 
 export { UserVault } from "./vault.js";
@@ -116,7 +112,7 @@ async function handleRegister(request: Request, env: Env): Promise<Response> {
 
   return Response.json(
     { userId, email, tier, token, expiresAt: now + SESSION_TTL_MS },
-    { status: 201 }
+    { status: 201, headers: { "Set-Cookie": sessionCookie(token) } }
   );
 }
 
@@ -157,13 +153,16 @@ async function handleLogin(request: Request, env: Env, ip: string): Promise<Resp
     .bind(user.id, ip, now)
     .run();
 
-  return Response.json({
-    userId: user.id,
-    email: user.email,
-    tier: user.tier,
-    token,
-    expiresAt: now + SESSION_TTL_MS,
-  });
+  return Response.json(
+    {
+      userId: user.id,
+      email: user.email,
+      tier: user.tier,
+      token,
+      expiresAt: now + SESSION_TTL_MS,
+    },
+    { headers: { "Set-Cookie": sessionCookie(token) } }
+  );
 }
 
 async function handleLogout(request: Request, env: Env): Promise<Response> {
@@ -191,6 +190,10 @@ function bearerToken(request: Request): string | null {
   const header = request.headers.get("Authorization");
   if (!header?.startsWith("Bearer ")) return null;
   return header.slice("Bearer ".length);
+}
+
+function sessionCookie(token: string): string {
+  return `ih_session=${encodeURIComponent(token)}; Domain=.insighthunter.app; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_TTL_MS / 1000}`;
 }
 
 async function jsonBody<T>(request: Request): Promise<T | null> {
