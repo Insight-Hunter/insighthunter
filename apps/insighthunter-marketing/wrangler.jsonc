@@ -1,0 +1,34 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "insighthunter-marketing",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-06",
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  // NOTE: no `routes` block is defined here on purpose. Production DNS and
+  // the `insighthunter.app` custom domain route currently belong to
+  // `apps/insighthunter-main` (see its wrangler.toml). Cutting the public
+  // domain over to this Worker is an explicit, reviewed infrastructure change
+  // outside the scope of this build — see the validation report.
+
+  // Used only to rate-limit the public contact form (no PII stored — see
+  // src/lib/rate-limit.ts). Replace with the real namespace id before deploy.
+  "kv_namespaces": [
+    {
+      "binding": "RATE_LIMIT",
+      "id": "REPLACE_WITH_KV_NAMESPACE_ID",
+      "preview_id": "REPLACE_WITH_KV_PREVIEW_NAMESPACE_ID"
+    }
+  ],
+
+  "vars": {
+    "CANONICAL_ORIGIN": "https://insighthunter.app",
+    "AUTH_ORIGIN": "https://auth.insighthunter.app",
+    "APP_ORIGIN": "https://app.insighthunter.app",
+    "CONTACT_TO_EMAIL": "sales@insighthunter.app"
+  }
+}
