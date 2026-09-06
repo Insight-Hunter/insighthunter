@@ -109,7 +109,7 @@ describe("contact form", () => {
     expect(result.ok).toBe(true);
   });
 
-  it("rejects honeypot-filled submissions", () => {
+  it("rejects honeypot-filled submissions and flags them distinctly from field errors", () => {
     const form = new FormData();
     form.set("name", "Jordan Rivera");
     form.set("email", "jordan@example.com");
@@ -117,6 +117,8 @@ describe("contact form", () => {
     form.set("website", "http://spam.example");
     const result = validateContactForm(form);
     expect(result.ok).toBe(false);
+    expect(result.bot).toBe(true);
+    expect(result.errors.message).toBeUndefined();
   });
 
   it("submits successfully end-to-end via the worker", async () => {
@@ -141,5 +143,33 @@ describe("contact form", () => {
       if (limited) break;
     }
     expect(limited).toBe(true);
+  });
+
+  it("rejects bot submissions without consuming the rate-limit budget", async () => {
+    const env = { ...baseEnv, RATE_LIMIT: createFakeKv() };
+
+    for (let i = 0; i < 20; i++) {
+      const spamForm = new FormData();
+      spamForm.set("name", "Bot");
+      spamForm.set("email", "bot@example.com");
+      spamForm.set("message", "This is a spam submission from a bot.");
+      spamForm.set("website", "http://spam.example");
+      await app.fetch(
+        new Request("https://insighthunter.app/contact", { method: "POST", body: spamForm }),
+        env,
+      );
+    }
+
+    // A real request right after 20 bot attempts should not be rate-limited,
+    // since bot submissions never increment the counter.
+    const realForm = new FormData();
+    realForm.set("name", "Jordan Rivera");
+    realForm.set("email", "jordan@example.com");
+    realForm.set("message", "We'd like a demo of the Hunter plan.");
+    const res = await app.fetch(
+      new Request("https://insighthunter.app/contact", { method: "POST", body: realForm }),
+      env,
+    );
+    expect(res.status).toBe(200);
   });
 });

@@ -202,6 +202,27 @@ app.get("/contact", (c) =>
 );
 
 app.post("/contact", async (c) => {
+  const form = await c.req.formData();
+  const result = validateContactForm(form);
+
+  // Bots that trip the honeypot are rejected immediately without touching
+  // the rate limiter, so they can't burn through a shared client's (e.g.
+  // NAT/office network) legitimate submission budget.
+  if (result.bot) {
+    c.status(422);
+    return c.html(
+      renderPage({
+        env: c.env,
+        seo: {
+          title: "Contact Sales — Insight Hunter",
+          description: "Get in touch with the Insight Hunter team.",
+          path: "/contact",
+        },
+        body: contactBody({ errors: { message: "Submission rejected." } }),
+      }),
+    );
+  }
+
   const clientKey = clientKeyFrom(c.req.raw);
   if (await isRateLimited(c.env, clientKey)) {
     c.status(429);
@@ -218,8 +239,6 @@ app.post("/contact", async (c) => {
     );
   }
 
-  const form = await c.req.formData();
-  const result = validateContactForm(form);
   if (!result.ok) {
     c.status(422);
     return c.html(

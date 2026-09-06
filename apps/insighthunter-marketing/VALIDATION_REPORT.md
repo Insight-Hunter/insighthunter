@@ -19,7 +19,7 @@ pnpm install --frozen-lockfile        # baseline install, 26 workspace projects
 pnpm install --no-frozen-lockfile     # after adding the new package, 27 projects, lockfile updated
 pnpm --filter @insighthunter/marketing lint        # biome check src tests -> PASS (0 errors)
 pnpm --filter @insighthunter/marketing typecheck    # tsc -p tsconfig.json --noEmit -> PASS (0 errors)
-pnpm --filter @insighthunter/marketing test         # vitest run --passWithNoTests -> PASS (13/13 tests)
+pnpm --filter @insighthunter/marketing test         # vitest run --passWithNoTests -> PASS (14/14 tests)
 pnpm --filter @insighthunter/marketing build        # wrangler deploy --dry-run -> PASS, bindings printed correctly
 ```
 
