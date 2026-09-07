@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getSignupUrl } from "../../lib/urls";
 const copy = {
   bookkeeping: [
     "Bookkeeping automation",
@@ -37,7 +38,7 @@ const [title, description] = copy["bookkeeping"];
       <div class="card">
         <p>Insight Hunter is designed to reduce swivel-chair work across finance operations and improve decision quality with a cleaner operating surface.</p>
         <p>Start with clean transaction records, consistent categories, and a reconciliation rhythm that gives your reports a dependable foundation.</p>
-        <p><a class="btn btn-primary" href="/signup">Start with Startup</a></p>
+        <p><a class="btn btn-primary" href={getSignupUrl("lite")}>Start with Startup</a></p>
       </div>
     </div>
   </section>
