@@ -21,7 +21,7 @@ id = "60e34ba310ca40c79edec05470c7a271"
 
 [vars]
 APP_BASE_URL = "https://auth.insighthunter.app"
-DASHBOARD_URL = "https://app.insighthunter.app"
+DASHBOARD_URL = "https://dashboard.insighthunter.app"
 MARKETING_URL = "https://insighthunter.app"
 ALLOWED_ORIGIN = "https://insighthunter.app"
 
