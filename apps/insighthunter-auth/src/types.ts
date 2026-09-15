@@ -4,6 +4,7 @@ export interface Env {
   USER_VAULT: DurableObjectNamespace;
   SESSION_SECRET: string; // wrangler secret, HMAC key for session tokens
   ALLOWED_ORIGIN: string; // e.g. https://insighthunter.app
+  DASHBOARD_URL: string; // e.g. https://dashboard.insighthunter.app
 }
 
 export type Tier = "startup" | "standard" | "pro";

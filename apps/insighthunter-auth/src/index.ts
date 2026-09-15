@@ -1,9 +1,16 @@
-import { hashPassword, verifyPassword, signSession, verifySession } from "./crypto";
-import type { Env } from "./types";
+import { hashPassword, verifyPassword, signSession, verifySession } from "./crypto.js";
+import type { Env, Tier } from "./types.js";
 
-const APP_ORIGIN = "https://app.insighthunter.app";
+export { UserVault } from "./vault.js";
+
+const DEFAULT_DASHBOARD_ORIGIN = "https://dashboard.insighthunter.app";
 const ALLOWED_PLANS = new Set(["lite", "standard", "pro"]);
 const SESSION_COOKIE = "ih_session";
+const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // matches sessionCookie Max-Age
+
+function toTier(plan: string): Tier {
+  return plan === "standard" || plan === "pro" ? plan : "startup";
+}
 
 const securityHeaders: HeadersInit = {
   "Cache-Control": "no-store",
@@ -20,15 +27,24 @@ function html(body: string, status = 200, headers: HeadersInit = {}): Response {
   });
 }
 
-function safeReturnTo(value: string | null): string {
-  if (!value) return `${APP_ORIGIN}/dashboard`;
+function dashboardOrigin(env: Env): string {
+  return env.DASHBOARD_URL || DEFAULT_DASHBOARD_ORIGIN;
+}
+
+function safeReturnTo(value: string | null, env: Env): string {
+  const fallback = `${dashboardOrigin(env)}/dashboard`;
+  if (!value) return fallback;
+
   try {
     const url = new URL(value);
-    if (url.origin === APP_ORIGIN && url.pathname.startsWith("/dashboard")) return url.toString();
+    if (url.origin === dashboardOrigin(env) && url.pathname.startsWith("/dashboard")) {
+      return url.toString();
+    }
   } catch {
     // Fall through to the fixed dashboard destination.
   }
-  return `${APP_ORIGIN}/dashboard`;
+
+  return fallback;
 }
 
 function safePlan(value: string | null): string {
@@ -61,14 +77,14 @@ function clearSessionCookie(): string {
   return `${SESSION_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
 }
 
-async function parseForm(request: Request): Promise<{ email: string; password: string; name: string; plan: string; returnTo: string }> {
+async function parseForm(request: Request, env: Env): Promise<{ email: string; password: string; name: string; plan: string; returnTo: string }> {
   const form = await request.formData();
   return {
     email: String(form.get("email") ?? "").trim().toLowerCase(),
     password: String(form.get("password") ?? ""),
     name: String(form.get("name") ?? "").trim(),
     plan: safePlan(String(form.get("plan") ?? "lite")),
-    returnTo: safeReturnTo(String(form.get("returnTo") ?? "")),
+    returnTo: safeReturnTo(String(form.get("returnTo") ?? ""), env),
   };
 }
 
@@ -80,7 +96,7 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const method = request.method.toUpperCase();
-    const returnTo = safeReturnTo(url.searchParams.get("returnTo"));
+    const returnTo = safeReturnTo(url.searchParams.get("returnTo"), env);
     const plan = safePlan(url.searchParams.get("plan"));
 
     if (method === "GET" && url.pathname === "/health") {
@@ -88,7 +104,7 @@ export default {
     }
 
     if (method === "GET" && url.pathname === "/") {
-      return Response.redirect(new URL(`/login?returnTo=${encodeURIComponent(returnTo)}`, url.origin), 302);
+      return Response.redirect(new URL(`/login?returnTo=${encodeURIComponent(returnTo)}`, url.origin).toString(), 302);
     }
 
     if (method === "GET" && url.pathname === "/login") {
@@ -100,7 +116,7 @@ export default {
     }
 
     if (method === "POST" && url.pathname === "/register") {
-      const { email, password, name, plan: selectedPlan, returnTo: destination } = await parseForm(request);
+      const { email, password, name, plan: selectedPlan, returnTo: destination } = await parseForm(request, env);
       if (!validEmail(email) || password.length < 12 || name.length < 2 || name.length > 120) {
         return authPage("register", destination, selectedPlan, "Please provide a valid name, email, and a password of at least 12 characters.");
       }
@@ -112,16 +128,25 @@ export default {
 
       const id = crypto.randomUUID();
       const passwordHash = await hashPassword(password);
-      await env.DB.prepare("INSERT INTO users (id, email, password_hash, name, plan, created_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)")
-        .bind(id, email, passwordHash, name, selectedPlan, new Date().toISOString())
+      const tier = toTier(selectedPlan);
+      // `name` isn't a users column; the auth DB only tracks tier/status/vault_do_id.
+      await env.DB.prepare("INSERT INTO users (id, email, password_hash, tier, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?5)")
+        .bind(id, email, passwordHash, tier, Date.now())
         .run();
 
-      const token = await signSession({ sub: id, email }, env);
-      return Response.redirect(destination, 303, { headers: { ...securityHeaders, "Set-Cookie": sessionCookie(token) } });
+      const issuedAt = Date.now();
+      const token = await signSession(
+        { userId: id, email, tier, issuedAt, expiresAt: issuedAt + SESSION_TTL_MS },
+        env.SESSION_SECRET
+      );
+      return new Response(null, {
+        status: 303,
+        headers: { Location: destination, ...securityHeaders, "Set-Cookie": sessionCookie(token) },
+      });
     }
 
     if (method === "POST" && url.pathname === "/login") {
-      const { email, password, returnTo: destination } = await parseForm(request);
+      const { email, password, returnTo: destination } = await parseForm(request, env);
       const user = validEmail(email)
         ? await env.DB.prepare("SELECT id, email, password_hash FROM users WHERE email = ?1").bind(email).first<{ id: string; email: string; password_hash: string }>()
         : null;
@@ -130,19 +155,30 @@ export default {
         return authPage("login", destination, plan, "Invalid email or password.");
       }
 
-      const token = await signSession({ sub: user.id, email: user.email }, env);
-      return Response.redirect(destination, 303, { headers: { ...securityHeaders, "Set-Cookie": sessionCookie(token) } });
+      const record = await env.DB.prepare("SELECT tier FROM users WHERE id = ?1").bind(user.id).first<{ tier: string }>();
+      const issuedAt = Date.now();
+      const token = await signSession(
+        { userId: user.id, email: user.email, tier: toTier(record?.tier ?? "lite"), issuedAt, expiresAt: issuedAt + SESSION_TTL_MS },
+        env.SESSION_SECRET
+      );
+      return new Response(null, {
+        status: 303,
+        headers: { Location: destination, ...securityHeaders, "Set-Cookie": sessionCookie(token) },
+      });
     }
 
     if (method === "POST" && url.pathname === "/logout") {
-      return Response.redirect(new URL("/login", url.origin), 303, { headers: { ...securityHeaders, "Set-Cookie": clearSessionCookie() } });
+      return new Response(null, {
+        status: 303,
+        headers: { Location: new URL("/login", url.origin).toString(), ...securityHeaders, "Set-Cookie": clearSessionCookie() },
+      });
     }
 
     if (url.pathname === "/session" && method === "GET") {
       const cookie = request.headers.get("Cookie") ?? "";
       const token = cookie.split("; ").find((entry) => entry.startsWith(`${SESSION_COOKIE}=`))?.slice(SESSION_COOKIE.length + 1);
       if (!token) return Response.json({ authenticated: false }, { status: 401, headers: securityHeaders });
-      const session = await verifySession(token, env);
+      const session = await verifySession(token, env.SESSION_SECRET);
       if (!session) return Response.json({ authenticated: false }, { status: 401, headers: securityHeaders });
       return Response.json({ authenticated: true, session }, { headers: securityHeaders });
     }

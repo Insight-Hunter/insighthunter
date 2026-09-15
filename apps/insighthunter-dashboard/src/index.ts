@@ -12,6 +12,20 @@ interface Session {
   email: string;
   tier: Tier;
 }
+const APP_TILES = [
+  { id: 'insights',      label: 'Insights',      mono: 'IN', url: 'https://insights.insighthunter.app',      desc: 'Financial KPIs & forecasting' },
+  { id: 'bookkeeping',   label: 'Bookkeeping',    mono: 'BK', url: 'https://bookkeeping.insighthunter.app',   desc: 'Transactions & reconciliation' },
+  { id: 'payroll',       label: 'Payroll',        mono: 'PR', url: 'https://payroll.insighthunter.app',       desc: 'Payroll & tax estimates' },
+  { id: 'advisor',       label: 'Advisor',        mono: 'AI', url: 'https://advisor.insighthunter.app',       desc: 'AI-powered CFO assistant' },
+  { id: 'bizforma',      label: 'Business Formation Assistant',       mono: 'BF', url: 'https://bizforma.insighthunter.app',      desc: 'Entity & compliance management' },
+  { id: 'pbx',           label: 'PBX',            mono: 'PX', url: 'https://pbx.insighthunter.app',           desc: 'Business phone & call analytics' },
+  { id: 'reports',       label: 'Reports',        mono: 'RP', url: 'https://reports.insighthunter.app',       desc: 'Automated financial reports' },
+  { id: 'ledger',        label: 'Ledger',         mono: 'LG', url: 'https://ledger.insighthunter.app',        desc: 'General ledger & chart of accounts' },
+  { id: 'finops',        label: 'FinOps',         mono: 'FO', url: 'https://finops.insighthunter.app',        desc: 'Cost optimization & tracking' },
+  { id: 'scout',         label: 'Scout',          mono: 'SC', url: 'https://scout.insighthunter.app',         desc: 'Business intelligence & signals' },
+  { id: 'dispatch',      label: 'Dispatch',       mono: 'DP', url: 'https://dispatch.insighthunter.app',      desc: 'Operations & task dispatch' },
+  { id: 'notifications',  label: 'Notifications', mono: 'NT', url: 'https://notifications.insighthunter.app', desc: 'Alerts & team notifications' },
+] as const;
 
 const MODULES = [
   { name: "Bookkeeping", tier: "startup", href: "https://bookkeeping.insighthunter.app", description: "Transactions, imports, and reconciliation." },

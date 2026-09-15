@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { verifyStripeWebhookSignature } from "./../billing/stripe.js";
+import { verifyStripeWebhookSignature } from "../billing/stripe.js";
 
 type EnvLike = {
   STRIPE_WEBHOOK_SECRET?: string;
