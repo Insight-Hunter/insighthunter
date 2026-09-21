@@ -1,38 +1,11 @@
+# insighthunter-main — DECOMMISSIONED
+# Routes intentionally removed. Do NOT re-add routes here.
+# Traffic for insighthunter.app     → insighthunter-marketing
+# Traffic for app.insighthunter.app → insighthunter-dashboard
+
 name = "insighthunter-main"
-main = "@astrojs/cloudflare/entrypoints/server"
-compatibility_date = "2026-08-01"
-compatibility_flags = ["nodejs_compat"]
-workers_dev = false
-
-routes = [
-  { pattern = "insighthunter.app/*", zone_name = "insighthunter.app" },
-  { pattern = "www.insighthunter.app/*", zone_name = "insighthunter.app" }
-]
-
-[assets]
-directory = "./dist/client"
-binding = "ASSETS"
+main = "src/index.ts"
+compatibility_date = "2026-09-06"
 
 [observability]
 enabled = true
-
-[[d1_databases]]
-binding = "DB"
-database_name = "insighthunter-main"
-database_id = "04854880-81f5-4c02-b555-905a34492b92"
-migrations_dir = "migrations"
-
-[[kv_namespaces]]
-binding = "KV_SESSIONS"
-id = "REPLACE_WITH_KV_SESSIONS_ID"
-
-[vars]
-# Public runtime config — safe to expose to client-side scripts
-PUBLIC_AUTH_API_URL    = "https://auth.insighthunter.app"
-PUBLIC_PAYMENTS_API_URL = "https://payments.insighthunter.app"
-PUBLIC_APP_BASE_URL    = "https://app.insighthunter.app"
-
-# Server-side only vars (not exposed to client)
-AUTH_URL       = "https://auth.insighthunter.app"
-DASHBOARD_URL  = "https://app.insighthunter.app"
-ENVIRONMENT   = "production"

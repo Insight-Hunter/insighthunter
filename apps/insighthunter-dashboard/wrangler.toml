@@ -1,6 +1,7 @@
 name = "insighthunter-dashboard"
 main = "src/index.ts"
-compatibility_date = "2026-08-23"
+compatibility_date = "2026-09-06"
+compatibility_flags = ["nodejs_compat"]
 
 [[routes]]
 pattern = "app.insighthunter.app/*"
@@ -15,5 +16,5 @@ binding = "AUTH_SERVICE"
 service = "insighthunter-auth"
 
 [vars]
-AUTH_ORIGIN = "https://auth.insighthunter.app"
-MARKETING_ORIGIN = "https://insighthunter.app"
+AUTH_ORIGIN       = "https://auth.insighthunter.app"
+MARKETING_ORIGIN  = "https://insighthunter.app"
