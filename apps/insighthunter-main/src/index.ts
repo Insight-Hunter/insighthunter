@@ -12,9 +12,18 @@ import { webhooksRoutes } from "./routes/webhooks.js";
 export type Env = {
   DB: D1Database;
   KV_SESSIONS: KVNamespace;
-  AUTH_URL: string; // https://auth.insighthunter.app
-  DASHBOARD_URL: string; // https://app.insighthunter.app
-  ENVIRONMENT: string;
+  AUTH_URL: string;       // https://auth.insighthunter.app
+  DASHBOARD_URL: string;  // https://app.insighthunter.app
+  ENVIRONMENT: string;    // production | staging | development
+};
+
+// Plan codes MUST match what billing/auth set on the user record.
+// Marketing tiers: lite | standard | pro  (enterprise = internal/sales)
+const PLAN_RANK: Record<string, number> = {
+  lite: 0,
+  standard: 1,
+  pro: 2,
+  enterprise: 3,
 };
 
 const app = new Hono<{ Bindings: Env }>();
@@ -39,75 +48,76 @@ app.use("/api/*", headerGuard());
 
 // ── Dashboard UI (SSR HTML) ───────────────────────────────────────────────────
 app.get("/", async (c) => {
-  const name = c.req.header("X-User-Name") ?? "there";
-  const role = c.req.header("X-User-Role") ?? "member";
-  const orgName = c.req.header("X-Org-Name") ?? "My Org";
-  const plan = c.req.header("X-Org-Plan") ?? "starter";
+  const name    = c.req.header("X-User-Name") ?? "there";
+  const role    = c.req.header("X-User-Role") ?? "member";
+  const orgName = c.req.header("X-Org-Name")  ?? "My Org";
+  const plan    = c.req.header("X-Org-Plan")  ?? "lite";
 
-  const firstName = name.split(" ")[0] ?? name;
-  const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+  const firstName  = name.split(" ")[0] ?? name;
+  const planLabel  = plan.charAt(0).toUpperCase() + plan.slice(1);
 
+  // Plan codes aligned with marketing site: lite | standard | pro | enterprise
   const APP_TILES = [
     {
       slug: "insights",
       name: "Insights",
-      icon: ".",
+      icon: "📊",
       url: "https://insights.insighthunter.app",
       desc: "Financial KPIs & AI forecasting",
-      plans: ["starter", "growth", "pro", "enterprise"],
+      plans: ["lite", "standard", "pro", "enterprise"],
     },
     {
       slug: "bookkeeping",
       name: "Bookkeeping",
-      icon: ".",
+      icon: "📒",
       url: "https://bookkeeping.insighthunter.app",
       desc: "Bank feeds, transactions & reconciliation",
-      plans: ["growth", "pro", "enterprise"],
+      plans: ["standard", "pro", "enterprise"],
     },
     {
       slug: "advisor",
-      name: "Advisor",
-      icon: ".",
+      name: "AI CFO Advisor",
+      icon: "🤖",
       url: "https://advisor.insighthunter.app",
-      desc: "AI-driven CFO advisory",
-      plans: ["growth", "pro", "enterprise"],
+      desc: "AI-driven CFO advisory & recommendations",
+      plans: ["standard", "pro", "enterprise"],
     },
     {
       slug: "reports",
       name: "Reports",
-      icon: ".",
+      icon: "📄",
       url: "https://reports.insighthunter.app",
       desc: "Automated financial reports",
-      plans: ["growth", "pro", "enterprise"],
+      plans: ["standard", "pro", "enterprise"],
     },
     {
       slug: "payroll",
       name: "Payroll",
-      icon: ".",
+      icon: "💵",
       url: "https://payroll.insighthunter.app",
       desc: "Payroll & contractor payments",
       plans: ["pro", "enterprise"],
     },
     {
       slug: "scout",
-      name: "Scout",
-      icon: ".",
+      name: "Scout CRM",
+      icon: "🔍",
       url: "https://scout.insighthunter.app",
-      desc: "Business intelligence & signals",
+      desc: "Leads, deals & revenue pipeline",
       plans: ["pro", "enterprise"],
     },
     {
       slug: "bizforma",
-      name: "Business Formation Assistant",
-      icon: ".",
+      name: "BizForma",
+      icon: "🏢",
       url: "https://bizforma.insighthunter.app",
       desc: "Entity formation & compliance",
-      plans: ["growth", "pro", "enterprise"],
+      plans: ["standard", "pro", "enterprise"],
     },
     {
       slug: "pbx",
       name: "PBX",
-      icon: ".",
+      icon: "📞",
       url: "https://pbx.insighthunter.app",
       desc: "Business phone & call analytics",
       plans: ["pro", "enterprise"],
@@ -115,41 +125,40 @@ app.get("/", async (c) => {
     {
       slug: "finops",
       name: "FinOps",
-      icon: ".",
+      icon: "⚙️",
       url: "https://finops.insighthunter.app",
-      desc: "Cost optimization & tracking",
+      desc: "Cost optimization & spend tracking",
       plans: ["pro", "enterprise"],
     },
     {
       slug: "dispatch",
       name: "Dispatch",
-      icon: ".",
+      icon: "📬",
       url: "https://dispatch.insighthunter.app",
       desc: "Operations & task dispatch",
-      plans: ["starter", "growth", "pro", "enterprise"],
+      plans: ["lite", "standard", "pro", "enterprise"],
     },
     {
       slug: "notifications",
       name: "Notifications",
-      icon: ".",
+      icon: "🔔",
       url: "https://notifications.insighthunter.app",
       desc: "Alerts & team notifications",
-      plans: ["starter", "growth", "pro", "enterprise"],
+      plans: ["lite", "standard", "pro", "enterprise"],
     },
     {
       slug: "platform",
       name: "Settings",
-      icon: ".",
+      icon: "⚙️",
       url: "https://platform.insighthunter.app",
       desc: "Org settings, members & billing",
-      plans: ["starter", "growth", "pro", "enterprise"],
+      plans: ["lite", "standard", "pro", "enterprise"],
     },
   ];
 
-  const PLAN_RANK: Record<string, number> = { starter: 0, growth: 1, pro: 2, enterprise: 3 };
-  const userRank = PLAN_RANK[plan] ?? 0;
+  const userRank   = PLAN_RANK[plan] ?? 0;
   const accessible = APP_TILES.filter((t) => t.plans.some((p) => (PLAN_RANK[p] ?? 0) <= userRank));
-  const locked = APP_TILES.filter((t) => !accessible.includes(t));
+  const locked     = APP_TILES.filter((t) => !accessible.includes(t));
 
   const tileHtml = (t: (typeof APP_TILES)[0], isLocked: boolean) =>
     `<a class="tile${isLocked ? " tile-locked" : ""}" href="${isLocked ? "https://platform.insighthunter.app/billing" : t.url}">
@@ -213,7 +222,7 @@ app.get("/", async (c) => {
   </nav>
   <main>
     <div class="welcome">
-      <h1>Welcome back, ${firstName} </h1>
+      <h1>Welcome back, ${firstName} 👋</h1>
       <p>${orgName} &nbsp;·&nbsp; ${role}</p>
       <div class="health-bar">
         <span>Business Health Score</span>
@@ -241,22 +250,17 @@ app.get("/", async (c) => {
   </main>
 
   <script>
-    // Async-fetch dashboard data after SSR shell renders
     (async () => {
       try {
         const res = await fetch('/api/dashboard', { credentials: 'include' });
         if (!res.ok) return;
         const d = await res.json();
 
-
-        // Health score
-
         if (d.healthScore) {
           document.getElementById('hs').textContent = d.healthScore.score;
           document.getElementById('hl').textContent = d.healthScore.label;
         }
 
-        // Notifications
         const nList = document.getElementById('notif-list');
         if (d.notifications?.length) {
           nList.innerHTML = d.notifications.map(n =>
@@ -266,7 +270,6 @@ app.get("/", async (c) => {
           nList.innerHTML = '<li class="empty">No new notifications</li>';
         }
 
-        // Activity
         const aList = document.getElementById('activity-list');
         if (d.recentActivity?.length) {
           aList.innerHTML = d.recentActivity.map(a =>

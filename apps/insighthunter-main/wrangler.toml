@@ -22,10 +22,17 @@ database_name = "insighthunter-main"
 database_id = "04854880-81f5-4c02-b555-905a34492b92"
 migrations_dir = "migrations"
 
+[[kv_namespaces]]
+binding = "KV_SESSIONS"
+id = "REPLACE_WITH_KV_SESSIONS_ID"
 
-# Public runtime config — no secrets here, these are read by client-side
-# scripts (pricing/signup/login pages) via import.meta.env at build time.
 [vars]
-PUBLIC_AUTH_API_URL = "https://auth.insighthunter.app"
+# Public runtime config — safe to expose to client-side scripts
+PUBLIC_AUTH_API_URL    = "https://auth.insighthunter.app"
 PUBLIC_PAYMENTS_API_URL = "https://payments.insighthunter.app"
-PUBLIC_APP_BASE_URL = "https://app.insighthunter.app"
+PUBLIC_APP_BASE_URL    = "https://app.insighthunter.app"
+
+# Server-side only vars (not exposed to client)
+AUTH_URL       = "https://auth.insighthunter.app"
+DASHBOARD_URL  = "https://app.insighthunter.app"
+ENVIRONMENT   = "production"
