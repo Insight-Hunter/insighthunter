@@ -1,0 +1,11 @@
+# insighthunter-main — DECOMMISSIONED
+# Routes intentionally removed. Do NOT re-add routes here.
+# Traffic for insighthunter.app     → insighthunter-marketing
+# Traffic for app.insighthunter.app → insighthunter-dashboard
+
+name = "insighthunter-main"
+main = "src/index.ts"
+compatibility_date = "2026-09-06"
+
+[observability]
+enabled = true
