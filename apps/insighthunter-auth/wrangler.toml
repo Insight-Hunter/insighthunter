@@ -19,6 +19,10 @@ database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
 binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
 
+[[send_email]]
+name = "SEND_EMAIL"
+allowed_sender_addresses = ["noreply@insighthunter.app"]
+
 [vars]
 APP_BASE_URL = "https://auth.insighthunter.app"
 DASHBOARD_URL = "https://dashboard.insighthunter.app"
@@ -39,7 +43,6 @@ tag = "v1"
 new_classes = ["UserVault"]
 
 # Secrets (set via wrangler secret put):
-# JWT_SECRET
-# RESEND_API_KEY
+# SESSION_SECRET
 # STRIPE_SECRET_KEY
 # STRIPE_WEBHOOK_SECRET

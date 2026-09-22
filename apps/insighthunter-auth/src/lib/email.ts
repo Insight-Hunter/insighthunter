@@ -1,52 +1,59 @@
-// apps/auth/src/lib/email.ts
-// Transactional email via Resend API
+// Transactional email via Cloudflare Email Service
 
-const BASE_URL = "https://auth.insighthunter.app";
+const VERIFICATION_BASE_URL = "https://insighthunter.app";
+const DEFAULT_FROM_NAME = "InsightHunter";
+
+export interface SendEmailBinding {
+  send(message: {
+    to: string | { email: string; name?: string };
+    from: string | { email: string; name?: string };
+    subject: string;
+    html?: string;
+    text?: string;
+  }): Promise<unknown>;
+}
 
 export async function sendVerificationEmail(
-  apiKey: string,
+  binding: SendEmailBinding,
   to: string,
   token: string,
+  fromName = DEFAULT_FROM_NAME,
 ): Promise<void> {
-  const link = `${BASE_URL}/auth/verify-email?token=${token}`;
-  await resendSend(apiKey, {
+  const link = `${VERIFICATION_BASE_URL}/verify-email?token=${encodeURIComponent(token)}`;
+  await sendEmail(binding, {
     to,
+    fromName,
     subject: "Verify your InsightHunter account",
     html: `<p>Click to verify your email: <a href="${link}">${link}</a></p><p>Expires in 24 hours.</p>`,
+    text: `Click to verify your email: ${link}\n\nExpires in 24 hours.`,
   });
 }
 
 export async function sendPasswordResetEmail(
-  apiKey: string,
+  binding: SendEmailBinding,
   to: string,
   token: string,
+  fromName = DEFAULT_FROM_NAME,
 ): Promise<void> {
-  const link = `${BASE_URL}/auth/reset-password?token=${token}`;
-  await resendSend(apiKey, {
+  const link = `${VERIFICATION_BASE_URL}/reset-password?token=${encodeURIComponent(token)}`;
+  await sendEmail(binding, {
     to,
+    fromName,
     subject: "Reset your InsightHunter password",
     html: `<p>Reset your password: <a href="${link}">${link}</a></p><p>Expires in 1 hour.</p>`,
+    text: `Reset your InsightHunter password: ${link}\n\nExpires in 1 hour.`,
   });
 }
 
-async function resendSend(
-  apiKey: string,
-  opts: { to: string; subject: string; html: string },
+async function sendEmail(
+  binding: SendEmailBinding,
+  opts: { to: string; fromName: string; subject: string; html: string; text: string },
 ): Promise<void> {
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "InsightHunter <noreply@insighthunter.app>",
-      to: [opts.to],
-      subject: opts.subject,
-      html: opts.html,
-    }),
+  await binding.send({
+    from: { email: "noreply@insighthunter.app", name: opts.fromName },
+    to: opts.to,
+    subject: opts.subject,
+    html: opts.html,
+    text: opts.text,
   });
-  if (!res.ok) {
-    throw new Error(`Resend error: ${res.status} ${await res.text()}`);
-  }
 }

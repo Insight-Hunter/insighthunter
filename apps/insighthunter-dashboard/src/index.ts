@@ -13,7 +13,7 @@ interface Session {
   tier: Tier;
 }
 const APP_TILES = [
-  { id: 'insights',      label: 'Insights',      mono: 'IN', url: 'https://insights.insighthunter.app',      desc: 'Financial KPIs & forecasting' },
+  { id: 'insights',      label: 'Insights',       mono: 'IN', url: 'https://insights.insighthunter.app',      desc: 'Financial KPIs & forecasting' },
   { id: 'bookkeeping',   label: 'Bookkeeping',    mono: 'BK', url: 'https://bookkeeping.insighthunter.app',   desc: 'Transactions & reconciliation' },
   { id: 'payroll',       label: 'Payroll',        mono: 'PR', url: 'https://payroll.insighthunter.app',       desc: 'Payroll & tax estimates' },
   { id: 'advisor',       label: 'Advisor',        mono: 'AI', url: 'https://advisor.insighthunter.app',       desc: 'AI-powered CFO assistant' },
@@ -24,7 +24,7 @@ const APP_TILES = [
   { id: 'finops',        label: 'FinOps',         mono: 'FO', url: 'https://finops.insighthunter.app',        desc: 'Cost optimization & tracking' },
   { id: 'scout',         label: 'Scout',          mono: 'SC', url: 'https://scout.insighthunter.app',         desc: 'Business intelligence & signals' },
   { id: 'dispatch',      label: 'Dispatch',       mono: 'DP', url: 'https://dispatch.insighthunter.app',      desc: 'Operations & task dispatch' },
-  { id: 'notifications',  label: 'Notifications', mono: 'NT', url: 'https://notifications.insighthunter.app', desc: 'Alerts & team notifications' },
+  { id: 'notifications', label: 'Notifications',  mono: 'NT', url: 'https://notifications.insighthunter.app', desc: 'Alerts & team notifications' },
 ] as const;
 
 const MODULES = [

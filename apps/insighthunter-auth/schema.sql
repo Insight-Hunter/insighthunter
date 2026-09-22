@@ -1,8 +1,11 @@
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL DEFAULT '',
+  org_name TEXT NOT NULL DEFAULT '',
+  role TEXT NOT NULL DEFAULT 'owner',
   password_hash TEXT NOT NULL,
-  tier TEXT NOT NULL CHECK (tier IN ('startup', 'standard', 'pro')),
+  tier TEXT NOT NULL CHECK (tier IN ('lite', 'standard', 'pro')),
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'deleted')),
   vault_do_id TEXT NOT NULL UNIQUE,
   created_at INTEGER NOT NULL,

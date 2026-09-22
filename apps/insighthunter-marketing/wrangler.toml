@@ -13,6 +13,14 @@ routes = [
 directory = "./dist/client"
 binding = "ASSETS"
 
+[[kv_namespaces]]
+binding = "LEADS"
+id = "3f9b5938564948569f7ce8d73cac769e"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "1a34ccfa48cd47bab83eef40c5586945"
+
 [observability]
 enabled = true
 

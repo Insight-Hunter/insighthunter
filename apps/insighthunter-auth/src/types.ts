@@ -1,6 +1,9 @@
+import type { SendEmailBinding } from "./lib/email.js";
+
 export interface Env {
   DB: D1Database;
   SESSIONS: KVNamespace;
+  SEND_EMAIL: SendEmailBinding;
   USER_VAULT: DurableObjectNamespace;
   SESSION_SECRET: string; // wrangler secret, HMAC key for session tokens
   ALLOWED_ORIGIN: string; // e.g. https://insighthunter.app

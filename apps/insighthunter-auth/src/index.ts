@@ -7,6 +7,8 @@ const DEFAULT_DASHBOARD_ORIGIN = "https://dashboard.insighthunter.app";
 const ALLOWED_PLANS = new Set(["lite", "standard", "pro"]);
 const SESSION_COOKIE = "ih_session";
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // matches sessionCookie Max-Age
+const LOGIN_RATE_LIMIT = 10;
+const LOGIN_RATE_WINDOW_SECONDS = 15 * 60;
 
 function toTier(plan: string): Tier {
   return plan === "standard" || plan === "pro" ? plan : "startup";
@@ -92,6 +94,34 @@ function validEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 254;
 }
 
+function loginRateKey(scope: "ip" | "email", value: string): string {
+  return `login-rate:${scope}:${value.toLowerCase()}`;
+}
+
+async function rateLimitExceeded(env: Env, ip: string, email: string): Promise<boolean> {
+  const [ipCount, emailCount] = await Promise.all([
+    env.SESSIONS.get<number>(loginRateKey("ip", ip)),
+    env.SESSIONS.get<number>(loginRateKey("email", email)),
+  ]);
+  return (ipCount ?? 0) >= LOGIN_RATE_LIMIT || (emailCount ?? 0) >= LOGIN_RATE_LIMIT;
+}
+
+async function recordFailedLogin(env: Env, ip: string, email: string): Promise<void> {
+  await Promise.all([ip, email].map(async (value, index) => {
+    const scope = index === 0 ? "ip" : "email";
+    const key = loginRateKey(scope, value);
+    const count = (await env.SESSIONS.get<number>(key)) ?? 0;
+    await env.SESSIONS.put(key, String(count + 1), { expirationTtl: LOGIN_RATE_WINDOW_SECONDS });
+  }));
+}
+
+async function clearLoginRateLimit(env: Env, ip: string, email: string): Promise<void> {
+  await Promise.all([
+    env.SESSIONS.delete(loginRateKey("ip", ip)),
+    env.SESSIONS.delete(loginRateKey("email", email)),
+  ]);
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
@@ -147,13 +177,20 @@ export default {
 
     if (method === "POST" && url.pathname === "/login") {
       const { email, password, returnTo: destination } = await parseForm(request, env);
+      const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+      if (await rateLimitExceeded(env, ip, email)) {
+        return authPage("login", destination, plan, "Too many login attempts. Try again later.");
+      }
       const user = validEmail(email)
         ? await env.DB.prepare("SELECT id, email, password_hash FROM users WHERE email = ?1").bind(email).first<{ id: string; email: string; password_hash: string }>()
         : null;
       const valid = user ? await verifyPassword(password, user.password_hash) : false;
       if (!user || !valid) {
+        await recordFailedLogin(env, ip, email);
         return authPage("login", destination, plan, "Invalid email or password.");
       }
+
+      await clearLoginRateLimit(env, ip, email);
 
       const record = await env.DB.prepare("SELECT tier FROM users WHERE id = ?1").bind(user.id).first<{ tier: string }>();
       const issuedAt = Date.now();
