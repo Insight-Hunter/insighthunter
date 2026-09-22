@@ -80,14 +80,29 @@ function clearSessionCookie(): string {
 }
 
 async function parseForm(request: Request, env: Env): Promise<{ email: string; password: string; name: string; plan: string; returnTo: string }> {
-  const form = await request.formData();
+  const contentType = request.headers.get("Content-Type") ?? "";
+  const values = contentType.includes("application/json")
+    ? await request.json<Record<string, unknown>>()
+    : Object.fromEntries(await request.formData());
   return {
-    email: String(form.get("email") ?? "").trim().toLowerCase(),
-    password: String(form.get("password") ?? ""),
-    name: String(form.get("name") ?? "").trim(),
-    plan: safePlan(String(form.get("plan") ?? "lite")),
-    returnTo: safeReturnTo(String(form.get("returnTo") ?? ""), env),
+    email: String(values["email"] ?? "").trim().toLowerCase(),
+    password: String(values["password"] ?? ""),
+    name: String(values["name"] ?? "").trim(),
+    plan: safePlan(String(values["plan"] ?? values["tier"] ?? "lite")),
+    returnTo: safeReturnTo(String(values["returnTo"] ?? ""), env),
   };
+}
+
+function jsonAuthResponse(token: string, userId: string, email: string, tier: Tier): Response {
+  return Response.json({ token, userId, email, tier, expiresAt: Date.now() + SESSION_TTL_MS }, { headers: securityHeaders });
+}
+
+function isJsonRequest(request: Request): boolean {
+  return (request.headers.get("Content-Type") ?? "").includes("application/json");
+}
+
+function jsonAuthError(error: string, status: number): Response {
+  return Response.json({ error }, { status, headers: securityHeaders });
 }
 
 function validEmail(email: string): boolean {
@@ -147,21 +162,23 @@ export default {
 
     if (method === "POST" && url.pathname === "/register") {
       const { email, password, name, plan: selectedPlan, returnTo: destination } = await parseForm(request, env);
-      if (!validEmail(email) || password.length < 12 || name.length < 2 || name.length > 120) {
+      const jsonRequest = isJsonRequest(request);
+      if (!validEmail(email) || password.length < 12 || (!jsonRequest && (name.length < 2 || name.length > 120))) {
+        if (jsonRequest) return jsonAuthError("invalid_registration", 400);
         return authPage("register", destination, selectedPlan, "Please provide a valid name, email, and a password of at least 12 characters.");
       }
 
       const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?1").bind(email).first<{ id: string }>();
       if (existing) {
+        if (jsonRequest) return jsonAuthError("email_in_use", 409);
         return authPage("register", destination, selectedPlan, "Unable to create this account. Try logging in or use another email address.");
       }
 
       const id = crypto.randomUUID();
       const passwordHash = await hashPassword(password);
       const tier = toTier(selectedPlan);
-      // `name` isn't a users column; the auth DB only tracks tier/status/vault_do_id.
-      await env.DB.prepare("INSERT INTO users (id, email, password_hash, tier, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?5)")
-        .bind(id, email, passwordHash, tier, Date.now())
+      await env.DB.prepare("INSERT INTO users (id, email, name, password_hash, tier, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?6)")
+        .bind(id, email, name, passwordHash, tier, Date.now())
         .run();
 
       const issuedAt = Date.now();
@@ -169,6 +186,9 @@ export default {
         { userId: id, email, tier, issuedAt, expiresAt: issuedAt + SESSION_TTL_MS },
         env.SESSION_SECRET
       );
+      if ((request.headers.get("Content-Type") ?? "").includes("application/json")) {
+        return jsonAuthResponse(token, id, email, tier);
+      }
       return new Response(null, {
         status: 303,
         headers: { Location: destination, ...securityHeaders, "Set-Cookie": sessionCookie(token) },
@@ -178,7 +198,9 @@ export default {
     if (method === "POST" && url.pathname === "/login") {
       const { email, password, returnTo: destination } = await parseForm(request, env);
       const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+      const jsonRequest = isJsonRequest(request);
       if (await rateLimitExceeded(env, ip, email)) {
+        if (jsonRequest) return jsonAuthError("rate_limited", 429);
         return authPage("login", destination, plan, "Too many login attempts. Try again later.");
       }
       const user = validEmail(email)
@@ -187,6 +209,7 @@ export default {
       const valid = user ? await verifyPassword(password, user.password_hash) : false;
       if (!user || !valid) {
         await recordFailedLogin(env, ip, email);
+        if (jsonRequest) return jsonAuthError("invalid_credentials", 401);
         return authPage("login", destination, plan, "Invalid email or password.");
       }
 
@@ -198,6 +221,9 @@ export default {
         { userId: user.id, email: user.email, tier: toTier(record?.tier ?? "lite"), issuedAt, expiresAt: issuedAt + SESSION_TTL_MS },
         env.SESSION_SECRET
       );
+      if (jsonRequest) {
+        return jsonAuthResponse(token, user.id, user.email, toTier(record?.tier ?? "lite"));
+      }
       return new Response(null, {
         status: 303,
         headers: { Location: destination, ...securityHeaders, "Set-Cookie": sessionCookie(token) },
@@ -218,6 +244,14 @@ export default {
       const session = await verifySession(token, env.SESSION_SECRET);
       if (!session) return Response.json({ authenticated: false }, { status: 401, headers: securityHeaders });
       return Response.json({ authenticated: true, session }, { headers: securityHeaders });
+    }
+
+    if (url.pathname === "/session/verify" && method === "GET") {
+      const authorization = request.headers.get("Authorization");
+      const token = authorization?.startsWith("Bearer ") ? authorization.slice(7) : null;
+      const session = token ? await verifySession(token, env.SESSION_SECRET) : null;
+      if (!session) return Response.json({ error: "Unauthorized" }, { status: 401, headers: securityHeaders });
+      return Response.json({ valid: true, ...session }, { headers: securityHeaders });
     }
 
     return new Response("Not found", { status: 404, headers: securityHeaders });

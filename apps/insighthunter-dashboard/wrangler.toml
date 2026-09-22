@@ -6,6 +6,10 @@ compatibility_date = "2026-08-23"
 pattern = "app.insighthunter.app/*"
 zone_name = "insighthunter.app"
 
+[[routes]]
+pattern = "dashboard.insighthunter.app/*"
+zone_name = "insighthunter.app"
+
 [observability]
 enabled = true
 head_sampling_rate = 1
