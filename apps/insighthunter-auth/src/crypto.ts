@@ -1,4 +1,4 @@
-import type { SessionPayload } from "./types.js";
+import type { SessionPayload, Tier, OrgRole } from "./types.js";
 
 const PBKDF2_ITERATIONS = 100_000; // Workers Web Crypto caps PBKDF2 at 100,000 iterations
 
@@ -17,13 +17,13 @@ export async function hashPassword(password: string): Promise<string> {
     keyMaterial,
     256
   );
-  const hashHex = toHex(new Uint8Array(bits));
-  const saltHex = toHex(salt);
-  return `${PBKDF2_ITERATIONS}:${saltHex}:${hashHex}`;
+  return `${PBKDF2_ITERATIONS}:${toHex(salt)}:${toHex(new Uint8Array(bits))}`;
 }
 
-/** Constant-time-ish verify (relies on Web Crypto internals; hash comparison
- *  itself is done byte-by-byte to avoid short-circuit timing leaks). */
+/**
+ * Constant-time-ish verify.
+ * Hash comparison is done byte-by-byte to avoid short-circuit timing leaks.
+ */
 export async function verifyPassword(
   password: string,
   stored: string
@@ -31,9 +31,7 @@ export async function verifyPassword(
   const [iterStr, saltHex, hashHex] = stored.split(":");
   if (!iterStr || !saltHex || !hashHex) return false;
   const iterations = Number.parseInt(iterStr, 10);
-  if (!Number.isSafeInteger(iterations) || iterations < 1 || iterations > PBKDF2_ITERATIONS) {
-    return false;
-  }
+  if (!Number.isSafeInteger(iterations) || iterations < 1 || iterations > PBKDF2_ITERATIONS) return false;
   const salt = fromHex(saltHex);
   if (!salt || !/^[0-9a-f]{64}$/i.test(hashHex)) return false;
   const keyMaterial = await crypto.subtle.importKey(
@@ -43,14 +41,12 @@ export async function verifyPassword(
     false,
     ["deriveBits"]
   );
-  const normalizedSalt = Uint8Array.from(salt);
   const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt: normalizedSalt.buffer, iterations, hash: "SHA-256" },
+    { name: "PBKDF2", salt: Uint8Array.from(salt).buffer, iterations, hash: "SHA-256" },
     keyMaterial,
     256
   );
-  const computedHex = toHex(new Uint8Array(bits));
-  return timingSafeEqual(computedHex, hashHex);
+  return timingSafeEqual(toHex(new Uint8Array(bits)), hashHex);
 }
 
 /** Sign a session payload as base64url(json).base64url(hmac) — a minimal JWT-like token. */
@@ -59,7 +55,7 @@ export async function signSession(
   secret: string
 ): Promise<string> {
   const body = base64url(JSON.stringify(payload));
-  const sig = await hmac(body, secret);
+  const sig  = await hmac(body, secret);
   return `${body}.${sig}`;
 }
 
@@ -67,8 +63,10 @@ export async function verifySession(
   token: string,
   secret: string
 ): Promise<SessionPayload | null> {
-  const [body, sig] = token.split(".");
-  if (!body || !sig) return null;
+  const dot = token.lastIndexOf(".");
+  if (dot < 1) return null;
+  const body = token.slice(0, dot);
+  const sig  = token.slice(dot + 1);
   const expected = await hmac(body, secret);
   if (!timingSafeEqual(sig, expected)) return null;
   try {
@@ -80,6 +78,8 @@ export async function verifySession(
   }
 }
 
+// ── Internals ────────────────────────────────────────────────────────────────
+
 async function hmac(data: string, secret: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
@@ -90,6 +90,27 @@ async function hmac(data: string, secret: string): Promise<string> {
   );
   const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(data));
   return toHex(new Uint8Array(sig));
+}
+
+const VALID_TIERS = new Set<Tier>(["lite", "standard", "pro", "enterprise"]);
+const VALID_ROLES = new Set<OrgRole>(["owner", "admin", "member", "viewer"]);
+
+function isTier(v: unknown): v is Tier  { return typeof v === "string" && VALID_TIERS.has(v as Tier); }
+function isRole(v: unknown): v is OrgRole { return typeof v === "string" && VALID_ROLES.has(v as OrgRole); }
+
+function isSessionPayload(value: unknown): value is SessionPayload {
+  if (!value || typeof value !== "object") return false;
+  const p = value as Record<string, unknown>;
+  return (
+    typeof p["userId"]    === "string" &&
+    typeof p["email"]     === "string" &&
+    typeof p["name"]      === "string" &&
+    typeof p["orgName"]   === "string" &&
+    isRole(p["role"])                  &&
+    isTier(p["tier"])                  &&
+    typeof p["issuedAt"]  === "number" &&
+    typeof p["expiresAt"] === "number"
+  );
 }
 
 function toHex(bytes: Uint8Array): string {
@@ -112,14 +133,4 @@ function timingSafeEqual(a: string, b: string): boolean {
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return diff === 0;
-}
-
-function isSessionPayload(value: unknown): value is SessionPayload {
-  if (!value || typeof value !== "object") return false;
-  const payload = value as Record<string, unknown>;
-  return typeof payload["userId"] === "string"
-    && typeof payload["email"] === "string"
-    && (payload["tier"] === "startup" || payload["tier"] === "standard" || payload["tier"] === "pro")
-    && typeof payload["issuedAt"] === "number"
-    && typeof payload["expiresAt"] === "number";
 }
