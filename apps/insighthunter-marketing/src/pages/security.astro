@@ -1,0 +1,31 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+---
+
+<MarketingLayout
+  title="Security | Insight Hunter"
+  description="Learn how Insight Hunter approaches authorization, tenant separation, secure transport, and operational security."
+>
+  <section class="wrap page">
+    <p class="eyebrow">Security and privacy</p>
+    <h1>Financial clarity should not compromise privacy.</h1>
+    <p class="lead">Insight Hunter is designed around explicit authorization, secure edge infrastructure, and tenant-isolated customer operations.</p>
+
+    <div class="grid">
+      <article><h2>Authentication</h2><p>Account authentication and authorization are handled through the dedicated Insight Hunter auth service.</p></article>
+      <article><h2>Tenant isolation</h2><p>Customer operations are designed to prevent cross-tenant access and data mixing.</p></article>
+      <article><h2>Secure transport</h2><p>Application requests use encrypted HTTPS transport and controlled security policies.</p></article>
+      <article><h2>Operational review</h2><p>Security-sensitive activity should be recorded and monitored through controlled operational systems.</p></article>
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  .page { padding-block: 5rem; }
+  .lead { max-width: 65ch; color: var(--ink-soft); font-size: 1.1rem; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 2rem; }
+  article { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 1.5rem; }
+  article h2 { font-size: 1.25rem; }
+  article p { color: var(--ink-soft); }
+  @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+</style>

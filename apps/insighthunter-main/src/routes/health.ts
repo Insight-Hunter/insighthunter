@@ -1,7 +1,7 @@
 // apps/insighthunter-main/src/routes/health.ts
 
 import { Hono } from "hono";
-import type { Env } from "../index";
+import type { Env } from "../index.js";
 
 export const healthRoutes = new Hono<{ Bindings: Env }>();
 

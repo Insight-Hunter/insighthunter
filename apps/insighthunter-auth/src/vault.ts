@@ -1,3 +1,9 @@
+import { verifySession } from "./crypto.js";
+
+interface VaultEnv {
+  SESSION_SECRET: string;
+}
+
 /**
  * UserVault — one Durable Object instance per user.
  *
@@ -12,15 +18,24 @@
  * own per-user D1 database reference stored in this vault's metadata.
  */
 export class UserVault {
+  private static readonly OWNER_KEY = "__owner_user_id";
   state: DurableObjectState;
+  private readonly sessionSecret: string;
 
-  constructor(state: DurableObjectState) {
+  constructor(state: DurableObjectState, env: VaultEnv) {
     this.state = state;
+    this.sessionSecret = env.SESSION_SECRET;
   }
 
   async fetch(request: Request): Promise<Response> {
+    const identity = await this.authorize(request);
+    if (!identity) return new Response("unauthorized", { status: 401 });
+
     const url = new URL(request.url);
     const key = url.searchParams.get("key");
+    if (key === UserVault.OWNER_KEY) {
+      return new Response("forbidden", { status: 403 });
+    }
 
     if (request.method === "GET") {
       if (!key) return this.list();
@@ -44,8 +59,20 @@ export class UserVault {
     return new Response("method not allowed", { status: 405 });
   }
 
+  private async authorize(request: Request): Promise<string | null> {
+    const authorization = request.headers.get("Authorization");
+    if (!authorization?.startsWith("Bearer ")) return null;
+    const session = await verifySession(authorization.slice(7), this.sessionSecret);
+    if (!session) return null;
+
+    const ownerId = await this.state.storage.get<string>(UserVault.OWNER_KEY);
+    if (ownerId && ownerId !== session.userId) return null;
+    if (!ownerId) await this.state.storage.put(UserVault.OWNER_KEY, session.userId);
+    return session.userId;
+  }
+
   private async list(): Promise<Response> {
     const map = await this.state.storage.list();
-    return Response.json({ keys: Array.from(map.keys()) });
+    return Response.json({ keys: Array.from(map.keys()).filter((key) => key !== UserVault.OWNER_KEY) });
   }
 }

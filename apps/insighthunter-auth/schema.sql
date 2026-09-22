@@ -2,6 +2,7 @@
 -- Migration note: if upgrading an existing DB, run the ALTER statements
 -- at the bottom of this file before redeploying.
 CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS users (
   id           TEXT    PRIMARY KEY,
   email        TEXT    NOT NULL UNIQUE,
   password_hash TEXT   NOT NULL,
@@ -13,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
   vault_do_id  TEXT    NOT NULL DEFAULT '',
   created_at   INTEGER NOT NULL,
   updated_at   INTEGER NOT NULL
+);
 );
 
 CREATE TABLE IF NOT EXISTS audit_log (

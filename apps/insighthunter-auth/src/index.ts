@@ -3,6 +3,8 @@
 import { hashPassword, verifyPassword, signSession, verifySession } from "./crypto.js";
 import type { Env, Tier, OrgRole } from "./types.js";
 
+export { UserVault } from "./vault.js";
+
 const APP_ORIGIN     = "https://app.insighthunter.app";
 const SESSION_COOKIE = "ih_session";
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
@@ -254,7 +256,7 @@ export default {
     }
 
     // ── GET /session/verify — Service Binding endpoint for insighthunter-dashboard ──
-    // Called internally via env.AUTH_SERVICE.fetch(). Accepts Bearer token.
+    // Called internally via env.AUTH_SERVICE.fetch(). Accepts ****** Cookie token.
     // Returns the Session shape expected by insighthunter-dashboard's Session interface.
     if (method === "GET" && url.pathname === "/session/verify") {
       const token   = bearerToken(request) ?? cookieToken(request);

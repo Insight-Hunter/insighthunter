@@ -19,7 +19,6 @@ interface Session {
   tier: Tier;
   role?: string;
 }
-
 const TIER_RANK: Record<Tier, number> = { lite: 0, standard: 1, pro: 2, enterprise: 3 };
 
 const APP_TILES = [

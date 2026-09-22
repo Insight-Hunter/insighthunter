@@ -1,9 +1,13 @@
+import type { SendEmailBinding } from "./lib/email.js";
+
 export interface Env {
   DB: D1Database;
   SESSIONS: KVNamespace;
+  SEND_EMAIL: SendEmailBinding;
   USER_VAULT: DurableObjectNamespace;
   SESSION_SECRET: string; // wrangler secret — HMAC key for session tokens
   ALLOWED_ORIGIN: string; // e.g. https://insighthunter.app
+  DASHBOARD_URL: string; // e.g. https://dashboard.insighthunter.app
 }
 
 /** Subscription tiers — must stay in sync with insighthunter-dashboard TIER_RANK. */

@@ -1,0 +1,173 @@
+---
+import MarketingLayout from "../layouts/MarketingLayout.astro";
+import { registerUrl, type Plan } from "../lib/auth-links";
+
+type PricingPlan = {
+  id: Plan;
+  name: string;
+  description: string;
+  price: string;
+  interval: string;
+  cta: string;
+  featured?: boolean;
+  badge?: string;
+  features: string[];
+};
+
+const plans: PricingPlan[] = [
+  {
+    id: "lite",
+    name: "Insight Lite",
+    description: "Perfect for getting started — no card required.",
+    price: "$0",
+    interval: "/mo",
+    cta: "Start free",
+    features: [
+      "Basic bookkeeping (up to 150 transactions per month)",
+      "Monthly profit & loss statement",
+      "Cash-flow snapshot",
+      "AI categorization assistance",
+      "1 user",
+    ],
+  },
+  {
+    id: "standard",
+    name: "Insight Standard",
+    description: "For businesses ready to automate their financial operations.",
+    price: "$49",
+    interval: "/mo",
+    badge: "Most popular",
+    featured: true,
+    cta: "Start 14-day trial",
+    features: [
+      "Everything in Insight Lite",
+      "Full bookkeeping support",
+      "Up to 1,000 transactions per month",
+      "Bank and credit-card connections",
+      "Cash-flow forecasting",
+      "Monthly financial reports",
+      "Up to 3 users",
+    ],
+  },
+  {
+    id: "pro",
+    name: "Insight Pro",
+    description: "For growing companies that need an always-on financial partner.",
+    price: "$129",
+    interval: "/mo",
+    cta: "Start 14-day trial",
+    features: [
+      "Everything in Insight Standard",
+      "Advanced reporting and forecasting",
+      "AI CFO insights and recommendations",
+      "Priority support",
+      "Custom dashboards",
+      "Up to 10 users",
+      "Priority access to new modules",
+    ],
+  },
+];
+---
+
+<MarketingLayout
+  title="Simple, Transparent Pricing | Insight Hunter"
+  description="Start free. Scale when ready. No hidden fees. Choose the Insight Hunter plan that fits your business."
+>
+  <main>
+    <section class="hero" aria-labelledby="pricing-title">
+      <div class="container">
+        <p class="eyebrow">Simple, transparent pricing</p>
+        <h1 id="pricing-title">Start free. Scale when ready.</h1>
+        <p class="hero-copy">
+          Enterprise-grade financial visibility for small businesses. No hidden fees.
+          Change or cancel your plan at any time.
+        </p>
+      </div>
+    </section>
+
+    <section class="pricing-section" aria-label="Pricing plans">
+      <div class="container">
+        <div class="pricing-grid">
+          {
+            plans.map((plan) => (
+              <article
+                class:list={[
+                  "pricing-card",
+                  { "pricing-card--featured": plan.featured },
+                ]}
+              >
+                {plan.badge && <p class="pricing-badge">{plan.badge}</p>}
+
+                <header class="pricing-card__header">
+                  <h2>{plan.name}</h2>
+                  <p class="pricing-card__description">{plan.description}</p>
+                  <p class="pricing-card__price">
+                    <span class="price">{plan.price}</span>
+                    <span class="interval">{plan.interval}</span>
+                  </p>
+                </header>
+
+                <a
+                  class:list={[
+                    "pricing-card__cta",
+                    { "pricing-card__cta--featured": plan.featured },
+                  ]}
+                  href={registerUrl(plan.id)}
+                  data-plan={plan.id}
+                >
+                  {plan.cta}
+                </a>
+
+                <ul class="pricing-card__features">
+                  {
+                    plan.features.map((feature) => (
+                      <li>
+                        <span aria-hidden="true">✓</span>
+                        {feature}
+                      </li>
+                    ))
+                  }
+                </ul>
+              </article>
+            ))
+          }
+        </div>
+
+        <p class="pricing-note">
+          Need payroll, business formation, phone, or concierge bookkeeping services?
+          <a href="/contact">Talk with our team</a>.
+        </p>
+      </div>
+    </section>
+  </main>
+</MarketingLayout>
+
+<style>
+  .hero { padding: 5.5rem 0 3rem; text-align: center; }
+  .container { width: min(100% - 2rem, 75rem); margin: 0 auto; }
+  .eyebrow { margin: 0 0 .75rem; color: var(--color-primary, #8b5e3c); font-size: .825rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  h1, h2 { color: var(--color-ink, #2b2118); }
+  h1 { max-width: 44rem; margin: 0 auto; font-size: clamp(2.25rem, 5vw, 4rem); line-height: 1.08; }
+  .hero-copy { max-width: 42rem; margin: 1.25rem auto 0; color: var(--color-muted, #675d55); font-size: 1.125rem; line-height: 1.65; }
+  .pricing-section { padding: 2rem 0 5rem; }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; align-items: stretch; }
+  .pricing-card { position: relative; display: flex; flex-direction: column; padding: 2rem; border: 1px solid var(--color-border, #dfd6ce); border-radius: 1rem; background: var(--color-surface, #fffdf9); box-shadow: 0 .5rem 1.5rem rgb(43 33 24 / .05); }
+  .pricing-card--featured { border: 2px solid var(--color-primary, #8b5e3c); box-shadow: 0 1rem 2.5rem rgb(139 94 60 / .18); transform: translateY(-.5rem); }
+  .pricing-badge { position: absolute; top: -.875rem; left: 50%; margin: 0; padding: .35rem .75rem; border-radius: 999px; background: var(--color-primary, #8b5e3c); color: #fff; font-size: .75rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; transform: translateX(-50%); white-space: nowrap; }
+  .pricing-card__header h2 { margin: 0; font-size: 1.5rem; }
+  .pricing-card__description { min-height: 3.4rem; margin: .875rem 0 1.5rem; color: var(--color-muted, #675d55); line-height: 1.5; }
+  .pricing-card__price { display: flex; align-items: baseline; gap: .375rem; margin: 0 0 1.75rem; }
+  .price { color: var(--color-ink, #2b2118); font-size: 3rem; font-weight: 800; line-height: 1; }
+  .interval { color: var(--color-muted, #675d55); font-size: 1rem; }
+  .pricing-card__cta { display: inline-flex; min-height: 3rem; align-items: center; justify-content: center; border: 1px solid var(--color-primary, #8b5e3c); border-radius: .625rem; background: transparent; color: var(--color-primary, #8b5e3c); font-weight: 700; text-decoration: none; transition: background-color 160ms ease, color 160ms ease, transform 160ms ease; }
+  .pricing-card__cta:hover, .pricing-card__cta:focus-visible { background: var(--color-primary, #8b5e3c); color: #fff; transform: translateY(-1px); }
+  .pricing-card__cta:focus-visible { outline: 3px solid rgb(139 94 60 / .4); outline-offset: 3px; }
+  .pricing-card__cta--featured { background: var(--color-primary, #8b5e3c); color: #fff; }
+  .pricing-card__cta--featured:hover, .pricing-card__cta--featured:focus-visible { background: var(--color-primary-dark, #704426); }
+  .pricing-card__features { display: grid; gap: .875rem; margin: 1.75rem 0 0; padding: 0; list-style: none; }
+  .pricing-card__features li { display: flex; gap: .625rem; color: var(--color-muted, #675d55); line-height: 1.45; }
+  .pricing-card__features span { color: var(--color-primary, #8b5e3c); font-weight: 800; }
+  .pricing-note { margin: 2rem 0 0; color: var(--color-muted, #675d55); text-align: center; }
+  .pricing-note a { color: var(--color-primary, #8b5e3c); font-weight: 700; }
+  @media (max-width: 52rem) { .pricing-grid { grid-template-columns: 1fr; max-width: 32rem; margin: 0 auto; } .pricing-card--featured { transform: none; } .pricing-card__description { min-height: auto; } }
+</style>

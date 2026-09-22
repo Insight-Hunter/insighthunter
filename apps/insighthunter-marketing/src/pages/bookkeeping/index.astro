@@ -1,0 +1,30 @@
+---
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import { getSignupUrl } from '../../lib/urls';
+---
+
+<MarketingLayout title="Cleaner books. Faster decisions. | Insight Hunter" description="Use Insight Hunter as the clarity layer around your bookkeeping workflow, reporting needs, and managed-support options.">
+  <section class="wrap module-page">
+    <p class="eyebrow">Bookkeeping</p>
+    <h1>Cleaner books. Faster decisions.</h1>
+    <p class="lead">Use Insight Hunter as the clarity layer around your bookkeeping workflow, reporting needs, and managed-support options.</p>
+
+    <div class="module-grid">
+      <article><h2>Operational visibility</h2><p>Translate bookkeeping activity into cash, margin, KPI, and forecast views.</p></article>
+      <article><h2>Reporting workflows</h2><p>Create recurring financial reporting for owners and advisors.</p></article>
+      <article><h2>Flexible support</h2><p>Choose a software-first workflow and add service support as needed.</p></article>
+    </div>
+
+    <a class="btn btn-primary" href={getSignupUrl('startup')}>Get started</a>
+  </section>
+</MarketingLayout>
+
+<style>
+  .module-page { padding-block: 5rem; }
+  .lead { max-width: 65ch; color: var(--ink-soft); font-size: 1.1rem; }
+  .module-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0; }
+  article { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 1.5rem; }
+  article h2 { font-size: 1.2rem; }
+  article p { color: var(--ink-soft); }
+  @media (max-width: 760px) { .module-grid { grid-template-columns: 1fr; } }
+</style>
