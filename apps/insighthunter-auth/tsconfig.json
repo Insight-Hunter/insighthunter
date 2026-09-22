@@ -5,5 +5,12 @@
     "outDir": "dist",
     "types": ["@cloudflare/workers-types"]
   },
-  "include": ["src/index.ts", "src/access.ts", "src/crypto.ts", "src/types.ts", "src/vault.ts", "src/lib/email.ts"]
+  "include": [
+    "src/index.ts",
+    "src/access.ts",
+    "src/crypto.ts",
+    "src/types.ts",
+    "src/vault.ts",
+    "src/lib/email.ts"
+  ]
 }

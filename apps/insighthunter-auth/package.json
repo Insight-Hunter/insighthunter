@@ -4,14 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev --config wrangler.toml",
-    "build": "wrangler deploy --dry-run --config wrangler.toml",
-    "deploy": "wrangler deploy --config wrangler.toml",
+    "dev":       "wrangler dev --config wrangler.toml",
+    "build":     "wrangler deploy --dry-run --config wrangler.toml",
+    "deploy":    "wrangler deploy --config wrangler.toml",
     "typecheck": "tsc -p tsconfig.json --noEmit"
-  },
-  "dependencies": {
-    "@insighthunter/auth-shared": "workspace:*",
-    "hono": "^4.6.10"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250701.0"

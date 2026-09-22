@@ -1,6 +1,7 @@
 name = "insighthunter-auth"
 main = "src/index.ts"
-compatibility_date = "2026-07-25"
+compatibility_date = "2026-09-06"
+compatibility_flags = ["nodejs_compat"]
 
 [[routes]]
 pattern = "auth.insighthunter.app/*"
@@ -15,24 +16,11 @@ binding = "DB"
 database_name = "insighthunter-auth-db"
 database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
 
+# Rate-limiting and short-lived token storage.
+# Previously named KV_SESSIONS in wrangler.jsonc.bak — binding name unified to SESSIONS.
 [[kv_namespaces]]
 binding = "SESSIONS"
 id = "60e34ba310ca40c79edec05470c7a271"
-
-[[send_email]]
-name = "SEND_EMAIL"
-allowed_sender_addresses = ["noreply@insighthunter.app"]
-
-[vars]
-APP_BASE_URL = "https://auth.insighthunter.app"
-DASHBOARD_URL = "https://dashboard.insighthunter.app"
-MARKETING_URL = "https://insighthunter.app"
-ALLOWED_ORIGIN = "https://insighthunter.app"
-
-[dev]
-port = 8787
-local_protocol = "http"
-inspector_port = 9232
 
 [[durable_objects.bindings]]
 name = "USER_VAULT"
@@ -42,7 +30,19 @@ class_name = "UserVault"
 tag = "v1"
 new_classes = ["UserVault"]
 
-# Secrets (set via wrangler secret put):
-# SESSION_SECRET
-# STRIPE_SECRET_KEY
-# STRIPE_WEBHOOK_SECRET
+[vars]
+APP_BASE_URL    = "https://auth.insighthunter.app"
+DASHBOARD_URL   = "https://app.insighthunter.app"
+MARKETING_URL   = "https://insighthunter.app"
+ALLOWED_ORIGIN  = "https://insighthunter.app"
+
+[dev]
+port           = 8787
+local_protocol = "http"
+inspector_port = 9232
+
+# ── Secrets (set via `wrangler secret put <NAME>`) ────────────────────────────
+# SESSION_SECRET   — HMAC-SHA256 key for signing session tokens (min 32 random bytes, hex)
+# RESEND_API_KEY   — Resend transactional email API key
+# STRIPE_SECRET_KEY       — (future) Stripe secret key
+# STRIPE_WEBHOOK_SECRET   — (future) Stripe webhook signing secret
