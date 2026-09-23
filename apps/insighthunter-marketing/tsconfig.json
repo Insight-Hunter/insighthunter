@@ -1,9 +1,9 @@
 {
-  "extends": "./../../tsconfig.base.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "paths": {
-      "*": ["/apps/*"],
-      "@/apps": ["/apps/*"]
-    }
-  }
+    "rootDir": "src",
+    "outDir": "dist",
+    "types": ["@cloudflare/workers-types"]
+  },
+  "include": ["src/**/*.ts"]
 }

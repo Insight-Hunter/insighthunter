@@ -1,0 +1,38 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "insighthunter-marketing",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-06",
+
+  "routes": [
+    { "pattern": "insighthunter.app/*",     "zone_name": "insighthunter.app" },
+    { "pattern": "www.insighthunter.app/*", "zone_name": "insighthunter.app" }
+  ],
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  // Rate-limit the public contact form (no PII stored — see src/lib/rate-limit.ts).
+  // Replace placeholder IDs with real namespace IDs before first deploy.
+  "kv_namespaces": [
+    {
+      "binding": "RATE_LIMIT",
+      "id": "REPLACE_WITH_KV_NAMESPACE_ID",
+      "preview_id": "REPLACE_WITH_KV_PREVIEW_NAMESPACE_ID"
+    },
+    {
+      "binding": "LEADS",
+      "id": "REPLACE_WITH_LEADS_KV_NAMESPACE_ID",
+      "preview_id": "REPLACE_WITH_LEADS_KV_PREVIEW_NAMESPACE_ID"
+    }
+  ],
+
+  "vars": {
+    "CANONICAL_ORIGIN": "https://insighthunter.app",
+    "AUTH_ORIGIN":      "https://auth.insighthunter.app",
+    "APP_ORIGIN":       "https://app.insighthunter.app",
+    "CONTACT_TO_EMAIL": "sales@insighthunter.app"
+  }
+}
