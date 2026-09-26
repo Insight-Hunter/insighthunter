@@ -1,12 +1,21 @@
 :root {
-  --ink: #e6edf5;
-  --ink-soft: #93a2b8;
-  --paper: #0b1120;
-  --panel: #131c31;
-  --line: #24304a;
-  --moss: #22d3ee;
-  --amber: #f59e0b;
-  --radius: 0.5rem;
+  --ink: #E9EDF3;
+  --ink-soft: #A9B4C4;
+  --paper: #0B0F14;
+  --paper-bright: #121822;
+  --panel: #161D28;
+  --amber: #00F0C8;
+  --amber-soft: #6FFFE0;
+  --moss: #5FA8FF;
+  --clay: #FF6B6B;
+  --line: rgba(233, 237, 243, 0.10);
+  --line-on-dark: rgba(233, 237, 243, 0.14);
+
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body: 'Public Sans', -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --radius: 6px;
   --wrap: 75rem;
   --brand-dark: #0891b2;
 }

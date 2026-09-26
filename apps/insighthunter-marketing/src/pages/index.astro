@@ -1,27 +1,15 @@
-Last login: Fri Sep 25 08:56:26 on ttys001
-jamesmichaelhunterturner@jmichaelhmbp ~ % cd Projects
-jamesmichaelhunterturner@jmichaelhmbp Projects % cd insighthunter
-jamesmichaelhunterturner@jmichaelhmbp insighthunter % git show git show f7e1bf:apps/insighthunter-main/src/pages/index.astro > /tmp/index-old.astro
-
-fatal: ambiguous argument 'git': unknown revision or path not in the working tree.
-Use '--' to separate paths from revisions, like this:
-'git <command> [<revision>...] -- [<file>...]'
-jamesmichaelhunterturner@jmichaelhmbp insighthunter % cd ~/path-to/insighthunter && git show f7e1bf0:apps/insighthunter-main/src/pages/index.astro
-
-cd: no such file or directory: /Users/jamesmichaelhunterturner/path-to/insighthunter
-jamesmichaelhunterturner@jmichaelhmbp insighthunter % git show f7e1bf0:apps/insighthunter-main/src/pages/index.astro
-
 ---
 import Layout from '../layouts/Layout.astro';
 import HeroGlow from '../components/HeroGlow.astro';
 import { MODULES } from '../data/modules';
+import { getSignupUrl } from '../lib/urls';
 ---
 <Layout title="Know your numbers before your competitors do">
   <!-- STAGE 1: HERO — Attention -->
   <section class="hero">
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <p class="eyebrow">The CFO you can't afford, automated</p>
+        <p class="eyebrow">Cloudflare Edge intelligence, always on</p>
         <h1>Stop guessing.<br /><span class="grad-text">Start knowing.</span></h1>
         <p class="hero-sub">
           Insight Hunter turns raw transactions into real-time answers — margin,
@@ -29,57 +17,7 @@ import { MODULES } from '../data/modules';
           moment your bookkeeper gets around to it.
         </p>
         <div class="hero-actions">
-          <a href="/signup" class="btn btn-primary">Start free — no card required</a>
-          <a href="/modules" class="btn btn-ghost">Explore the platform</a>
-        </div>
-:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----
-import Layout from '../layouts/Layout.astro';
-import HeroGlow from '../components/HeroGlow.astro';
-import { MODULES } from '../data/modules';
----
-import Layout from '../layouts/Layout.astro';
-import HeroGlow from '../components/HeroGlow.astro';
-import { MODULES } from '../data/modules';
----
-<Layout title="Know your numbers before your competitors do">
-  <!-- STAGE 1: HERO — Attention -->
-  <section class="hero">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <p class="eyebrow">The CFO you can't afford, automated</p>
-        <h1>Stop guessing.<br /><span class="grad-text">Start knowing.</span></h1>
-        <p class="hero-sub">
-          Insight Hunter turns raw transactions into real-time answers — margin,
-          runway, and cash position, updated the moment they happen, not the
-          moment your bookkeeper gets around to it.
-        </p>
-        <div class="hero-actions">
-          <a href="/signup" class="btn btn-primary">Start free — no card required</a>
+          <a href={getSignupUrl('lite')} class="btn btn-primary">Start free — no card required</a>
           <a href="/modules" class="btn btn-ghost">Explore the platform</a>
         </div>
         <p class="hero-fine mono">Free forever on Startup. No sales call required.</p>
@@ -108,8 +46,8 @@ import { MODULES } from '../data/modules';
   <section class="ruled stat-bar">
     <div class="wrap stat-grid">
       <div class="stat">
-        <span class="stat-num mono">2.3 sec</span>
-        <span class="stat-label">avg sync latency from bank feed to dashboard</span>
+        <span class="stat-num mono">Always on</span>
+        <span class="stat-label">financial visibility built for the decisions you make every day</span>
       </div>
       <div class="stat">
         <span class="stat-num mono">6 modules</span>
@@ -154,7 +92,7 @@ import { MODULES } from '../data/modules';
         <h2>Set up in under 5 minutes. See real numbers today.</h2>
         <p>No card required for Startup. Cancel anytime. Upgrade the day reports, payroll, or advisory pay for themselves.</p>
       </div>
-      <a href="/signup" class="btn btn-on-dark">Claim your free dashboard</a>
+      <a href={getSignupUrl('lite')} class="btn btn-on-dark">Claim your free dashboard</a>
     </div>
   </section>
 
@@ -179,35 +117,21 @@ import { MODULES } from '../data/modules';
     .stat { display: flex; flex-direction: column; gap: 6px; }
     .stat-num { font-size: 2rem; color: var(--amber); font-weight: 600; }
     .stat-label { font-size: 0.88rem; color: var(--ink-soft); max-width: 30ch; }
----
-import Layout from '../layouts/Layout.astro';
-import HeroGlow from '../components/HeroGlow.astro';
-import { MODULES } from '../data/modules';
----
-<Layout title="Know your numbers before your competitors do">
-  <!-- STAGE 1: HERO — Attention -->
-  <section class="hero">
-    <div class="wrap hero-grid">
----
-import Layout from '../layouts/Layout.astro';
-import HeroGlow from '../components/HeroGlow.astro';
-import { MODULES } from '../data/modules';
----
-<Layout title="Know your numbers before your competitors do">
-  <!-- STAGE 1: HERO — Attention -->
-  <section class="hero">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <p class="eyebrow">Brings you financial insight delivered on the Edge</p>
-        <h1>Stop guessing.<br /><span class="grad-text">Start knowing.</span></h
-1>
-        <p class="hero-sub">
-          Insight Hunter turns raw transactions into real-time answers — margin,
-          runway, and cash position, updated the moment they happen.
-        </p>
-        <div class="hero-actions">
-          <a href="/signup" class="btn btn-primary">Start free — no card require
-d</a>
-          <a href="/modules" class="btn btn-ghost">Explore the platform</a>
-        </div>
-:
+
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px; }
+    .feature-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; transition: border-color 0.2s ease, transform 0.2s ease; }
+    .feature-card:hover { border-color: var(--amber); transform: translateY(-2px); }
+    .feature-num { font-size: 1.6rem; font-weight: 700; }
+    .feature-card h3 { margin: 12px 0 8px; font-size: 1.15rem; }
+    .feature-card p { margin: 0; font-size: 0.92rem; }
+
+    .cta-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
+    .cta-inner p { max-width: 44ch; }
+
+    @media (max-width: 860px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: 1fr; gap: 20px; }
+      .feature-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</Layout>
