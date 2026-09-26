@@ -9,7 +9,6 @@ voice.post("/inbound", async (c) => {
   const valid = await verifyTwilioSignature(c.req.raw, c.env.TWILIO_AUTH_TOKEN);
   if (!valid) return c.text("Forbidden", 403);
 
-  const form = await c.req.formData();
   const orgId = new URL(c.req.url).searchParams.get("org"); // routed per-number in Twilio console
 
   const twiml = `<?xml version="1.0" encoding="UTF-8"?>
