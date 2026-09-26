@@ -63,7 +63,9 @@ export class CheckPayrollProvider implements PayrollTaxProvider {
 
     return {
       providerEmployeeId: result.id,
-      onboardingUrl: result.onboard?.onboarding_url,
+      ...(result.onboard?.onboarding_url
+        ? { onboardingUrl: result.onboard.onboarding_url }
+        : {}),
       status:
         result.onboard_status === "completed"
           ? "active"

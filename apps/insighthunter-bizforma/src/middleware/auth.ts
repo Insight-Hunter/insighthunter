@@ -16,7 +16,7 @@ declare module "hono" {
 export async function requireAuth(
   c: Context<{ Bindings: BizformaEnv }>,
   next: Next,
-): Promise<Response | void> {
+): Promise<Response | undefined> {
   const userId = c.req.header("X-User-Id");
   const orgId = c.req.header("X-Org-Id");
   const role = c.req.header("X-User-Role");

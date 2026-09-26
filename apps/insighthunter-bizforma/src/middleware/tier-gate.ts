@@ -21,7 +21,7 @@ function rankOf(plan: string): number {
 export async function requireBizformaTier(
   c: Context<{ Bindings: BizformaEnv }>,
   next: Next,
-): Promise<Response | void> {
+): Promise<Response | undefined> {
   const orgPlan = c.get("orgPlan");
 
   if (!orgPlan || rankOf(orgPlan) < TIER_RANK.growth) {

@@ -45,7 +45,7 @@ compliance.post("/case/:caseId", async (c) => {
     title: body.title,
     due_date: body.due_date,
     status: "pending",
-    notes: body.notes,
+    ...(body.notes === undefined ? {} : { notes: body.notes }),
   });
   return c.json({ ok: true }, 201);
 });

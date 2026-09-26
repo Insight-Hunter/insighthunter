@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; frame-src 'none'; script-src 'none'; style-src data: 'unsafe-inline'; img-src data:; media-src data:; font-src data:; object-src 'none'; base-uri 'none'; form-action 'none'; connect-src 'none';">
+  
+<style>
+  :root {
+    --bg: #070b12;
+    --panel-hi: #141d2c;
+    --panel-lo: #0a111c;
+    --panel-2: #0d1522;
+    --line: #1e2c40;
+    --line-strong: #2b3d55;
+    --ink: #dbe7f3;
+    --ink-soft: #8ba0b6;
+    --ink-faint: #5f7690;
+    --cyan: #22d3ee;
+    --cyan-bright: #7ee7ff;
+    --cyan-dim: rgba(34, 211, 238, 0.14);
+    --orange: #ff8a00;
+    --orange-bright: #ffb25e;
+    --orange-dim: rgba(255, 138, 0, 0.14);
+  }
+
+  * { box-sizing: border-box; border-radius: 0 !important; }
+  html { color-scheme: dark; }
+  html, body { margin: 0; }
+  body {
+    background:
+      radial-gradient(1100px 700px at 85% -10%, rgba(34, 211, 238, 0.10), transparent 60%),
+      radial-gradient(900px 700px at -10% 110%, rgba(255, 138, 0, 0.08), transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .page { width: min(1240px, 100% - 2rem); margin: 0 auto; padding: 1.25rem 0 3rem; }
+  h1, h2, h3 { margin: 0; }
+  h2 { font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
+
+  .topbar, .card, .kpi {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 34%), linear-gradient(180deg, var(--panel-hi), var(--panel-lo));
+    border: 1px solid var(--line);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 10px 30px rgba(0, 0, 0, 0.45);
+  }
+  .topbar {
+    display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; padding: 1rem 1.25rem; margin-bottom: 1.25rem;
+    border-bottom: 2px solid rgba(34, 211, 238, 0.35);
+  }
+  .brand { display: flex; align-items: center; gap: 0.6rem; }
+  .brand-mark { font-size: 1.6rem; color: var(--cyan); text-shadow: 0 0 14px rgba(34, 211, 238, 0.55); }
+  .brand-name { font-weight: 800; font-size: 1.05rem; letter-spacing: 0.02em; }
+  .brand-sub { font-size: 0.72rem; color: var(--cyan-bright); letter-spacing: 0.22em; text-transform: uppercase; }
+  .ws { flex: 1 1 260px; min-width: 220px; }
+  .ws label, .business label { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-faint); }
+  .ws-row { display: flex; gap: 0.5rem; }
+  .ws-row select { flex: 1; }
+  .ws-row input { flex: 1.2; }
+  .business { flex: 1 1 220px; min-width: 200px; }
+  .business-row { display: flex; gap: 0.5rem; }
+  .business-row input { flex: 1; }
+  .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+  input, select, button { font: inherit; color: inherit; }
+  input, select {
+    padding: 0.55rem 0.65rem; border: 1px solid var(--line-strong); background: rgba(4, 9, 16, 0.6); color: var(--ink); min-width: 0;
+  }
+  input::placeholder { color: var(--ink-faint); }
+  input:focus, select:focus { border-color: var(--cyan); outline: none; box-shadow: 0 0 0 1px var(--cyan), 0 0 14px rgba(34, 211, 238, 0.2); }
+
+  .btn {
+    border: 1px solid var(--cyan); background: linear-gradient(180deg, #3ae2f7, #0ea5c4); color: #04131a;
+    padding: 0.55rem 0.95rem; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer;
+    box-shadow: 0 0 16px rgba(34, 211, 238, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    transition: filter 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .btn:hover { background: linear-gradient(180deg, #7ee7ff, #22d3ee); }
+  .btn-ghost { background: rgba(34, 211, 238, 0.04); color: var(--cyan-bright); border-color: rgba(34, 211, 238, 0.5); box-shadow: none; }
+  .btn-ghost:hover { background: rgba(34, 211, 238, 0.12); }
+  .btn-ghost.danger { color: var(--orange-bright); border-color: rgba(255, 138, 0, 0.55); }
+  .btn-ghost.danger:hover { background: rgba(255, 138, 0, 0.12); }
+
+  .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .tab {
+    padding: 0.55rem 1rem; background: rgba(34, 211, 238, 0.04); border: 1px solid var(--line-strong); color: var(--ink-soft);
+    cursor: pointer; font: inherit; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+  }
+  .tab.active { background: linear-gradient(180deg, #3ae2f7, #0ea5c4); color: #04131a; border-color: var(--cyan); box-shadow: 0 0 16px rgba(34, 211, 238, 0.2); }
+
+  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.9rem; margin-bottom: 1.25rem; }
+  .kpi { padding: 1rem; display: flex; flex-direction: column; gap: 0.2rem; border-top: 2px solid rgba(34, 211, 238, 0.55); }
+  .kpi-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-faint); }
+  .kpi-value { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .kpi-sub { font-size: 0.76rem; color: var(--ink-soft); }
+  .pos { color: var(--cyan-bright); }
+  .neg { color: var(--orange-bright); }
+  .kpi-value.pos { text-shadow: 0 0 12px rgba(34, 211, 238, 0.35); }
+  .kpi-value.neg { text-shadow: 0 0 12px rgba(255, 138, 0, 0.35); }
+
+  .card { padding: 1.1rem 1.25rem; margin-bottom: 1.25rem; }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.9rem; }
+  .card-head h2::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 0.55rem; background: var(--cyan); box-shadow: 0 0 10px rgba(34, 211, 238, 0.7); }
+  .grid { display: grid; grid-template-columns: 340px 1fr; gap: 1.25rem; align-items: start; }
+  .col { display: flex; flex-direction: column; }
+
+  .legend { display: flex; gap: 1rem; color: var(--ink-soft); font-size: 0.8rem; margin: 0.4rem 0 0.8rem; }
+  .dot { display: inline-block; width: 0.7rem; height: 0.7rem; margin-right: 0.3rem; }
+  .dot.pos { background: var(--cyan); box-shadow: 0 0 8px rgba(34, 211, 238, 0.6); }
+  .dot.neg { background: var(--orange); box-shadow: 0 0 8px rgba(255, 138, 0, 0.6); }
+  .bars { display: flex; gap: 0.75rem; align-items: stretch; }
+  .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; min-width: 0; }
+  .bar-col { height: 150px; width: 100%; display: flex; align-items: flex-end; gap: 4px; }
+  .bar { flex: 1; min-height: 3px; }
+  .bar-income { background: linear-gradient(180deg, #7ee7ff, #0891b2); box-shadow: 0 0 8px rgba(34, 211, 238, 0.25); }
+  .bar-expense { background: linear-gradient(180deg, #ffb25e, #d97706); box-shadow: 0 0 8px rgba(255, 138, 0, 0.22); }
+  .bar-label { font-size: 0.72rem; color: var(--ink-faint); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+  .charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem; }
+  .charts .card { margin-bottom: 0; }
+  .flow-card, .spend-card, .forecast-card { grid-column: 1 / -1; }
+  .fc-line { stroke: var(--orange); filter: drop-shadow(0 0 6px rgba(255, 138, 0, 0.6)); }
+
+  .flow-svg { display: block; width: 100%; height: auto; }
+  .flow-line { fill: none; stroke: var(--cyan); stroke-width: 2.5; filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.65)); }
+  .flow-area { fill: url(#flowGrad); }
+  .axis { stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 3 5; }
+  .flow-months { display: flex; justify-content: space-between; gap: 0.5rem; margin-top: 0.5rem; color: var(--ink-faint); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.72rem; }
+  .flow-summary { margin-top: 0.45rem; color: var(--ink-soft); font-size: 0.85rem; }
+
+  .h-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+  .h-label { display: flex; justify-content: space-between; gap: 0.75rem; font-size: 0.85rem; }
+  .h-label .name { color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .h-label .val { color: var(--ink-soft); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .h-track { height: 8px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--line); }
+  .h-fill { height: 100%; }
+  .h-fill.cyan { background: linear-gradient(90deg, #0891b2, #7ee7ff); box-shadow: 0 0 10px rgba(34, 211, 238, 0.35); }
+  .h-fill.orange { background: linear-gradient(90deg, #d97706, #ffb25e); box-shadow: 0 0 10px rgba(255, 138, 0, 0.3); }
+
+  .reports { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem; }
+  .reports .card { margin-bottom: 0; }
+  .stmt-period { margin: 0.9rem 0 0.35rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-faint); }
+  .stmt-row { display: flex; justify-content: space-between; gap: 0.75rem; padding: 0.45rem 0; border-bottom: 1px solid var(--line); }
+  .stmt-row.total { border-bottom: 1px solid var(--line-strong); font-weight: 700; }
+  .stmt-label { color: var(--ink-soft); }
+  .stmt-val { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+  .stmt-sub { margin-top: 0.55rem; display: flex; justify-content: space-between; gap: 0.75rem; font-size: 0.78rem; color: var(--ink-faint); }
+
+  .accounts { list-style: none; margin: 0 0 1rem; padding: 0; }
+  .accounts li { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; padding: 0.65rem 0; border-bottom: 1px solid var(--line); }
+  .acct-name { font-weight: 600; display: block; }
+  .acct-type { font-size: 0.72rem; color: var(--ink-faint); text-transform: capitalize; letter-spacing: 0.06em; }
+  .acct-bal { font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+  .add-panel { display: grid; gap: 0.5rem; }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem; margin-bottom: 0; }
+  .lines { display: grid; gap: 0.5rem; grid-column: 1 / -1; }
+  .line-row { display: grid; grid-template-columns: 1fr 140px 32px; gap: 0.5rem; }
+  .add-line { justify-self: start; }
+  .run-row { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+  .run-row select { flex: 1; }
+  .hint { color: var(--ink-faint); font-size: 0.82rem; margin: 0.5rem 0 1rem; }
+
+  .insights { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.65rem; }
+  .insight { border-left: 3px solid var(--cyan); padding: 0.6rem 0.75rem; background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent); }
+  .insight p { margin: 0.25rem 0 0; color: var(--ink-soft); font-size: 0.85rem; }
+  .insight strong { font-size: 0.92rem; }
+  .insight-watch, .insight-alert { border-left-color: var(--orange); }
+  .insight-alert { box-shadow: inset 0 0 0 1px rgba(255, 138, 0, 0.12); }
+  .insight-sev { display: inline-block; font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--cyan-bright); background: var(--cyan-dim); padding: 0.12rem 0.45rem; margin-bottom: 0.3rem; }
+  .insight-watch .insight-sev, .insight-alert .insight-sev { color: var(--orange-bright); background: var(--orange-dim); }
+
+  .tx-form-grid { display: grid; grid-template-columns: repeat(6, minmax(90px, 1fr)); gap: 0.5rem; margin-bottom: 1rem; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 0.6rem 0.55rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-faint); border-bottom: 1px solid var(--line-strong); }
+  tbody tr:hover { background: rgba(34, 211, 238, 0.04); }
+  td.num, th.num { text-align: right; }
+  .mono, td.num { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+  .chip { display: inline-block; font-size: 0.7rem; padding: 0.12rem 0.5rem; background: rgba(34, 211, 238, 0.08); color: var(--cyan-bright); border: 1px solid rgba(34, 211, 238, 0.22); white-space: nowrap; }
+  .chip.auto { background: rgba(255, 138, 0, 0.1); color: var(--orange-bright); border-color: rgba(255, 138, 0, 0.3); margin-left: 0.35rem; }
+  .chip.ghost { background: transparent; border-color: var(--line-strong); color: var(--ink-soft); }
+  .cat-cell { position: relative; }
+  .cat-cell select { display: none; margin-top: 0.35rem; width: 100%; font-size: 0.8rem; padding: 0.35rem; }
+  .cat-cell:hover select, .cat-cell select:focus { display: block; }
+  .icon-btn { border: 0; background: transparent; color: var(--ink-faint); cursor: pointer; font-size: 0.9rem; padding: 0.2rem 0.35rem; }
+  .icon-btn:hover { color: var(--orange-bright); background: rgba(255, 138, 0, 0.1); }
+  .row-actions { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
+  .count { font-size: 0.8rem; color: var(--ink-soft); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .empty { color: var(--ink-soft); text-align: center; padding: 1.5rem 0; }
+
+  .footer { margin-top: 1rem; color: var(--ink-faint); font-size: 0.82rem; line-height: 1.6; text-align: center; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 1.25rem; transform: translateX(-50%) translateY(1rem);
+    background: var(--panel-2); color: var(--ink); padding: 0.6rem 1rem; border: 1px solid rgba(34, 211, 238, 0.4);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.18); opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; font-size: 0.9rem;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { border-color: rgba(255, 138, 0, 0.6); box-shadow: 0 0 20px rgba(255, 138, 0, 0.2); }
+
+  .modal { position: fixed; inset: 0; background: rgba(2, 6, 10, 0.72); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 1rem; }
+  .modal-card {
+    width: min(420px, 100%); padding: 1.5rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 34%), linear-gradient(180deg, var(--panel-hi), var(--panel-lo));
+    border: 1px solid var(--line-strong); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(34, 211, 238, 0.12);
+  }
+  .modal-card h3 { margin-bottom: 0.4rem; }
+  .modal-card p { color: var(--ink-soft); font-size: 0.88rem; margin: 0.4rem 0 1rem; }
+  .modal-card input { width: 100%; margin-bottom: 1rem; }
+  .modal-card.wide { width: min(600px, 100%); }
+  .modal-form { display: grid; gap: 0.5rem; margin-bottom: 1rem; }
+  .modal-form input, .modal-form select { margin-bottom: 0; }
+  .modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+
+  @media (max-width: 1080px) {
+    .kpis { grid-template-columns: repeat(3, 1fr); }
+    .reports { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 980px) {
+    .grid { grid-template-columns: 1fr; }
+    .tx-form-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .tx-form-grid { grid-template-columns: 1fr; }
+    .topbar { align-items: stretch; flex-direction: column; }
+    .charts { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    body { background: #fff; color: #111; }
+    .page { width: 100%; }
+    .topbar .actions, .topbar .business, .topbar .ws, .tabs, .add-panel, .add-tx, .form-grid, .run-row, .icon-btn, .recat, .footer { display: none !important; }
+    .topbar, .card, .kpi { background: #fff; border: 1px solid #ccc; box-shadow: none; }
+    .topbar { border-bottom: 1px solid #ccc; }
+    .kpi { border-top: 1px solid #ccc; }
+    .brand-mark { color: #000; text-shadow: none; }
+    .brand-sub, .kpi-label, .kpi-sub, th, .bar-label, .acct-type, .footer, .count, .stmt-period, .stmt-label, .stmt-sub, .hint { color: #555; }
+    .kpi-value { color: #111; text-shadow: none; }
+    .pos { color: #0b6b58; } .neg { color: #b45309; }
+    .bar-income { background: #0891b2; box-shadow: none; }
+    .bar-expense { background: #d97706; box-shadow: none; }
+    .chip, .chip.auto, .insight { background: #f4f4f4; color: #333; border-color: #ccc; }
+    .insight p, .empty { color: #444; }
+    .grid { display: block; }
+    .col { display: block; }
+    .cat-cell select { display: none !important; }
+    .charts { display: block; }
+    .charts .card { margin-bottom: 1rem; page-break-inside: avoid; }
+    .flow-line { stroke: #0891b2; filter: none; }
+    .axis { stroke: #ccc; }
+    .h-track { background: #eee; border-color: #ccc; }
+    .h-fill.cyan { background: #0891b2; box-shadow: none; }
+    .h-fill.orange { background: #d97706; box-shadow: none; }
+    .flow-months, .flow-summary, .h-label .val { color: #555; }
+    .reports { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .reports .card { margin-bottom: 0; page-break-inside: avoid; }
+  }
+</style><title>Insight Hunter — Command Center</title></head>
+<body>
+    <div class="page"><div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">◈</span>
+        <div>
+          <div class="brand-name">Insight Hunter</div>
+          <div class="brand-sub">Command Center</div>
+        </div>
+      </div>
+      <div class="ws">
+        <label>Workspace</label>
+        <div class="ws-row">
+          <select id="ws-select" aria-label="Workspace"><option value="default" selected="">default</option></select>
+          <input id="ws-new" placeholder="new-workspace" maxlength="60">
+          <button class="btn btn-ghost" data-act="new-ws">New</button>
+        </div>
+      </div>
+      <div class="business">
+        <label>Business</label>
+        <div class="business-row">
+          <input id="business-name" maxlength="80" value="Acme Studio">
+          <button class="btn btn-ghost" data-act="save-name">Save</button>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" data-act="lock">Invite code</button>
+        <button class="btn btn-ghost" data-act="demo">Load demo</button>
+        <button class="btn btn-ghost danger" data-act="reset">Reset</button>
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="Modules">
+      <button class="tab active" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="invoices">Invoices</button>
+      <button class="tab" data-tab="bills">Bills</button>
+      <button class="tab" data-tab="payroll">Payroll</button>
+      <button class="tab" data-tab="journal">Journal</button>
+    </nav>
+
+    
+    <section class="kpis" aria-label="Key numbers">
+      <article class="kpi"><span class="kpi-label">Cash on hand</span><span class="kpi-value">$0.00</span><span class="kpi-sub">no card debt</span></article>
+      <article class="kpi"><span class="kpi-label">Net worth</span><span class="kpi-value">$0.00</span><span class="kpi-sub">assets − liabilities</span></article>
+      <article class="kpi"><span class="kpi-label">Income · this month</span><span class="kpi-value pos">$0.00</span><span class="kpi-sub">Sep</span></article>
+      <article class="kpi"><span class="kpi-label">Expenses · this month</span><span class="kpi-value neg">$0.00</span><span class="kpi-sub">Sep</span></article>
+      <article class="kpi"><span class="kpi-label">Net · this month</span><span class="kpi-value pos">$0.00</span><span class="kpi-sub">income − expenses</span></article>
+      <article class="kpi"><span class="kpi-label">Runway</span><span class="kpi-value">∞</span><span class="kpi-sub">no burn</span></article>
+    </section>
+
+    <section class="charts" aria-label="Financial charts">
+      <article class="card flow-card">
+        <div class="card-head"><h2>Cash flow</h2><span class="chip ghost">trailing 6 mo</span></div>
+        
+    <svg class="flow-svg" viewBox="0 0 720 220" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="flowGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="rgba(34, 211, 238, 0.32)"></stop>
+          <stop offset="1" stop-color="rgba(34, 211, 238, 0)"></stop>
+        </linearGradient>
+      </defs>
+      <line class="axis" x1="12" y1="208.0" x2="708" y2="208.0"></line>
+      <polygon class="flow-area" points="12,208 12.0,208.0 151.2,208.0 290.4,208.0 429.6,208.0 568.8,208.0 708.0,208.0 708,208" fill="url(#flowGrad)"></polygon>
+      <polyline class="flow-line" points="12.0,208.0 151.2,208.0 290.4,208.0 429.6,208.0 568.8,208.0 708.0,208.0"></polyline>
+    </svg>
+    <div class="flow-months"><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span></div>
+    <div class="flow-summary">Net operating cash flow: <strong class="pos">+$0.00</strong> over 6 months</div>
+      </article>
+      <article class="card">
+        <div class="card-head"><h2>Income vs expenses</h2></div>
+        <div class="legend"><span><i class="dot pos"></i>Income</span><span><i class="dot neg"></i>Expenses</span></div>
+        <div class="bars" role="img" aria-label="Income and expenses for the last six months">
+      <div class="bar-group">
+        <div class="bar-col">
+          <div class="bar bar-income" style="height:3px"></div>
+          <div class="bar bar-expense" style="height:3px"></div>
+        </div>
+        <span class="bar-label">Apr</span>
+      </div>
+      <div class="bar-group">
+        <div class="bar-col">
+          <div class="bar bar-income" style="height:3px"></div>
+          <div class="bar bar-expense" style="height:3px"></div>
+        </div>
+        <span class="bar-label">May</span>
+      </div>
+      <div class="bar-group">
+        <div class="bar-col">
+          <div class="bar bar-income" style="height:3px"></div>
+          <div class="bar bar-expense" style="height:3px"></div>
+        </div>
+        <span class="bar-label">Jun</span>
+      </div>
+      <div class="bar-group">
+        <div class="bar-col">
+          <div class="bar bar-income" style="height:3px"></div>
+          <div class="bar bar-expense" style="height:3px"></div>
+        </div>
+        <span class="bar-label">Jul</span>
+      </div>
+      <div class="bar-group">
+        <div class="bar-col">
+          <div class="bar bar-income" style="height:3px"></div>
+          <div class="bar bar-expense" style="height:3px"></div>
+        </div>
+        <span class="bar-label">Aug</span>
+      </div>
+      <div class="bar-group">
+        <div class="bar-col">
+          <div class="bar bar-income" style="height:3px"></div>
+          <div class="bar bar-expense" style="height:3px"></div>
+        </div>
+        <span class="bar-label">Sep</span>
+      </div></div>
+      </article>
+      <article class="card">
+        <div class="card-head"><h2>Capital allocation</h2></div>
+        
+    <ul class="h-list">
+      
+            <li class="h-row">
+              <div class="h-label"><span class="name">Business Checking</span><span class="val pos">$0.00</span></div>
+              <div class="h-track"><div class="h-fill cyan" style="width:0%"></div></div>
+            </li>
+    </ul>
+      </article>
+      <article class="card spend-card">
+        <div class="card-head"><h2>Spend mix</h2><span class="chip ghost">expenses</span></div>
+        <p class="empty">No expenses yet.</p>
+      </article>
+
+      <article class="card forecast-card">
+        <div class="card-head"><h2>Runway projection</h2><span class="chip ghost">next 12 mo</span></div>
+        
+    <svg class="flow-svg" viewBox="0 0 720 180" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="fcGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="rgba(255, 138, 0, 0.30)"></stop>
+          <stop offset="1" stop-color="rgba(255, 138, 0, 0)"></stop>
+        </linearGradient>
+      </defs>
+      <line class="axis" x1="12" y1="168.0" x2="708" y2="168.0"></line>
+      <polygon class="flow-area" points="12,168 12.0,168.0 70.0,168.0 128.0,168.0 186.0,168.0 244.0,168.0 302.0,168.0 360.0,168.0 418.0,168.0 476.0,168.0 534.0,168.0 592.0,168.0 650.0,168.0 708.0,168.0 708,168" fill="url(#fcGrad)"></polygon>
+      <polyline class="flow-line fc-line" points="12.0,168.0 70.0,168.0 128.0,168.0 186.0,168.0 244.0,168.0 302.0,168.0 360.0,168.0 418.0,168.0 476.0,168.0 534.0,168.0 592.0,168.0 650.0,168.0 708.0,168.0"></polyline>
+    </svg>
+    <div class="flow-summary">Forecast net <strong class="pos">+$0.00</strong>/mo · breakeven revenue <strong>$0.00</strong>/mo</div>
+      </article>
+    </section>
+
+    <section class="reports" aria-label="Financial statements">
+    <article class="card">
+      <div class="card-head"><h2>Profit &amp; Loss</h2></div>
+      <p class="stmt-period">This month</p>
+      <div class="stmt-row"><span class="stmt-label">Income</span><span class="stmt-val pos">$0.00</span></div>
+      <div class="stmt-row"><span class="stmt-label">Expenses</span><span class="stmt-val neg">$0.00</span></div>
+      <div class="stmt-row total"><span class="stmt-label">Net</span><span class="stmt-val pos">$0.00</span></div>
+      <p class="stmt-period">Year to date</p>
+      <div class="stmt-row"><span class="stmt-label">Income</span><span class="stmt-val pos">$0.00</span></div>
+      <div class="stmt-row"><span class="stmt-label">Expenses</span><span class="stmt-val neg">$0.00</span></div>
+      <div class="stmt-row total"><span class="stmt-label">Net</span><span class="stmt-val pos">$0.00</span></div>
+    </article>
+    <article class="card">
+      <div class="card-head"><h2>Balance sheet</h2></div>
+      <div class="stmt-row"><span class="stmt-label">Assets</span><span class="stmt-val pos">$0.00</span></div>
+      <div class="stmt-row"><span class="stmt-label">Liabilities</span><span class="stmt-val neg">$0.00</span></div>
+      <div class="stmt-row total"><span class="stmt-label">Equity</span><span class="stmt-val pos">$0.00</span></div>
+      <div class="stmt-sub"><span>Accounts receivable</span><span>$0.00</span></div>
+      <div class="stmt-sub"><span>Accounts payable</span><span>$0.00</span></div>
+      <div class="stmt-sub"><span>Opening equity</span><span>$0.00</span></div>
+      <div class="stmt-sub"><span>Retained earnings</span><span>$0.00</span></div>
+    </article>
+    <article class="card">
+      <div class="card-head"><h2>Cash flow</h2></div>
+      <div class="stmt-row"><span class="stmt-label">Opening cash</span><span class="stmt-val">$0.00</span></div>
+      <div class="stmt-row"><span class="stmt-label">Closing cash</span><span class="stmt-val">$0.00</span></div>
+      <div class="stmt-row total"><span class="stmt-label">Net movement</span><span class="stmt-val pos">$0.00</span></div>
+    </article></section>
+
+    <main class="grid">
+      <div class="col">
+        <section class="card">
+          <div class="card-head"><h2>Accounts</h2></div>
+          <ul class="accounts">
+            
+                <li>
+                  <div><span class="acct-name">Business Checking</span><span class="acct-type">checking</span></div>
+                  <span class="acct-bal pos">$0.00</span>
+                </li>
+          </ul>
+          <form class="add-panel" data-form="account">
+            <input placeholder="Account name" required="" maxlength="60">
+            <select name="type">
+              <option value="checking">Checking</option>
+              <option value="savings">Savings</option>
+              <option value="cash">Cash</option>
+              <option value="credit">Credit card</option>
+            </select>
+            <input name="opening" type="number" step="0.01" placeholder="Opening balance">
+            <button class="btn" type="submit">Add account</button>
+          </form>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><h2>Insights</h2><span class="chip ghost">rule-based</span></div>
+          <ul class="insights">
+            
+                <li class="insight insight-good">
+                  <span class="insight-sev">good</span>
+                  <strong>No urgent flags</strong>
+                  <p>Cash, burn, and spend concentration are all inside healthy ranges right now.</p>
+                </li>
+          </ul>
+        </section>
+      </div>
+
+      <section class="card tx">
+        <div class="card-head"><h2>Transactions</h2><span class="count">0</span></div>
+        <form class="add-tx" data-form="transaction">
+          <div class="tx-form-grid">
+            <input name="date" type="date" value="2026-09-26" required="">
+            <input name="description" placeholder="Description" required="" maxlength="200">
+            <input name="amount" type="number" step="0.01" min="0.01" placeholder="Amount" required="">
+            <select name="direction"><option value="expense">Expense</option><option value="income">Income</option></select>
+            <select name="account"><option value="636f6827-b8d3-42d1-be34-92a24b3d04dc">Business Checking</option></select>
+            <select name="category"><option value="">Auto-categorise</option>
+    <optgroup label="Income"><option value="cat-0">Sales</option><option value="cat-1">Services</option><option value="cat-2">Interest</option><option value="cat-3">Other income</option></optgroup>
+    <optgroup label="Expense"><option value="cat-4">Software &amp; Subscriptions</option><option value="cat-5">Payroll &amp; Contractors</option><option value="cat-6">Marketing</option><option value="cat-7">Office &amp; Supplies</option><option value="cat-8">Travel</option><option value="cat-9">Meals &amp; Entertainment</option><option value="cat-10">Rent &amp; Utilities</option><option value="cat-11">Taxes &amp; Fees</option><option value="cat-12">Other expense</option></optgroup></select>
+            <button class="btn" type="submit">Add transaction</button>
+          </div>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Description</th><th>Account</th><th>Category</th><th class="num">Amount</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <p class="empty">No transactions yet. Add one above or load demo data.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      Workspace-scoped command center — double-entry bookkeeping, AR/AP, payroll, and reporting.
+      Multi-tenant auth, Stripe, bank feeds, and payroll/PBX integrations live in the production repo, not this Gadget.
+    </footer>
+  </div></div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div></body></html>

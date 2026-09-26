@@ -1,11 +1,13 @@
 // insighthunter-auth — Authentication Worker
 // Handles: register, login, logout, session read, session verify (Service Binding)
 import { hashPassword, verifyPassword, signSession, verifySession } from "./crypto.js";
+import { sendPasswordResetEmail } from "./lib/email.js";
 import type { Env, Tier, OrgRole, SessionPayload } from "./types.js";
 
 export { UserVault } from "./vault.js";
 
 const APP_ORIGIN     = "https://app.insighthunter.app";
+const MARKETING_ORIGIN = "https://insighthunter.app";
 const SESSION_COOKIE = "ih_session";
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
 
@@ -17,6 +19,9 @@ const securityHeaders: HeadersInit = {
   "Referrer-Policy": "no-referrer",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
+  "Access-Control-Allow-Origin": "https://insighthunter.app",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
 // ── HTML helpers ──────────────────────────────────────────────────────────────
@@ -46,6 +51,10 @@ function jsonAuthError(error: string, status: number): Response {
   return Response.json({ error }, { status, headers: securityHeaders });
 }
 
+function resetToken(): string {
+  return `${crypto.randomUUID()}${crypto.randomUUID()}`.replaceAll("-", "");
+}
+
 function validEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 254;
 }
@@ -58,9 +67,15 @@ function safeReturnTo(value: string | null): string {
   if (!value) return `${APP_ORIGIN}/`;
   try {
     const url = new URL(value);
-    if (url.origin === APP_ORIGIN) return url.toString();
+    if (url.origin === APP_ORIGIN || url.origin === MARKETING_ORIGIN) return url.toString();
   } catch { /* fall through */ }
   return `${APP_ORIGIN}/`;
+}
+
+function redirectWithToken(returnTo: string, token: string): string {
+  const url = new URL(returnTo);
+  url.searchParams.set("token", token);
+  return url.toString();
 }
 
 // ── Cookie helpers ────────────────────────────────────────────────────────────
@@ -139,6 +154,7 @@ function authPage(mode: "login" | "register", returnTo: string, tier: Tier, erro
         <label class="field">Password<input type="password" name="password" autocomplete="${isLogin ? "current-password" : "new-password"}" required minlength="12" maxlength="128"></label>
         <button type="submit">${isLogin ? "Log in" : "Create account"}</button>
       </form>
+      ${isLogin ? '<p><a href="/forgot-password">Forgot your password?</a></p>' : ""}
       <p>${isLogin ? "New?" : "Already have an account?"} <a href="${altHref}">${altLabel}</a></p>
     </main>`
   );
@@ -162,6 +178,10 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url    = new URL(request.url);
     const method = request.method.toUpperCase();
+
+    if (method === "OPTIONS") {
+      return new Response(null, { status: 204, headers: securityHeaders });
+    }
 
     // ── Health ──────────────────────────────────────────────────────────────
     if (method === "GET" && url.pathname === "/health") {
@@ -188,6 +208,70 @@ export default {
         safeReturnTo(url.searchParams.get("returnTo")),
         safeTier(url.searchParams.get("tier"))
       );
+    }
+
+    if (method === "GET" && url.pathname === "/forgot-password") {
+      return html(`<main class="card"><h1>Reset your password</h1><p>Enter your email and we'll send a reset link if an account exists.</p><form method="post" action="/forgot-password"><label class="field">Email<input type="email" name="email" autocomplete="email" required maxlength="254"></label><button type="submit">Send reset link</button></form><p><a href="/login">Back to log in</a></p></main>`);
+    }
+
+    if (method === "GET" && url.pathname === "/reset-password") {
+      const token = escape(url.searchParams.get("token") ?? "");
+      return html(`<main class="card"><h1>Choose a new password</h1><form method="post" action="/reset-password"><input type="hidden" name="token" value="${token}"><label class="field">New password<input type="password" name="password" autocomplete="new-password" required minlength="12" maxlength="128"></label><button type="submit">Update password</button></form></main>`);
+    }
+
+    if (method === "POST" && url.pathname === "/forgot-password") {
+      const { email } = await parseForm(request);
+      if (validEmail(email)) {
+        const user = await env.DB.prepare("SELECT id FROM users WHERE email = ?1")
+          .bind(email).first<{ id: string }>();
+        if (user) {
+          const token = resetToken();
+          const expiresAt = Date.now() + 60 * 60 * 1000;
+          await env.DB.prepare("DELETE FROM password_resets WHERE user_id = ?1 OR expires_at < ?2")
+            .bind(user.id, Date.now()).run();
+          await env.DB.prepare(
+            "INSERT INTO password_resets (user_id, token, used, expires_at, created_at) VALUES (?1, ?2, 0, ?3, ?4)"
+          ).bind(user.id, token, expiresAt, Date.now()).run();
+          try {
+            await sendPasswordResetEmail(env.SEND_EMAIL, email, token);
+          } catch (error) {
+            console.error("password reset email failed", error);
+          }
+        }
+      }
+      if (!isJsonRequest(request)) {
+        return html("<main class=\"card\"><h1>Check your email</h1><p>If an account exists for that email, a reset link is on its way.</p><p><a href=\"/login\">Back to log in</a></p></main>");
+      }
+      return Response.json({ ok: true }, { headers: securityHeaders });
+    }
+
+    if (method === "POST" && url.pathname === "/reset-password") {
+      const values = isJsonRequest(request)
+        ? await request.json<Record<string, unknown>>()
+        : Object.fromEntries(await request.formData());
+      const token = String(values["token"] ?? "");
+      const password = String(values["password"] ?? "");
+      if (!token || password.length < 12) {
+        if (!isJsonRequest(request)) return html("<main class=\"card\"><h1>Reset link invalid</h1><p>This reset link is invalid or expired.</p><p><a href=\"/forgot-password\">Request another link</a></p></main>", 400);
+        return jsonAuthError("invalid_reset", 400);
+      }
+
+      const reset = await env.DB.prepare(
+        "SELECT user_id FROM password_resets WHERE token = ?1 AND used = 0 AND expires_at > ?2"
+      ).bind(token, Date.now()).first<{ user_id: string }>();
+      if (!reset) {
+        if (!isJsonRequest(request)) return html("<main class=\"card\"><h1>Reset link invalid</h1><p>This reset link is invalid or expired.</p><p><a href=\"/forgot-password\">Request another link</a></p></main>", 400);
+        return jsonAuthError("invalid_reset", 400);
+      }
+
+      const passwordHash = await hashPassword(password);
+      await env.DB.batch([
+        env.DB.prepare("UPDATE users SET password_hash = ?1, updated_at = ?2 WHERE id = ?3")
+          .bind(passwordHash, Date.now(), reset.user_id),
+        env.DB.prepare("UPDATE password_resets SET used = 1 WHERE token = ?1").bind(token),
+      ]);
+      if (!isJsonRequest(request)) return Response.redirect(`${url.origin}/login?reset=success`, 303);
+      return Response.json({ ok: true }, { headers: securityHeaders });
     }
 
     // ── POST /register ───────────────────────────────────────────────────────
@@ -227,7 +311,7 @@ export default {
       }
       return new Response(null, {
         status: 303,
-        headers: { Location: returnTo, "Set-Cookie": sessionCookie(token), ...securityHeaders },
+        headers: { Location: redirectWithToken(returnTo, token), "Set-Cookie": sessionCookie(token), ...securityHeaders },
       });
     }
 
@@ -273,7 +357,7 @@ export default {
       }
       return new Response(null, {
         status: 303,
-        headers: { Location: returnTo, "Set-Cookie": sessionCookie(token), ...securityHeaders },
+        headers: { Location: redirectWithToken(returnTo, token), "Set-Cookie": sessionCookie(token), ...securityHeaders },
       });
     }
 

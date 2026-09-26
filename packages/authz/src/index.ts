@@ -1,4 +1,6 @@
 // packages/authz/src/index.ts
+import type { OrgRole, Permission } from "./types";
+
 // Re-export everything so consuming apps import from '@insighthunter/authz'
 
 export type {

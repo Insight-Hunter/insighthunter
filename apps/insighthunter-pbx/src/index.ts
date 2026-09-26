@@ -4,8 +4,8 @@ import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 import { requireAuth } from "./middleware/auth.js";
 import { requirePbxTier } from "./middleware/tier-gate.js";
-import { voice } from "./routes/voice.js";
 import { sms } from "./routes/sms.js";
+import { voice } from "./routes/voice.js";
 import { voicemail } from "./routes/voicemail.js";
 
 export interface Env {

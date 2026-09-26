@@ -1,6 +1,6 @@
 // Transactional email via Cloudflare Email Service
 
-const VERIFICATION_BASE_URL = "https://insighthunter.app";
+const VERIFICATION_BASE_URL = "https://auth.insighthunter.app";
 const DEFAULT_FROM_NAME = "InsightHunter";
 
 export interface SendEmailBinding {

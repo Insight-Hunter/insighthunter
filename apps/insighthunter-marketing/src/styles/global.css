@@ -1,0 +1,12 @@
+@import "./tokens.css";
+@import "./reset.css";
+@import "./typography.css";
+@import "./utilities.css";
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }

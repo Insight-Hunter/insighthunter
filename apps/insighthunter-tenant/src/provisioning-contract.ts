@@ -1,8 +1,4 @@
-export type TenantProvisioningStatus =
-  | "requested"
-  | "provisioning"
-  | "ready"
-  | "failed";
+export type TenantProvisioningStatus = "requested" | "provisioning" | "ready" | "failed";
 
 export interface TenantProvisioningRequest {
   readonly tenantId: string;
@@ -48,15 +44,11 @@ export function transitionProvisioningStatus(
   }
 
   if (nextStatus === "failed" && !failureCode) {
-    throw new TypeError(
-      "A failure code is required when tenant provisioning fails.",
-    );
+    throw new TypeError("A failure code is required when tenant provisioning fails.");
   }
 
   if (nextStatus !== "failed" && failureCode) {
-    throw new TypeError(
-      "A failure code is only valid for failed tenant provisioning.",
-    );
+    throw new TypeError("A failure code is only valid for failed tenant provisioning.");
   }
 
   return {
@@ -68,8 +60,6 @@ export function transitionProvisioningStatus(
   };
 }
 
-export function canAcceptFinancialData(
-  status: TenantProvisioningStatus,
-): boolean {
+export function canAcceptFinancialData(status: TenantProvisioningStatus): boolean {
   return status === "ready";
 }

@@ -14,8 +14,6 @@ import { formation } from "./routes/formation.js";
 import { wizard } from "./routes/wizard.js";
 import type { BizformaEnv } from "./types.js";
 
-
-
 const app = new Hono<{ Bindings: BizformaEnv }>();
 
 app.use("*", timing());
@@ -51,7 +49,6 @@ app.get("/health", (c) =>
 app.get("/", (c) => c.redirect("https://bizforma.insighthunter.app", 302));
 
 app.use("/api/*", requireAuth, requireBizformaTier);
-
 
 app.route("/api/formation", formation);
 app.route("/api/compliance", compliance);

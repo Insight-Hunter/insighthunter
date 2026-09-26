@@ -14,14 +14,15 @@ dashboard.get("/", async (c) => {
     listCasesByOrg(c.env.DB, orgId),
     listUpcomingEvents(c.env.DB, orgId, 30),
   ]);
+  const casesWithStatus = cases as Array<{ status: string }>;
+  const eventsWithStatus = upcoming as Array<{ status: string }>;
 
-  type Case = { status: string };
   const stats = {
     total: cases.length,
-    active: cases.filter((ca: Case) => ca.status === "active").length,
-    draft: cases.filter((ca: Case) => ca.status === "draft").length,
-    filed: cases.filter((ca: Case) => ca.status === "filed").length,
-    overdue: upcoming.filter((e: { status: string }) => e.status === "overdue").length,
+    active: casesWithStatus.filter((ca) => ca.status === "active").length,
+    draft: casesWithStatus.filter((ca) => ca.status === "draft").length,
+    filed: casesWithStatus.filter((ca) => ca.status === "filed").length,
+    overdue: eventsWithStatus.filter((e) => e.status === "overdue").length,
     due_soon: upcoming.length,
   };
 

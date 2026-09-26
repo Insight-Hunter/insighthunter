@@ -32,8 +32,10 @@ voice.post("/recording-complete", async (c) => {
   if (recordingUrl && orgId) {
     await c.env.DB.prepare(
       `INSERT INTO voicemails (org_id, from_number, recording_url, created_at, status)
-       VALUES (?1, ?2, ?3, ?4, 'unread')`
-    ).bind(orgId, String(from), String(recordingUrl), new Date().toISOString()).run();
+       VALUES (?1, ?2, ?3, ?4, 'unread')`,
+    )
+      .bind(orgId, String(from), String(recordingUrl), new Date().toISOString())
+      .run();
   }
   return c.text('<?xml version="1.0" encoding="UTF-8"?><Response></Response>', 200, {
     "Content-Type": "text/xml",
