@@ -1,0 +1,330 @@
+---
+interface Step {
+  number: string;
+  title: string;
+  description: string;
+  icon: "upload" | "dashboard" | "insights";
+}
+
+const steps: Step[] = [
+  {
+    number: "01",
+    title: "Connect or upload",
+    description:
+      "Start with a CSV today, then connect supported financial systems as your plan grows.",
+    icon: "upload",
+  },
+  {
+    number: "02",
+    title: "See the full picture",
+    description:
+      "Review decision-ready dashboards, operating KPIs, reports, and cash-flow forecasts in one place.",
+    icon: "dashboard",
+  },
+  {
+    number: "03",
+    title: "Act with confidence",
+    description:
+      "Use alerts and guided insights to prioritize the next financial decision for your business.",
+    icon: "insights",
+  },
+];
+---
+
+<section
+  id="how-it-works"
+  class="how-it-works"
+  aria-labelledby="how-it-works-title"
+>
+  <div class="how-it-works__container">
+    <header class="how-it-works__heading">
+      <p class="how-it-works__eyebrow">Simple by design</p>
+      <h2 id="how-it-works-title">
+        From financial data to a clearer next move.
+      </h2>
+      <p class="how-it-works__intro">
+        Insight Hunter gives small-business owners, bookkeepers, and advisors
+        a practical financial command center without the complexity of
+        enterprise software.
+      </p>
+    </header>
+
+    <ol class="how-it-works__steps">
+      {
+        steps.map((step) => (
+          <li class="how-it-works__step">
+            <div class="how-it-works__step-top">
+              <span class="how-it-works__number" aria-hidden="true">
+                {step.number}
+              </span>
+
+              <span class="how-it-works__icon" aria-hidden="true">
+                {
+                  step.icon === "upload" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path
+                        d="M12 16V3m0 0-4 4m4-4 4 4M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  )
+                }
+
+                {
+                  step.icon === "dashboard" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <rect
+                        x="3"
+                        y="3"
+                        width="18"
+                        height="18"
+                        rx="2"
+                        stroke-width="1.8"
+                      />
+                      <path
+                        d="M7 16v-3m5 3V8m5 8v-5"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  )
+                }
+
+                {
+                  step.icon === "insights" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path
+                        d="M9 18h6m-5 3h4m-7-6a7 7 0 1 1 10 0c-.9.7-1.4 1.7-1.6 2.8H8.6C8.4 16.7 7.9 15.7 7 15Z"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  )
+                }
+              </span>
+            </div>
+
+            <h3>{step.title}</h3>
+            <p>{step.description}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="how-it-works__cta">
+      <a class="how-it-works__button" href="/pricing#startup">
+        Start Free — No Credit Card
+      </a>
+      <a
+        class="how-it-works__text-link"
+        href="https://auth.insighthunter.app/login?returnTo=https%3A%2F%2Fapp.insighthunter.app%2Fdashboard"
+      >
+        Already a customer? Login to Command Center
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .how-it-works {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(4.5rem, 8vw, 8rem) 1.5rem;
+    background:
+      radial-gradient(
+        circle at 20% 10%,
+        rgb(34 197 94 / 10%),
+        transparent 34rem
+      ),
+      linear-gradient(180deg, #07120d 0%, #0b1912 100%);
+    color: #f7faf8;
+  }
+
+  .how-it-works__container {
+    width: min(100%, 72rem);
+    margin: 0 auto;
+  }
+
+  .how-it-works__heading {
+    max-width: 46rem;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .how-it-works__eyebrow {
+    margin: 0 0 0.875rem;
+    color: #68e59c;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+  }
+
+  .how-it-works h2 {
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.045em;
+  }
+
+  .how-it-works__intro {
+    max-width: 40rem;
+    margin: 1.25rem auto 0;
+    color: #b8cbbf;
+    font-size: clamp(1rem, 1.5vw, 1.125rem);
+    line-height: 1.7;
+  }
+
+  .how-it-works__steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+    margin: clamp(2.5rem, 5vw, 4rem) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .how-it-works__step {
+    position: relative;
+    min-height: 17rem;
+    padding: 1.5rem;
+    overflow: hidden;
+    border: 1px solid rgb(173 255 204 / 16%);
+    border-radius: 1.25rem;
+    background: rgb(255 255 255 / 5%);
+    box-shadow: 0 1rem 3rem rgb(0 0 0 / 16%);
+  }
+
+  .how-it-works__step::after {
+    position: absolute;
+    top: 3.1rem;
+    right: -0.75rem;
+    width: 1.5rem;
+    height: 1px;
+    background: rgb(104 229 156 / 45%);
+    content: "";
+  }
+
+  .how-it-works__step:last-child::after {
+    display: none;
+  }
+
+  .how-it-works__step-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .how-it-works__number {
+    color: #68e59c;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+  }
+
+  .how-it-works__icon {
+    display: grid;
+    width: 3rem;
+    height: 3rem;
+    place-items: center;
+    border: 1px solid rgb(104 229 156 / 25%);
+    border-radius: 0.875rem;
+    background: rgb(104 229 156 / 10%);
+    color: #83f2ae;
+  }
+
+  .how-it-works__icon svg {
+    width: 1.45rem;
+    height: 1.45rem;
+  }
+
+  .how-it-works h3 {
+    margin: 2.25rem 0 0.75rem;
+    color: #ffffff;
+    font-size: 1.25rem;
+    line-height: 1.25;
+  }
+
+  .how-it-works__step p {
+    margin: 0;
+    color: #b8cbbf;
+    line-height: 1.65;
+  }
+
+  .how-it-works__cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .how-it-works__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding: 0.8rem 1.15rem;
+    border-radius: 0.75rem;
+    background: #68e59c;
+    color: #06220f;
+    font-weight: 800;
+    text-decoration: none;
+    transition:
+      transform 160ms ease,
+      background 160ms ease;
+  }
+
+  .how-it-works__button:hover {
+    background: #8bf6b4;
+    transform: translateY(-2px);
+  }
+
+  .how-it-works__button:focus-visible,
+  .how-it-works__text-link:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 4px;
+  }
+
+  .how-it-works__text-link {
+    color: #c7f7d8;
+    font-weight: 700;
+    text-underline-offset: 0.25rem;
+  }
+
+  @media (max-width: 48rem) {
+    .how-it-works__steps {
+      grid-template-columns: 1fr;
+    }
+
+    .how-it-works__step {
+      min-height: auto;
+    }
+
+    .how-it-works__step::after {
+      top: auto;
+      right: auto;
+      bottom: -0.625rem;
+      left: 50%;
+      width: 1px;
+      height: 1.25rem;
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .how-it-works__button {
+      transition: none;
+    }
+
+    .how-it-works__button:hover {
+      transform: none;
+    }
+  }
+</style>

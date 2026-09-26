@@ -1,0 +1,40 @@
+---
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+
+const resources = [
+  ['/resources/cash-flow-forecasting', 'Cash-flow forecasting for small business', 'Anticipate pressure before it becomes a crisis.'],
+  ['/resources/small-business-financial-dashboard', 'What belongs on a financial dashboard', 'Focus financial reporting on real operating decisions.'],
+  ['/resources/automated-financial-reporting', 'Automated financial reporting', 'Reduce repetitive spreadsheet work without losing control.'],
+  ['/resources/fractional-cfo-tools', 'Tools for fractional CFO workflows', 'Create consistent reporting and planning conversations.'],
+];
+---
+
+<MarketingLayout title="Resources | Insight Hunter" description="Practical financial operations resources for small-business owners, bookkeepers, and advisors.">
+  <section class="wrap page">
+    <p class="eyebrow">Financial operations resources</p>
+    <h1>Clearer financial thinking for growing businesses.</h1>
+    <p class="lead">Practical, plain-English guides on cash flow, reporting, dashboards, and financial advisory workflows.</p>
+
+    <div class="grid">
+      {resources.map(([href, title, description]) => (
+        <article>
+          <h2><a href={href}>{title}</a></h2>
+          <p>{description}</p>
+          <a class="read" href={href}>Read guide →</a>
+        </article>
+      ))}
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  .page { padding-block: 5rem; }
+  .lead { max-width: 65ch; color: var(--ink-soft); font-size: 1.1rem; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 2rem; }
+  article { border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem; }
+  article h2 { font-size: 1.25rem; }
+  article h2 a, .read { color: var(--ink); text-decoration: none; }
+  article p { color: var(--ink-soft); }
+  .read { color: var(--moss); font-weight: 800; }
+  @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+</style>

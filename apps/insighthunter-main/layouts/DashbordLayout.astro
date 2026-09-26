@@ -1,0 +1,43 @@
+---
+// src/layouts/DashboardLayout.astro
+import '../styles/global.css';
+import { getSession } from '@insighthunter/auth-shared';
+import type { IHSession } from '@insighthunter/auth-shared';
+
+const { title = 'Dashboard', session } = Astro.props;
+const planLabel = session.plan === 'enterprise' ? 'Enterprise' : session.plan === 'growth' ? 'Growth' : 'Starter';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="icon" href="/favicon.svg" />
+  </head>
+  <body>
+    <nav>
+      <div class="logo">Insight Hunter</div>
+      <div class="nav-right">
+        <span>{session.user?.email}</span>
+        <span class="badge">{planLabel}</span>
+        <a href="/auth/logout">Logout</a>
+      </div>
+    </nav>
+    <main>
+      <slot />
+    </main>
+    <style>
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+      :root{--brand:#00F0C8;--brand-2:#5FA8FF;--dark:#0B0F14;--nav:#0B0F14;--card:#161D28;--text:#E9EDF3;--muted:#A9B4C4;--border:rgba(233,237,243,0.10)}
+      body{font-family:system-ui,sans-serif;background:var(--dark);color:var(--text);min-height:100vh}
+      nav{background:var(--nav);border-bottom:1px solid var(--border);padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+      .logo{font-size:1.2rem;font-weight:900;color:var(--brand)}
+      .nav-right{display:flex;align-items:center;gap:1rem;font-size:.85rem;color:var(--muted)}
+      .nav-right a{color:var(--brand);text-decoration:none;font-weight:600}
+      .badge{display:inline-block;background:#0ea5e920;color:var(--brand);border:1px solid #0ea5e940;border-radius:6px;padding:.15rem .5rem;font-size:.7rem;font-weight:700}
+      main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem}
+    </style>
+  </body>
+</html>

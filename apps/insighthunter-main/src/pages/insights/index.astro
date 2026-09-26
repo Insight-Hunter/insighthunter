@@ -1,0 +1,30 @@
+---
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import { getSignupUrl } from '../../lib/urls';
+---
+
+<MarketingLayout title="Turn financial data into a practical next step. | Insight Hunter" description="Insight Hunter helps identify relevant trends, risks, and decisions so numbers become an operating advantage.">
+  <section class="wrap module-page">
+    <p class="eyebrow">Insights</p>
+    <h1>Turn financial data into a practical next step.</h1>
+    <p class="lead">Insight Hunter helps identify relevant trends, risks, and decisions so numbers become an operating advantage.</p>
+
+    <div class="module-grid">
+      <article><h2>Guided signals</h2><p>Surface meaningful changes in cash, margins, expenses, and performance.</p></article>
+      <article><h2>Forward context</h2><p>Connect historical activity with cash-flow and operating forecasts.</p></article>
+      <article><h2>Advisory-ready views</h2><p>Support better conversations among owners, bookkeepers, and advisors.</p></article>
+    </div>
+
+    <a class="btn btn-primary" href={getSignupUrl('pro')}>Get started</a>
+  </section>
+</MarketingLayout>
+
+<style>
+  .module-page { padding-block: 5rem; }
+  .lead { max-width: 65ch; color: var(--ink-soft); font-size: 1.1rem; }
+  .module-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0; }
+  article { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 1.5rem; }
+  article h2 { font-size: 1.2rem; }
+  article p { color: var(--ink-soft); }
+  @media (max-width: 760px) { .module-grid { grid-template-columns: 1fr; } }
+</style>

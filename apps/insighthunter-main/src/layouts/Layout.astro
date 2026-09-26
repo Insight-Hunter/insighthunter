@@ -1,0 +1,32 @@
+---
+import '../styles/global.css';
+import SeoHead from '../components/SeoHead.astro';
+import SkipLink from '../components/SkipLink.astro';
+import Header from '../components/navigation/Header.astro';
+import Footer from '../components/navigation/Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Insight Hunter | Financial Intelligence for Small Business',
+  description = 'Financial dashboards, cash-flow forecasts, reports, and practical business insights.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <SeoHead title={title} description={description} />
+  </head>
+  <body>
+    <SkipLink />
+    <Header />
+    <slot />
+    <Footer />
+  </body>
+</html>

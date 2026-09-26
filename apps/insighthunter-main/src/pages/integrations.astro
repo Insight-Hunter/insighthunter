@@ -1,0 +1,42 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+
+const integrations = [
+  ['CSV uploads', 'Start quickly with exports from your existing financial systems.', 'Available now'],
+  ['QuickBooks', 'A planned connection for supported accounting workflows.', 'Planned'],
+  ['Xero', 'A planned connection for supported accounting workflows.', 'Planned'],
+  ['Service partners', 'Payroll, compliance, and communications services through partners.', 'Expanding'],
+];
+---
+
+<MarketingLayout
+  title="Integrations | Insight Hunter"
+  description="Start with CSV uploads and expand Insight Hunter with supported accounting and service-partner integrations."
+>
+  <section class="wrap page">
+    <p class="eyebrow">Connect your operation</p>
+    <h1>Start with the data you have.</h1>
+    <p class="lead">Begin with structured financial exports, then add supported accounting, compliance, payroll, and partner connections as they become available.</p>
+
+    <div class="grid">
+      {integrations.map(([title, description, status]) => (
+        <article>
+          <p class="status">{status}</p>
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  .page { padding-block: 5rem; }
+  .lead { max-width: 65ch; color: var(--ink-soft); font-size: 1.1rem; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 2rem; }
+  article { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 1.5rem; }
+  .status { color: var(--moss); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  article h2 { font-size: 1.25rem; }
+  article p:not(.status) { color: var(--ink-soft); }
+  @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+</style>

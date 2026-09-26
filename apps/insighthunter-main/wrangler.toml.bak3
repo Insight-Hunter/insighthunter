@@ -1,0 +1,24 @@
+name = "insighthunter-main"
+main = "./dist/server/virtual_astro_middleware.mjs"
+compatibility_date = "2026-08-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+
+routes = [
+  { pattern = "insighthunter.app/*", zone_name = "insighthunter.app" },
+  { pattern = "www.insighthunter.app/*", zone_name = "insighthunter.app" }
+]
+
+[assets]
+directory = "./dist/client"
+binding = "ASSETS"
+
+[observability]
+enabled = true
+
+# Public runtime config — no secrets here, these are read by client-side
+# scripts (pricing/signup/login pages) via import.meta.env at build time.
+[vars]
+PUBLIC_AUTH_API_URL = "https://auth.insighthunter.app"
+PUBLIC_PAYMENTS_API_URL = "https://payments.insighthunter.app"
+PUBLIC_APP_BASE_URL = "https://app.insighthunter.app"

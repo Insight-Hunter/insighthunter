@@ -1,0 +1,31 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+---
+
+<MarketingLayout
+  title="Features | Insight Hunter"
+  description="Financial dashboards, cash-flow forecasting, reports, alerts, and decision-ready insights for small business."
+>
+  <section class="wrap page">
+    <p class="eyebrow">Financial intelligence that stays practical</p>
+    <h1>More clarity. Less spreadsheet archaeology.</h1>
+    <p class="lead">Insight Hunter connects financial visibility, reporting, forecasts, and operating context in one decision-ready platform.</p>
+
+    <div class="grid">
+      <article><h2>Cash visibility</h2><p>See cash position, upcoming commitments, and changes that require attention.</p></article>
+      <article><h2>Forecasting</h2><p>Identify likely cash pressure early enough to adjust collections, spending, or timing.</p></article>
+      <article><h2>Reporting</h2><p>Build recurring reports for owners, advisors, clients, lenders, and stakeholders.</p></article>
+      <article><h2>Financial insights</h2><p>Turn underlying activity into focused, practical next steps.</p></article>
+    </div>
+  </section>
+</MarketingLayout>
+
+<style>
+  .page { padding-block: 5rem; }
+  .lead { max-width: 65ch; color: var(--ink-soft); font-size: 1.1rem; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 2rem; }
+  article { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 1.5rem; }
+  article h2 { font-size: 1.25rem; }
+  article p { color: var(--ink-soft); }
+  @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+</style>

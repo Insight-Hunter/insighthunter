@@ -1,0 +1,30 @@
+---
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import { getSignupUrl } from '../../lib/urls';
+---
+
+<MarketingLayout title="Reports that move decisions forward. | Insight Hunter" description="Create recurring financial reports that help owners, advisors, clients, and stakeholders understand what matters now.">
+  <section class="wrap module-page">
+    <p class="eyebrow">Reports</p>
+    <h1>Reports that move decisions forward.</h1>
+    <p class="lead">Create recurring financial reports that help owners, advisors, clients, and stakeholders understand what matters now.</p>
+
+    <div class="module-grid">
+      <article><h2>Core reporting</h2><p>Create P&L, cash-flow, KPI, and planning-oriented reports.</p></article>
+      <article><h2>Scheduled delivery</h2><p>Build a reporting rhythm without repetitive spreadsheet assembly.</p></article>
+      <article><h2>Stakeholder-ready exports</h2><p>Prepare clean outputs for clients, lenders, and internal leaders.</p></article>
+    </div>
+
+    <a class="btn btn-primary" href={getSignupUrl('standard')}>Get started</a>
+  </section>
+</MarketingLayout>
+
+<style>
+  .module-page { padding-block: 5rem; }
+  .lead { max-width: 65ch; color: var(--ink-soft); font-size: 1.1rem; }
+  .module-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0; }
+  article { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 1.5rem; }
+  article h2 { font-size: 1.2rem; }
+  article p { color: var(--ink-soft); }
+  @media (max-width: 760px) { .module-grid { grid-template-columns: 1fr; } }
+</style>

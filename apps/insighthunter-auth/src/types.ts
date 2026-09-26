@@ -1,13 +1,11 @@
-import type { SendEmailBinding } from "./lib/email.js";
-
 export interface Env {
   DB: D1Database;
-  SESSIONS: KVNamespace;
-  SEND_EMAIL: SendEmailBinding;
+  SESSIONS: KVNamespace;          // rate limiting + short-lived tokens
   USER_VAULT: DurableObjectNamespace;
-  SESSION_SECRET: string; // wrangler secret — HMAC key for session tokens
-  ALLOWED_ORIGIN: string; // e.g. https://insighthunter.app
-  DASHBOARD_URL: string; // e.g. https://app.insighthunter.app
+  SESSION_SECRET: string;         // wrangler secret — HMAC-SHA256 key (32+ random bytes, hex)
+  ALLOWED_ORIGIN: string;         // https://insighthunter.app
+  DASHBOARD_URL?: string;         // e.g. https://app.insighthunter.app
+  RESEND_API_KEY?: string;        // wrangler secret — transactional email (optional until email flows are wired)
 }
 
 /** Subscription tiers — must stay in sync with insighthunter-dashboard TIER_RANK. */
@@ -39,7 +37,7 @@ export interface UserRecord {
 
 /**
  * SessionPayload is embedded inside the signed token.
- * Keep this small — it travels in every request header/cookie.
+ * Keep this small — it travels in every request header / cookie.
  */
 export interface SessionPayload {
   userId: string;

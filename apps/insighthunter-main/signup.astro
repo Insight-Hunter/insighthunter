@@ -1,0 +1,135 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Create your account">
+  <section class="auth-section">
+    <div class="wrap auth-wrap">
+      <div class="auth-card">
+        <p class="eyebrow">Get started</p>
+        <h1 id="auth-heading">Create your account</h1>
+        <p id="tier-note" class="mono tier-note"></p>
+
+        <form id="signup-form">
+          <label>
+            Work email
+            <input type="email" name="email" required autocomplete="email" />
+          </label>
+          <label>
+            Password
+            <input type="password" name="password" required minlength="10" autocomplete="new-password" />
+            <span class="hint">At least 10 characters.</span>
+          </label>
+          <button type="submit" class="btn btn-primary submit-btn">Create account</button>
+          <p id="error-note" class="error-note" role="alert"></p>
+        </form>
+
+        <p class="alt-action">Already have an account? <a href="/login">Log in</a></p>
+      </div>
+    </div>
+  </section>
+
+  <script
+    define:vars={{
+      authApi: import.meta.env.PUBLIC_AUTH_API_URL,
+      paymentsApi: import.meta.env.PUBLIC_PAYMENTS_API_URL,
+      appBaseUrl: import.meta.env.PUBLIC_APP_BASE_URL,
+    }}
+  >
+    const params = new URLSearchParams(window.location.search);
+    const requestedTier = params.get('tier') || 'startup';
+    const requestedAddon = params.get('addon');
+
+    if (requestedTier !== 'startup') {
+      document.getElementById('tier-note').textContent =
+        `Creating a ${requestedTier} account — you'll be sent to secure checkout next.`;
+    }
+
+    const form = document.getElementById('signup-form');
+    const errorNote = document.getElementById('error-note');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorNote.textContent = '';
+      const submitBtn = form.querySelector('.submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating account…';
+
+      const email = form.email.value.trim();
+      const password = form.password.value;
+
+      try {
+        const res = await fetch(`${authApi}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, tier: 'startup' }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error === 'email_in_use' ? 'That email already has an account. Try logging in.' : (data.detail || data.error || 'Something went wrong.'));
+        }
+
+        const { token } = data;
+
+        // Free tier: go straight to the dashboard.
+        if (requestedTier === 'startup' && !requestedAddon) {
+          window.location.href = `${appBaseUrl}/dashboard?token=${encodeURIComponent(token)}`;
+          return;
+        }
+
+        // Paid tier or add-on: kick off Stripe Checkout immediately.
+        const checkoutBody = requestedAddon
+          ? { type: 'module_addon', value: requestedAddon }
+          : { type: 'account_tier', value: requestedTier };
+
+        const checkoutRes = await fetch(`${paymentsApi}/checkout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(checkoutBody),
+        });
+        const checkoutData = await checkoutRes.json();
+        if (!checkoutRes.ok) throw new Error(checkoutData.error || 'Could not start checkout.');
+
+        window.location.href = checkoutData.checkoutUrl;
+      } catch (err) {
+        errorNote.textContent = err.message || 'Something went wrong. Try again.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create account';
+      }
+    });
+  </script>
+
+  <style>
+    .auth-section { padding: 72px 0 120px; }
+    .auth-wrap { display: flex; justify-content: center; }
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--paper-bright);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 40px;
+    }
+    .tier-note { color: var(--moss); font-size: 0.8rem; margin-bottom: 8px; }
+    form { display: flex; flex-direction: column; gap: 18px; margin-top: 20px; }
+    label { display: flex; flex-direction: column; gap: 6px; font-size: 0.88rem; color: var(--ink-soft); }
+    input {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: #fff;
+      color: var(--ink);
+    }
+    input:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
+    .hint { font-size: 0.76rem; color: var(--moss); }
+    .submit-btn { width: 100%; justify-content: center; margin-top: 6px; }
+    .submit-btn:disabled { opacity: 0.6; cursor: default; transform: none; }
+    .error-note { color: var(--clay); font-size: 0.86rem; margin: 0; min-height: 1em; }
+    .alt-action { font-size: 0.88rem; margin-top: 22px; text-align: center; }
+    .alt-action a { color: var(--moss); }
+  </style>
+</Layout>

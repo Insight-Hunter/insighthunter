@@ -1,0 +1,24 @@
+---
+import { site } from "../data/site";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Contact — Insight Hunter">
+  <section class="section">
+    <div class="container grid cards-2">
+      <div class="prose">
+        <div class="eyebrow">Contact</div>
+        <h1 class="page-title">Talk with the Insight Hunter team.</h1>
+        <p class="lead">Use this page for sales, partnerships, implementation questions, or support routing.</p>
+        <p>Email: <a href={`mailto:${site.email}`}>{site.email}</a></p>
+        <p>Phone: {site.phone}</p>
+        <p>Location: {site.address}</p>
+      </div>
+      <div class="card prose">
+        <h2>How we can help</h2>
+        <p>For a plan recommendation, implementation question, or partnership inquiry, email the team with your business name, team size, and the workflow you are evaluating.</p>
+        <p>We use the same address for account support and sales, so your request reaches the right person without a dead-end web form.</p>
+        <a class="btn btn-primary" href={`mailto:${site.email}?subject=Insight%20Hunter%20inquiry`}>Email Insight Hunter</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

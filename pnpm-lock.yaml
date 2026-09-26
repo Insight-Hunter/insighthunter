@@ -54,13 +54,6 @@ importers:
         version: 4.107.0(@cloudflare/workers-types@4.20260702.1)
 
   apps/insighthunter-auth:
-    dependencies:
-      '@insighthunter/auth-shared':
-        specifier: workspace:*
-        version: link:../../packages/authz
-      hono:
-        specifier: ^4.6.10
-        version: 4.12.27
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20250701.0
