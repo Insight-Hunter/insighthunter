@@ -12,11 +12,15 @@ export function privacyBody() {
 </section>
 <section aria-labelledby="use-heading">
   <h2 id="use-heading">How We Use It</h2>
-  <p>Contact submissions are used solely to respond to your inquiry and are not shared with third parties except as required to operate our email and CRM tooling.</p>
+  <p>Contact submissions are used solely to respond to your inquiry. Validated submissions are held in a restricted lead queue for up to 90 days and are not used for advertising.</p>
 </section>
 <section aria-labelledby="rights-heading">
   <h2 id="rights-heading">Your Rights</h2>
   <p>You may request access to, correction of, or deletion of your contact submission at any time by emailing <a href="mailto:privacy@insighthunter.app">privacy@insighthunter.app</a>.</p>
+</section>
+<section id="cookies" aria-labelledby="cookies-heading">
+  <h2 id="cookies-heading">Cookies</h2>
+  <p>The public marketing site does not use advertising or analytics cookies. Essential browser storage, if introduced for a site feature, will be documented here.</p>
 </section>
 `;
 }

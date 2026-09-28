@@ -5,6 +5,8 @@ import { hashPassword, verifyPassword, signSession, verifySession } from "./cryp
 import { sendPasswordResetEmail } from "./lib/email.js";
 import type { Env, Tier, OrgRole, SessionPayload } from "./types.js";
 
+export { UserVault } from "./vault.js";
+
 const APP_ORIGIN     = "https://app.insighthunter.app";
 const MARKETING_ORIGIN = "https://insighthunter.app";
 const SESSION_COOKIE = "ih_session";

@@ -3,37 +3,21 @@ import { html } from "hono/html";
 export function featuresBody() {
   return html`
 <section>
-  <h1>Features Built for Market Intelligence</h1>
-  <p class="lede">Everything you need to replace manual competitive research with an automated data mining software pipeline.</p>
+  <p class="eyebrow">A connected finance workflow</p>
+  <h1>Financial operations, organized around the decisions you make.</h1>
+  <p class="lede">Insight Hunter brings bookkeeping, recurring reports, cash-flow context, and service modules into one practical operating picture.</p>
 </section>
 
 <section aria-labelledby="feature-list-heading">
-  <h2 id="feature-list-heading">What's Inside Insight Hunter</h2>
-  <div class="grid-3">
-    <div class="card">
-      <h3>Autonomous Trend Hunting</h3>
-      <p>Always-on scanning of public market signals, surfaced as ranked opportunities in your dashboard.</p>
-    </div>
-    <div class="card">
-      <h3>Competitor Anomalies</h3>
-      <p>Alerts the moment a tracked competitor changes pricing, positioning, or go-to-market strategy.</p>
-    </div>
-    <div class="card">
-      <h3>Predictive Demand Scopes</h3>
-      <p>Forward-looking demand mapping so roadmap and marketing decisions are based on where the market is heading.</p>
-    </div>
-    <div class="card">
-      <h3>Historical Data Vault</h3>
-      <p>Five-plus years of archived trend history available as an add-on for deep longitudinal analysis.</p>
-    </div>
-    <div class="card">
-      <h3>Advanced API Pipeline</h3>
-      <p>Direct webhook access so custom CRMs and internal tools can react to signals in real time.</p>
-    </div>
-    <div class="card">
-      <h3>Niche Industry Data Packs</h3>
-      <p>Curated micro-market datasets for teams that need depth beyond the core feed.</p>
-    </div>
+  <h2 id="feature-list-heading">The connected capabilities</h2>
+  <div class="capability-layout feature-layout">
+    <article id="bookkeeping" class="capability-card capability-featured"><span class="capability-index mono">01 / BOOKKEEPING</span><h3>Continuous ledger sync</h3><p>Keep transaction activity moving into an organized ledger without waiting for an overnight batch job.</p></article>
+    <article id="reports" class="capability-card"><span class="capability-index mono">02 / REPORTS</span><h3>Financial reporting</h3><p>Prepare recurring P&amp;L, cash-flow, and forecast views for owners and advisors.</p></article>
+    <article id="insights" class="capability-card"><span class="capability-index mono">03 / INSIGHTS</span><h3>Operating context</h3><p>Connect movement in margin, cash, and customer activity to questions worth investigating.</p></article>
+    <article id="payroll" class="capability-card"><span class="capability-index mono">04 / PAYROLL</span><h3>Payroll workflows</h3><p>Choose a tier that fits your operations, with a platform designed to support partner and white-label delivery.</p></article>
+    <article id="bizforma" class="capability-card"><span class="capability-index mono">05 / BIZFORMA</span><h3>Formation and compliance</h3><p>Organize business-formation steps and ongoing compliance support in one guided workflow.</p></article>
+    <article id="pbx" class="capability-card"><span class="capability-index mono">06 / PBX</span><h3>Business communications</h3><p>Bring phone, voicemail, SMS, and automessages into a dedicated communications hub.</p></article>
+    <article class="capability-card capability-advisory"><span class="capability-index mono">07 / OPTIONAL ADVISORY</span><h3>AI CFO assistance</h3><p>Automated advisory insights can help frame questions and scenarios. They support&mdash;not replace&mdash;qualified professional judgment.</p></article>
   </div>
 </section>
 

@@ -1,26 +1,27 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import HeroGlow from '../components/HeroGlow.astro';
-import { MODULES } from '../data/modules';
-import { getSignupUrl } from '../lib/urls';
+import HeroGlow from "../components/HeroGlow.astro";
+import { MODULES } from "../data/modules";
+import Layout from "../layouts/Layout.astro";
+import { getSignupUrl } from "../lib/urls";
 ---
-<Layout title="Know your numbers before your competitors do">
+<Layout title="Insight Hunter — Business Services and Insights">
   <!-- STAGE 1: HERO — Attention -->
   <section class="hero">
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <p class="eyebrow">Cloudflare Edge intelligence, always on</p>
-        <h1>Stop guessing.<br /><span class="grad-text">Start knowing.</span></h1>
+        <p class="eyebrow">Business services and insights for every stage</p>
+        <h1>Hunt Down Business Insights. <span class="grad-text">Get the Support to Grow.</span></h1>
         <p class="hero-sub">
-          Insight Hunter turns raw transactions into real-time answers — margin,
-          runway, and cash position, updated the moment they happen, not the
-          moment your bookkeeper gets around to it.
+          Insight Hunter brings bookkeeping, payroll, PBX business phone,
+          business formation assistance, and website services together&mdash;
+          alongside the insights that help you make informed decisions as your
+          business grows.
         </p>
         <div class="hero-actions">
-          <a href={getSignupUrl('lite')} class="btn btn-primary">Start free — no card required</a>
-          <a href="/modules" class="btn btn-ghost">Explore the platform</a>
+          <a href="#services" class="btn btn-primary">Explore Business Services</a>
+          <a href="/pricing" class="btn btn-ghost">View Plans</a>
         </div>
-        <p class="hero-fine mono">Free forever on Startup. No sales call required.</p>
+        <p class="hero-fine mono">Practical tools for starting, operating, and growing a business.</p>
       </div>
       <div class="hero-visual">
         <HeroGlow />
@@ -31,13 +32,13 @@ import { getSignupUrl } from '../lib/urls';
   <!-- STAGE 2: PAIN — Interest -->
   <section class="ruled pain-section">
     <div class="wrap">
-      <p class="eyebrow">The problem with "good enough" books</p>
-      <h2>By the time your report lands, the number's already stale.</h2>
+      <p class="eyebrow">Less juggling, more clarity</p>
+      <h2>Bring essential business support together.</h2>
       <p class="section-lead">
-        A ledger tells you what happened. A $500/month bookkeeper tells you
-        what happened, three weeks later. Insight Hunter tells you what's
-        happening — margin drift, runway shrinkage, cash gaps — while you can
-        still do something about it.
+        Bookkeeping, payroll, business phone, formation, and website needs can
+        pull your attention in different directions. Insight Hunter brings
+        these services together with business insights to help you stay focused
+        on building and growing your company.
       </p>
     </div>
   </section>
@@ -46,16 +47,16 @@ import { getSignupUrl } from '../lib/urls';
   <section class="ruled stat-bar">
     <div class="wrap stat-grid">
       <div class="stat">
-        <span class="stat-num mono">Always on</span>
-        <span class="stat-label">financial visibility built for the decisions you make every day</span>
+        <span class="stat-num mono">Bookkeeping</span>
+        <span class="stat-label">organized financial records and clearer business visibility</span>
       </div>
       <div class="stat">
-        <span class="stat-num mono">6 modules</span>
-        <span class="stat-label">bookkeeping, payroll, reporting, advisory, compliance, comms</span>
+        <span class="stat-num mono">Payroll &amp; PBX</span>
+        <span class="stat-label">essential people and communications services for daily operations</span>
       </div>
       <div class="stat">
-        <span class="stat-num mono">$0/mo</span>
-        <span class="stat-label">Startup tier, forever — upgrade only when you outgrow it</span>
+        <span class="stat-num mono">Formation &amp; web</span>
+        <span class="stat-label">support for getting established and building your online presence</span>
       </div>
     </div>
   </section>
@@ -63,22 +64,22 @@ import { getSignupUrl } from '../lib/urls';
   <!-- STAGE 4: FEATURES — Consideration -->
   <section class="ruled">
     <div class="wrap">
-      <p class="eyebrow">Built for speed, not spreadsheets</p>
+      <p class="eyebrow">Support for the work of running a business</p>
       <div class="feature-grid">
         <div class="feature-card">
           <span class="feature-num grad-text mono">01</span>
-          <h3>Real-time data engine</h3>
-          <p>Bank, payroll, and invoice feeds sync continuously on the edge — no overnight batch jobs, no stale numbers.</p>
+          <h3>Bookkeeping &amp; insights</h3>
+          <p>Organize business finances and make more informed decisions with useful financial context.</p>
         </div>
         <div class="feature-card">
           <span class="feature-num grad-text mono">02</span>
-          <h3>Reports that write themselves</h3>
-          <p>P&L, cash flow, and forecasts generate on schedule and land in your inbox before you ask for them.</p>
+          <h3>Payroll &amp; PBX</h3>
+          <p>Bring pay operations and business communications into the tools you use to run your company.</p>
         </div>
         <div class="feature-card">
           <span class="feature-num grad-text mono">03</span>
-          <h3>Add-ons that scale with you</h3>
-          <p>Layer on payroll, formation compliance, or webhook alerts only the day your business actually needs them.</p>
+          <h3>Formation &amp; website services</h3>
+          <p>Get assistance establishing your business and services to build a clear online presence.</p>
         </div>
       </div>
     </div>
@@ -88,11 +89,11 @@ import { getSignupUrl } from '../lib/urls';
   <section class="ruled dark cta-section">
     <div class="wrap cta-inner">
       <div>
-        <p class="eyebrow" style="color: var(--amber);">Your books, illuminated</p>
-        <h2>Set up in under 5 minutes. See real numbers today.</h2>
-        <p>No card required for Startup. Cancel anytime. Upgrade the day reports, payroll, or advisory pay for themselves.</p>
+        <p class="eyebrow" style="color: var(--amber);">Build your business with Insight Hunter</p>
+        <h2>Get the support and tools to move forward.</h2>
+        <p>Explore the services, compare plans, and choose the support that fits your business needs.</p>
       </div>
-      <a href={getSignupUrl('lite')} class="btn btn-on-dark">Claim your free dashboard</a>
+      <a href={getSignupUrl('lite')} class="btn btn-on-dark">Explore plans</a>
     </div>
   </section>
 

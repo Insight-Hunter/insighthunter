@@ -64,6 +64,11 @@ describe("public routes", () => {
     expect(res.status).toBe(200);
     const bodyText = await res.text();
     expect(bodyText).toContain('rel="canonical"');
+    expect(bodyText).toContain("Cloudflare Edge intelligence, always on.");
+    expect(bodyText).toContain("Hunt down business insights in finance and customer movements");
+    expect(bodyText).toContain("margin, runway, and cash position");
+    expect(bodyText).toContain("Illustrative workflows, not customer testimonials");
+    expect(bodyText).toContain("Cloudflare Workers run the web experience");
     expect(bodyText).toContain("https://auth.insighthunter.app/register?plan=startup");
     expect(bodyText).toContain("https://auth.insighthunter.app/login?return_to=");
   });
@@ -71,9 +76,24 @@ describe("public routes", () => {
   it("serves pricing with a signup CTA per plan", async () => {
     const res = await app.fetch(new Request("https://insighthunter.app/pricing"), baseEnv);
     const bodyText = await res.text();
+    expect(bodyText).toContain("Lite");
     expect(bodyText).toContain("plan=startup");
     expect(bodyText).toContain("plan=standard");
     expect(bodyText).toContain("plan=pro");
+    expect(bodyText).toContain("Most popular");
+    expect(bodyText).toContain("data-billing=\"annual\"");
+    expect(bodyText).toContain("$149");
+  });
+
+  it("serves the simulated add-on marketplace without charging", async () => {
+    const res = await app.fetch(new Request("https://insighthunter.app/addons"), baseEnv);
+    const bodyText = await res.text();
+    expect(res.status).toBe(200);
+    expect(bodyText).toContain("BizForma filing support");
+    expect(bodyText).toContain("PBX communications");
+    expect(bodyText).toContain("AI CFO assistance");
+    expect(bodyText).toContain("addon-monthly-total");
+    expect(bodyText).toContain("No checkout or payment is initiated here.");
   });
 
   it("serves robots.txt and sitemap.xml", async () => {
