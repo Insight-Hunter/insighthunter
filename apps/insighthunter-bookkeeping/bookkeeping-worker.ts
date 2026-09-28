@@ -38,12 +38,12 @@ export default {
       return withCors(Response.json({ error: "internal_error" }, { status: 500 }), cors);
     }
   },
-} satisfies ExportedHandler<Env>;
+} satisfies { fetch(request: Request, env: Env): Promise<Response> };
 
 async function handleCreateTransaction(
   request: Request,
   env: Env,
-  ledger: DurableObjectStub
+  ledger: LedgerStub
 ): Promise<Response> {
   const body = (await request.json()) as {
     accountId?: string;
@@ -85,6 +85,10 @@ async function handleCreateTransaction(
 
   return createRes;
 }
+
+type LedgerStub = {
+  fetch(request: Request): Promise<Response>;
+};
 
 async function requireSession(request: Request, env: Env): Promise<SessionPayload | null> {
   const token = bearerOrCookieToken(request);

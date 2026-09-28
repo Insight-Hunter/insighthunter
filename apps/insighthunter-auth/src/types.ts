@@ -4,6 +4,7 @@ export interface Env {
   USER_VAULT: DurableObjectNamespace;
   SESSION_SECRET: string;         // wrangler secret — HMAC-SHA256 key (32+ random bytes, hex)
   ALLOWED_ORIGIN: string;         // https://insighthunter.app
+  DASHBOARD_URL?: string;         // e.g. https://app.insighthunter.app
   RESEND_API_KEY?: string;        // wrangler secret — transactional email (optional until email flows are wired)
 }
 

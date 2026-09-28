@@ -12,7 +12,7 @@ export function softwareApplicationJsonLd(canonicalOrigin: string): string {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: "Insight Hunter",
-    applicationCategory: "BusinessApplication",
+    applicationCategory: "FinanceApplication",
     operatingSystem: "Web",
     url: canonicalOrigin,
     offers: PLANS.map((plan) => ({
@@ -22,7 +22,7 @@ export function softwareApplicationJsonLd(canonicalOrigin: string): string {
       priceCurrency: "USD",
     })),
     description:
-      "Insight Hunter is a SaaS market intelligence platform for automated data mining and predictive market trend analysis.",
+      "Insight Hunter is a small-business financial operations platform for bookkeeping, reporting, cash-flow visibility, and business support modules.",
   });
 }
 
@@ -34,23 +34,23 @@ export function addOnsProductJsonLd(canonicalOrigin: string): string {
       {
         "@type": "Product",
         position: 1,
-        name: "Historical Data Vault Link",
+        name: "BizForma filing support",
         url: `${canonicalOrigin}/addons`,
-        description: "Instant unlock of 5+ years of archive trend data.",
+        description: "One-time business formation and filing support preview.",
       },
       {
         "@type": "Product",
         position: 2,
-        name: "Advanced API Pipeline",
+        name: "PBX communications",
         url: `${canonicalOrigin}/addons`,
-        description: "Direct webhook access for custom CRMs and data pipelines.",
+        description: "Business phone, voicemail, SMS, and automessage workflows.",
       },
       {
         "@type": "Product",
         position: 3,
-        name: "Niche Industry Data Packs",
+        name: "Payroll and AI CFO assistance",
         url: `${canonicalOrigin}/addons`,
-        description: "Deep-dive datasets for specific micro-markets.",
+        description: "Optional payroll workflows and automated advisory insights.",
       },
     ],
   });

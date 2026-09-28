@@ -7,6 +7,10 @@ compatibility_flags = ["nodejs_compat"]
 pattern = "app.insighthunter.app/*"
 zone_name = "insighthunter.app"
 
+[[routes]]
+pattern = "dashboard.insighthunter.app/*"
+zone_name = "insighthunter.app"
+
 [observability]
 enabled = true
 head_sampling_rate = 1

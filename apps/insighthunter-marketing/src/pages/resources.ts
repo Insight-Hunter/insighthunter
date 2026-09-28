@@ -4,18 +4,18 @@ export function resourcesIndexBody() {
   return html`
 <section>
   <h1>Resource Library</h1>
-  <p class="lede">Guides and directories on SaaS market intelligence, automated data mining, and predictive analytics.</p>
+  <p class="lede">Practical guides on bookkeeping, cash-flow planning, financial reporting, and small-business operations.</p>
 </section>
 <section aria-labelledby="resources-list-heading">
   <h2 id="resources-list-heading">Guides</h2>
   <div class="grid-3">
     <div class="card">
-      <h3><a href="/resources/saas-data-mining-guide">SaaS Data Mining Guide</a></h3>
-      <p>How automated data mining software finds market opportunities before your competitors do.</p>
+      <h3><a href="/resources/saas-data-mining-guide">A practical guide to financial data</a></h3>
+      <p>Turn bookkeeping activity into useful context for cash, margin, and operating decisions.</p>
     </div>
     <div class="card">
-      <h3><a href="/resources/predictive-analytics-directory">Predictive Analytics Directory</a></h3>
-      <p>A reference for evaluating predictive market trends tools and the signals they track.</p>
+      <h3><a href="/resources/predictive-analytics-directory">Cash-flow forecasting basics</a></h3>
+      <p>Understand the inputs and assumptions behind a practical cash-flow forecast.</p>
     </div>
   </div>
 </section>
@@ -25,25 +25,25 @@ export function resourcesIndexBody() {
 export function saasDataMiningGuideBody() {
   return html`
 <section>
-  <h1>SaaS Data Mining Guide</h1>
-  <p class="lede">A practical primer on automated data mining software for SaaS teams evaluating a market intelligence platform.</p>
+  <h1>Make financial data useful for the next decision</h1>
+  <p class="lede">A practical introduction to connecting organized bookkeeping with reporting and small-business operating decisions.</p>
 </section>
 <section aria-labelledby="why-heading">
-  <h2 id="why-heading">Why Automate Data Mining</h2>
-  <p>Manual competitive research does not scale past a handful of tracked competitors or markets. Automated data mining software continuously scans public signals &mdash; pricing pages, changelogs, review sites, and search trends &mdash; and turns them into ranked, actionable alerts instead of a weekly spreadsheet update.</p>
+  <h2 id="why-heading">Start with reliable bookkeeping</h2>
+  <p>Useful financial insight starts with consistent records. Keep transactions categorized, reconcile accounts on a regular cadence, and make sure the reporting period and assumptions are clear before comparing performance.</p>
 </section>
 <section aria-labelledby="signals-heading">
-  <h2 id="signals-heading">Signals Worth Tracking</h2>
+  <h2 id="signals-heading">Questions worth tracking</h2>
   <ul>
-    <li>Pricing and packaging changes</li>
-    <li>New feature announcements and changelog activity</li>
-    <li>Search demand shifts for category keywords</li>
-    <li>Review sentiment and win/loss language</li>
+    <li>How much cash is available today and what is already committed?</li>
+    <li>Which revenue and expense movements explain margin changes?</li>
+    <li>How do upcoming obligations compare with expected cash receipts?</li>
+    <li>Which forecast assumptions changed since the last review?</li>
   </ul>
 </section>
 <section aria-labelledby="next-heading">
   <h2 id="next-heading">Next Step</h2>
-  <p><a href="/pricing">See how Insight Hunter automates this</a> across your tracked markets.</p>
+  <p><a href="/pricing">Explore Insight Hunter plans</a> for bookkeeping, reporting, and cash-flow visibility.</p>
 </section>
 `;
 }
@@ -51,21 +51,21 @@ export function saasDataMiningGuideBody() {
 export function predictiveAnalyticsDirectoryBody() {
   return html`
 <section>
-  <h1>Predictive Analytics Directory</h1>
-  <p class="lede">A reference for evaluating a predictive market trends tool, including the buy market data add-ons worth considering.</p>
+  <h1>Cash-flow forecasting basics</h1>
+  <p class="lede">A reference for building a useful forecast, checking assumptions, and keeping expected inflows and outflows visible.</p>
 </section>
 <section aria-labelledby="capabilities-heading">
-  <h2 id="capabilities-heading">Capabilities to Evaluate</h2>
+  <h2 id="capabilities-heading">A practical forecast checklist</h2>
   <ul>
-    <li>Forward-looking demand mapping, not just historical dashboards</li>
-    <li>Alerting on anomalies, not only scheduled reports</li>
-    <li>API access for feeding signals into internal tools</li>
-    <li>Depth add-ons for niche or vertical-specific markets</li>
+    <li>Start with a clear forecast horizon and opening cash balance</li>
+    <li>Separate expected receipts from confirmed receipts</li>
+    <li>Include recurring obligations and known one-time costs</li>
+    <li>Review actuals against assumptions and update the forecast</li>
   </ul>
 </section>
 <section aria-labelledby="addons-heading">
-  <h2 id="addons-heading">Buy Market Data Add-ons</h2>
-  <p>Insight Hunter's <a href="/addons">add-on marketplace</a> covers historical data vaults, API pipelines, and niche industry data packs so you only pay for the depth you need.</p>
+  <h2 id="addons-heading">Keep the assumptions visible</h2>
+  <p>A forecast is a planning tool, not a guarantee. Insight Hunter helps teams review current records alongside forward-looking estimates. <a href="/addons">Explore optional business modules</a>.</p>
 </section>
 `;
 }

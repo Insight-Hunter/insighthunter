@@ -40,7 +40,7 @@ formation.post("/", async (c) => {
     state: body.state,
     business_name: body.business_name,
     status: "draft",
-    registered_agent: body.registered_agent,
+    ...(body.registered_agent === undefined ? {} : { registered_agent: body.registered_agent }),
   });
 
   c.env.ANALYTICS.writeDataPoint({

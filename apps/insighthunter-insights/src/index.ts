@@ -67,8 +67,8 @@ type KPIRow = {
 async function getKPIs(db: D1Database, orgId: string): Promise<KPIRow[]> {
   // Current period: this calendar month
   const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0]!;
-  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split("T")[0]!;
+  const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0] ?? "";
+  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split("T")[0] ?? "";
 
   const sql = `
     SELECT
@@ -328,26 +328,30 @@ app.get("/health", (c) =>
 
 // GET /api/kpis — 6 core KPIs for current month vs prior month
 app.get("/api/kpis", async (c) => {
-  const session = getSession(c.req.raw)!;
+  const session = getSession(c.req.raw);
+  if (!session) return c.json({ error: "unauthorized" }, 401);
   const kpis = await getKPIs(c.env.DB, session.orgId);
   return c.json({ orgId: session.orgId, period: "MTD", kpis });
 });
 
 // GET /api/cashflow?months=12 — monthly cash in/out/net
 app.get("/api/cashflow", async (c) => {
-  const session = getSession(c.req.raw)!;
+  const session = getSession(c.req.raw);
+  if (!session) return c.json({ error: "unauthorized" }, 401);
   const data = await getCashFlow(c.env.DB, session.orgId);
   return c.json({ orgId: session.orgId, cashflow: data });
 });
 
 // GET /api/pnl?from=YYYY-MM-DD&to=YYYY-MM-DD — P&L by account
 app.get("/api/pnl", async (c) => {
-  const session = getSession(c.req.raw)!;
+  const session = getSession(c.req.raw);
+  if (!session) return c.json({ error: "unauthorized" }, 401);
   const now = new Date();
   const from =
     c.req.query("from") ??
-    new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0]!;
-  const to = c.req.query("to") ?? now.toISOString().split("T")[0]!;
+    new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0] ??
+    "";
+  const to = c.req.query("to") ?? now.toISOString().split("T")[0] ?? "";
   const lines = await getPnL(c.env.DB, session.orgId, from, to);
 
   const revenue = lines.filter((l) => l.type === "REVENUE").reduce((s, l) => s + l.net, 0);
@@ -364,14 +368,16 @@ app.get("/api/pnl", async (c) => {
 
 // GET /api/health-score — compute + store 6-factor business health score
 app.get("/api/health-score", async (c) => {
-  const session = getSession(c.req.raw)!;
+  const session = getSession(c.req.raw);
+  if (!session) return c.json({ error: "unauthorized" }, 401);
   const result = await computeAndStoreHealthScore(c.env.DB, session.orgId);
   return c.json({ orgId: session.orgId, ...result });
 });
 
 // GET /api/summary — all KPIs + health score in one call (used by dashboard)
 app.get("/api/summary", async (c) => {
-  const session = getSession(c.req.raw)!;
+  const session = getSession(c.req.raw);
+  if (!session) return c.json({ error: "unauthorized" }, 401);
   const [kpis, cashflow, health] = await Promise.all([
     getKPIs(c.env.DB, session.orgId),
     getCashFlow(c.env.DB, session.orgId),
@@ -383,7 +389,9 @@ app.get("/api/summary", async (c) => {
 // ── SSR Dashboard UI ───────────────────────────────────────────────────────────
 
 app.get("/", async (c) => {
-  const session = getSession(c.req.raw)!;
+  const session = getSession(c.req.raw);
+  if (!session)
+    return c.redirect(`${c.env.AUTH_URL}/login?redirect=${encodeURIComponent(c.req.url)}`, 302);
   const firstName = session.name.split(" ")[0] ?? session.name;
 
   const html = `<!DOCTYPE html>

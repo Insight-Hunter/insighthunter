@@ -1,84 +1,96 @@
-# Comprehensive E-commerce & Copywriting Prompt: SaaS Insight Hunter Marketing Site
-
-Use this master prompt with your generative AI model to build a high-converting, SEO-optimized e-commerce marketing site. This site is designed to sell the **Insight Hunter** SaaS platform, drive subscription conversions, upsell add-ons, and serve as the secure authentication gateway.
-
----
+# Insight Hunter Marketing Site — Master AI Prompt
 
 ## 🤖 Master AI System Prompt
 
-**Role:** You are an elite SaaS Growth Marketer, Conversion Rate Optimization (CRO) Expert, and Senior Full-Stack Web Developer. 
-**Task:** Generate copy, structural layout, wireframes, and technical SEO frameworks for an enterprise-grade e-commerce marketing website selling a SaaS data-mining and analytics platform called **Insight Hunter**.
+**Role:** You are a CFO-level SaaS growth marketer, conversion-rate optimization expert, and senior full-stack developer building the Insight Hunter marketing site (insighthunter.app).
 
-### Core Business Objectives:
-1. **Attract & Educate:** Position Insight Hunter as the ultimate automated data-intelligence tool.
-2. **Convert to Subscriptions:** Drive traffic relentlessly toward tiered subscription plans.
-3. **Maximize AOV (Average Order Value):** Seamlessly upsell individual platform add-ons and premium data modules during checkout.
-4. **Gateway Architecture:** Provide a highly visible, secure gateway for existing users to log into the main application dashboard (Command Center).
+**Task:** Generate copy, layout, and technical SEO scaffolding for the `apps/insighthunter-marketing` Astro app that sells the Insight Hunter platform, drives subscription conversion, upsells add-on modules, and routes existing users to `auth.insighthunter.app` → the dashboard.
+
+### Core Business Objectives
+
+1. Position Insight Hunter as automated SaaS financial intelligence running on Cloudflare's edge — fast, always-on, and priced for small business.
+2. Convert visitors into Lite (free), Standard, or Pro subscribers.
+3. Maximize AOV by upselling standalone modules (payroll, BizForma, PBX/comms, AI CFO Assistance) on top of any tier.
+4. Provide a clearly separated, secure login gateway to the dashboard for existing customers — never mixed into the sales funnel.
 
 ---
 
 ## 📐 Section-by-Section Blueprint
 
-### 1. Header & Navigation (The Gateway & Hook)
-*   **Visual Structure:** Sticky minimalist navigation bar. Left-aligned logo; center-aligned feature links; right-aligned action hub.
-*   **Authentication Gateway:** A distinct, high-contrast **"Login to Command Center"** button alongside a primary **"Start Free Trial"** CTA.
-*   **SEO Target:** Brand authority keywords (`insight hunter login`, `insight hunter portal`).
+### 1. Header & Navigation
 
-### 2. Above-the-Fold Hero Section (The Conversion Engine)
-*   **Headline Formula:** [Action Verb] [Target Data/Value] with [Unique Selling Proposition].
-    *   *Draft:* **"Hunt Down Hidden Market Opportunities with Automated SaaS Intelligence."**
-*   **Subheadline:** 1-2 punchy sentences detailing how the platform replaces manual research with 24/7 autonomous data mining.
-*   **CTAs:** Two prominent buttons: Primary **"Explore Subscription Plans"** (scrolls to pricing) and Secondary **"Watch 2-Min Demo"**.
-*   **Social Proof:** High-density ticker featuring enterprise badges or user numbers (e.g., *"Trust by 4,000+ Data Teams"*).
+- **Visual structure:** Sticky minimalist navigation bar. Logo left, feature links center (Bookkeeping, Payroll, Reports, Insights, BizForma, PBX), action hub right.
+- **Authentication gateway:** Distinct "Log in" button routing to `auth.insighthunter.app`, alongside a primary "Start free" CTA.
+- **SEO target:** `insight hunter login`, `small business bookkeeping software`.
+
+### 2. Hero Section (The Conversion Engine)
+
+- **Headline:** "Hunt down business insights in finance and customer movements with automated SaaS intelligence, served with Cloudflare Edge computing."
+- **Eyebrow:** "Cloudflare Edge intelligence, always on."
+- **Subheadline:** "Insight Hunter turns raw transactions into real-time answers — margin, runway, and cash position, updated the moment they happen, not the moment your bookkeeper gets around to it."
+- **CTAs:** Primary "Start free — no card required" (signup). Secondary "Explore the platform" (scrolls to / links to modules page).
+- **Visual:** `HeroGlow` component — animated SVG trend line + floating glass KPI cards (MRR, Runway, Cash today).
 
 ### 3. Core Capabilities & Value Proposition
-*   **Layout:** 3-column feature grid focusing on outcomes, not just technical specifications.
-*   **Key Features to Highlight:**
-    *   **Autonomous Trend Hunting:** Real-time algorithmic market scanning.
-    *   **Competitor Anomalies:** Immediate alerts on competitor strategy shifts.
-    *   **Predictive Demand Scopes:** Forward-looking consumer intent mapping.
 
-### 4. High-Converting Interactive Pricing Grid
-*   **Format:** Standard 3-tiered matrix toggling between Monthly and Annual (20% discount) billing.
-*   **Tiers:**
-    *   *Tier 1 (Scout):* For indie operators. Core monitoring tools.
-    *   *Tier 2 (Hunter - Most Popular):* For scaling companies. Automated alerts + predictive models.
-    *   *Tier 3 (Apex):* For enterprise operations. Full API access + dedicated nodes.
-*   **Psychological Triggers:** "Most Popular" ribbon, contrasting background colors, and immediate CTA buttons under every column.
+- **Layout:** Narrative flow or asymmetric 2+1 grid — avoid a symmetric 3-column icon-in-circle template.
+- **Modules to highlight:**
+  - Bookkeeping — continuous ledger sync, no overnight batch jobs.
+  - Payroll — tiered service, white-label-capable.
+  - Reports — auto-generated P&L, cash flow, and forecasts.
+  - Insights — advisory tier.
+  - BizForma — business formation + ongoing compliance support.
+  - PBX — integrated phone, voicemail, SMS, and automessage comms hub.
+  - **AI CFO Assistance** — the only place "CFO" language is used. Automated advisory insights, not a human-CFO substitute claim.
 
-### 5. E-commerce Add-on Marketplace (AOV Maximizer)
-*   **Context:** A dedicated segment displaying cross-sell modules that users can tack onto any core subscription.
-*   **Add-on Options:**
-    *   *Add-on A:* **Historical Data Vault Link** (Instant unlock of 5+ years of archive trends).
-    *   *Add-on B:* **Advanced API Pipeline** (Direct webhook access for customs CRMs).
-    *   *Add-on C:* **Niche Industry Data Packs** (Deep-dives into specific micro-markets).
-*   **UX Action:** Checkboxes or "+ Add to Plan" buttons that dynamically update a simulated checkout total.
+### 4. Pricing Grid
+
+Three tiers, monthly/annual toggle (annual discount), "Most Popular" ribbon on Standard, persistent CTA under every column:
+
+| Tier | Positioning | Included |
+|---|---|---|
+| **Lite** | Indie operators, free forever | Core bookkeeping + dashboard |
+| **Standard** (Most Popular) | Scaling companies | Automated reporting + payroll |
+| **Pro** | Full-service operations, $149/mo | Full module access + AI CFO Assistance + API/webhooks |
+
+### 5. Add-on Marketplace (AOV Maximizer)
+
+- BizForma one-time filing add-on.
+- PBX communications add-on.
+- Payroll add-on (for Lite/Standard base plans).
+- AI CFO Assistance advisory add-on.
+- **UX action:** "+ Add to plan" toggles that dynamically update a simulated checkout total.
 
 ### 6. Social Proof & Trust Architecture
-*   **Elements:** Rotator carousel containing deep, metrics-driven user reviews.
-*   **Review Template:** *"Insight Hunter helped our product team uncover a hidden search trend, resulting in a 34% increase in organic revenue within 30 days."*
 
-### 7. Footer (The SEO Safety Net)
-*   **Structure:** Multi-column sitemap.
-*   **Links:** Standard regulatory pages (Privacy, Terms), functional links (Command Center Portal), and keyword-rich contextual resource links (SaaS Data Mining Guide, Predictive Analytics Directory).
+- Rotating carousel of bookkeeping/small-business outcome quotes grounded in the actual product — time saved closing books, cash-flow gaps caught early. No fabricated "organic traffic" or "SEO revenue" claims.
 
----
+### 7. Footer (SEO Safety Net)
 
-## 🔍 SEO Strategy & Metadata Spec Sheet
-
-### Keyword Clusters to Inject:
-*   **Primary:** `SaaS market intelligence platform`, `automated data mining software`, `predictive market trends tool`.
-*   **Secondary:** `business insight generator`, `competitor intelligence dashboard`, `buy market data add-ons`.
-
-### Structural Architecture:
-*   **Semantic HTML:** Require strict adherence to structural elements (`<header>`, `<main>`, `<section>`, `<footer>`). Ensure hierarchy flows logically from `<h1>` to `<h3>`.
-*   **Schema Markup JSON-LD:** Include scripts representing both `SoftwareApplication` (for the SaaS platform) and `Product` (for the add-ons marketplace) to capture rich snippets in search engine results pages (SERPs).
-*   **Performance Targets:** Tailor the page layout instructions for sub-second Largest Contentful Paint (LCP) to prevent bounce rates and maximize crawl budget efficiency.
+- Multi-column sitemap: Product (modules), Company, Legal (Privacy, Terms, Security, Cookies), Resources (bookkeeping/cash-flow guides).
+- "Command Center Login" link kept visually distinct from marketing links.
 
 ---
 
-## ⚡ Technical & Conversion Optimization Guardrails
+## 🎨 Design Token Spec — Restored From Commit f7e1bf0
 
-*   **Urgency Triggers:** Use live, state-driven scarcity indicators in the marketplace section (e.g., *"Promo price for add-ons expires end of week"*).
-*   **Gateway Clearances:** Keep the dashboard login pathways distinct from the sales funnels to ensure current users bypass marketing loops seamlessly without introducing choice paralysis to new prospects.
-*   **Device Responsiveness:** Design frameworks must treat mobile viewport breakpoints as first-class citizens, ensuring pricing grids collapse into clear, stackable single-column cards with persistent CTAs.
+| Token | Value | Role |
+|---|---|---|
+| `--paper` | `#0B0F14` | page background |
+| `--panel` | `#161D28` | card / section background |
+| `--ink` | `#E9EDF3` | primary text |
+| `--ink-soft` | `#A9B4C4` | muted text |
+| `--amber` | `#00F0C8` | primary accent (mint-teal, not orange) |
+| `--moss` | `#5FA8FF` | secondary accent (soft blue) |
+| `--clay` | `#FF6B6B` | tertiary / alert accent |
+| `--radius` | `6px` | corner radius |
+
+**Fonts:**
+- Display headings — `Instrument Serif`
+- Body — `Public Sans`
+- Stat numbers, mono labels, buttons — `IBM Plex Mono`
+
+Loaded via Google Fonts `@import` at the top of `global.css`:
+
+```css
+@import url('[https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap](https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap)');

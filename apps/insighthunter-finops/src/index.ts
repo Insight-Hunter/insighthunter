@@ -22,8 +22,9 @@ app.get("/payables", async (c) => {
     WHERE je.organization_id = ?
       AND a.type = 'LIABILITY'
       AND jl.credit > 0
-    ORDER BY je.posted_at DESC`
-    ).bind(orgId).all();
+    ORDER BY je.posted_at DESC`)
+    .bind(orgId)
+    .all();
 
   return c.json({ items: results });
 });
@@ -41,9 +42,9 @@ app.get("/receivables", async (c) => {
     WHERE je.organization_id = ?
       AND a.type = 'ASSET'
       AND jl.debit > 0
-    ORDER BY je.posted_at DESC`
-    ).bind(orgId)
-     .all();
+    ORDER BY je.posted_at DESC`)
+    .bind(orgId)
+    .all();
 
   return c.json({ items: results });
 });

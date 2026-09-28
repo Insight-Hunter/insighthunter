@@ -46,7 +46,9 @@ export async function createCase(
       now,
     )
     .run();
-  return getCaseById(db, id) as Promise<FormationCase>;
+  const result = await getCaseById(db, id);
+  if (!result) throw new Error("Formation case was not created");
+  return result as unknown as FormationCase;
 }
 
 export async function getCaseById(db: D1Database, id: string) {

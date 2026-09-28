@@ -9,6 +9,7 @@ enabled = true
 [vars]
 APP_NAME = "insighthunter-payroll"
 ENVIRONMENT = "development"
+# wrangler secret put CHECK_API_KEY
 
 [dev]
 inspector_port = 9242

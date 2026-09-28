@@ -38,9 +38,9 @@ app.get("/", (c) =>
     renderPage({
       env: c.env,
       seo: {
-        title: "Insight Hunter — SaaS Market Intelligence Platform",
+        title: "Insight Hunter — Small Business Bookkeeping and Financial Insights",
         description:
-          "Automated data mining software and predictive market trends tool for teams who need a competitor intelligence dashboard, not a spreadsheet.",
+          "Real-time bookkeeping context, cash-flow visibility, automated reporting, payroll, and business operations tools powered by Cloudflare Workers.",
         path: "/",
       },
       jsonLd: [softwareApplicationJsonLd(c.env.CANONICAL_ORIGIN)],
@@ -56,7 +56,7 @@ app.get("/features", (c) =>
       seo: {
         title: "Features — Insight Hunter",
         description:
-          "Autonomous trend hunting, competitor anomaly alerts, and predictive demand scopes.",
+          "Explore connected bookkeeping, reporting, payroll, business formation, PBX communications, and financial insight workflows.",
         path: "/features",
       },
       body: featuresBody(),
@@ -70,7 +70,7 @@ app.get("/pricing", (c) =>
       env: c.env,
       seo: {
         title: "Pricing — Insight Hunter",
-        description: "Scout, Hunter, and Apex plans for automated SaaS market intelligence.",
+        description: "Compare Lite, Standard, and Pro plans for small-business bookkeeping and financial operations.",
         path: "/pricing",
       },
       jsonLd: [softwareApplicationJsonLd(c.env.CANONICAL_ORIGIN)],
@@ -86,7 +86,7 @@ app.get("/addons", (c) =>
       seo: {
         title: "Add-on Marketplace — Insight Hunter",
         description:
-          "Buy market data add-ons: historical data vault, advanced API pipeline, and niche industry data packs.",
+          "Preview optional BizForma, PBX, payroll, and AI-assisted financial insight add-ons for your plan.",
         path: "/addons",
       },
       jsonLd: [addOnsProductJsonLd(c.env.CANONICAL_ORIGIN)],

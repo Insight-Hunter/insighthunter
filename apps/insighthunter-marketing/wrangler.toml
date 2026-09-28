@@ -29,4 +29,4 @@ enabled = true
 [vars]
 PUBLIC_AUTH_API_URL = "https://auth.insighthunter.app"
 PUBLIC_PAYMENTS_API_URL = "https://payments.insighthunter.app"
-PUBLIC_APP_BASE_URL = "https://dashboard.insighthunter.app"
+PUBLIC_APP_BASE_URL = "https://app.insighthunter.app"

@@ -6,7 +6,7 @@ import { dirname, resolve } from 'node:path';
 
 const dryRun = process.argv.includes('--dry-run');
 const repoRoot = process.cwd();
-const appRoot = resolve(repoRoot, 'apps/insighthunter-main');
+const appRoot = resolve(repoRoot, 'apps/insighthunter-marketing');
 
 const exists = async (path) => {
   try {

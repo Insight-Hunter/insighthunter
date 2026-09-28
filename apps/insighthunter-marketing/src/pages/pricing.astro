@@ -1,6 +1,6 @@
 ---
 import MarketingLayout from "../layouts/MarketingLayout.astro";
-import { registerUrl, type Plan } from "../lib/auth-links";
+import { type Plan, registerUrl } from "../lib/auth-links";
 
 type PricingPlan = {
   id: Plan;
@@ -112,7 +112,7 @@ const plans: PricingPlan[] = [
                     "pricing-card__cta",
                     { "pricing-card__cta--featured": plan.featured },
                   ]}
-                  href={registerUrl(plan.id)}
+                  href={registerUrl(plan.id, "https://insighthunter.app/pricing")}
                   data-plan={plan.id}
                 >
                   {plan.cta}
@@ -141,6 +141,36 @@ const plans: PricingPlan[] = [
     </section>
   </main>
 </MarketingLayout>
+
+<script is:inline>
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if (token) {
+    document.querySelectorAll('[data-plan]').forEach((link) => {
+      link.addEventListener('click', async (event) => {
+        event.preventDefault();
+        const plan = link.dataset.plan;
+        if (plan === 'lite') {
+          window.location.href = `https://app.insighthunter.app/dashboard?token=${encodeURIComponent(token)}`;
+          return;
+        }
+        link.textContent = 'Opening checkout...';
+        try {
+          const response = await fetch('https://payments.insighthunter.app/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ type: 'account_tier', value: plan }),
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'Checkout unavailable');
+          window.location.href = data.checkoutUrl;
+        } catch (error) {
+          link.textContent = error.message || 'Checkout unavailable';
+        }
+      });
+    });
+  }
+</script>
 
 <style>
   .hero { padding: 5.5rem 0 3rem; text-align: center; }
