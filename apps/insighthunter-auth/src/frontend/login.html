@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Insight Hunter</title>
+<style>
+  :root{--bg:#0f172a;--card:#111827;--accent:#22c55e;--text:#e5e7eb;--muted:#94a3b8;}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text);}
+  .card{width:100%;max-width:380px;background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:32px;}
+  h1{font-size:20px;margin:0 0 4px;}
+  p.sub{color:var(--muted);font-size:13px;margin:0 0 24px;}
+  label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted);}
+  input{width:100%;padding:10px 12px;margin-bottom:16px;background:#0b1220;border:1px solid #1f2937;
+    border-radius:8px;color:var(--text);font-size:14px;}
+  input:focus{outline:none;border-color:var(--accent);}
+  button{width:100%;padding:11px;background:var(--accent);color:#052e16;font-weight:600;border:none;
+    border-radius:8px;font-size:14px;cursor:pointer;}
+  button:hover{opacity:.9;}
+  .err{color:#f87171;font-size:13px;margin-bottom:12px;display:none;}
+  .foot{margin-top:18px;text-align:center;font-size:13px;color:var(--muted);}
+  .foot a{color:var(--accent);text-decoration:none;}
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Sign in to Insight Hunter</h1>
+    <p class="sub">Access your bookkeeping and finance dashboard.</p>
+    <div id="error" class="err"></div>
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" autocomplete="email" required>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <button type="submit">Sign In</button>
+    </form>
+    <div class="foot">No account? <a href="/register">Create one</a></div>
+  </div>
+<script>
+  const form = document.getElementById('loginForm');
+  const errBox = document.getElementById('error');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errBox.style.display = 'none';
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Invalid email or password.');
+      window.location.href = data.redirect || 'https://app.insighthunter.app';
+    } catch (err) {
+      errBox.textContent = err.message || 'Something went wrong.';
+      errBox.style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>

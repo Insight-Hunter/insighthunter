@@ -2,7 +2,6 @@
 import HeroGlow from "../components/HeroGlow.astro";
 import { MODULES } from "../data/modules";
 import Layout from "../layouts/Layout.astro";
-import { getSignupUrl } from "../lib/urls";
 ---
 <Layout title="Insight Hunter — Business Services and Insights">
   <!-- STAGE 1: HERO — Attention -->
@@ -18,8 +17,8 @@ import { getSignupUrl } from "../lib/urls";
           business grows.
         </p>
         <div class="hero-actions">
-          <a href="#services" class="btn btn-primary">Explore Business Services</a>
-          <a href="/pricing" class="btn btn-ghost">View Plans</a>
+          <a href="https://app.insighthunter.app" class="btn btn-primary">Explore Business Services</a>
+          <a href="https://app.insighthunter.app" class="btn btn-ghost">View Plans</a>
         </div>
         <p class="hero-fine mono">Practical tools for starting, operating, and growing a business.</p>
       </div>
@@ -93,7 +92,7 @@ import { getSignupUrl } from "../lib/urls";
         <h2>Get the support and tools to move forward.</h2>
         <p>Explore the services, compare plans, and choose the support that fits your business needs.</p>
       </div>
-      <a href={getSignupUrl('lite')} class="btn btn-on-dark">Explore plans</a>
+      <a href="https://app.insighthunter.app" class="btn btn-on-dark">Explore plans</a>
     </div>
   </section>
 

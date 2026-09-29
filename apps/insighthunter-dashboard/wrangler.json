@@ -1,0 +1,36 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "insighthunter-dashboard",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-27",
+  "compatibility_flags": ["nodejs_compat"],
+
+ "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+ "routes": [{
+      "pattern": "app.insighthunter.app/*",
+      "zone_name": "insighthunter.app"
+  }],
+
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+
+  "services": [
+    { "binding": "AUTH_SERVICE", "service": "insighthunter-auth" },
+    { "binding": "INSIGHTS_SERVICE", "service": "insighthunter-insights" },
+    { "binding": "INVOICING_SERVICE", "service": "insighthunter-invoicing" },
+    { "binding": "BILLS_SERVICE", "service": "insighthunter-bills" },
+    { "binding": "PAYROLL_SERVICE", "service": "insighthunter-payroll" },
+    { "binding": "LEDGER_SERVICE", "service": "insighthunter-ledger" }
+  ],
+
+  "vars": {
+    "AUTH_ORIGIN": "https://auth.insighthunter.app",
+    "MARKETING_ORIGIN": "https://insighthunter.app"
+  }
+}
