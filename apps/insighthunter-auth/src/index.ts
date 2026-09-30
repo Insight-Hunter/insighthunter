@@ -1,10 +1,11 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import type { Env, ProvisioningMessage } from './types/env.js';
+import type { Env, ProvisioningMessage } from './env.js';
 import authRoutes from './routes/auth.js';
 import { handleProvisioningBatch } from './queue/provisioning-consumer.js';
 
 export { RateLimiter } from './lib/rate-limiter.js';
+export { UserVault } from './vault.js';
 
 const app = new Hono<{ Bindings: Env }>();
 

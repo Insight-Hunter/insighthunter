@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { setCookie, getCookie, deleteCookie } from 'hono/cookie';
 import { z } from 'zod';
-import type { Env, SessionPayload } from '../types/env.js';
+import type { Env, SessionPayload } from '../env.js';
 import { signJwt, verifyJwt, generateRefreshToken, hashToken, hashPassword, verifyPassword } from '../lib/jwt.js';
 
 const auth = new Hono<{ Bindings: Env }>();

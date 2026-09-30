@@ -1,7 +1,3 @@
-// src/types/env.ts
-// Cloudflare bindings + environment contract for insighthunter-auth.
-// Secrets (JWT_SECRET, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, CF_API_TOKEN)
-// must be set via `wrangler secret put <NAME>` — never placed in wrangler.jsonc vars.
 
 export interface Env {
   AUTH_DB: D1Database;
