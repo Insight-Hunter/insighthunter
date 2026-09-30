@@ -11,8 +11,8 @@ interface Props {
 }
 
 const {
-  title = 'Insight Hunter | Financial Intelligence for Small Business',
-  description = 'Financial dashboards, cash-flow forecasts, reports, and practical business insights.',
+  title = 'Insight Hunter | Business services, insights, and AI CFO Assistance',
+  description = 'Insight Hunter helps small businesses run with bookkeeping, payroll, PBX, formation support, website services, and decision-ready business insights.',
 } = Astro.props;
 ---
 
@@ -26,7 +26,9 @@ const {
   <body>
     <SkipLink />
     <Header />
-    <slot />
+    <main id="main-content">
+      <slot />
+    </main>
     <Footer />
   </body>
 </html>

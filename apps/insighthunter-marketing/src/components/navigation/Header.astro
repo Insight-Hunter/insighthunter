@@ -1,21 +1,27 @@
 ---
-import { getSignupUrl } from '../../lib/urls';
+const DEMO_URL = "https://app.insighthunter.app";
+const LOGIN_URL = "https://auth.insighthunter.app/login.html";
+const REGISTER_URL = "https://auth.insighthunter.app/register.html";
 ---
 
 <header class="header">
   <div class="wrap header-inner">
-    <a class="brand" href="/">Insight Hunter</a>
+    <a class="brand" href="/" aria-label="Insight Hunter home">
+      <span class="brand-mark">IH</span>
+      <span class="brand-text">Insight Hunter</span>
+    </a>
 
-    <nav aria-label="Primary navigation">
+    <nav class="nav" aria-label="Primary navigation">
       <a href="/features">Features</a>
       <a href="/pricing">Pricing</a>
       <a href="/resources">Resources</a>
       <a href="/about">About</a>
     </nav>
 
-    <div class="actions">
-      <a href="https://app.insighthunter.app">Login</a>
-      <a class="btn btn-primary" href={getSignupUrl()}>Start free</a>
+    <div class="cta-row">
+      <a class="btn btn-demo" href={DEMO_URL} target="_blank" rel="noopener noreferrer">Open Demo</a>
+      <a class="btn btn-secondary" href={LOGIN_URL}>Login</a>
+      <a class="btn btn-ghost" href={REGISTER_URL}>Start Free</a>
     </div>
   </div>
 </header>
@@ -23,52 +29,153 @@ import { getSignupUrl } from '../../lib/urls';
 <style>
   .header {
     position: sticky;
-    z-index: 20;
     top: 0;
-    border-bottom: 1px solid var(--line);
-    background: rgb(11 17 32 / 95%);
-    backdrop-filter: blur(6px);
+    z-index: 30;
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 78%, transparent 22%);
+    background: color-mix(in srgb, var(--paper) 82%, rgba(9, 14, 26, 0.9) 18%);
+    backdrop-filter: blur(14px);
   }
 
   .header-inner {
-    display: flex;
-    min-height: 4rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    gap: 1.25rem;
+    min-height: 5rem;
   }
 
   .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
     color: var(--ink);
-    font-weight: 900;
-    font-size: 1.2rem;
     text-decoration: none;
   }
 
-  nav,
-  .actions {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
+  .brand-mark {
+    display: inline-grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 0.85rem;
+    background: linear-gradient(135deg, var(--amber), color-mix(in srgb, var(--amber) 38%, white 62%));
+    color: rgb(16 18 24);
+    font-size: 0.82rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
   }
 
-  nav a,
-  .actions > a:not(.btn) {
+  .brand-text {
+    font-size: 1.02rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+
+  .nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.4rem;
+  }
+
+  .nav a {
     color: var(--ink-soft);
-    font-size: 0.88rem;
+    font-size: 0.92rem;
     font-weight: 700;
     text-decoration: none;
+    transition: color 0.18s ease, opacity 0.18s ease;
   }
 
-  nav a:hover, nav a:focus-visible { color: var(--ink); }
+  .nav a:hover,
+  .nav a:focus-visible {
+    color: var(--ink);
+  }
 
-  @media (max-width: 700px) {
-    nav {
-      display: none;
+  .cta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.8rem;
+    padding: 0 1rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+  }
+
+  .btn:hover,
+  .btn:focus-visible {
+    transform: translateY(-1px);
+  }
+
+  .btn-demo {
+    background: var(--amber);
+    color: rgb(17 20 26);
+    border: 1px solid color-mix(in srgb, var(--amber) 82%, black 18%);
+  }
+
+  .btn-secondary {
+    background: color-mix(in srgb, var(--panel) 88%, white 12%);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid color-mix(in srgb, var(--line) 86%, transparent 14%);
+  }
+
+  .btn-ghost:hover,
+  .btn-ghost:focus-visible {
+    color: var(--ink);
+    border-color: color-mix(in srgb, var(--amber) 45%, var(--line) 55%);
+  }
+
+  @media (max-width: 920px) {
+    .header-inner {
+      grid-template-columns: 1fr;
+      padding: 0.9rem 0;
     }
 
-    .actions > a:not(.btn) {
-      display: none;
+    .nav {
+      justify-content: flex-start;
+      overflow-x: auto;
+      padding-bottom: 0.15rem;
+    }
+
+    .cta-row {
+      justify-content: flex-start;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .nav {
+      gap: 1rem;
+    }
+
+    .nav a {
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
+
+    .cta-row {
+      width: 100%;
+    }
+
+    .btn {
+      flex: 1 1 160px;
     }
   }
 </style>
