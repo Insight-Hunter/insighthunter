@@ -65,8 +65,8 @@ name = "USER_VAULT"
 class_name = "UserVault"
 
 [[durable_objects.bindings]]
-name = "USER_VAULT"
-class_name = "UserVault"
+name = "RATE_LIMITER"
+class_name = "RateLimiter
 
 [[migrations]]
 tag = "v2"
