@@ -1,4 +1,7 @@
-# Wrangler runtime cache — never commit
-.wrangler/
+.ipynb_checkpoints/
 dist/
-node_modules/
+.wrangler/
+.turbo/
+.DS_Store
+*.ipynb
+package-lock.json

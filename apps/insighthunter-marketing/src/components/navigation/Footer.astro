@@ -1,19 +1,33 @@
 ---
-import { getLoginUrl, getSignupUrl } from '../../lib/urls';
+const DEMO_URL = "https://app.insighthunter.app";
+const LOGIN_URL = "https://auth.insighthunter.app/login.html";
+const REGISTER_URL = "https://auth.insighthunter.app/register.html";
 ---
 
 <footer class="footer">
   <div class="wrap footer-grid">
-    <div>
-      <a class="brand" href="/">Insight Hunter</a>
-      <p>Financial dashboards, forecasts, reporting, and practical next steps for small business.</p>
+    <div class="footer-brand-block">
+      <a class="brand" href="/" aria-label="Insight Hunter home">
+        <span class="brand-mark">IH</span>
+        <span class="brand-text">Insight Hunter</span>
+      </a>
+
+      <p>
+        Business services, operational support, and decision-ready insights for
+        companies that want cleaner execution and better visibility.
+      </p>
+
+      <div class="footer-cta">
+        <a class="footer-btn footer-btn-primary" href={DEMO_URL} target="_blank" rel="noopener noreferrer">Open Demo</a>
+        <a class="footer-btn footer-btn-secondary" href={REGISTER_URL}>Start Free</a>
+      </div>
     </div>
 
     <div>
       <h2>Platform</h2>
       <a href="/features">Features</a>
       <a href="/pricing">Pricing</a>
-      <a href="/integrations">Integrations</a>
+      <a href="/resources">Resources</a>
     </div>
 
     <div>
@@ -26,8 +40,9 @@ import { getLoginUrl, getSignupUrl } from '../../lib/urls';
 
     <div>
       <h2>Account</h2>
-      <a href={getSignupUrl()}>Start free</a>
-      <a href={getLoginUrl()}>Command Center</a>
+      <a href={LOGIN_URL}>Login</a>
+      <a href={REGISTER_URL}>Register</a>
+      <a href={DEMO_URL} target="_blank" rel="noopener noreferrer">Command Center</a>
       <a href="/security">Security</a>
       <a href="/legal/privacy">Privacy</a>
     </div>
@@ -35,8 +50,10 @@ import { getLoginUrl, getSignupUrl } from '../../lib/urls';
 
   <div class="wrap bottom">
     <span>© {new Date().getFullYear()} Insight Hunter</span>
-    <a href="/legal/terms">Terms</a>
-    <a href="/legal/cookies">Cookies</a>
+    <div class="bottom-links">
+      <a href="/legal/terms">Terms</a>
+      <a href="/legal/cookies">Cookies</a>
+    </div>
   </div>
 </footer>
 
@@ -44,59 +61,150 @@ import { getLoginUrl, getSignupUrl } from '../../lib/urls';
   .footer {
     margin-top: 0;
     border-top: 1px solid var(--line);
-    background: var(--panel);
-    padding: 3rem 1.5rem 2rem;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, white 8%) 0%, color-mix(in srgb, var(--paper) 88%, white 12%) 100%);
+    padding: 4rem 1.5rem 2rem;
   }
 
   .footer-grid {
     display: grid;
-    grid-template-columns: 2fr repeat(3, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: 1.7fr 1fr 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .footer-brand-block p {
+    margin: 1rem 0 1.2rem;
+    max-width: 34ch;
   }
 
   .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
     color: var(--ink);
     font-weight: 900;
     text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-mark {
+    display: inline-grid;
+    place-items: center;
+    width: 2.35rem;
+    height: 2.35rem;
+    border-radius: 0.85rem;
+    background: linear-gradient(135deg, var(--amber), color-mix(in srgb, var(--amber) 40%, white 60%));
+    color: var(--brand-dark);
+    font-size: 0.82rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .brand-text {
+    font-size: 1rem;
   }
 
   .footer p,
-  .footer a:not(.brand) {
+  .footer a:not(.brand):not(.footer-btn) {
     color: var(--ink-soft);
-    font-size: 0.88rem;
+    font-size: 0.92rem;
   }
 
-  .footer a:not(.brand) {
+  .footer a:not(.brand):not(.footer-btn) {
     display: block;
-    margin-bottom: 0.55rem;
+    margin-bottom: 0.7rem;
     text-decoration: none;
+    transition: color 0.18s ease, transform 0.18s ease;
+  }
+
+  .footer a:not(.brand):not(.footer-btn):hover,
+  .footer a:not(.brand):not(.footer-btn):focus-visible {
+    color: var(--moss);
+    transform: translateX(1px);
   }
 
   .footer h2 {
+    margin-bottom: 0.95rem;
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+  }
+
+  .footer-cta {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .footer-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.7rem;
+    padding: 0 1rem;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
     font-size: 0.9rem;
-    letter-spacing: 0;
+    font-weight: 800;
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  }
+
+  .footer-btn:hover,
+  .footer-btn:focus-visible {
+    transform: translateY(-1px);
+  }
+
+  .footer-btn-primary {
+    background: var(--brand-dark);
+    color: white;
+    border: 1px solid var(--brand-dark);
+  }
+
+  .footer-btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
   }
 
   .bottom {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
     gap: 1rem;
-    margin-top: 2.5rem;
+    margin-top: 3rem;
     border-top: 1px solid var(--line);
-    padding-block: 1.25rem;
+    padding-block: 1.25rem 0;
     color: var(--ink-soft);
-    font-size: 0.78rem;
+    font-size: 0.8rem;
   }
 
-  .footer h2 { color: var(--ink-soft); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
-  .footer a:hover { color: var(--moss); }
+  .bottom-links {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
 
   .bottom a {
     color: inherit;
+    text-decoration: none;
   }
 
-  @media (max-width: 760px) {
+  @media (max-width: 900px) {
     .footer-grid {
       grid-template-columns: repeat(2, 1fr);
+    }
+
+    .bottom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>

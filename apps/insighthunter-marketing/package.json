@@ -1,10 +1,10 @@
 {
-  "name": "@insighthunter/marketing",
+  "name": "insighthunter-marketing",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
-    "build": "wrangler deploy --dry-run",
+    "build": "astro build && wrangler deploy --dry-run",
     "deploy": "wrangler deploy",
     "lint": "biome check src tests",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -12,7 +12,11 @@
     "cf:types": "wrangler types"
   },
   "dependencies": {
-    "hono": "^4.6.10"
+    "@astrojs/cloudflare": "^14.3.3",
+    "@astrojs/mdx": "^8.0.2",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.5",
+    "hono": "4.13.5"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260620.0",

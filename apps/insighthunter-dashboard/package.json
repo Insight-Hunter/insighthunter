@@ -1,17 +1,16 @@
 {
   "name": "insighthunter-dashboard",
+ "private": true,
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev --config wrangler.toml",
-    "build": "wrangler deploy --dry-run --config wrangler.toml",
-    "deploy": "wrangler deploy --config wrangler.toml",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "hono": "^4.6.10"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250701.0",
-    "typescript": "^5.9.2",
-    "wrangler": "^4.114.0"
+    "wrangler": "^4.0.0"
   }
 }

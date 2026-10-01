@@ -1,138 +1,314 @@
 ---
 import HeroGlow from "../components/HeroGlow.astro";
-import { MODULES } from "../data/modules";
 import Layout from "../layouts/Layout.astro";
-import { getSignupUrl } from "../lib/urls";
+
+export const DEMO_URL = "https://app.insighthunter.app";
+export const LOGIN_URL = "https://auth.insighthunter.app/login.html";
+export const REGISTER_URL = "https://auth.insighthunter.app/register.html";
 ---
+
 <Layout title="Insight Hunter — Business Services and Insights">
-  <!-- STAGE 1: HERO — Attention -->
   <section class="hero">
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <p class="eyebrow">Business services and insights for every stage</p>
-        <h1>Hunt Down Business Insights. <span class="grad-text">Get the Support to Grow.</span></h1>
+        <p class="eyebrow">Cloudflare-edge business services platform</p>
+        <h1>
+          Hunt Down Business Insights in Finance and Customers movements with
+          Automated SaaS Intelligence served with Cloudflare Edge computing.
+        </h1>
         <p class="hero-sub">
-          Insight Hunter brings bookkeeping, payroll, PBX business phone,
-          business formation assistance, and website services together&mdash;
-          alongside the insights that help you make informed decisions as your
-          business grows.
+          Insight Hunter combines bookkeeping, payroll, PBX business phone,
+          business formation support, website services, and AI CFO Assistance
+          into one sharp operating platform built to help small businesses move
+          faster with more clarity.
         </p>
+
         <div class="hero-actions">
-          <a href="#services" class="btn btn-primary">Explore Business Services</a>
-          <a href="/pricing" class="btn btn-ghost">View Plans</a>
+          <a href={DEMO_URL} class="btn btn-primary" target="_blank" rel="noopener noreferrer">Open Demo</a>
+          <a href={LOGIN_URL} class="btn btn-secondary">Login</a>
+          <a href={REGISTER_URL} class="btn btn-ghost">Start Free</a>
         </div>
-        <p class="hero-fine mono">Practical tools for starting, operating, and growing a business.</p>
+
+        <p class="hero-fine mono">
+          Practical business operations, sharper reporting, and decision-ready visibility.
+        </p>
       </div>
+
       <div class="hero-visual">
         <HeroGlow />
       </div>
     </div>
   </section>
 
-  <!-- STAGE 2: PAIN — Interest -->
   <section class="ruled pain-section">
     <div class="wrap">
-      <p class="eyebrow">Less juggling, more clarity</p>
-      <h2>Bring essential business support together.</h2>
+      <p class="eyebrow">Stop stitching services together</p>
+      <h2>One place to operate the business with more confidence.</h2>
       <p class="section-lead">
-        Bookkeeping, payroll, business phone, formation, and website needs can
-        pull your attention in different directions. Insight Hunter brings
-        these services together with business insights to help you stay focused
-        on building and growing your company.
+        Most small businesses end up juggling separate providers for books,
+        payroll, phones, setup, websites, and reporting. Insight Hunter brings
+        these core services together so owners can spend less time chasing
+        answers and more time acting on them.
       </p>
     </div>
   </section>
 
-  <!-- STAGE 3: PROOF — Consideration -->
   <section class="ruled stat-bar">
     <div class="wrap stat-grid">
       <div class="stat">
-        <span class="stat-num mono">Bookkeeping</span>
-        <span class="stat-label">organized financial records and clearer business visibility</span>
+        <span class="stat-num mono">Books</span>
+        <span class="stat-label">cleaner records, better reporting, and clearer financial visibility</span>
       </div>
       <div class="stat">
-        <span class="stat-num mono">Payroll &amp; PBX</span>
-        <span class="stat-label">essential people and communications services for daily operations</span>
+        <span class="stat-num mono">Ops</span>
+        <span class="stat-label">payroll and communications support connected to the way the business runs</span>
       </div>
       <div class="stat">
-        <span class="stat-num mono">Formation &amp; web</span>
-        <span class="stat-label">support for getting established and building your online presence</span>
+        <span class="stat-num mono">Growth</span>
+        <span class="stat-label">formation, web presence, and insight tools that help the business move forward</span>
       </div>
     </div>
   </section>
 
-  <!-- STAGE 4: FEATURES — Consideration -->
   <section class="ruled">
     <div class="wrap">
-      <p class="eyebrow">Support for the work of running a business</p>
+      <p class="eyebrow">Built for the real work</p>
       <div class="feature-grid">
         <div class="feature-card">
-          <span class="feature-num grad-text mono">01</span>
-          <h3>Bookkeeping &amp; insights</h3>
-          <p>Organize business finances and make more informed decisions with useful financial context.</p>
+          <span class="feature-num mono">01</span>
+          <h3>Bookkeeping and insight visibility</h3>
+          <p>
+            Keep the books organized, understand where money is moving, and get
+            context that supports better decisions.
+          </p>
         </div>
+
         <div class="feature-card">
-          <span class="feature-num grad-text mono">02</span>
-          <h3>Payroll &amp; PBX</h3>
-          <p>Bring pay operations and business communications into the tools you use to run your company.</p>
+          <span class="feature-num mono">02</span>
+          <h3>Payroll and PBX operations</h3>
+          <p>
+            Support team pay and customer communications with tools designed to
+            fit daily business operations.
+          </p>
         </div>
+
         <div class="feature-card">
-          <span class="feature-num grad-text mono">03</span>
-          <h3>Formation &amp; website services</h3>
-          <p>Get assistance establishing your business and services to build a clear online presence.</p>
+          <span class="feature-num mono">03</span>
+          <h3>Formation, web, and launch support</h3>
+          <p>
+            Start strong, stay present online, and build with services that
+            support the full business journey.
+          </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- STAGE 5: URGENCY — Decision / Action -->
   <section class="ruled dark cta-section">
     <div class="wrap cta-inner">
       <div>
-        <p class="eyebrow" style="color: var(--amber);">Build your business with Insight Hunter</p>
-        <h2>Get the support and tools to move forward.</h2>
-        <p>Explore the services, compare plans, and choose the support that fits your business needs.</p>
+        <p class="eyebrow cta-eyebrow">Get inside the platform</p>
+        <h2>See the command center and choose the support that fits.</h2>
+        <p>
+          Open the demo, log in, or register to start using Insight Hunter with
+          the services your business needs now.
+        </p>
       </div>
-      <a href={getSignupUrl('lite')} class="btn btn-on-dark">Explore plans</a>
+
+      <div class="cta-actions">
+        <a href={DEMO_URL} class="btn btn-on-dark" target="_blank" rel="noopener noreferrer">Open Demo</a>
+        <a href={REGISTER_URL} class="btn btn-dark-ghost">Register</a>
+      </div>
     </div>
   </section>
 
   <style>
-    .hero { padding-top: 72px; padding-bottom: 96px; background: var(--paper); }
-    .hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center; }
-    .hero-sub { font-size: 1.12rem; }
-    .hero-actions { display: flex; gap: 14px; margin: 28px 0 18px; flex-wrap: wrap; }
-    .hero-fine { font-size: 0.8rem; color: var(--moss); }
-    .grad-text {
-      background: linear-gradient(90deg, var(--amber), var(--moss));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+    .hero {
+      padding-top: 72px;
+      padding-bottom: 104px;
+      background:
+        radial-gradient(circle at top right, rgba(201, 150, 63, 0.16), transparent 28%),
+        linear-gradient(180deg, var(--paper) 0%, color-mix(in srgb, var(--paper) 88%, #ffffff 12%) 100%);
     }
 
-    .pain-section { background: var(--paper); }
-    .section-lead { font-size: 1.08rem; max-width: 68ch; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 56px;
+      align-items: center;
+    }
 
-    .stat-bar { background: var(--panel); }
-    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-    .stat { display: flex; flex-direction: column; gap: 6px; }
-    .stat-num { font-size: 2rem; color: var(--amber); font-weight: 600; }
-    .stat-label { font-size: 0.88rem; color: var(--ink-soft); max-width: 30ch; }
+    .hero-copy h1 {
+      max-width: 12ch;
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+      font-size: clamp(2.9rem, 6vw, 5.4rem);
+      margin-bottom: 18px;
+    }
 
-    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px; }
-    .feature-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; transition: border-color 0.2s ease, transform 0.2s ease; }
-    .feature-card:hover { border-color: var(--amber); transform: translateY(-2px); }
-    .feature-num { font-size: 1.6rem; font-weight: 700; }
-    .feature-card h3 { margin: 12px 0 8px; font-size: 1.15rem; }
-    .feature-card p { margin: 0; font-size: 0.92rem; }
+    .hero-sub {
+      font-size: 1.1rem;
+      max-width: 62ch;
+      color: var(--ink-soft);
+    }
 
-    .cta-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
-    .cta-inner p { max-width: 44ch; }
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      margin: 28px 0 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .hero-fine {
+      font-size: 0.8rem;
+      color: var(--moss);
+    }
+
+    .pain-section {
+      background: var(--paper);
+    }
+
+    .section-lead {
+      font-size: 1.08rem;
+      max-width: 68ch;
+      color: var(--ink-soft);
+    }
+
+    .stat-bar {
+      background: linear-gradient(180deg, var(--panel) 0%, color-mix(in srgb, var(--panel) 90%, white 10%) 100%);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 6px 0;
+    }
+
+    .stat-num {
+      font-size: 1.65rem;
+      color: var(--amber);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-label {
+      font-size: 0.92rem;
+      color: var(--ink-soft);
+      max-width: 30ch;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .feature-card {
+      background: color-mix(in srgb, var(--panel) 92%, white 8%);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 30px 28px;
+      transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 30px rgba(12, 18, 24, 0.04);
+    }
+
+    .feature-card:hover {
+      border-color: color-mix(in srgb, var(--amber) 60%, var(--line) 40%);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 36px rgba(12, 18, 24, 0.08);
+    }
+
+    .feature-num {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--amber);
+    }
+
+    .feature-card h3 {
+      margin: 12px 0 10px;
+      font-size: 1.18rem;
+      letter-spacing: -0.02em;
+    }
+
+    .feature-card p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--ink-soft);
+    }
+
+    .cta-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .cta-inner p {
+      max-width: 44ch;
+    }
+
+    .cta-eyebrow {
+      color: var(--amber);
+    }
+
+    .cta-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn-secondary {
+      background: var(--panel);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-dark-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.16);
+      color: white;
+      text-decoration: none;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-dark-ghost:hover {
+      border-color: rgba(255,255,255,0.34);
+      transform: translateY(-1px);
+    }
 
     @media (max-width: 860px) {
-      .hero-grid { grid-template-columns: 1fr; }
-      .stat-grid { grid-template-columns: 1fr; gap: 20px; }
-      .feature-grid { grid-template-columns: 1fr; }
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .cta-inner {
+        align-items: flex-start;
+      }
     }
   </style>
 </Layout>
