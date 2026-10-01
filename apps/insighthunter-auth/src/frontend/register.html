@@ -65,5 +65,115 @@
     }
   });
 </script>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Create account — Insight Hunter</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f7f6f2; --surface: #ffffff; --text: #28251d; --muted: #7a7974;
+      --primary: #01696f; --primary-hover: #0c4e54; --border: #d4d1ca;
+      --error: #a12c7b; --radius: 0.5rem; --shadow: 0 4px 24px rgba(0,0,0,.08);
+      font-family: system-ui, sans-serif; font-size: 16px;
+    }
+    body { min-height: 100dvh; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+    .card { background: var(--surface); border-radius: 1rem; box-shadow: var(--shadow); padding: 2.5rem 2rem; width: 100%; max-width: 420px; }
+    .logo { display: flex; align-items: center; gap: .5rem; margin-bottom: 2rem; }
+    .logo svg { color: var(--primary); }
+    .logo-text { font-size: 1.1rem; font-weight: 700; color: var(--text); letter-spacing: -.02em; }
+    h1 { font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: .25rem; }
+    .subtitle { color: var(--muted); font-size: .95rem; margin-bottom: 1.75rem; }
+    label { display: block; font-size: .875rem; font-weight: 500; color: var(--text); margin-bottom: .375rem; }
+    input, select { display: block; width: 100%; padding: .625rem .875rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 1rem; color: var(--text); background: #fff; transition: border-color .15s, box-shadow .15s; }
+    input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(1,105,111,.15); }
+    .field { margin-bottom: 1.1rem; }
+    .hint { font-size: .8rem; color: var(--muted); margin-top: .3rem; }
+    .btn { display: block; width: 100%; padding: .7rem 1rem; background: var(--primary); color: #fff; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .15s; margin-top: 1.5rem; min-height: 44px; }
+    .btn:hover { background: var(--primary-hover); }
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
+    .error-msg { display: none; color: var(--error); font-size: .875rem; margin-top: 1rem; padding: .625rem .875rem; border-radius: var(--radius); background: rgba(161,44,123,.07); }
+    .error-msg.visible { display: block; }
+    .footer-link { text-align: center; margin-top: 1.5rem; font-size: .875rem; color: var(--muted); }
+    .footer-link a { color: var(--primary); text-decoration: none; font-weight: 500; }
+    .footer-link a:hover { text-decoration: underline; }
+    .tos { font-size: .8rem; color: var(--muted); text-align: center; margin-top: 1rem; }
+    .tos a { color: var(--primary); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="card" role="main">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <circle cx="14" cy="14" r="13" stroke="currentColor" stroke-width="2"/>
+        <path d="M9 14h10M14 9v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span class="logo-text">Insight Hunter</span>
+    </div>
+    <h1>Create your account</h1>
+    <p class="subtitle">Start your free Startup plan — no credit card required</p>
+    <form id="form" novalidate>
+      <div class="field">
+        <label for="businessName">Business name</label>
+        <input id="businessName" type="text" name="businessName" autocomplete="organization" placeholder="Acme LLC" />
+      </div>
+      <div class="field">
+        <label for="email">Work email</label>
+        <input id="email" type="email" name="email" autocomplete="email" required placeholder="you@company.com" />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" autocomplete="new-password" required placeholder="At least 10 characters" />
+        <p class="hint">Minimum 10 characters</p>
+      </div>
+      <div class="field">
+        <label for="tier">Plan</label>
+        <select id="tier" name="tier">
+          <option value="startup">Startup (Free)</option>
+          <option value="standard">Standard</option>
+          <option value="pro">Pro</option>
+        </select>
+      </div>
+      <div class="error-msg" id="error" role="alert" aria-live="polite"></div>
+      <button type="submit" class="btn" id="btn">Create account</button>
+    </form>
+    <p class="tos">By creating an account you agree to our <a href="https://insighthunter.app/terms" target="_blank" rel="noopener">Terms</a> and <a href="https://insighthunter.app/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</p>
+    <p class="footer-link">Already have an account? <a href="/login">Sign in</a></p>
+  </div>
+  <script type="module">
+    const form = document.getElementById('form');
+    const btn  = document.getElementById('btn');
+    const err  = document.getElementById('error');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      err.className = 'error-msg';
+      btn.disabled = true;
+      btn.textContent = 'Creating account…';
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            email: form.email.value.trim(),
+            password: form.password.value,
+            businessName: form.businessName.value.trim(),
+            tier: form.tier.value,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message ?? 'Registration failed');
+        sessionStorage.setItem('ih_at', data.accessToken);
+        window.location.href = 'https://app.insighthunter.app/dashboard';
+      } catch (ex) {
+        err.textContent = ex instanceof Error ? ex.message : 'An unexpected error occurred.';
+        err.className = 'error-msg visible';
+        btn.disabled = false;
+        btn.textContent = 'Create account';
+      }
+    });
+  </script>
 </body>
 </html>
