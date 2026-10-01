@@ -1,6 +1,3 @@
-// Thin fetch wrapper for calling sibling Worker service bindings with the
-// caller's identity forwarded, and JSON in/out.
-
 export async function callService(binding, path, session, init = {}) {
   const req = new Request(`https://service.internal${path}`, {
     method: init.method ?? "GET",

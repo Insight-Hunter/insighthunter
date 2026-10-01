@@ -38,14 +38,6 @@ max_batch_timeout = 10
 max_retries = 5
 dead_letter_queue = "insighthunter-provisioning-dlq"
 
-[[durable_objects.bindings]]
-name = "RATE_LIMITER"
-class_name = "RateLimiter"
-
-[[migrations]]
-tag = "v1"
-new_sqlite_classes = [ "RateLimiter" ]
-
 [[analytics_engine_datasets]]
 binding = "AUTH_ANALYTICS"
 dataset = "insighthunter_auth_events"
@@ -61,13 +53,17 @@ ACCESS_TOKEN_TTL_SECONDS = "900"
 REFRESH_TOKEN_TTL_SECONDS = "2592000"
 
 [[durable_objects.bindings]]
+name = "RATE_LIMITER"
+class_name = "RateLimiter"
+
+[[durable_objects.bindings]]
 name = "USER_VAULT"
 class_name = "UserVault"
 
-[[durable_objects.bindings]]
-name = "RATE_LIMITER"
-class_name = "RateLimiter
+[[migrations]]
+tag = "v1"
+new_classes = ["UserVault"]
 
 [[migrations]]
 tag = "v2"
-renamed_classes = []
+new_sqlite_classes = ["RateLimiter"]

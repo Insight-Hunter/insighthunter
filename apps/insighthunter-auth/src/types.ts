@@ -36,7 +36,7 @@ export type org_role =
   | "member"
   | "viewer";
 
-export type Module =
+export type ModuleId =
   | "bookkeeping"
   | "bizforma"
   | "payroll"
@@ -49,40 +49,34 @@ export type status =
   | "suspended"
   | "deleted";
 
-export type name = string;
-export type email = string;
-export type tenant_id = string;
-export type org_name = string;
-export type user_id = string;
-
 export interface ProvisioningMessage {
-  tenantId: tenant_id;
-  user_id: user_id;
-  org_name: org_name;
+  tenantId: string;
+  user_id: string;
+  org_name: string;
   tier: tier;
   attempt?: number;
 }
 export interface SessionPayload {
   sub: string;
-  tenantId: tenant_id;
+  tenantId: string;
   role: org_role;
   tier: tier;
   iat: number;
   exp: number;
-  user_id: user_id;
-  email: email;
-  name: name;     // display name for dashboard greeting
+  user_id: string;
+  email: string;
+  name: string;     // display name for dashboard greeting
   org_name: string;  // org name shown in nav bar  // controls permission checks in module workers
   issuedAt: number;
   expiresAt: number;
 }
 
 export interface UserRecord {
-  user_id: user_id;
-  email: email;
+  user_id: string;
+  email: string;
   password_hash: string;
-  name: name;      // full name supplied at registration
-  org_name: org_name;  // business / organisation name
+  name: string;      // full name supplied at registration
+  org_name: string;  // business / organisation name
   role: org_role;     // user's role within their org
   tier: tier;
   status: status;
@@ -91,13 +85,13 @@ export interface UserRecord {
   updated_at: number;
 }
 export interface RegisterRequest {
-  email: email;
+  email: string;
   password: string;
-  name: name;
-  org_name: org_name;
+  name: string;
+  org_name: string;
   tier: tier;
 }
 export interface LoginRequest {
-  email: email;
+  email: string;
   password: string;
 }
