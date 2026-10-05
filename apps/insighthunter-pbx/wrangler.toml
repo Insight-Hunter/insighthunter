@@ -1,5 +1,5 @@
 name = "insighthunter-pbx"
-main = "src/index.ts"
+main = "src/backend/index.ts"
 compatibility_date = "2026-07-01"
 compatibility_flags = ["nodejs_compat"]
 
@@ -12,3 +12,12 @@ ENVIRONMENT = "development"
 
 [dev]
 inspector_port = 9243
+
+# D1 is required by src/backend/index.ts (c.env.DB). Provision with:
+#   wrangler d1 create insighthunter-pbx
+# then replace database_id below and run `wrangler d1 migrations apply`.
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-pbx"
+database_id = "REPLACE_WITH_PROVISIONED_D1_DATABASE_ID"
+migrations_dir = "migrations"

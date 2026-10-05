@@ -1,0 +1,5 @@
+# Copy to .dev.vars for local `wrangler dev`. Never commit real values.
+
+# Twilio account credentials (Console > Account Info)
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=replace-with-local-test-token

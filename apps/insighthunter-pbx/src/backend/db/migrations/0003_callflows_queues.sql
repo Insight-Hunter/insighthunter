@@ -1,0 +1,10 @@
+-- PLANNED, NOT APPLIED.
+-- This file is a planning stub only (see ./README.md). It is not referenced
+-- by wrangler.toml and must never be run with `wrangler d1 migrations apply`.
+-- The real, applied D1 migrations for this Worker live at ../../../migrations/.
+--
+-- Planned scope: Call-flow definitions, node graphs, call queues, and agent presence (docs/insight-pbx-master-prompt.md §4.3, §4.8).
+--
+-- TODO: when this feature area is actually built, write a real migration
+-- under the app-root migrations/ directory instead of here, then update this
+-- file to point at it.
