@@ -1,71 +1,47 @@
-// routes/wizard.ts — Multi-step formation wizard
 import { Hono } from "hono";
-import { createCase } from "../services/formation.js";
-import {
-  completeSession,
-  createSession,
-  getSession,
-  updateSessionStep,
-} from "../services/wizard-session.js";
-import type { BizformaEnv } from "../types.js";
+import type { AppBindings } from "../types.js";
+import { badRequest, conflict, notFound, ok } from "../utils/http.js";
+import { wizardStepSchema } from "../utils/validators.js";
+import { completeWizardSession, createWizardSession, getWizardSession, updateWizardStep } from "../services/wizard-service.js";
+import { createCase } from "../services/case-service.js";
 
-export const wizard = new Hono<{ Bindings: BizformaEnv }>();
+export const wizard = new Hono<AppBindings>();
 
-// POST /api/wizard/start — begin new wizard session
 wizard.post("/start", async (c) => {
-  const orgId = c.get("orgId");
-  const userId = c.get("userId");
-  const session = await createSession(c.env.DB, orgId, userId);
-  return c.json({ session }, 201);
+  const session = await createWizardSession(c.env, c.get("orgId"), c.get("userId"));
+  return ok(c, { session }, 201);
 });
 
-// GET /api/wizard/:sessionId
 wizard.get("/:sessionId", async (c) => {
-  const { sessionId } = c.req.param();
-  const session = await getSession(c.env.DB, sessionId);
-  if (!session) return c.json({ error: "Session not found" }, 404);
-  return c.json({ session });
+  const session = await getWizardSession(c.env, c.req.param("sessionId"), c.get("orgId"));
+  if (!session) return notFound(c, "Session not found");
+  return ok(c, { session });
 });
 
-// PATCH /api/wizard/:sessionId/step — save step data and advance
 wizard.patch("/:sessionId/step", async (c) => {
-  const { sessionId } = c.req.param();
-  const body = await c.req.json<{ step: number; data: Record<string, unknown> }>();
-  if (body.step === undefined || !body.data) {
-    return c.json({ error: "step and data required" }, 400);
-  }
-  await updateSessionStep(c.env.DB, sessionId, body.step, body.data);
-  return c.json({ ok: true, step: body.step });
+  const parsed = wizardStepSchema.safeParse(await c.req.json());
+  if (!parsed.success) return badRequest(c, "Invalid payload", parsed.error.flatten());
+
+  await updateWizardStep(c.env, c.req.param("sessionId"), c.get("orgId"), parsed.data.step, parsed.data.data);
+  return ok(c, { ok: true, step: parsed.data.step });
 });
 
-// POST /api/wizard/:sessionId/complete — finalize + create formation case
 wizard.post("/:sessionId/complete", async (c) => {
-  const { sessionId } = c.req.param();
-  const orgId = c.get("orgId");
-  const userId = c.get("userId");
-
-  const session = (await getSession(c.env.DB, sessionId)) as {
-    data_json: string;
-    completed: number;
-  } | null;
-
-  if (!session) return c.json({ error: "Session not found" }, 404);
-  if (session.completed) return c.json({ error: "Session already completed" }, 409);
+  const session = await getWizardSession(c.env, c.req.param("sessionId"), c.get("orgId")) as { data_json?: string; completed?: number } | null;
+  if (!session) return notFound(c, "Session not found");
+  if (session.completed) return conflict(c, "Session already completed");
 
   const data = JSON.parse(session.data_json ?? "{}");
-
-  const newCase = await createCase(c.env.DB, {
-    org_id: orgId,
-    user_id: userId,
+  const newCase = await createCase(c.env, {
+    org_id: c.get("orgId"),
+    user_id: c.get("userId"),
     entity_type: data.entity_type ?? "LLC",
     state: data.state ?? "DE",
     business_name: data.business_name ?? "Unnamed Business",
-    status: "draft",
     registered_agent: data.registered_agent,
-    metadata_json: JSON.stringify(data),
+    metadata_json: JSON.stringify(data)
   });
 
-  await completeSession(c.env.DB, sessionId);
-
-  return c.json({ ok: true, case: newCase }, 201);
+  await completeWizardSession(c.env, c.req.param("sessionId"), c.get("orgId"));
+  return ok(c, { ok: true, case: newCase }, 201);
 });

@@ -3,7 +3,7 @@
 // here because apps/gateway has no addon field in its session model yet (only
 // session.plan -> X-Org-Plan). Re-add the bypass once addons ship platform-wide.
 import type { Context, Next } from "hono";
-import type { BizformaEnv } from "../types.js";
+import type { AppBindings } from "../types.js";
 
 type OrgPlan = "starter" | "growth" | "pro" | "enterprise";
 
@@ -19,10 +19,10 @@ function rankOf(plan: string): number {
 }
 
 export async function requireBizformaTier(
-  c: Context<{ Bindings: BizformaEnv }>,
+  c: Context<AppBindings>,
   next: Next,
 ): Promise<Response | undefined> {
-  const orgPlan = c.get("orgPlan");
+  const orgPlan = c.req.header("x-org-plan");
 
   if (!orgPlan || rankOf(orgPlan) < TIER_RANK.growth) {
     return c.json(

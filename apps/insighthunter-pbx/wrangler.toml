@@ -19,5 +19,5 @@ inspector_port = 9243
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-pbx"
-database_id = "REPLACE_WITH_PROVISIONED_D1_DATABASE_ID"
+database_id = "3356277c-70d7-4c39-88ea-1cfe26bdbd44"
 migrations_dir = "migrations"

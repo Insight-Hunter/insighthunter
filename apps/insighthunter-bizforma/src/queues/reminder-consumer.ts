@@ -20,18 +20,16 @@ export async function processReminderBatch(
     try {
       console.log(`[reminders] Sending reminder: ${job.title} due ${job.due_date}`);
 
-      // Write notification to platform DB (cross-worker)
-      await env.DB.prepare(`
-        INSERT OR IGNORE INTO notifications
-          (id, org_id, user_id, title, body, type, read, created_at)
-        VALUES (?1,?2,?3,?4,?5,'warning',0,datetime('now'))
+      await env.BIZFORMA_DB.prepare(`
+        INSERT OR IGNORE INTO bizforma_reminder_deliveries
+          (id, org_id, event_id, channel, status, created_at)
+        VALUES (?1, ?2, ?3, 'system', 'queued', ?4)
       `)
         .bind(
           crypto.randomUUID(),
           job.org_id,
-          job.user_id,
-          `Compliance Due: ${job.title}`,
-          `Action required by ${job.due_date}`,
+          job.event_id,
+          new Date().toISOString(),
         )
         .run();
 
@@ -51,7 +49,7 @@ export async function processReminderBatch(
 export async function dispatchUpcomingReminders(env: BizformaEnv): Promise<void> {
   const cutoff = new Date(Date.now() + 14 * 86400000).toISOString().split("T")[0];
 
-  const result = await env.DB.prepare(`
+  const result = await env.BIZFORMA_DB.prepare(`
     SELECT e.*, e.id AS event_id, c.org_id, c.user_id
     FROM bizforma_compliance_events e
     JOIN bizforma_cases c ON c.id = e.case_id
