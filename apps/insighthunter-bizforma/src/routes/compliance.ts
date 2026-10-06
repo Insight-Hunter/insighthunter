@@ -1,59 +1,69 @@
-// routes/compliance.ts — Compliance calendar events API
 import { Hono } from "hono";
-import {
-  createEvent,
-  listEventsByCase,
-  listUpcomingEvents,
-  markEventComplete,
-} from "../services/compliance-calendar.js";
-import type { BizformaEnv } from "../types.js";
+import type { AppBindings } from "../types.js";
+import { badRequest, ok } from "../utils/http.js";
+import { createComplianceEventSchema } from "../utils/validators.js";
+import { createComplianceEvent, listEventsByCase, listUpcomingEvents, markComplianceEventComplete } from "../services/compliance-service.js";
+import { assertCaseOwnership } from "../services/case-service.js";
 
-export const compliance = new Hono<{ Bindings: BizformaEnv }>();
+export const compliance = new Hono<AppBindings>();
 
-// GET /api/compliance/upcoming — events due in next 30 days
 compliance.get("/upcoming", async (c) => {
-  const orgId = c.get("orgId");
   const days = Number(c.req.query("days") ?? 30);
-  const events = await listUpcomingEvents(c.env.DB, orgId, days);
-  return c.json({ events });
+  const events = await listUpcomingEvents(c.env, c.get("orgId"), days);
+  return ok(c, { events });
 });
 
-// GET /api/compliance/case/:caseId
 compliance.get("/case/:caseId", async (c) => {
-  const { caseId } = c.req.param();
-  const events = await listEventsByCase(c.env.DB, caseId);
-  return c.json({ events });
+  const events = await listEventsByCase(c.env, c.req.param("caseId"), c.get("orgId"));
+  return ok(c, { events });
 });
 
-// POST /api/compliance/case/:caseId — add a compliance event
 compliance.post("/case/:caseId", async (c) => {
-  const { caseId } = c.req.param();
+  const parsed = createComplianceEventSchema.safeParse(await c.req.json());
+  if (!parsed.success) return badRequest(c, "Invalid payload", parsed.error.flatten());
+
+  const caseId = c.req.param("caseId");
   const orgId = c.get("orgId");
-  const body = await c.req.json<{
-    event_type: string;
-    title: string;
-    due_date: string;
-    notes?: string;
-  }>();
-  if (!body.event_type || !body.title || !body.due_date) {
-    return c.json({ error: "event_type, title, due_date required" }, 400);
-  }
-  await createEvent(c.env.DB, {
+  const owned = await assertCaseOwnership(c.env, caseId, orgId);
+  if (!owned) return badRequest(c, "Case not found");
+
+  const eventId = await createComplianceEvent(c.env, {
     case_id: caseId,
     org_id: orgId,
-    event_type: body.event_type,
-    title: body.title,
-    due_date: body.due_date,
-    status: "pending",
-    ...(body.notes === undefined ? {} : { notes: body.notes }),
+    ...parsed.data
   });
-  return c.json({ ok: true }, 201);
+
+  const agentId = c.env.COMPLIANCE_AGENT.idFromName(orgId);
+  await c.env.COMPLIANCE_AGENT.get(agentId).fetch("https://compliance-agent/events", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      orgId,
+      caseId,
+      eventId,
+      status: "pending",
+      dueDate: parsed.data.due_date
+    })
+  });
+
+  return ok(c, { ok: true, event_id: eventId }, 201);
 });
 
-// PATCH /api/compliance/events/:eventId/complete
 compliance.patch("/events/:eventId/complete", async (c) => {
-  const { eventId } = c.req.param();
-  const { notes } = await c.req.json<{ notes?: string }>();
-  await markEventComplete(c.env.DB, eventId, notes);
-  return c.json({ ok: true });
+  const body = await c.req.json<{ notes?: string }>();
+  const eventId = c.req.param("eventId");
+  const orgId = c.get("orgId");
+  await markComplianceEventComplete(c.env, eventId, orgId, body.notes);
+  const events = await c.env.BIZFORMA_DB.prepare(
+    "SELECT case_id FROM bizforma_compliance_events WHERE id = ?1 AND org_id = ?2"
+  ).bind(eventId, orgId).first<{ case_id: string }>();
+  if (events) {
+    const agentId = c.env.COMPLIANCE_AGENT.idFromName(orgId);
+    await c.env.COMPLIANCE_AGENT.get(agentId).fetch("https://compliance-agent/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orgId, caseId: events.case_id, eventId, status: "completed" })
+    });
+  }
+  return ok(c, { ok: true });
 });

@@ -1,5 +1,5 @@
 name = "insighthunter-pbx"
-main = "src/index.ts"
+main = "src/backend/index.ts"
 compatibility_date = "2026-07-01"
 compatibility_flags = ["nodejs_compat"]
 
@@ -12,3 +12,9 @@ ENVIRONMENT = "development"
 
 [dev]
 inspector_port = 9243
+
+[[d1_databases]]
+binding = "DB"
+database_name = "insighthunter-pbx"
+database_id = "3356277c-70d7-4c39-88ea-1cfe26bdbd44"
+migrations_dir = "migrations"

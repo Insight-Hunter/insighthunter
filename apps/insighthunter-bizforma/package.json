@@ -1,19 +1,23 @@
 {
-  "name": "@insighthunter/bizforma",
+  "name": "insighthunter-bizforma",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
-    "build": "wrangler deploy --dry-run",
-    "lint": "biome check src",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run --passWithNoTests",
-    "cf:types": "wrangler types"
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "cf-typegen": "wrangler types",
+    "db:migrate:local": "wrangler d1 execute BIZFORMA_DB --local --file ./src/db/schema.sql",
+    "db:migrate:remote": "wrangler d1 execute BIZFORMA_DB --remote --file ./src/db/schema.sql"
   },
-  "dependencies": { "hono": "^4.6.10" },
+  "dependencies": {
+    "hono": "^4.7.2",
+    "zod": "^3.24.1"
+  },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260620.0",
-    "vitest": "^2.1.3",
-    "wrangler": "^4.21.0"
+    "@cloudflare/workers-types": "^4.20250321.0",
+    "typescript": "^5.8.2",
+    "wrangler": "^4.7.1"
   }
 }

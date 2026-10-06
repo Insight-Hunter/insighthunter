@@ -1,20 +1,73 @@
 name = "insighthunter-bizforma"
 main = "src/index.ts"
-compatibility_date = "2026-07-01"
+compatibility_date = "2025-03-07"
 compatibility_flags = ["nodejs_compat"]
 
 [observability]
 enabled = true
+head_sampling_rate = 1
 
 [vars]
 APP_NAME = "insighthunter-bizforma"
 ENVIRONMENT = "development"
 AUTH_URL = "https://auth.insighthunter.app"
-APP_URL = "https://bizforma.insighthunter.app"
+APP_URL = "https://app.insighthunter.app"
+JWKS_URL = "https://auth.insighthunter.app/.well-known/jwks.json"
+
+[triggers]
+crons = ["0 9 * * *", "0 0 * * *"]
+
+[[d1_databases]]
+binding = "BIZFORMA_DB"
+database_name = "insighthunter-bizforma"
+database_id = "ab885914-020c-47fa-b269-ce15710d2ffb"
+migrations_dir = "../../packages/database/migrations"
+
+[[r2_buckets]]
+binding = "BIZFORMA_DOCUMENTS"
+bucket_name = "insighthunter-bizforma-documents"
+preview_bucket_name = "insighthunter-bizforma-documents-preview"
+
+[[kv_namespaces]]
+binding = "BIZFORMA_CACHE"
+id = "785b5540d57b49bc8760e63824c36129"
+preview_id = "1171ae60a27b49f2b3ab24026d88795d"
+
+[[queues.producers]]
+binding = "PDF_QUEUE"
+queue = "insighthunter-bizforma-pdf"
+
+[[queues.producers]]
+binding = "REMINDER_QUEUE"
+queue = "insighthunter-bizforma-reminders"
+
+[[queues.consumers]]
+queue = "insighthunter-bizforma-pdf"
+max_batch_size = 5
+max_batch_timeout = 30
+dead_letter_queue = "insighthunter-bizforma-pdf-dlq"
+
+[[queues.consumers]]
+queue = "insighthunter-bizforma-reminders"
+max_batch_size = 20
+max_batch_timeout = 60
+dead_letter_queue = "insighthunter-bizforma-reminders-dlq"
+
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "insighthunter_bizforma_events"
+
+[ai]
+binding = "AI"
+
+[[durable_objects.bindings]]
+name = "FORMATION_AGENT"
+class_name = "FormationAgent"
+
+[[durable_objects.bindings]]
+name = "COMPLIANCE_AGENT"
+class_name = "ComplianceAgent"
 
 [[migrations]]
-tag = "v2-remove-durable-objects"
-deleted_classes = ["ComplianceAgent", "FormationAgent"]
-
-[dev]
-inspector_port = 9233
+tag = "v1"
+new_sqlite_classes = ["FormationAgent", "ComplianceAgent"]

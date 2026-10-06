@@ -1,0 +1,10 @@
+-- PLANNED, NOT APPLIED.
+-- This file is a planning stub only (see ./README.md). It is not referenced
+-- by wrangler.toml and must never be run with `wrangler d1 migrations apply`.
+-- The real, applied D1 migrations for this Worker live at ../../../migrations/.
+--
+-- Planned scope: Cross-cutting indexes/views once the above tables exist for real.
+--
+-- TODO: when this feature area is actually built, write a real migration
+-- under the app-root migrations/ directory instead of here, then update this
+-- file to point at it.

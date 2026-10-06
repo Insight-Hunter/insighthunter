@@ -1,38 +1,20 @@
-// middleware/auth.ts — trusts identity headers injected by apps/gateway
-import type { Context, Next } from "hono";
-import type { BizformaEnv } from "../types.js";
+import type { MiddlewareHandler } from "hono";
+import { unauthorized } from "../utils/http.js";
 
-declare module "hono" {
-  interface ContextVariableMap {
-    userId: string;
-    orgId: string;
-    role: string;
-    email: string;
-    name: string;
-    orgPlan: string;
-  }
-}
+export const requireAuth: MiddlewareHandler = async (c, next) => {
+  const authHeader = c.req.header("authorization") ?? "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  if (!token) return unauthorized(c);
 
-export async function requireAuth(
-  c: Context<{ Bindings: BizformaEnv }>,
-  next: Next,
-): Promise<Response | undefined> {
-  const userId = c.req.header("X-User-Id");
-  const orgId = c.req.header("X-Org-Id");
-  const role = c.req.header("X-User-Role");
-  const email = c.req.header("X-User-Email");
-  const orgPlan = c.req.header("X-Org-Plan");
+  c.set("authToken", token);
 
-  if (!userId || !orgId || !role || !email || !orgPlan) {
-    return c.json({ error: "Unauthorized", code: "MISSING_GATEWAY_HEADERS" }, 401);
+  const orgId = c.req.header("x-org-id") ?? "";
+  const userId = c.req.header("x-user-id") ?? "";
+  if (!orgId || !userId) {
+    return unauthorized(c, "Missing org or user context");
   }
 
-  c.set("userId", userId);
   c.set("orgId", orgId);
-  c.set("role", role);
-  c.set("email", email);
-  c.set("name", c.req.header("X-User-Name") ?? email);
-  c.set("orgPlan", orgPlan);
-
+  c.set("userId", userId);
   await next();
-}
+};
