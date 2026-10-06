@@ -1,16 +1,42 @@
-// apps/insighthunter-pbx/vite.config.ts
-//
-// This is a Vitest config, not a real Vite application bundler config —
-// matching the convention used elsewhere in this monorepo (see
-// apps/insighthunter-marketing/vite.config.ts). No app in this monorepo
-// currently uses React/Vite for its frontend build; the `src/frontend/`
-// tree here is a structural placeholder (see src/frontend/README.md) and
-// has no build tooling wired up yet. This file exists to satisfy
-// docs/file-structure.md and to give Vitest an explicit config target.
-import { defineConfig } from "vitest/config";
+import { defineConfig } from "vite";
+import { resolve } from "node:path";
+
+const workerTarget = process.env.PBX_API_TARGET ?? "http://127.0.0.1:8787";
 
 export default defineConfig({
-  test: {
-    globals: true,
+  root: "src/frontend",
+  publicDir: false,
+  server: {
+    host: "0.0.0.0",
+    port: 4174,
+    proxy: {
+      "/api": {
+        target: workerTarget,
+        changeOrigin: true,
+      },
+      "/health": {
+        target: workerTarget,
+        changeOrigin: true,
+      },
+      "/voice": {
+        target: workerTarget,
+        changeOrigin: true,
+      },
+      "/webhooks": {
+        target: workerTarget,
+        changeOrigin: true,
+      },
+    },
+  },
+  preview: {
+    host: "0.0.0.0",
+    port: 4174,
+  },
+  build: {
+    outDir: "../../dist/frontend",
+    emptyOutDir: true,
+    rollupOptions: {
+      input: resolve(process.cwd(), "src/frontend/index.html"),
+    },
   },
 });
