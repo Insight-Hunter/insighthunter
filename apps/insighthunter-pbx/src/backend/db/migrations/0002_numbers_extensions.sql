@@ -3,7 +3,11 @@
 -- by wrangler.toml and must never be run with `wrangler d1 migrations apply`.
 -- The real, applied D1 migrations for this Worker live at ../../../migrations/.
 --
--- Planned scope: Phone number inventory and employee extensions, superseding the minimal phone_numbers table in migrations/0002_compliance_and_ledger.sql with provider metadata, number type, and porting status (docs/insight-pbx-master-prompt.md §4.2).
+-- The minimal phone-number inventory and tenant-scoped list/register API are
+-- implemented in the app-root migration 0002_compliance_and_ledger.sql and
+-- routes/numbers.ts. This planning stub remains for the unimplemented
+-- provider metadata, number lifecycle, and employee extensions
+-- (docs/insight-pbx-master-prompt.md §4.2).
 --
 -- TODO: when this feature area is actually built, write a real migration
 -- under the app-root migrations/ directory instead of here, then update this

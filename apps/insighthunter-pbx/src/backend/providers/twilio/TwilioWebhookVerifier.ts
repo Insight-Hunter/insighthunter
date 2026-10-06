@@ -1,10 +1,8 @@
-import type { TelephonyProvider } from "../interfaces/TelephonyProvider.js";
-
 /**
  * Validates Twilio's `X-Twilio-Signature` header against the canonical
  * request URL and sorted form parameters, per Twilio's signature algorithm.
  */
-export class TwilioWebhookVerifier implements TelephonyProvider {
+export class TwilioWebhookVerifier {
   async verifyWebhookSignature(req: Request, authToken: string): Promise<boolean> {
     const signature = req.headers.get("X-Twilio-Signature");
     if (!signature) return false;

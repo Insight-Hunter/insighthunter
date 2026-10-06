@@ -13,9 +13,6 @@ ENVIRONMENT = "development"
 [dev]
 inspector_port = 9243
 
-# D1 is required by src/backend/index.ts (c.env.DB). Provision with:
-#   wrangler d1 create insighthunter-pbx
-# then replace database_id below and run `wrangler d1 migrations apply`.
 [[d1_databases]]
 binding = "DB"
 database_name = "insighthunter-pbx"

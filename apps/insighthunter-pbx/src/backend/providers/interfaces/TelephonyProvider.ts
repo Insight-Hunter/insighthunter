@@ -8,4 +8,11 @@
 export interface TelephonyProvider {
   /** Verifies that an inbound webhook request genuinely originated from the provider. */
   verifyWebhookSignature(req: Request, authToken: string): Promise<boolean>;
+
+  /** Confirms an E.164 number is provisioned in the configured provider account. */
+  findIncomingNumber(
+    phoneNumber: string,
+    accountSid: string,
+    authToken: string,
+  ): Promise<{ providerNumberId: string } | null>;
 }

@@ -18,15 +18,21 @@ the specification's implementation order. It currently supports:
 - Inbound SMS webhook with STOP/START/HELP compliance handling and an
   append-only inbound message log.
 - Voicemail listing and mark-read (authenticated API) with audit logging.
+- Tenant-scoped number inventory listing and owner/admin registration of
+  E.164 numbers verified against the configured Twilio account, with duplicate
+  protection and audit logging.
 - Entitlement gating via `X-Org-Plan` (Growth tier and above).
 
 **Not yet implemented** (tracked against the master prompt, highest-value
-next): number/extension/department management UI, call-flow designer and
-runtime, call queues and agent presence, softphone client, AI receptionist,
-video rooms, billing reconciliation jobs and tenant usage dashboard, A2P 10DLC
-/ toll-free verification workflow UI, and Durable Object-backed real-time
-call/queue state. See [docs/insight-pbx-master-prompt.md](./docs/insight-pbx-master-prompt.md)
-§16 for the full phased plan.
+next): number search/purchase/release and extensions,
+department management, call-flow designer and runtime, call queues and agent
+presence, softphone client, AI receptionist, video rooms, billing
+reconciliation jobs and tenant usage dashboard, A2P 10DLC / toll-free
+verification workflow UI, and Durable Object-backed real-time call/queue
+state. Number registration confirms that a number is present in the
+configured Twilio account but does not purchase or release numbers. See
+[docs/insight-pbx-master-prompt.md](./docs/insight-pbx-master-prompt.md) §16
+for the full phased plan.
 
 ## Local setup
 
@@ -123,17 +129,22 @@ files only — see
 
 Inbound Twilio webhooks never trust a caller- or URL-supplied tenant ID
 directly. `src/backend/services/tenant-resolution.ts` resolves the tenant from the
-Twilio `To` number against a trusted `phone_numbers` mapping table. Because
-number provisioning/assignment UI does not exist yet, the code falls back to
-an `org` query parameter (set by an admin when configuring the Twilio
-console webhook URL, and covered by the Twilio request signature) when no
-mapping row exists yet — and records that resolution as `verified: false` in
-the audit log so it is visible and traceable. **This fallback is a known,
-documented gap**: once number provisioning exists, all numbers should be
-present in `phone_numbers` and the fallback should be removed/alerted on.
+Twilio `To` number against a `phone_numbers` mapping table. Owner/admin
+registration checks that the number exists in the configured Twilio account
+before assigning it to the authenticated tenant. Because number purchase and
+assignment workflows are not yet complete, the code still falls back to an
+`org` query parameter (configured in the Twilio console and covered by the
+Twilio request signature) when no mapping exists; those resolutions are
+recorded with `verified: false`. This is a known gap: map every assigned
+number before removing the fallback.
 
 Every authenticated API route also enforces `org_id` scoping on all D1
-queries (no cross-tenant reads/writes).
+queries (no cross-tenant reads/writes). `GET /api/numbers` returns only the
+authenticated tenant's number inventory. `POST /api/numbers` is restricted
+to `owner` and `admin` roles and registers a number verified in Twilio; the
+tenant ID always comes from the authenticated session, never the request
+body. Phone numbers are globally unique to prevent assigning one inbound
+destination to multiple tenants.
 
 ## Usage accounting model
 
