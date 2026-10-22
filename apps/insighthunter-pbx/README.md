@@ -190,3 +190,7 @@ Twilio webhook signature verification, STOP/START/HELP classification, and
 tenant resolution are covered by unit tests under `src/backend/**/*.test.ts` using
 signed request fixtures and an in-memory D1 stub — no live Twilio calls are
 made in tests.
+
+## Call flows
+
+Flows are designed via `/api/call-flows` (draft, validate, publish, rollback) and assigned to a number with `PUT /api/numbers/:id/flow` (`{"flowId": n | null}`; the flow must be published). Inbound calls on a number with a flow run it through `/voice/inbound` and `/voice/flow`; numbers without a flow use the legacy voicemail prompt. `business_hours` nodes need `timezone`, `days` (0–6), `open` and `close` (HH:MM).

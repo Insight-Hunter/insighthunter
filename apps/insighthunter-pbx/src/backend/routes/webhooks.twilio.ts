@@ -15,6 +15,8 @@ import {
   voicemailPromptTwiml,
 } from "../providers/twilio/twiml.js";
 import { recordAuditEvent } from "../services/audit.js";
+import type { CallFlowDefinition } from "../services/callFlowValidation.js";
+import { type StepContext, renderFlowFrom, resolveNext } from "../services/callRoutingService.js";
 import { classifyKeyword, recordOptIn, recordOptOut } from "../services/consent.js";
 import { resolveTenantForNumber } from "../services/tenant-resolution.js";
 import { recordUsageEvent } from "../services/usage-ledger.js";
@@ -53,8 +55,110 @@ twilioVoiceWebhooks.post("/inbound", async (c) => {
     metadata: { toNumber, verified: tenant.verified },
   });
 
+  const assigned = await c.env.DB.prepare(
+    `SELECT f.id AS flowId, f.published_version AS version
+     FROM phone_numbers p JOIN call_flows f ON f.id = p.call_flow_id AND f.org_id = p.org_id
+     WHERE p.phone_number = ?1 AND p.org_id = ?2 AND f.published_version IS NOT NULL`,
+  )
+    .bind(toNumber, tenant.orgId)
+    .first<{ flowId: number; version: number }>();
+
+  if (assigned && tenant.verified) {
+    const def = await loadPublishedFlow(c.env.DB, tenant.orgId, assigned.flowId, assigned.version);
+    if (def) {
+      const ctx = flowContext(c.env.DB, c.req.url, tenant.orgId, assigned.flowId, assigned.version);
+      return c.text(await renderFlowFrom(def, def.start, ctx), 200, { "Content-Type": "text/xml" });
+    }
+  }
+
   return c.text(voicemailPromptTwiml(tenant.orgId), 200, { "Content-Type": "text/xml" });
 });
+
+// Continuation of a running call flow. The query string is covered by the
+// Twilio signature, but the flow is still loaded scoped to the org.
+twilioVoiceWebhooks.post("/flow", async (c) => {
+  const valid = await webhookVerifier.verifyWebhookSignature(c.req.raw, c.env.TWILIO_AUTH_TOKEN);
+  if (!valid) return c.text("Forbidden", 403);
+
+  const url = new URL(c.req.url);
+  const orgId = url.searchParams.get("org") ?? "";
+  const flowId = Number(url.searchParams.get("flow"));
+  const version = Number(url.searchParams.get("v"));
+  const node = url.searchParams.get("node") ?? "";
+  const kind = url.searchParams.get("kind");
+  if (
+    !orgId ||
+    !Number.isInteger(flowId) ||
+    !Number.isInteger(version) ||
+    (kind !== "menu" && kind !== "dial")
+  ) {
+    return c.text(SAFE_FALLBACK_TWIML, 200, { "Content-Type": "text/xml" });
+  }
+
+  const def = await loadPublishedFlow(c.env.DB, orgId, flowId, version);
+  if (!def) return c.text(SAFE_FALLBACK_TWIML, 200, { "Content-Type": "text/xml" });
+
+  const form = await c.req.formData();
+  const digits = form.get("Digits");
+  const dialStatus = form.get("DialCallStatus");
+  const next = resolveNext(def, node, kind, {
+    ...(typeof digits === "string" ? { digits } : {}),
+    ...(typeof dialStatus === "string" ? { dialStatus } : {}),
+  });
+  const ctx = flowContext(c.env.DB, c.req.url, orgId, flowId, version);
+  return c.text(await renderFlowFrom(def, next, ctx), 200, { "Content-Type": "text/xml" });
+});
+
+async function loadPublishedFlow(
+  db: D1Database,
+  orgId: string,
+  flowId: number,
+  version: number,
+): Promise<CallFlowDefinition | null> {
+  const row = await db
+    .prepare(
+      `SELECT definition FROM call_flow_versions
+       WHERE org_id = ?1 AND flow_id = ?2 AND version = ?3 AND status = 'published'`,
+    )
+    .bind(orgId, flowId, version)
+    .first<{ definition: string }>();
+  return row ? (JSON.parse(row.definition) as CallFlowDefinition) : null;
+}
+
+function flowContext(
+  db: D1Database,
+  requestUrl: string,
+  orgId: string,
+  flowId: number,
+  version: number,
+): StepContext {
+  const origin = new URL(requestUrl).origin;
+  return {
+    orgId,
+    now: new Date(),
+    stepUrl: (node, kind) => {
+      const q = new URLSearchParams({
+        org: orgId,
+        flow: String(flowId),
+        v: String(version),
+        node,
+        kind,
+      });
+      return `${origin}/voice/flow?${q.toString()}`;
+    },
+    voicemailAction: `/voice/recording-complete?org=${encodeURIComponent(orgId)}`,
+    // Softphone identity convention: "<orgId>:<userId>" (token issuance not built yet).
+    clientIdentityFor: async (extension) => {
+      const row = await db
+        .prepare(
+          "SELECT user_id FROM extensions WHERE org_id = ?1 AND extension = ?2 AND kind = 'user'",
+        )
+        .bind(orgId, extension)
+        .first<{ user_id: string | null }>();
+      return row?.user_id ? `${orgId}:${row.user_id}` : null;
+    },
+  };
+}
 
 twilioVoiceWebhooks.post("/recording-complete", async (c) => {
   const valid = await webhookVerifier.verifyWebhookSignature(c.req.raw, c.env.TWILIO_AUTH_TOKEN);

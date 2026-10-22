@@ -95,12 +95,10 @@ export function normalizeBankRow(row: ParsedImportRow): NormalizedBankRow {
   const { category, confidence } = inferCategory(clean);
 
   return {
-    sourceDate: row.date,
-    sourceDescription: row.description,
-    sourceAmount: row.amount,
-    normalizedDate: row.date,
-    normalizedDescription: clean,
-    normalizedAmount: row.amount,
+    ...(row.date ? { sourceDate: row.date, normalizedDate: row.date } : {}),
+    ...(row.description ? { sourceDescription: row.description } : {}),
+    ...(row.amount !== undefined ? { sourceAmount: row.amount, normalizedAmount: row.amount } : {}),
+    ...(clean ? { normalizedDescription: clean } : {}),
     category,
     confidence,
   };

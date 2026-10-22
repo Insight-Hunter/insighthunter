@@ -1,4 +1,9 @@
-function statCard(label: string, value: string, note: string, tone: "default" | "success" | "warning" = "default"): string {
+function statCard(
+  label: string,
+  value: string,
+  note: string,
+  tone: "default" | "success" | "warning" = "default",
+): string {
   return `
     <article class="ih-card ih-stat ${tone !== "default" ? `tone-${tone}` : ""}">
       <span class="ih-label">${label}</span>
@@ -11,8 +16,18 @@ function statCard(label: string, value: string, note: string, tone: "default" | 
 export function HomePage(): string {
   const stats = [
     statCard("Open conversations", "148", "22 awaiting reply, 8 escalated to billing."),
-    statCard("Today's answered calls", "92%", "268 answered, 21 missed-call texts sent.", "success"),
-    statCard("Queue pressure", "2 queues", "Support East and Billing exceed target hold times.", "warning"),
+    statCard(
+      "Today's answered calls",
+      "92%",
+      "268 answered, 21 missed-call texts sent.",
+      "success",
+    ),
+    statCard(
+      "Queue pressure",
+      "2 queues",
+      "Support East and Billing exceed target hold times.",
+      "warning",
+    ),
     statCard("Projected PBX gross margin", "61.4%", "After Twilio usage and transcription cost."),
   ].join("");
 

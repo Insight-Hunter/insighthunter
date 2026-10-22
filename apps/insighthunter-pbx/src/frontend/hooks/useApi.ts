@@ -15,7 +15,6 @@ const devHeaders: Record<string, string> = {
   "X-Org-Plan": "growth",
 };
 
-
 export async function useApi<T>({
   path,
   method = "GET",

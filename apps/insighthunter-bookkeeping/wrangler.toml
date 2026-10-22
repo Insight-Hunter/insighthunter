@@ -1,14 +1,23 @@
 name = "insighthunter-bookkeeping"
-main = "src/index.ts"
+main = "@astrojs/cloudflare/entrypoints/server"
 compatibility_date = "2026-07-08"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+
+routes = [
+  { pattern = "bookkeeping.insighthunter.app/*", zone_name = "insighthunter.app" }
+]
+
+[assets]
+directory = "./dist/client"
+binding = "ASSETS"
+
+[ai]
+binding = "AI"
 
 [observability]
 enabled = true
 head_sampling_rate = 1
-
-[[routes]]
-pattern = "bookkeeping.insighthunter.app/*"
-zone_name = "insighthunter.app"
 
 # Shared D1 database. Use organization_id on every tenant-owned row and
 # validate the organization context from verified auth claims.
@@ -43,6 +52,7 @@ id = "b694951a306e42f68de14b3bd80edb11"
 
 [vars]
 AUTH_URL = "https://auth.insighthunter.app"
+ALLOWED_ORIGIN = "https://bookkeeping.insighthunter.app"
 DASHBOARD_URL = "https://app.insighthunter.app"
 ENVIRONMENT = "production"
 BOOKKEEPING_CHECKOUT_SUCCESS_URL = "https://app.insighthunter.app/onboarding?checkout=success"

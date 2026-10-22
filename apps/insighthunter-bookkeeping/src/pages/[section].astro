@@ -1,0 +1,24 @@
+---
+import AppLayout from "../layouts/AppLayout.astro";
+
+export const prerender = false;
+
+const sections: Record<string, string> = {
+  overview: "Overview",
+  transactions: "Transactions",
+  journal: "Journal",
+  reconcile: "Reconcile",
+  invoices: "Invoices",
+  bills: "Bills",
+  reports: "Reports",
+  close: "Month-end close",
+  documents: "Documents",
+  exceptions: "Exceptions",
+  settings: "Settings",
+};
+const section = Astro.params.section ?? "";
+const title = sections[section];
+if (!title) return Astro.rewrite("/404");
+---
+
+<AppLayout title={title} section={section} />

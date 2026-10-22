@@ -80,7 +80,7 @@ export function requireFeature(
   feature: Feature,
   now = new Date(),
 ): Entitlement {
-  if (!canUseFeature(entitlement, feature, now)) {
+  if (!entitlement || !canUseFeature(entitlement, feature, now)) {
     throw forbiddenResponse(feature);
   }
 

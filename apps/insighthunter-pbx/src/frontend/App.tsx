@@ -1,18 +1,17 @@
 import { AIReceptionistPage } from "./pages/AIReceptionist";
-import { AddonsPage }         from "./pages/Addons";
-import { AutomationsPage }    from "./pages/Automations";
-import { BillingPage }        from "./pages/Billing";
-import { CallFlowsPage }      from "./pages/CallFlows";
-import { CallsPage }          from "./pages/Calls";
-import { HomePage }           from "./pages/Home";
-import { InboxPage }          from "./pages/Inbox";
-import { QueuesPage }
-  from "./pages/Queues.js";
-import { ReportsPage }        from "./pages/Reports.js";
-import { SettingsPage }       from "./pages/Settings.js";
-import { TeamPage }           from "./pages/Team.js";
-import { VoicemailPage }      from "./pages/Voicemail.js";
+import { AddonsPage } from "./pages/Addons";
+import { AutomationsPage } from "./pages/Automations";
+import { BillingPage } from "./pages/Billing";
+import { CallFlowsPage } from "./pages/CallFlows";
+import { CallsPage } from "./pages/Calls";
+import { HomePage } from "./pages/Home";
+import { InboxPage } from "./pages/Inbox";
 import { NumbersPage, resetNumbersPageHydration } from "./pages/Numbers";
+import { QueuesPage } from "./pages/Queues.js";
+import { ReportsPage } from "./pages/Reports.js";
+import { SettingsPage } from "./pages/Settings.js";
+import { TeamPage } from "./pages/Team.js";
+import { VoicemailPage } from "./pages/Voicemail.js";
 
 type NavItem = {
   id: string;
@@ -22,20 +21,90 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { id: "home", label: "Overview", description: "KPIs, alerts, and service health", page: HomePage },
-  { id: "inbox", label: "Inbox", description: "SMS, MMS, and threaded conversations", page: InboxPage },
-  { id: "calls", label: "Calls", description: "Live status and recent call activity", page: CallsPage },
-  { id: "numbers", label: "Numbers", description: "DIDs, assignments, and porting", page: NumbersPage },
-  { id: "call-flows", label: "Call Flows", description: "IVR, routing, and emergency branches", page: CallFlowsPage },
-  { id: "queues", label: "Queues", description: "Departments, staffing, and SLA coverage", page: QueuesPage },
-  { id: "voicemail", label: "Voicemail", description: "Mailboxes, transcripts, and retention", page: VoicemailPage },
-  { id: "automations", label: "Automations", description: "Missed-call texts, reminders, and follow-ups", page: AutomationsPage },
-  { id: "ai", label: "AI Receptionist", description: "Intake logic, routing, and escalation", page: AIReceptionistPage },
-  { id: "team", label: "Team", description: "Extensions, permissions, and coverage", page: TeamPage },
-  { id: "reports", label: "Reports", description: "Usage, performance, and margins", page: ReportsPage },
-  { id: "billing", label: "Billing", description: "Plan, usage rating, and vendor cost", page: BillingPage },
-  { id: "addons", label: "Add-ons", description: "Mailbox, freight, and partner services", page: AddonsPage },
-  { id: "settings", label: "Settings", description: "Compliance, hours, and system policy", page: SettingsPage },
+  {
+    id: "home",
+    label: "Overview",
+    description: "KPIs, alerts, and service health",
+    page: HomePage,
+  },
+  {
+    id: "inbox",
+    label: "Inbox",
+    description: "SMS, MMS, and threaded conversations",
+    page: InboxPage,
+  },
+  {
+    id: "calls",
+    label: "Calls",
+    description: "Live status and recent call activity",
+    page: CallsPage,
+  },
+  {
+    id: "numbers",
+    label: "Numbers",
+    description: "DIDs, assignments, and porting",
+    page: NumbersPage,
+  },
+  {
+    id: "call-flows",
+    label: "Call Flows",
+    description: "IVR, routing, and emergency branches",
+    page: CallFlowsPage,
+  },
+  {
+    id: "queues",
+    label: "Queues",
+    description: "Departments, staffing, and SLA coverage",
+    page: QueuesPage,
+  },
+  {
+    id: "voicemail",
+    label: "Voicemail",
+    description: "Mailboxes, transcripts, and retention",
+    page: VoicemailPage,
+  },
+  {
+    id: "automations",
+    label: "Automations",
+    description: "Missed-call texts, reminders, and follow-ups",
+    page: AutomationsPage,
+  },
+  {
+    id: "ai",
+    label: "AI Receptionist",
+    description: "Intake logic, routing, and escalation",
+    page: AIReceptionistPage,
+  },
+  {
+    id: "team",
+    label: "Team",
+    description: "Extensions, permissions, and coverage",
+    page: TeamPage,
+  },
+  {
+    id: "reports",
+    label: "Reports",
+    description: "Usage, performance, and margins",
+    page: ReportsPage,
+  },
+  {
+    id: "billing",
+    label: "Billing",
+    description: "Plan, usage rating, and vendor cost",
+    page: BillingPage,
+  },
+  {
+    id: "addons",
+    label: "Add-ons",
+    description: "Mailbox, freight, and partner services",
+    page: AddonsPage,
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    description: "Compliance, hours, and system policy",
+    page: SettingsPage,
+  },
 ];
 
 function iconFor(id: string): string {
@@ -129,7 +198,7 @@ export function App(): string {
       </main>
     </div>
   `;
-  }
+}
 
 function wireNavigation(): void {
   const buttons = Array.from(document.querySelectorAll<HTMLElement>("[data-nav-target]"));
@@ -137,7 +206,7 @@ function wireNavigation(): void {
 
   for (const button of buttons) {
     button.onclick = () => {
-      const target = button.dataset.navTarget;
+      const target = button.getAttribute("data-nav-target");
       if (!target) return;
 
       for (const candidate of buttons) {
@@ -145,7 +214,7 @@ function wireNavigation(): void {
       }
 
       for (const page of pages) {
-        page.classList.toggle("is-active", page.dataset.page === target);
+        page.classList.toggle("is-active", page.getAttribute("data-page") === target);
       }
 
       if (target === "numbers") {
@@ -161,13 +230,7 @@ function wireNavigation(): void {
   }
 }
 
-
 window.addEventListener("ih:numbers:active", () => {
   const marker = document.getElementById("ih-numbers-list");
-    if (!marker) return;
+  if (!marker) return;
 });
-
-for (const button of buttons) {
-  button.addEventListener("click", () => activate(button.dataset.navTarget ?? "home"));
-}
-

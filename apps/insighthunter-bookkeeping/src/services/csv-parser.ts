@@ -84,15 +84,18 @@ export async function parseCsv(text: string): Promise<ParsedImportRow[]> {
     const cols = parseQuotedCsv(lines[i]!);
     if (cols.every((c) => !c)) continue; // blank line
 
+    const date = dateIdx >= 0 ? normalizeDate(cols[dateIdx] ?? "") : undefined;
+    const description = descIdx >= 0 ? cols[descIdx] || undefined : undefined;
+    const amount = parseAmount(
+      amtIdx >= 0 ? (cols[amtIdx] ?? "") : "",
+      debitIdx >= 0 ? (cols[debitIdx] ?? "") : "",
+      creditIdx >= 0 ? (cols[creditIdx] ?? "") : "",
+    );
     results.push({
       rowIndex: i,
-      date: dateIdx >= 0 ? normalizeDate(cols[dateIdx] ?? "") : undefined,
-      description: descIdx >= 0 ? (cols[descIdx] ?? undefined) : undefined,
-      amount: parseAmount(
-        amtIdx >= 0 ? (cols[amtIdx] ?? "") : "",
-        debitIdx >= 0 ? (cols[debitIdx] ?? "") : "",
-        creditIdx >= 0 ? (cols[creditIdx] ?? "") : "",
-      ),
+      ...(date ? { date } : {}),
+      ...(description ? { description } : {}),
+      ...(amount !== undefined ? { amount } : {}),
     });
   }
 
