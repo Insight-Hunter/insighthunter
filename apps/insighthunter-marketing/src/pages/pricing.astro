@@ -16,7 +16,7 @@ type PricingPlan = {
 
 const plans: PricingPlan[] = [
   {
-    id: "lite",
+    id: "startup",
     name: "Insight Lite",
     description: "Perfect for getting started — no card required.",
     price: "$0",
@@ -53,7 +53,7 @@ const plans: PricingPlan[] = [
     id: "pro",
     name: "Insight Pro",
     description: "For growing companies that need an always-on financial partner.",
-    price: "$129",
+    price: "$149",
     interval: "/mo",
     cta: "Start 14-day trial",
     features: [
@@ -150,7 +150,7 @@ const plans: PricingPlan[] = [
       link.addEventListener('click', async (event) => {
         event.preventDefault();
         const plan = link.dataset.plan;
-        if (plan === 'lite') {
+        if (plan === 'startup') {
           window.location.href = `https://app.insighthunter.app/dashboard?token=${encodeURIComponent(token)}`;
           return;
         }
