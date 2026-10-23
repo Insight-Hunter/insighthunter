@@ -25,6 +25,7 @@ export interface Env {
 }
 /** Subscription tiers — must stay in sync with insighthunter-dashboard TIER_RANK. */
 export type tier =
+  | "startup"
   | "lite"
   | "standard"
   | "pro"
