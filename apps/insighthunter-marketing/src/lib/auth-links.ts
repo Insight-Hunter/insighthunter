@@ -1,4 +1,4 @@
-export type Plan = "lite" | "standard" | "pro";
+export type Plan = "startup" | "standard" | "pro";
 
 const AUTH_ORIGIN = "https://auth.insighthunter.app";
 const APP_ORIGIN = "https://app.insighthunter.app";
@@ -13,7 +13,7 @@ export function loginUrl(path = "/dashboard"): string {
   return url.toString();
 }
 
-export function registerUrl(plan: Plan = "lite", path = "https://insighthunter.app/pricing"): string {
+export function registerUrl(plan: Plan = "startup", path = "https://insighthunter.app/pricing"): string {
   const url = new URL("/register", AUTH_ORIGIN);
   url.searchParams.set("plan", plan);
   url.searchParams.set("returnTo", returnTo(path));

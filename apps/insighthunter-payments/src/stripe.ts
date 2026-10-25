@@ -85,8 +85,11 @@ export async function createSubscriptionCheckoutSession(
     metadata: { userId: params.userId, type: params.type, value: params.value },
     // Copy metadata onto the subscription itself so later webhook events
     // (renewal, cancellation) can identify the user without extra lookups.
+    allow_promotion_codes: true,
     subscription_data: {
       metadata: { userId: params.userId, type: params.type, value: params.value },
+      // Pricing page advertises a 14-day trial on paid account tiers.
+      ...(params.type === "account_tier" ? { trial_period_days: 14 } : {}),
     },
   });
 }

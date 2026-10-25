@@ -92,7 +92,7 @@ async function hmac(data: string, secret: string): Promise<string> {
   return toHex(new Uint8Array(sig));
 }
 
-const VALID_TIERS = new Set<Tier>(["lite", "standard", "pro", "enterprise"]);
+const VALID_TIERS = new Set<Tier>(["startup", "lite", "standard", "pro", "enterprise"]);
 const VALID_ROLES = new Set<OrgRole>(["owner", "admin", "member", "viewer"]);
 
 function isTier(v: unknown): v is Tier  { return typeof v === "string" && VALID_TIERS.has(v as Tier); }
