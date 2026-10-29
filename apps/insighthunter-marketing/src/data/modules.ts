@@ -1,10 +1,4 @@
-export type ModuleId =
-  | "bookkeeping"
-  | "bizforma"
-  | "payroll"
-  | "reports"
-  | "insights"
-  | "pbx";
+export type ModuleId = "bookkeeping" | "bizforma" | "payroll" | "reports" | "insights" | "pbx";
 
 export type TierId = "startup" | "standard" | "pro";
 

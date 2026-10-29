@@ -81,7 +81,7 @@ describe("public routes", () => {
     expect(bodyText).toContain("plan=standard");
     expect(bodyText).toContain("plan=pro");
     expect(bodyText).toContain("Most popular");
-    expect(bodyText).toContain("data-billing=\"annual\"");
+    expect(bodyText).toContain('data-billing="annual"');
     expect(bodyText).toContain("$149");
   });
 

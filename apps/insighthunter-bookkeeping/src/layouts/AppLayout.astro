@@ -1,0 +1,244 @@
+---
+interface Props {
+  title: string;
+  section: string;
+}
+
+const { title, section } = Astro.props;
+const navigation = [
+  ["overview", "Overview"],
+  ["transactions", "Transactions"],
+  ["journal", "Journal"],
+  ["reconcile", "Reconcile"],
+  ["invoices", "Invoices"],
+  ["bills", "Bills"],
+  ["reports", "Reports"],
+  ["close", "Close"],
+  ["documents", "Documents"],
+  ["exceptions", "Exceptions"],
+  ["settings", "Settings"],
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>{title} · Bookkeeping</title>
+    <meta
+      name="description"
+      content="Review transactions, reconcile accounts, and manage month-end close."
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <div class="app-frame">
+      <aside class="sidebar" aria-label="Primary navigation">
+        <a class="brand" href="/overview" aria-label="Bookkeeping overview">
+          <span class="brand-mark" aria-hidden="true">B</span>
+          <span>Bookkeeping</span>
+        </a>
+        <p class="nav-caption">WORKSPACE</p>
+        <nav>
+          {
+            navigation.map(([href, label]) => (
+              <a
+                href={`/${href}`}
+                class:list={["nav-link", { active: section === href }]}
+                aria-current={section === href ? "page" : undefined}
+              >
+                <span class="nav-dot" aria-hidden="true"></span>
+                {label}
+              </a>
+            ))
+          }
+        </nav>
+        <div class="sidebar-foot">
+          <span class="status-indicator" aria-hidden="true"></span>
+          <span>Books workspace</span>
+        </div>
+      </aside>
+      <main id="main" class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">FINANCE OPERATIONS</p>
+            <h1>{title}</h1>
+          </div>
+          <div class="topbar-meta">
+            <span class="secure-label"><span aria-hidden="true">●</span> Secure workspace</span>
+          </div>
+        </header>
+        <section class="page-content" data-section={section} aria-live="polite">
+          <div id="app-content">
+            <p class="loading">Loading your workspace…</p>
+          </div>
+          <p id="app-error" class="error-message" role="alert" hidden></p>
+        </section>
+      </main>
+    </div>
+    <script>
+      import "../scripts/app.ts";
+    </script>
+    <style is:global>
+      :global(*) { box-sizing: border-box; }
+      :global(body) {
+        margin: 0;
+        color: #172a35;
+        background: #f5f8f8;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      :global(a) { color: inherit; }
+      .skip-link {
+        position: absolute; left: 12px; top: -60px; z-index: 10;
+        padding: 10px 14px; background: #fff; border-radius: 8px;
+      }
+      .skip-link:focus { top: 12px; }
+      .app-frame { min-height: 100vh; }
+      .sidebar {
+        position: fixed; inset: 0 auto 0 0; width: 238px; display: flex; flex-direction: column;
+        padding: 25px 16px 18px; background: #102832; color: #d7e4e5;
+      }
+      .brand {
+        display: flex; align-items: center; gap: 11px; margin: 0 8px 43px;
+        color: #fff; text-decoration: none; font-size: 16px; font-weight: 700;
+      }
+      .brand-mark {
+        display: grid; place-items: center; width: 33px; height: 33px;
+        border-radius: 10px; color: #102832; background: #73d1b4; font-weight: 800;
+      }
+      .nav-caption, .eyebrow {
+        margin: 0 8px 12px; color: #8aa2a8; font-size: 10px; letter-spacing: .13em; font-weight: 700;
+      }
+      nav { display: grid; gap: 4px; }
+      .nav-link {
+        display: flex; align-items: center; gap: 12px; min-height: 41px; padding: 0 11px;
+        border-radius: 8px; color: #bfd0d2; text-decoration: none; font-weight: 550;
+      }
+      .nav-link:hover, .nav-link:focus-visible { color: #fff; background: #1b3a45; outline: none; }
+      .nav-link.active { color: #fff; background: #244650; }
+      .nav-dot { width: 7px; height: 7px; border: 1px solid #77939a; border-radius: 50%; }
+      .nav-link.active .nav-dot { border-color: #73d1b4; background: #73d1b4; }
+      .sidebar-foot {
+        display: flex; align-items: center; gap: 9px; margin-top: auto; padding: 14px 9px 0;
+        border-top: 1px solid #29434b; color: #8aa2a8; font-size: 12px;
+      }
+      .status-indicator { width: 7px; height: 7px; border-radius: 50%; background: #73d1b4; }
+      .main { margin-left: 238px; min-height: 100vh; }
+      .topbar {
+        min-height: 112px; display: flex; justify-content: space-between; align-items: center;
+        gap: 20px; padding: 24px clamp(22px, 4vw, 56px); background: #fff;
+        border-bottom: 1px solid #e4ebeb;
+      }
+      .topbar .eyebrow { margin: 0 0 3px; color: #778d91; }
+      h1 { margin: 0; font-size: 25px; letter-spacing: -.035em; }
+      .topbar-meta { color: #61787c; font-size: 12px; }
+      .secure-label { white-space: nowrap; }
+      .secure-label span { padding-right: 5px; color: #238b70; font-size: 10px; }
+      .page-content { max-width: 1440px; margin: 0 auto; padding: 32px clamp(22px, 4vw, 56px) 56px; }
+      .loading { color: #647b7e; }
+      .metric-grid {
+        display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px; margin-bottom: 22px;
+      }
+      .metric-card, .panel {
+        min-width: 0; border: 1px solid #e3ebea; border-radius: 12px;
+        background: #fff; box-shadow: 0 2px 8px rgb(16 40 50 / 3%);
+      }
+      .metric-card { display: grid; gap: 8px; padding: 18px; }
+      .metric-label { color: #647b7e; font-size: 12px; font-weight: 600; }
+      .metric-value { color: #173540; font-size: 24px; letter-spacing: -.03em; }
+      .panel { margin: 0 0 18px; padding: 20px; }
+      .panel-title { margin: 0 0 16px; color: #1a3640; font-size: 16px; letter-spacing: -.015em; }
+      .action-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .action-link {
+        display: grid; gap: 4px; min-height: 76px; padding: 14px;
+        border: 1px solid #e3ebea; border-radius: 9px; text-decoration: none;
+      }
+      .action-link:hover { border-color: #79bba8; background: #f5fbf9; }
+      .action-link span, .muted { color: #667d80; font-size: 12px; }
+      .form-grid {
+        display: grid; grid-template-columns: repeat(3, minmax(150px, 1fr));
+        align-items: end; gap: 14px; margin: 0;
+      }
+      .journal-form { display: grid; gap: 16px; }
+      .journal-form h3 { margin: 0; font-size: 14px; }
+      .journal-lines { display: grid; gap: 10px; }
+      .journal-line { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
+      .journal-form .form-actions { justify-content: space-between; gap: 10px; }
+      .field { display: grid; gap: 6px; color: #536a6f; font-size: 12px; font-weight: 600; }
+      input, select, textarea {
+        width: 100%; min-width: 0; min-height: 39px; padding: 8px 10px;
+        border: 1px solid #d5e0df; border-radius: 7px; color: #172a35;
+        background: #fff; font: inherit; font-weight: 400;
+      }
+      input:focus-visible, select:focus-visible, textarea:focus-visible,
+      button:focus-visible, a:focus-visible {
+        outline: 3px solid #78cbb2; outline-offset: 2px;
+      }
+      input[type="file"] { padding: 5px; }
+      .form-actions { display: flex; align-items: center; min-height: 39px; }
+      .button {
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        min-height: 38px; padding: 8px 13px; border: 1px solid transparent;
+        border-radius: 7px; font: inherit; font-weight: 650; cursor: pointer;
+      }
+      .button:disabled { opacity: .5; cursor: not-allowed; }
+      .button-primary { color: #fff; background: #146c5a; }
+      .button-primary:hover:not(:disabled) { background: #105747; }
+      .button-secondary { color: #27434a; border-color: #d7e2e1; background: #fff; }
+      .button-secondary:hover:not(:disabled) { background: #f2f7f6; }
+      .button-danger { color: #9a3b34; border-color: #efd0cc; background: #fff8f7; }
+      .button-small { min-height: 32px; padding: 5px 9px; font-size: 11px; white-space: nowrap; }
+      .row-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 190px; }
+      .row-actions select { min-width: 150px; min-height: 32px; padding: 4px 7px; font-size: 11px; }
+      .table-scroll { width: 100%; overflow-x: auto; }
+      table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+      th, td { padding: 11px 10px; border-bottom: 1px solid #e8eeee; vertical-align: middle; }
+      th { color: #657b7f; background: #f7f9f9; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; }
+      td { color: #30484e; }
+      tbody tr:hover { background: #fbfdfd; }
+      .period-card { display: grid; gap: 12px; padding: 15px 0; border-top: 1px solid #e7eded; }
+      .period-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .period-heading h3 { margin: 0; font-size: 15px; }
+      .status-pill { color: #286451; font-size: 12px; font-weight: 650; }
+      .task-list { display: grid; gap: 8px; }
+      .task-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px; border-radius: 7px; background: #f6f9f8; }
+      .task-row > div { display: grid; gap: 2px; }
+      .error-message, .success-message { margin: 0 0 16px; padding: 11px 13px; border-radius: 8px; }
+      .error-message { color: #8f302a; border: 1px solid #f0d0cc; background: #fff5f3; }
+      .success-message { color: #215c49; border: 1px solid #c8e4d8; background: #f0faf5; }
+      .import-review-content { display: grid; gap: 12px; }
+      .reconciliation-match-content { display: grid; gap: 12px; }
+      [hidden] { display: none !important; }
+      @media (max-width: 1050px) {
+        .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 760px) {
+        .sidebar { position: static; width: auto; padding: 14px 16px; }
+        .brand { margin: 0 4px 15px; }
+        .nav-caption, .sidebar-foot { display: none; }
+        nav { display: flex; overflow-x: auto; padding-bottom: 2px; }
+        .nav-link { flex: 0 0 auto; min-height: 37px; padding: 0 10px; }
+        .main { margin-left: 0; }
+        .topbar { min-height: 88px; padding-top: 16px; padding-bottom: 16px; }
+        h1 { font-size: 22px; }
+        .secure-label { display: none; }
+        .page-content { padding-top: 20px; }
+        .panel { padding: 15px; }
+        .form-grid { grid-template-columns: minmax(0, 1fr); }
+        .journal-line { grid-template-columns: minmax(0, 1fr); }
+        .journal-form .form-actions { align-items: stretch; flex-direction: column; }
+        .action-grid { grid-template-columns: minmax(0, 1fr); }
+        .period-heading { align-items: flex-start; flex-direction: column; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        :global(*), :global(*::before), :global(*::after) { scroll-behavior: auto !important; }
+      }
+    </style>
+  </body>
+</html>

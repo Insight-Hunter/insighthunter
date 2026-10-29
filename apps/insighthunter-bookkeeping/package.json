@@ -4,15 +4,23 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev src/index.ts",
+    "dev": "astro dev",
+    "build": "astro check && astro build && wrangler deploy --dry-run",
     "deploy": "wrangler deploy",
-    "check": "tsc --noEmit"
+    "check": "astro check && tsc --noEmit && tsc -p tsconfig.frontend.json --noEmit",
+    "typecheck": "astro check && tsc --noEmit && tsc -p tsconfig.frontend.json --noEmit",
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.3.3",
+    "astro": "^7.3.5",
     "hono": "^4.9.8"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@cloudflare/workers-types": "^4.20260620.0",
     "typescript": "^5.9.2",
+    "vitest": "^2.1.3",
     "wrangler": "^4.107.0"
   }
 }

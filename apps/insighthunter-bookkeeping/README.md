@@ -1,129 +1,94 @@
-# insighthunter-bookkeeping
+# InsightHunter Bookkeeping
 
-The first real module — `bookkeeping.insighthunter.app`. Accounts,
-transactions, categories, and AI-assisted categorization, all stored per-user
-in an isolated Durable Object.
+An auditable bookkeeping workspace for transaction intake, double-entry
+accounting, reconciliation, invoices, bills, documents, reporting, and period
+close. The Astro application runs on Cloudflare Workers; D1 is the financial
+system of record, R2 stores private source files, and Queues process CSV
+imports.
 
-## Isolation pattern (sets the template for every other module)
+The implementation and remaining work are described in
+[ARCHITECTURE.md](./ARCHITECTURE.md). Product acceptance criteria are in
+[insight-bookkeeping-master-prompt.md](./insight-bookkeeping-master-prompt.md).
 
-Rather than routing through `insighthunter-auth`'s generic `UserVault` DO,
-this module defines its **own** per-user Durable Object — `BookkeepingLedger`
-— with its own SQL schema (Cloudflare's SQLite-backed DO storage). The
-instance id is derived deterministically from the user's id:
+## Architecture and controls
 
-```ts
-const ledgerId = env.LEDGER.idFromName(session.userId);
-```
+- Astro SSR serves the workspace at `/overview`, `/transactions`,
+  `/journal`, `/reconcile`, `/invoices`, `/bills`, `/reports`, `/close`,
+  `/documents`, `/exceptions`, and `/settings`.
+- Hono handles same-origin `/api/*` requests. It verifies the session against
+  `AUTH_URL/api/auth/verify`, derives tenant identity only from verified
+  claims, and scopes every bookkeeping operation to the tenant and entity.
+- D1 stores tenant-scoped financial and workflow records. Migrations in
+  `migrations/` are the schema source of truth.
+- Journal drafts require balanced integer-minor-unit debits and credits.
+  Posting is a separate reviewer-authorized action; database controls protect
+  posted lines, enforce balance, and prevent posting into locked periods.
+- CSV files are staged for review. Committing an import creates pending
+  transactions; it does not post journal entries.
+- R2 objects are private and are streamed only after an authenticated,
+  tenant-scoped document lookup.
+- Workers AI can suggest a category with an explanation. Suggestions never
+  change a transaction or post an entry.
 
-No id needs to be generated or stored anywhere — `idFromName` always maps
-the same `userId` to the same DO instance, and only this worker (which
-verified the session first) can address it. This is simpler than
-auth's original `newUniqueId()` + stored-id approach, and it's the pattern
-every subsequent module (reports, insights, bizforma, payroll, pbx) should
-copy: own DO class, own schema, `idFromName(userId)`.
+## Requirements
 
-Every request first hits `GET {AUTH_API_URL}/session/verify` — via either an
-`Authorization: Bearer` header (API/curl use) or the `ih_session` cookie
-`insighthunter-dashboard` sets (browser use, works automatically since the
-cookie's `Domain=.insighthunter.app` covers this subdomain). No entitlement
-check beyond a valid session — bookkeeping is included at every tier,
-Startup included.
+- Node.js supported by the repository and pnpm workspace.
+- Cloudflare account/resources configured for the production bindings in
+  `wrangler.toml` (D1, R2, Queues, KV, and Workers AI).
+- A reachable auth service configured through `AUTH_URL`.
 
-## AI categorization
+## Local development
 
-`POST /transactions` without a `categoryId` triggers a Workers AI call
-(`@cf/meta/llama-3.1-8b-instruct`) that picks the best-fit category from the
-user's category list, scoped to income or expense based on the transaction's
-sign. The result is marked `ai_suggested: true` — the user can always
-recategorize via `PATCH /transactions/:id`, which clears that flag.
-
-## Setup
-
-```bash
-npm install
-npx wrangler dev
-```
-
-No secrets or D1 needed — this worker only needs its Durable Object binding
-(auto-provisioned) and the Workers AI binding (already enabled account-wide
-on Cloudflare, no separate signup).
-
-## Deploy
+From the repository root:
 
 ```bash
-npx wrangler deploy
+pnpm install
+pnpm --dir apps/insighthunter-bookkeeping exec wrangler d1 migrations apply insighthunter-bookkeeping --local
+pnpm --dir apps/insighthunter-bookkeeping dev
 ```
 
-## Example requests
+The API calls the configured auth service for every `/api/*` request. Set a
+local `AUTH_URL` in a `.dev.vars` file if the production auth URL is not
+appropriate for local development, and use a valid session accepted by that
+auth service. Do not put secrets in `wrangler.toml` or commit `.dev.vars`.
 
-All examples assume a valid session token from `insighthunter-auth`.
-
-Create an account:
+## Validation and build
 
 ```bash
-curl -X POST https://bookkeeping.insighthunter.app/accounts \
-  -H "Authorization: Bearer <session_token>" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Business Checking","type":"checking"}'
+pnpm --dir apps/insighthunter-bookkeeping check
+pnpm --dir apps/insighthunter-bookkeeping test
+pnpm --dir apps/insighthunter-bookkeeping build
 ```
 
-List categories (seeded automatically on first request):
+The build script runs Astro diagnostics, creates the Cloudflare Worker
+artifact, and runs `wrangler deploy --dry-run`. Apply production D1 migrations
+before deploying application code that depends on them.
+
+## Production deployment
+
+Provision the D1 database, R2 bucket, Queue and dead-letter Queue, and KV
+namespace referenced in `wrangler.toml`. Confirm `AUTH_URL` and allowed
+origins are appropriate for the target environment, then:
 
 ```bash
-curl https://bookkeeping.insighthunter.app/categories \
-  -H "Authorization: Bearer <session_token>"
+pnpm --dir apps/insighthunter-bookkeeping build
+pnpm --dir apps/insighthunter-bookkeeping deploy
 ```
 
-Add a transaction, letting AI categorize it:
+Apply unapplied production migrations using Wrangler's D1 migration command
+for the configured database. Never use local development credentials or
+production financial data in test fixtures.
 
-```bash
-curl -X POST https://bookkeeping.insighthunter.app/transactions \
-  -H "Authorization: Bearer <session_token>" \
-  -H "Content-Type: application/json" \
-  -d '{"accountId":"<account_id>","amountCents":-4200,"description":"Adobe Creative Cloud subscription"}'
-```
+## Current limitations
 
-Response (category picked automatically):
-
-```json
-{
-  "id": "…",
-  "account_id": "…",
-  "amount_cents": -4200,
-  "description": "Adobe Creative Cloud subscription",
-  "category_id": "…",
-  "ai_suggested": 1,
-  "created_at": 1755500000000
-}
-```
-
-Recategorize a transaction:
-
-```bash
-curl -X PATCH https://bookkeeping.insighthunter.app/transactions/<tx_id> \
-  -H "Authorization: Bearer <session_token>" \
-  -H "Content-Type: application/json" \
-  -d '{"categoryId":"<category_id>"}'
-```
-
-Monthly summary (feeds insighthunter-reports later):
-
-```bash
-curl https://bookkeeping.insighthunter.app/summary \
-  -H "Authorization: Bearer <session_token>"
-```
-
-## Known follow-ups
-
-- No real bank feed integration yet — transactions are entered manually or
-  via this API. Plaid (or similar) is the natural next step for automatic
-  bank feeds; that integration would post into the same `POST /transactions`
-  endpoint, so the schema doesn't need to change, just the source.
-- No pagination cursor on `GET /transactions` yet — `limit` only (capped at
-  200). Add a cursor once real usage shows it's needed.
-- Startup tier has no enforced transaction-count cap yet (marketing site
-  lists "up to 25 AI-categorized transactions/mo" for Startup) — add a
-  monthly count check in this worker before the AI-categorization branch
-  once that limit needs to be real. Flagged, not silently built, since it's
-  a product decision (hard cap vs. soft warning vs. graceful degrade to
-  manual categorization after the limit).
+The app does not yet connect to live bank/card feeds. Reconciliation matching
+calculates a book balance and remaining difference, but reviewer certification
+and unmatch workflows remain. Period close still needs certification and
+review controls. Invoice/bill line items and payment processing, report
+exports and cash-flow reporting, OCR, malware scanning, upload/AI rate
+limiting, foreign-currency conversion, and end-to-end tenant-isolation tests
+are also follow-up work. The current transaction API explicitly supports USD
+only so unconverted currencies are not silently combined in reports. See the
+phased roadmap in
+[ARCHITECTURE.md](./ARCHITECTURE.md); these capabilities should not be
+represented as complete until implemented and validated.

@@ -40,7 +40,19 @@
   color: var(--ink);
 }
 
-main { max-width: var(--wrap); margin: 0 auto; padding: 0 1.5rem; }
-section { padding: 3.5rem 0; border-bottom: 1px solid var(--line); }
-section:last-of-type { border-bottom: none; }
-article { background: var(--panel); border: 1px solid var(--line); }
+main {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+section {
+  padding: 3.5rem 0;
+  border-bottom: 1px solid var(--line);
+}
+section:last-of-type {
+  border-bottom: none;
+}
+article {
+  background: var(--panel);
+  border: 1px solid var(--line);
+}

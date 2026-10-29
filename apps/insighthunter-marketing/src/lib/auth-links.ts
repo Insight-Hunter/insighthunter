@@ -13,7 +13,10 @@ export function loginUrl(path = "/dashboard"): string {
   return url.toString();
 }
 
-export function registerUrl(plan: Plan = "startup", path = "https://insighthunter.app/pricing"): string {
+export function registerUrl(
+  plan: Plan = "startup",
+  path = "https://insighthunter.app/pricing",
+): string {
   const url = new URL("/register", AUTH_ORIGIN);
   url.searchParams.set("plan", plan);
   url.searchParams.set("returnTo", returnTo(path));

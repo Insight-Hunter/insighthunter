@@ -4,6 +4,7 @@ import { requireRole } from "../middleware/roles.js";
 import { TwilioTelephonyProvider } from "../providers/twilio/TwilioTelephonyProvider.js";
 import { recordAuditEvent } from "../services/audit.js";
 import type { Env } from "../types.js";
+import { readJsonObject } from "../utils/http.js";
 import { isE164 } from "../utils/phone.js";
 
 export const numbers = new Hono<{ Bindings: Env }>();
@@ -13,7 +14,7 @@ numbers.get("/", async (c) => {
   if (!session) return c.json({ error: "unauthorized" }, 401);
 
   const result = await c.env.DB.prepare(
-    `SELECT id, phone_number AS phoneNumber, label, created_at AS createdAt
+    `SELECT id, phone_number AS phoneNumber, label, call_flow_id AS callFlowId, created_at AS createdAt
      FROM phone_numbers
      WHERE org_id = ?1
      ORDER BY created_at DESC, id DESC`,
@@ -111,4 +112,45 @@ numbers.post("/", requireRole("owner", "admin"), async (c) => {
     },
     201,
   );
+});
+
+// Assign (or clear) the call flow that answers inbound calls on a number.
+numbers.put("/:id/flow", requireRole("owner", "admin"), async (c) => {
+  const session = getSession(c.req.raw);
+  if (!session) return c.json({ error: "unauthorized" }, 401);
+  const id = Number(c.req.param("id"));
+  if (!Number.isInteger(id) || id <= 0) return c.json({ error: "invalid_id" }, 400);
+
+  const body = await readJsonObject(c.req.raw);
+  const flowId = body?.["flowId"];
+  if (flowId !== null && (typeof flowId !== "number" || !Number.isInteger(flowId))) {
+    return c.json({ error: "invalid_flow_id" }, 400);
+  }
+
+  if (flowId !== null) {
+    const flow = await c.env.DB.prepare(
+      "SELECT published_version AS version FROM call_flows WHERE org_id = ?1 AND id = ?2",
+    )
+      .bind(session.orgId, flowId)
+      .first<{ version: number | null }>();
+    if (!flow) return c.json({ error: "flow_not_found" }, 404);
+    if (flow.version === null) return c.json({ error: "flow_not_published" }, 409);
+  }
+
+  const updated = await c.env.DB.prepare(
+    "UPDATE phone_numbers SET call_flow_id = ?1 WHERE org_id = ?2 AND id = ?3",
+  )
+    .bind(flowId, session.orgId, id)
+    .run();
+  if (updated.meta.changes === 0) return c.json({ error: "not_found" }, 404);
+
+  await recordAuditEvent(c.env.DB, {
+    orgId: session.orgId,
+    actorUserId: session.userId,
+    action: "phone_number.assign_flow",
+    resourceType: "phone_number",
+    resourceId: String(id),
+    metadata: { flowId },
+  });
+  return c.json({ item: { id, flowId } });
 });

@@ -8,7 +8,7 @@
     "build": "vite build && wrangler deploy --dry-run",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
     "lint": "biome check src",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.frontend.json --noEmit",
     "test": "vitest run --passWithNoTests",
     "cf:types": "wrangler types"
   },
