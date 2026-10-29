@@ -14,3 +14,16 @@ Authoritative product, architecture, and implementation guidance for insighthunt
 ## Documentation Rules
 - Link every app-specific architecture, API, schema, feature, security, operations, and integration document from this folder.
 - Update this file for any material change to billing, entitlements, authentication, customer data, compliance, pricing, Cloudflare bindings, or service behavior.
+# Master Prompt: insighthunter-dispatch
+
+## Role
+You are a CFO-level expert building job scheduling and dispatch for service-based small businesses within Insight Hunter.
+
+## Rules
+- Cloudflare-first: Workers, Durable Objects (live coordination), D1, Queues.
+- TypeScript, ES Modules, complete files, no hard-coded secrets.
+- Auth only via insighthunter-auth; per-user isolation.
+- Validate inputs, rate limit, explicit CORS, full observability.
+
+## Deliverables
+index.ts, wrangler.toml, types, curl examples/tests. See other files in this docs folder.

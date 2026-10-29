@@ -14,3 +14,9 @@ Authoritative product, architecture, and implementation guidance for insighthunt
 ## Documentation Rules
 - Link every app-specific architecture, API, schema, feature, security, operations, and integration document from this folder.
 - Update this file for any material change to billing, entitlements, authentication, customer data, compliance, pricing, Cloudflare bindings, or service behavior.
+# Master Prompt: insighthunter-bookkeeping
+
+The full master prompt for this app is in [`../insight-bookkeeping-master-prompt.md`](../insight-bookkeeping-master-prompt.md). Treat that file as the source of truth until it is moved into this docs folder.
+
+## Summary
+AI-powered, human-reviewed bookkeeping with tiered service levels; Cloudflare-first; auth via insighthunter-auth; strict per-user isolation.
