@@ -112,7 +112,7 @@ const plans: PricingPlan[] = [
                     "pricing-card__cta",
                     { "pricing-card__cta--featured": plan.featured },
                   ]}
-                  href={registerUrl(plan.id, "https://insighthunter.app/pricing")}
+                  href={registerUrl(plan.id, "https://insighthunter.dev/pricing")}
                   data-plan={plan.id}
                 >
                   {plan.cta}
@@ -151,12 +151,12 @@ const plans: PricingPlan[] = [
         event.preventDefault();
         const plan = link.dataset.plan;
         if (plan === 'startup') {
-          window.location.href = `https://app.insighthunter.app/dashboard?token=${encodeURIComponent(token)}`;
+          window.location.href = `https://app.insighthunter.dev/dashboard?token=${encodeURIComponent(token)}`;
           return;
         }
         link.textContent = 'Opening checkout...';
         try {
-          const response = await fetch('https://payments.insighthunter.app/checkout', {
+          const response = await fetch('https://payments.insighthunter.dev/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({ type: 'account_tier', value: plan }),

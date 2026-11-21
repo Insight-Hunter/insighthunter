@@ -10,9 +10,9 @@ head_sampling_rate = 1
 [vars]
 APP_NAME = "insighthunter-bizforma"
 ENVIRONMENT = "development"
-AUTH_URL = "https://auth.insighthunter.app"
-APP_URL = "https://app.insighthunter.app"
-JWKS_URL = "https://auth.insighthunter.app/.well-known/jwks.json"
+AUTH_URL = "https://auth.insighthunter.dev"
+APP_URL = "https://app.insighthunter.dev"
+JWKS_URL = "https://auth.insighthunter.dev/.well-known/jwks.json"
 
 [triggers]
 crons = ["0 9 * * *", "0 0 * * *"]

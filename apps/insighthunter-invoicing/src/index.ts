@@ -1,5 +1,5 @@
 // apps/insighthunter-invoicing — Invoice management, client billing, revenue recognition
-// Deployed at invoicing.insighthunter.app
+// Deployed at invoicing.insighthunter.dev
 // Auth: reads X-* identity headers injected by apps/gateway.
 
 import { Hono } from "hono";
@@ -58,7 +58,7 @@ app.use("*", async (c, next) => {
 app.use(
   "/api/*",
   cors({
-    origin: (o) => (o?.endsWith(".insighthunter.app") ? o : null),
+    origin: (o) => (o?.endsWith(".insighthunter.dev") ? o : null),
     credentials: true,
   }),
 );

@@ -11,8 +11,8 @@
   },
 
  "routes": [{
-      "pattern": "app.insighthunter.app/*",
-      "zone_name": "insighthunter.app"
+      "pattern": "app.insighthunter.dev/*",
+      "zone_name": "insighthunter.dev"
   }],
 
   "assets": {
@@ -30,7 +30,7 @@
   ],
 
   "vars": {
-    "AUTH_ORIGIN": "https://auth.insighthunter.app",
-    "MARKETING_ORIGIN": "https://insighthunter.app"
+    "AUTH_ORIGIN": "https://auth.insighthunter.dev",
+    "MARKETING_ORIGIN": "https://insighthunter.dev"
   }
 }

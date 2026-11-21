@@ -105,8 +105,8 @@ const files = {
   "observability": { "enabled": true },
   "vars": {
     "APP_NAME": "Insight Hunter",
-    "MAIN_BASE_URL": "https://insighthunter.app",
-    "AUTH_BASE_URL": "https://auth.insighthunter.app"
+    "MAIN_BASE_URL": "https://insighthunter.dev",
+    "AUTH_BASE_URL": "https://auth.insighthunter.dev"
   }
 }
 `,
@@ -227,7 +227,7 @@ app.get('/session/:token', (c) => c.json({
   ok: true,
   session: {
     token: c.req.param('token'),
-    user: { subject: 'demo-user', email: 'demo@insighthunter.app' },
+    user: { subject: 'demo-user', email: 'demo@insighthunter.dev' },
     expiresAt: new Date(Date.now() + 3600000).toISOString()
   }
 }));

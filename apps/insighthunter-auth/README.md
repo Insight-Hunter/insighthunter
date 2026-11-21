@@ -2,7 +2,7 @@
 
 Auth service for Insight Hunter. Handles registration, login, session
 verification, and provisioning of each user's isolated `UserVault` Durable
-Object. Deployed at `auth.insighthunter.app`.
+Object. Deployed at `auth.insighthunter.dev`.
 
 ## Setup
 
@@ -76,7 +76,7 @@ Every other module (bookkeeping, reports, insights, etc.) should, on each
 request:
 
 1. Read the `Authorization: Bearer <token>` header.
-2. Call `GET https://auth.insighthunter.app/session/verify` (or, once this is
+2. Call `GET https://auth.insighthunter.dev/session/verify` (or, once this is
    stable, switch to local JWT verification using a shared public key to
    avoid the extra network hop — noted as a follow-up optimization).
 3. On success, get `userId` — use it to derive the same Durable Object id

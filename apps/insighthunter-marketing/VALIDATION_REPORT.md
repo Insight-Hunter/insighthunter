@@ -36,9 +36,9 @@ below), then `curl`'d every route:
 - `POST /contact` with a valid payload — `200`, renders the success alert,
   and the structured request log line contains no form field values.
 - Confirmed rendered HTML contains the exact required CTA URLs:
-  - `https://auth.insighthunter.app/register?plan=startup` (and `standard`,
+  - `https://auth.insighthunter.dev/register?plan=startup` (and `standard`,
     `pro` on `/pricing`)
-  - `https://auth.insighthunter.app/login?return_to=https%3A%2F%2Fapp.insighthunter.app%2Fdashboard`
+  - `https://auth.insighthunter.dev/login?return_to=https%3A%2F%2Fapp.insighthunter.dev%2Fdashboard`
   - Confirmed `insighthutner` (misspelling) does not appear anywhere in
     rendered output or source.
 - Confirmed response headers include CSP (`script-src 'self'`, no
@@ -85,14 +85,14 @@ smoke test; the committed `wrangler.jsonc` uses `compatibility_date =
    because `startup` isn't in its allow-list, and `return_to` is silently
    ignored in favor of the default `${APP_ORIGIN}/dashboard` because only
    `returnTo` is read. Functionally the user still ends up at
-   `app.insighthunter.app/dashboard` after registering, so there is no
+   `app.insighthunter.dev/dashboard` after registering, so there is no
    broken link or security issue, but the plan selection signal is lost.
    **Recommendation:** align `insighthunter-auth`'s `ALLOWED_PLANS` (rename
    `lite` → `startup`, or add `startup` as an alias) and accept `return_to`
    (in addition to or instead of `returnTo`) in a follow-up change scoped to
    `insighthunter-auth`, which is out of bounds for this task.
 2. **No production route/domain change was made.** `apps/insighthunter-main`
-   still owns the `insighthunter.app` / `www.insighthunter.app` Cloudflare
+   still owns the `insighthunter.dev` / `www.insighthunter.dev` Cloudflare
    routes in its `wrangler.toml`. This new Worker is deployable to a
    `workers.dev` preview subdomain or a non-production route, but cutting
    the public domain over to it is an explicit, reviewed infrastructure

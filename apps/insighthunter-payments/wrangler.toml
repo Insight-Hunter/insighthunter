@@ -3,8 +3,8 @@ main = "src/index.ts"
 compatibility_date = "2026-07-25"
 
 [[routes]]
-pattern = "payments.insighthunter.app/*"
-zone_name = "insighthunter.app"
+pattern = "payments.insighthunter.dev/*"
+zone_name = "insighthunter.dev"
 
 [observability]
 enabled = true
@@ -16,10 +16,10 @@ database_name = "insighthunter-auth-db"
 database_id = "1b58d27d-77c0-481d-a490-0c043f0e063c"
 
 [vars]
-DASHBOARD_URL = "https://app.insighthunter.app"
-APP_BASE_URL = "https://app.insighthunter.app"
-AUTH_VERIFY_URL = "https://auth.insighthunter.app/session/verify"
-ALLOWED_ORIGIN = "https://insighthunter.app"
+DASHBOARD_URL = "https://app.insighthunter.dev"
+APP_BASE_URL = "https://app.insighthunter.dev"
+AUTH_VERIFY_URL = "https://auth.insighthunter.dev/session/verify"
+ALLOWED_ORIGIN = "https://insighthunter.dev"
 
 # Confirm these in Stripe TEST mode before deployment.
 STRIPE_PRICE_STANDARD = "price_1TBfZoF3gri2YoH2g9u0mqkI"

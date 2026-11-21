@@ -1,6 +1,6 @@
 # insighthunter-bizforma
 
-Business formation and compliance tracking — `bizforma.insighthunter.app`.
+Business formation and compliance tracking — `bizforma.insighthunter.dev`.
 Requires Standard tier or above (or the BizForma Compliance add-on).
 
 ## Scope — read this before marketing copy gets written
@@ -51,7 +51,7 @@ npx wrangler deploy
 Create an entity:
 
 ```bash
-curl -X POST https://bizforma.insighthunter.app/entities \
+curl -X POST https://bizforma.insighthunter.dev/entities \
   -H "Authorization: Bearer <session_token>" \
   -H "Content-Type: application/json" \
   -d '{"legalName":"Acme Bakery LLC","entityType":"llc","state":"DE","status":"active"}'
@@ -60,7 +60,7 @@ curl -X POST https://bizforma.insighthunter.app/entities \
 Add a recurring compliance deadline:
 
 ```bash
-curl -X POST https://bizforma.insighthunter.app/compliance \
+curl -X POST https://bizforma.insighthunter.dev/compliance \
   -H "Authorization: Bearer <session_token>" \
   -H "Content-Type: application/json" \
   -d '{"entityId":"<entity_id>","title":"Delaware Annual Report","dueDate":1767139200000,"recurrence":"annual"}'
@@ -69,7 +69,7 @@ curl -X POST https://bizforma.insighthunter.app/compliance \
 Mark it complete (auto-schedules next year's):
 
 ```bash
-curl -X PATCH https://bizforma.insighthunter.app/compliance/<item_id> \
+curl -X PATCH https://bizforma.insighthunter.dev/compliance/<item_id> \
   -H "Authorization: Bearer <session_token>" \
   -H "Content-Type: application/json" \
   -d '{"status":"completed"}'
@@ -78,7 +78,7 @@ curl -X PATCH https://bizforma.insighthunter.app/compliance/<item_id> \
 Upcoming deadlines within 30 days:
 
 ```bash
-curl "https://bizforma.insighthunter.app/compliance?withinDays=30" \
+curl "https://bizforma.insighthunter.dev/compliance?withinDays=30" \
   -H "Authorization: Bearer <session_token>"
 ```
 

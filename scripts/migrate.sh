@@ -214,7 +214,7 @@ seed_dev() {
 
   run_sql_inline "$MAIN_DB_NAME" "
     INSERT OR IGNORE INTO customers (id, user_id, email, created_at)
-    VALUES ('cust_dev_001', 'user_dev_001', 'demo@insighthunter.app', datetime('now'));
+    VALUES ('cust_dev_001', 'user_dev_001', 'demo@insighthunter.dev', datetime('now'));
 
     INSERT OR IGNORE INTO subscriptions (
       id, customer_id, plan_code, status, created_at, updated_at
@@ -232,7 +232,7 @@ seed_dev() {
 
   run_sql_inline "$PLATFORM_DB_NAME" "
     INSERT OR IGNORE INTO users (id, email, name, password_hash, email_verified, created_at, updated_at)
-    VALUES ('user_dev_001', 'demo@insighthunter.app', 'Demo Owner', 'HASHED_IN_PROD', 1, datetime('now'), datetime('now'));
+    VALUES ('user_dev_001', 'demo@insighthunter.dev', 'Demo Owner', 'HASHED_IN_PROD', 1, datetime('now'), datetime('now'));
 
     INSERT OR IGNORE INTO organizations (id, name, slug, plan, status, owner_user_id, created_at, updated_at)
     VALUES ('org_dev_001', 'Demo Business LLC', 'demo-business', 'growth', 'active', 'user_dev_001', datetime('now'), datetime('now'));

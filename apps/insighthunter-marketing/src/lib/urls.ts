@@ -4,8 +4,8 @@ type PublicEnv = {
 };
 
 const publicEnv = (import.meta as ImportMeta & { env: PublicEnv }).env;
-const authBaseUrl = publicEnv.PUBLIC_AUTH_API_URL || "https://auth.insighthunter.app";
-const dashboardBaseUrl = publicEnv.PUBLIC_APP_BASE_URL || "https://app.insighthunter.app";
+const authBaseUrl = publicEnv.PUBLIC_AUTH_API_URL || "https://auth.insighthunter.dev";
+const dashboardBaseUrl = publicEnv.PUBLIC_APP_BASE_URL || "https://app.insighthunter.dev";
 
 export const getSignupUrl = (plan = "lite"): string =>
   `${authBaseUrl}/register?plan=${encodeURIComponent(plan)}&returnTo=${encodeURIComponent(`${dashboardBaseUrl}/dashboard`)}`;

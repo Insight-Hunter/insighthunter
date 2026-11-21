@@ -11,8 +11,8 @@ type Bindings = {
   DB: D1Database;
   KV_SESSIONS: KVNamespace;
   KV_ENTITLEMENTS: KVNamespace;
-  AUTH_URL: string; // https://auth.insighthunter.app
-  DASHBOARD_URL: string; // https://app.insighthunter.app
+  AUTH_URL: string; // https://auth.insighthunter.dev
+  DASHBOARD_URL: string; // https://app.insighthunter.dev
   STRIPE_PORTAL_URL: string; // Stripe billing portal link (per-customer, set via secret)
 };
 
@@ -140,7 +140,7 @@ app.use("*", async (c, next) => {
 app.use(
   "/api/*",
   cors({
-    origin: ["https://insighthunter.app", "https://app.insighthunter.app"],
+    origin: ["https://insighthunter.dev", "https://app.insighthunter.dev"],
     credentials: true,
   }),
 );
@@ -287,7 +287,7 @@ function nav(active: string, session: IHSession) {
         <div style="font-size:.75rem;color:var(--muted);margin-bottom:.25rem">${session.orgName}</div>
         <div style="font-size:.8rem;font-weight:600">${session.name}</div>
         <div style="font-size:.7rem;color:var(--muted)">${session.email}</div>
-        <a href="${session.expiresAt > 0 ? "https://auth.insighthunter.app/logout" : "/"}" 
+        <a href="${session.expiresAt > 0 ? "https://auth.insighthunter.dev/logout" : "/"}" 
            style="display:block;margin-top:.75rem;font-size:.75rem;color:var(--muted);text-decoration:none">Sign out →</a>
       </div>
     </div>
@@ -322,7 +322,7 @@ app.get("/settings", async (c) => {
     return c.redirect(
       c.env.AUTH_URL +
         "/login?redirect=" +
-        encodeURIComponent("https://platform.insighthunter.app/settings"),
+        encodeURIComponent("https://platform.insighthunter.dev/settings"),
     );
 
   const error = c.req.query("error");
@@ -484,7 +484,7 @@ app.get("/members", async (c) => {
     return c.redirect(
       c.env.AUTH_URL +
         "/login?redirect=" +
-        encodeURIComponent("https://platform.insighthunter.app/members"),
+        encodeURIComponent("https://platform.insighthunter.dev/members"),
     );
 
   const error = c.req.query("error");
@@ -774,7 +774,7 @@ app.get("/billing", async (c) => {
     return c.redirect(
       c.env.AUTH_URL +
         "/login?redirect=" +
-        encodeURIComponent("https://platform.insighthunter.app/billing"),
+        encodeURIComponent("https://platform.insighthunter.dev/billing"),
     );
 
   const org = await c.env.DB.prepare("SELECT * FROM organizations WHERE id = ?")
@@ -874,7 +874,7 @@ app.get("/audit", async (c) => {
     return c.redirect(
       c.env.AUTH_URL +
         "/login?redirect=" +
-        encodeURIComponent("https://platform.insighthunter.app/audit"),
+        encodeURIComponent("https://platform.insighthunter.dev/audit"),
     );
   if (session.role !== "owner" && session.role !== "admin")
     return c.redirect("/settings?error=forbidden");

@@ -200,8 +200,8 @@ body {
 `,
 
   'src/lib/urls.ts': `
-const authBaseUrl = import.meta.env.AUTH_BASE_URL || 'https://auth.insighthunter.app';
-const dashboardBaseUrl = import.meta.env.DASHBOARD_BASE_URL || 'https://app.insighthunter.app';
+const authBaseUrl = import.meta.env.AUTH_BASE_URL || 'https://auth.insighthunter.dev';
+const dashboardBaseUrl = import.meta.env.DASHBOARD_BASE_URL || 'https://app.insighthunter.dev';
 
 export const getSignupUrl = (plan = 'startup'): string =>
   \`\${authBaseUrl}/signup?plan=\${encodeURIComponent(plan)}\`;

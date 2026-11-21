@@ -27,8 +27,8 @@ app.use("*", errorBoundary);
 app.use("*", requestLogger);
 app.use("*", cors({
   origin: [
-    "https://app.insighthunter.app",
-    "https://insighthunter.app",
+    "https://app.insighthunter.dev",
+    "https://insighthunter.dev",
     "http://localhost:4321",
     "http://localhost:8787"
   ],

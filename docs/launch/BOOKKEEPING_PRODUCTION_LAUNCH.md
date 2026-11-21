@@ -14,8 +14,8 @@ Insight Hunter Bookkeeping provides small businesses with secure financial works
 Payroll, tax filing, tax or legal advice, bill payment, collections, invoicing, inventory accounting, sales-tax filing, 1099 filing, and fractional CFO work are separate services unless included in a signed order form.
 
 ## Customer journey
-1. Customer selects a plan on `https://insighthunter.app`.
-2. Authentication and registration occur at `https://auth.insighthunter.app`.
+1. Customer selects a plan on `https://insighthunter.dev`.
+2. Authentication and registration occur at `https://auth.insighthunter.dev`.
 3. Startup provisions immediately; paid plans use Stripe-hosted Checkout. Insight Hunter never handles raw card data.
 4. A verified Stripe webhook projects the authoritative tenant entitlement. A checkout return page never grants access.
 5. An idempotent workflow provisions the isolated tenant workspace.

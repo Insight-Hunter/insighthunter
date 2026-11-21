@@ -4,7 +4,7 @@ compatibility_date = "2026-08-01"
 workers_dev = false
 
 routes = [
-  { pattern = "bookkeeping.insighthunter.app/*", zone_name = "insighthunter.app" }
+  { pattern = "bookkeeping.insighthunter.dev/*", zone_name = "insighthunter.dev" }
 ]
 
 [observability]
@@ -22,5 +22,5 @@ new_sqlite_classes = ["BookkeepingLedger"]
 binding = "AI"
 
 [vars]
-AUTH_API_URL = "https://auth.insighthunter.app"
-ALLOWED_ORIGIN = "https://app.insighthunter.app"
+AUTH_API_URL = "https://auth.insighthunter.dev"
+ALLOWED_ORIGIN = "https://app.insighthunter.dev"

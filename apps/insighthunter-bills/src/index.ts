@@ -50,7 +50,7 @@ app.use('*', async (c, next) => {
 });
 
 app.use('/api/*', cors({
-  origin: (o) => (o?.endsWith('.insighthunter.app') ? o : null),
+  origin: (o) => (o?.endsWith('.insighthunter.dev') ? o : null),
   credentials: true,
 }));
 

@@ -15,7 +15,7 @@ export function securityHeaders(): MiddlewareHandler {
     c.header(
       "Content-Security-Policy",
       "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-        "img-src 'self' data:; font-src 'self' https://fonts.gstatic.com; form-action 'self' https://auth.insighthunter.app; " +
+        "img-src 'self' data:; font-src 'self' https://fonts.gstatic.com; form-action 'self' https://auth.insighthunter.dev; " +
         "base-uri 'none'; frame-ancestors 'none'; object-src 'none'",
     );
     c.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");

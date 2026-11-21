@@ -6,10 +6,10 @@ import { isRateLimited } from "../src/lib/rate-limit.js";
 import { validateContactForm } from "../src/lib/validate.js";
 
 const baseEnv: Env = {
-  CANONICAL_ORIGIN: "https://insighthunter.app",
-  AUTH_ORIGIN: "https://auth.insighthunter.app",
-  APP_ORIGIN: "https://app.insighthunter.app",
-  CONTACT_TO_EMAIL: "sales@insighthunter.app",
+  CANONICAL_ORIGIN: "https://insighthunter.dev",
+  AUTH_ORIGIN: "https://auth.insighthunter.dev",
+  APP_ORIGIN: "https://app.insighthunter.dev",
+  CONTACT_TO_EMAIL: "sales@insighthunter.dev",
   RATE_LIMIT: createFakeKv(),
   LEADS: createFakeKv(),
 };
@@ -38,17 +38,17 @@ function kvValues(kv: KVNamespace): unknown[] {
 describe("CTA links", () => {
   it("builds the exact required signup URL for each plan", () => {
     expect(signupUrl(baseEnv, "startup")).toBe(
-      "https://auth.insighthunter.app/register?plan=startup",
+      "https://auth.insighthunter.dev/register?plan=startup",
     );
     expect(signupUrl(baseEnv, "standard")).toBe(
-      "https://auth.insighthunter.app/register?plan=standard",
+      "https://auth.insighthunter.dev/register?plan=standard",
     );
-    expect(signupUrl(baseEnv, "pro")).toBe("https://auth.insighthunter.app/register?plan=pro");
+    expect(signupUrl(baseEnv, "pro")).toBe("https://auth.insighthunter.dev/register?plan=pro");
   });
 
   it("builds the exact required login URL", () => {
     expect(loginUrl(baseEnv)).toBe(
-      "https://auth.insighthunter.app/login?return_to=https%3A%2F%2Fapp.insighthunter.app%2Fdashboard",
+      "https://auth.insighthunter.dev/login?return_to=https%3A%2F%2Fapp.insighthunter.dev%2Fdashboard",
     );
   });
 
@@ -60,7 +60,7 @@ describe("CTA links", () => {
 
 describe("public routes", () => {
   it("serves the homepage with canonical and CTA links", async () => {
-    const res = await app.fetch(new Request("https://insighthunter.app/"), baseEnv);
+    const res = await app.fetch(new Request("https://insighthunter.dev/"), baseEnv);
     expect(res.status).toBe(200);
     const bodyText = await res.text();
     expect(bodyText).toContain('rel="canonical"');
@@ -69,12 +69,12 @@ describe("public routes", () => {
     expect(bodyText).toContain("margin, runway, and cash position");
     expect(bodyText).toContain("Illustrative workflows, not customer testimonials");
     expect(bodyText).toContain("Cloudflare Workers run the web experience");
-    expect(bodyText).toContain("https://auth.insighthunter.app/register?plan=startup");
-    expect(bodyText).toContain("https://auth.insighthunter.app/login?return_to=");
+    expect(bodyText).toContain("https://auth.insighthunter.dev/register?plan=startup");
+    expect(bodyText).toContain("https://auth.insighthunter.dev/login?return_to=");
   });
 
   it("serves pricing with a signup CTA per plan", async () => {
-    const res = await app.fetch(new Request("https://insighthunter.app/pricing"), baseEnv);
+    const res = await app.fetch(new Request("https://insighthunter.dev/pricing"), baseEnv);
     const bodyText = await res.text();
     expect(bodyText).toContain("Lite");
     expect(bodyText).toContain("plan=startup");
@@ -86,7 +86,7 @@ describe("public routes", () => {
   });
 
   it("serves the simulated add-on marketplace without charging", async () => {
-    const res = await app.fetch(new Request("https://insighthunter.app/addons"), baseEnv);
+    const res = await app.fetch(new Request("https://insighthunter.dev/addons"), baseEnv);
     const bodyText = await res.text();
     expect(res.status).toBe(200);
     expect(bodyText).toContain("BizForma filing support");
@@ -97,23 +97,23 @@ describe("public routes", () => {
   });
 
   it("serves robots.txt and sitemap.xml", async () => {
-    const robots = await app.fetch(new Request("https://insighthunter.app/robots.txt"), baseEnv);
-    expect(await robots.text()).toContain("Sitemap: https://insighthunter.app/sitemap.xml");
+    const robots = await app.fetch(new Request("https://insighthunter.dev/robots.txt"), baseEnv);
+    expect(await robots.text()).toContain("Sitemap: https://insighthunter.dev/sitemap.xml");
 
-    const sitemap = await app.fetch(new Request("https://insighthunter.app/sitemap.xml"), baseEnv);
+    const sitemap = await app.fetch(new Request("https://insighthunter.dev/sitemap.xml"), baseEnv);
     expect(sitemap.headers.get("Content-Type")).toContain("xml");
-    expect(await sitemap.text()).toContain("<loc>https://insighthunter.app/pricing</loc>");
+    expect(await sitemap.text()).toContain("<loc>https://insighthunter.dev/pricing</loc>");
   });
 
   it("applies strict security headers", async () => {
-    const res = await app.fetch(new Request("https://insighthunter.app/"), baseEnv);
+    const res = await app.fetch(new Request("https://insighthunter.dev/"), baseEnv);
     expect(res.headers.get("X-Frame-Options")).toBe("DENY");
     expect(res.headers.get("Content-Security-Policy")).toContain("script-src 'self'");
     expect(res.headers.get("Strict-Transport-Security")).toContain("max-age=31536000");
   });
 
   it("returns 404 for unknown paths", async () => {
-    const res = await app.fetch(new Request("https://insighthunter.app/nope"), baseEnv);
+    const res = await app.fetch(new Request("https://insighthunter.dev/nope"), baseEnv);
     expect(res.status).toBe(404);
   });
 });
@@ -161,7 +161,7 @@ describe("contact form", () => {
     form.set("company", "Example Co");
     form.set("message", "We'd like a demo of the Hunter plan.");
     const res = await app.fetch(
-      new Request("https://insighthunter.app/contact", { method: "POST", body: form }),
+      new Request("https://insighthunter.dev/contact", { method: "POST", body: form }),
       env,
     );
     expect(res.status).toBe(200);
@@ -198,7 +198,7 @@ describe("contact form", () => {
       spamForm.set("message", "This is a spam submission from a bot.");
       spamForm.set("website", "http://spam.example");
       const spamRes = await app.fetch(
-        new Request("https://insighthunter.app/contact", { method: "POST", body: spamForm }),
+        new Request("https://insighthunter.dev/contact", { method: "POST", body: spamForm }),
         env,
       );
       // Bots get the same 200 success response as real users so detection
@@ -214,7 +214,7 @@ describe("contact form", () => {
     realForm.set("email", "jordan@example.com");
     realForm.set("message", "We'd like a demo of the Hunter plan.");
     const res = await app.fetch(
-      new Request("https://insighthunter.app/contact", { method: "POST", body: realForm }),
+      new Request("https://insighthunter.dev/contact", { method: "POST", body: realForm }),
       env,
     );
     expect(res.status).toBe(200);

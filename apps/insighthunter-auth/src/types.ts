@@ -3,8 +3,8 @@ export interface Env {
   SESSIONS: KVNamespace;          // rate limiting + short-lived tokens
   USER_VAULT: DurableObjectNamespace;
   SESSION_SECRET: string;         // wrangler secret — HMAC-SHA256 key (32+ random bytes, hex)
-  ALLOWED_ORIGIN: string;         // https://insighthunter.app
-  DASHBOARD_URL?: string;         // e.g. https://app.insighthunter.app
+  ALLOWED_ORIGIN: string;         // https://insighthunter.dev
+  DASHBOARD_URL?: string;         // e.g. https://app.insighthunter.dev
   RESEND_API_KEY?: string;        // wrangler secret — transactional email (optional until email flows are wired)
   AUTH_DB: D1Database;
   SESSION_KV: KVNamespace;

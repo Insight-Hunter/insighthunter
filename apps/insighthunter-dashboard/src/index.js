@@ -13,14 +13,14 @@ const app = new Hono();
 
 // ── App launcher tiles (ported from the decommissioned insighthunter-main) ──
 const APP_TILES = [
-  { slug: "insights", name: "Insights", desc: "Financial KPIs, forecasting & AI analysis", url: "https://insights.insighthunter.app", icon: "📊", minTier: "lite" },
-  { slug: "bookkeeping", name: "Bookkeeping", desc: "Bank feeds, transactions & reconciliation", url: "https://bookkeeping.insighthunter.app", icon: "📒", minTier: "standard" },
-  { slug: "advisor", name: "Advisor", desc: "AI-driven CFO advisory using your real data", url: "https://advisor.insighthunter.app", icon: "🤖", minTier: "standard" },
-  { slug: "reports", name: "Reports", desc: "Automated financial reports & exports", url: "https://reports.insighthunter.app", icon: "📄", minTier: "standard" },
-  { slug: "payroll", name: "Payroll", desc: "Employee & contractor payroll processing", url: "https://payroll.insighthunter.app", icon: "💰", minTier: "pro" },
-  { slug: "bizforma", name: "BizForma", desc: "Business formation & compliance tracking", url: "https://bizforma.insighthunter.app", icon: "🏛️", minTier: "standard" },
-  { slug: "pbx", name: "PBX", desc: "AI-powered business phone & call analytics", url: "https://pbx.insighthunter.app", icon: "📞", minTier: "pro" },
-  { slug: "scout", name: "Scout", desc: "Business intelligence & market signals", url: "https://scout.insighthunter.app", icon: "🔍", minTier: "pro" },
+  { slug: "insights", name: "Insights", desc: "Financial KPIs, forecasting & AI analysis", url: "https://insights.insighthunter.dev", icon: "📊", minTier: "lite" },
+  { slug: "bookkeeping", name: "Bookkeeping", desc: "Bank feeds, transactions & reconciliation", url: "https://bookkeeping.insighthunter.dev", icon: "📒", minTier: "standard" },
+  { slug: "advisor", name: "Advisor", desc: "AI-driven CFO advisory using your real data", url: "https://advisor.insighthunter.dev", icon: "🤖", minTier: "standard" },
+  { slug: "reports", name: "Reports", desc: "Automated financial reports & exports", url: "https://reports.insighthunter.dev", icon: "📄", minTier: "standard" },
+  { slug: "payroll", name: "Payroll", desc: "Employee & contractor payroll processing", url: "https://payroll.insighthunter.dev", icon: "💰", minTier: "pro" },
+  { slug: "bizforma", name: "BizForma", desc: "Business formation & compliance tracking", url: "https://bizforma.insighthunter.dev", icon: "🏛️", minTier: "standard" },
+  { slug: "pbx", name: "PBX", desc: "AI-powered business phone & call analytics", url: "https://pbx.insighthunter.dev", icon: "📞", minTier: "pro" },
+  { slug: "scout", name: "Scout", desc: "Business intelligence & market signals", url: "https://scout.insighthunter.dev", icon: "🔍", minTier: "pro" },
 ];
 const TIER_RANK = { lite: 0, standard: 1, pro: 2, enterprise: 3 };
 

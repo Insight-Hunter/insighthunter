@@ -32,7 +32,7 @@ async function signedRequest(url: string, params: Record<string, string>) {
 
 describe("TwilioWebhookVerifier", () => {
   it("accepts a correctly signed request", async () => {
-    const req = await signedRequest("https://pbx.insighthunter.app/voice/inbound?org=abc", {
+    const req = await signedRequest("https://pbx.insighthunter.dev/voice/inbound?org=abc", {
       CallSid: "CA123",
       To: "+15551234567",
     });
@@ -41,7 +41,7 @@ describe("TwilioWebhookVerifier", () => {
   });
 
   it("rejects a request with a tampered body", async () => {
-    const req = await signedRequest("https://pbx.insighthunter.app/voice/inbound?org=abc", {
+    const req = await signedRequest("https://pbx.insighthunter.dev/voice/inbound?org=abc", {
       CallSid: "CA123",
       To: "+15551234567",
     });
@@ -55,7 +55,7 @@ describe("TwilioWebhookVerifier", () => {
   });
 
   it("rejects a request missing the signature header", async () => {
-    const req = new Request("https://pbx.insighthunter.app/voice/inbound", {
+    const req = new Request("https://pbx.insighthunter.dev/voice/inbound", {
       method: "POST",
       body: new URLSearchParams({ CallSid: "CA123" }),
     });

@@ -9,7 +9,7 @@
     "head_sampling_rate": 1
   },
   "routes": [
-    { "pattern": "bills.insighthunter.app/*", "zone_name": "insighthunter.app" }
+    { "pattern": "bills.insighthunter.dev/*", "zone_name": "insighthunter.dev" }
   ],
   "d1_databases": [
     {
@@ -19,8 +19,8 @@
     }
   ],
   "vars": {
-    "AUTH_URL": "https://auth.insighthunter.app",
-    "DASHBOARD_URL": "https://app.insighthunter.app",
+    "AUTH_URL": "https://auth.insighthunter.dev",
+    "DASHBOARD_URL": "https://app.insighthunter.dev",
     "ENVIRONMENT": "production"
   }
 }

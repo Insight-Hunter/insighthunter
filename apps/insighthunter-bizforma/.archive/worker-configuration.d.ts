@@ -26,8 +26,8 @@ declare namespace Cloudflare {
 		DOCUMENT_QUEUE?: Queue;
 		REMINDER_QUEUE?: Queue;
 		AI?: Ai;
-		APP_ORIGIN?: "https://bizforma.insighthunter.app";
-		AUTH_ORIGIN?: "https://auth.insighthunter.app";
+		APP_ORIGIN?: "https://bizforma.insighthunter.dev";
+		AUTH_ORIGIN?: "https://auth.insighthunter.dev";
 		AUTH_AUDIENCE?: "bizforma";
 		AUTH_INTROSPECT_PATH?: "/api/introspect";
 		PROVISIONING_ENABLED?: "false";

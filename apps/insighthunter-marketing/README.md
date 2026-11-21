@@ -28,10 +28,10 @@ boundary](#isolation-boundary) below.
 Login and signup links are built in one place (`src/lib/links.ts`) from
 environment variables so they never diverge from the required format:
 
-- Signup: `https://auth.insighthunter.app/register?plan=startup|standard|pro`
-- Login: `https://auth.insighthunter.app/login?return_to=https%3A%2F%2Fapp.insighthunter.app%2Fdashboard`
+- Signup: `https://auth.insighthunter.dev/register?plan=startup|standard|pro`
+- Login: `https://auth.insighthunter.dev/login?return_to=https%3A%2F%2Fapp.insighthunter.dev%2Fdashboard`
 
-The domain is always `app.insighthunter.app` / `auth.insighthunter.app` —
+The domain is always `app.insighthunter.dev` / `auth.insighthunter.dev` —
 never the misspelled `insighthutner.app`.
 
 ## Isolation boundary
@@ -80,6 +80,6 @@ pnpm --filter @insighthunter/marketing build        # wrangler deploy --dry-run
   `LEADS` namespace above; informational until a real delivery integration
   reads from it (see the validation report).
 
-No `routes` entry is defined — `insighthunter.app` is currently routed to
+No `routes` entry is defined — `insighthunter.dev` is currently routed to
 `apps/insighthunter-main`. Cutting the production domain over to this Worker
 is an explicit infrastructure change outside this app's scope.

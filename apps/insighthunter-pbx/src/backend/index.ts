@@ -27,7 +27,7 @@ const app = new Hono<{ Bindings: Env }>();
 app.use("*", secureHeaders());
 app.use(
   "/api/*",
-  cors({ origin: (o) => (o?.endsWith(".insighthunter.app") ? o : null), credentials: true }),
+  cors({ origin: (o) => (o?.endsWith(".insighthunter.dev") ? o : null), credentials: true }),
 );
 
 app.route("/health", health);

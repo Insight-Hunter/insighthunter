@@ -4,8 +4,8 @@ compatibility_date = "2026-09-06"
 compatibility_flags = [ "nodejs_compat" ]
 
 [[routes]]
-pattern = "auth.insighthunter.app/*"
-zone_name = "insighthunter.app"
+pattern = "auth.insighthunter.dev/*"
+zone_name = "insighthunter.dev"
 
 [observability]
 enabled = true
@@ -47,8 +47,8 @@ binding = "BOOKKEEPING_SERVICE"
 service = "insighthunter-bookkeeping"
 
 [vars]
-MARKETING_ORIGIN = "https://insighthunter.app"
-APP_ORIGIN = "https://app.insighthunter.app"
+MARKETING_ORIGIN = "https://insighthunter.dev"
+APP_ORIGIN = "https://app.insighthunter.dev"
 ACCESS_TOKEN_TTL_SECONDS = "900"
 REFRESH_TOKEN_TTL_SECONDS = "2592000"
 

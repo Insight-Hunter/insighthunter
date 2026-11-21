@@ -3,8 +3,8 @@ main = "src/index.ts"
 compatibility_date = "2026-08-23"
 
 [[routes]]
-pattern = "reports.insighthunter.app/*"
-zone_name = "insighthunter.app"
+pattern = "reports.insighthunter.dev/*"
+zone_name = "insighthunter.dev"
 
 [observability]
 enabled = true
@@ -16,6 +16,6 @@ database_name = "insighthunter-db"
 database_id = "REPLACE_WITH_D1_DATABASE_ID"
 
 [vars]
-AUTH_URL = "https://auth.insighthunter.app"
-DASHBOARD_URL = "https://app.insighthunter.app"
+AUTH_URL = "https://auth.insighthunter.dev"
+DASHBOARD_URL = "https://app.insighthunter.dev"
 ENVIRONMENT = "production"

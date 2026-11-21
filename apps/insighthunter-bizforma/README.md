@@ -30,7 +30,7 @@ Current scaffold expects:
 - `X-Org-Id: <org_id>`
 - `X-User-Id: <user_id>`
 
-Replace `src/middleware/auth.ts` with real JWT/JWKS verification from `auth.insighthunter.app`.
+Replace `src/middleware/auth.ts` with real JWT/JWKS verification from `auth.insighthunter.dev`.
 
 ## Key routes
 

@@ -5,13 +5,13 @@
 ```
 insighthunter/
   apps/
-    insighthunter-main/       Astro marketing site (insighthunter.app)
+    insighthunter-main/       Astro marketing site (insighthunter.dev)
                                - tier marketing (Startup/free, Standard, Pro)
                                - signup → hands off to auth
-    insighthunter-auth/       Worker + D1 + Durable Objects (auth.insighthunter.app)
+    insighthunter-auth/       Worker + D1 + Durable Objects (auth.insighthunter.dev)
                                - registration, login, sessions
                                - provisions per-user isolated storage
-    insighthunter-dashboard/  Worker + Static Assets (app.insighthunter.app)
+    insighthunter-dashboard/  Worker + Static Assets (app.insighthunter.dev)
                                - post-login personalized dashboard
     insighthunter-bookkeeping/  Worker + D1 (per-user) — module, tiered
     insighthunter-bizforma/     Worker + D1/R2 — formation + compliance docs
@@ -56,15 +56,15 @@ flagged here rather than silently built, since it affects architecture and cost.
 
 ## Auth flow
 
-1. `insighthunter.app` → signup/tier selection → redirects to
-   `auth.insighthunter.app/register`
+1. `insighthunter.dev` → signup/tier selection → redirects to
+   `auth.insighthunter.dev/register`
 2. Auth worker creates the D1 user row + provisions their `UserVault` Durable
    Object, hashes password (PBKDF2/scrypt via Web Crypto, no plaintext ever
    stored), issues a session token (stored in KV, short TTL + refresh).
-3. Redirect to `app.insighthunter.app/dashboard` with session cookie
+3. Redirect to `app.insighthunter.dev/dashboard` with session cookie
    (`HttpOnly`, `Secure`, `SameSite=Strict`).
 4. Dashboard + module workers validate the session by calling
-   `auth.insighthunter.app/session/verify` (or shared JWT verification if you
+   `auth.insighthunter.dev/session/verify` (or shared JWT verification if you
    move to signed JWTs — see note in code).
 
 ## Payments

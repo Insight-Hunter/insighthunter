@@ -1,5 +1,5 @@
 // apps/insighthunter-report — Financial report generation
-// Deployed at reports.insighthunter.app
+// Deployed at reports.insighthunter.dev
 // Auth: reads X-* identity headers injected by apps/gateway.
 
 import { Hono } from "hono";
@@ -53,7 +53,7 @@ app.use("*", async (c, next) => {
 app.use(
   "/api/*",
   cors({
-    origin: (o) => (o?.endsWith(".insighthunter.app") ? o : null),
+    origin: (o) => (o?.endsWith(".insighthunter.dev") ? o : null),
     credentials: true,
   }),
 );

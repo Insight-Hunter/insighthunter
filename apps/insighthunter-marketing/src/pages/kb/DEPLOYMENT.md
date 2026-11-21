@@ -84,4 +84,4 @@ curl -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache
 
 Cloudflare Access protects internal routes.
 
-Allow list: '*@insighthunter.app'
+Allow list: '*@insighthunter.dev'

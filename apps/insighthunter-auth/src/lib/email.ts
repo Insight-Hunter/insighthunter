@@ -1,8 +1,8 @@
 // insighthunter-auth — transactional email via Resend
 // All links land on the marketing/auth domain so users see a consistent URL.
 
-const FROM_ADDRESS = "InsightHunter <noreply@insighthunter.app>";
-const AUTH_ORIGIN  = "https://auth.insighthunter.app";
+const FROM_ADDRESS = "InsightHunter <noreply@insighthunter.dev>";
+const AUTH_ORIGIN  = "https://auth.insighthunter.dev";
 
 export async function sendVerificationEmail(
   apiKey: string,
@@ -37,7 +37,7 @@ export async function sendWelcomeEmail(
   to: string,
   name: string,
 ): Promise<void> {
-  const dashboardLink = "https://app.insighthunter.app";
+  const dashboardLink = "https://app.insighthunter.dev";
   await resendSend(apiKey, {
     to,
     subject: "Welcome to InsightHunter!",

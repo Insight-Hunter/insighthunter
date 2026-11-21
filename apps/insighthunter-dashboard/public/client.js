@@ -105,7 +105,7 @@ function render() {
       </div>
       <div class="actions">
         <button class="btn btn-ghost" data-act="refresh">Refresh</button>
-        <a class="btn btn-ghost" href="https://auth.insighthunter.app/logout">Sign out</a>
+        <a class="btn btn-ghost" href="https://auth.insighthunter.dev/logout">Sign out</a>
       </div>
     </header>
 
@@ -305,7 +305,7 @@ function payrollHtml() {
         <input name="salary" type="number" step="0.01" min="0.01" placeholder="Annual salary" required />
         <button class="btn" type="submit">Add employee</button>
       </form>
-      <p class="hint">Payroll run approval requires tax-provider onboarding in the Payroll app itself — <a class="btn-ghost btn" href="https://payroll.insighthunter.app">open Payroll →</a></p>
+      <p class="hint">Payroll run approval requires tax-provider onboarding in the Payroll app itself — <a class="btn-ghost btn" href="https://payroll.insighthunter.dev">open Payroll →</a></p>
     </section>`;
 }
 

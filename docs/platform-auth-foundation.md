@@ -49,7 +49,7 @@ wrangler d1 execute insighthunter-db --file=packages/database/migrations/0007_pl
 | `src/legacy.ts` | NEW — existing JWT auth logic moved here; zero breaking changes |
 
 ### `apps/insighthunter-main` — Dashboard launcher
-MS365-style app grid at `app.insighthunter.app`. Protected by `authGuard()`. Shows all 12 apps with icons and descriptions.
+MS365-style app grid at `app.insighthunter.dev`. Protected by `authGuard()`. Shows all 12 apps with icons and descriptions.
 
 ## How to add auth to any existing app
 

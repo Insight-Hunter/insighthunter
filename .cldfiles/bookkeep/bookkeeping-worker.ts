@@ -103,7 +103,7 @@ function bearerOrCookieToken(request: Request): string | null {
   if (header?.startsWith("Bearer ")) return header.slice("Bearer ".length);
 
   // Browser requests arrive with the ih_session cookie set by
-  // insighthunter-dashboard (Domain=.insighthunter.app covers this subdomain).
+  // insighthunter-dashboard (Domain=.insighthunter.dev covers this subdomain).
   const cookie = request.headers.get("Cookie");
   if (!cookie) return null;
   const match = cookie.split(";").map((c) => c.trim()).find((c) => c.startsWith("ih_session="));

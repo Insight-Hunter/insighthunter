@@ -1,6 +1,6 @@
 # insighthunter-bookkeeping
 
-The first real module — `bookkeeping.insighthunter.app`. Accounts,
+The first real module — `bookkeeping.insighthunter.dev`. Accounts,
 transactions, categories, and AI-assisted categorization, all stored per-user
 in an isolated Durable Object.
 
@@ -25,7 +25,7 @@ copy: own DO class, own schema, `idFromName(userId)`.
 Every request first hits `GET {AUTH_API_URL}/session/verify` — via either an
 `Authorization: Bearer` header (API/curl use) or the `ih_session` cookie
 `insighthunter-dashboard` sets (browser use, works automatically since the
-cookie's `Domain=.insighthunter.app` covers this subdomain). No entitlement
+cookie's `Domain=.insighthunter.dev` covers this subdomain). No entitlement
 check beyond a valid session — bookkeeping is included at every tier,
 Startup included.
 
@@ -61,7 +61,7 @@ All examples assume a valid session token from `insighthunter-auth`.
 Create an account:
 
 ```bash
-curl -X POST https://bookkeeping.insighthunter.app/accounts \
+curl -X POST https://bookkeeping.insighthunter.dev/accounts \
   -H "Authorization: Bearer <session_token>" \
   -H "Content-Type: application/json" \
   -d '{"name":"Business Checking","type":"checking"}'
@@ -70,14 +70,14 @@ curl -X POST https://bookkeeping.insighthunter.app/accounts \
 List categories (seeded automatically on first request):
 
 ```bash
-curl https://bookkeeping.insighthunter.app/categories \
+curl https://bookkeeping.insighthunter.dev/categories \
   -H "Authorization: Bearer <session_token>"
 ```
 
 Add a transaction, letting AI categorize it:
 
 ```bash
-curl -X POST https://bookkeeping.insighthunter.app/transactions \
+curl -X POST https://bookkeeping.insighthunter.dev/transactions \
   -H "Authorization: Bearer <session_token>" \
   -H "Content-Type: application/json" \
   -d '{"accountId":"<account_id>","amountCents":-4200,"description":"Adobe Creative Cloud subscription"}'
@@ -100,7 +100,7 @@ Response (category picked automatically):
 Recategorize a transaction:
 
 ```bash
-curl -X PATCH https://bookkeeping.insighthunter.app/transactions/<tx_id> \
+curl -X PATCH https://bookkeeping.insighthunter.dev/transactions/<tx_id> \
   -H "Authorization: Bearer <session_token>" \
   -H "Content-Type: application/json" \
   -d '{"categoryId":"<category_id>"}'
@@ -109,7 +109,7 @@ curl -X PATCH https://bookkeeping.insighthunter.app/transactions/<tx_id> \
 Monthly summary (feeds insighthunter-reports later):
 
 ```bash
-curl https://bookkeeping.insighthunter.app/summary \
+curl https://bookkeeping.insighthunter.dev/summary \
   -H "Authorization: Bearer <session_token>"
 ```
 
