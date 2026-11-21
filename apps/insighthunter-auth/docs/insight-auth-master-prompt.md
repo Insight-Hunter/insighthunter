@@ -1,6 +1,6 @@
 # Insight Hunter Auth App Master Prompt
 
-Build the `apps/insighthunter-auth` application for Insight Hunter as a Cloudflare-first authentication, registration, tenant-provisioning, and subscription gateway service for `https://auth.insighthunter.app`, with post-auth redirects into `https://app.insighthunter.app` and purchase/signup flows initiated from `https://insighthunter.app`. The app must be deployable on Cloudflare Workers and designed for small-business financial SaaS with high isolation, strong security, low latency, and practical cost control.
+Build the `apps/insighthunter-auth` application for Insight Hunter as a Cloudflare-first authentication, registration, tenant-provisioning, and subscription gateway service for `https://auth.insighthunter.dev`, with post-auth redirects into `https://app.insighthunter.dev` and purchase/signup flows initiated from `https://insighthunter.dev`. The app must be deployable on Cloudflare Workers and designed for small-business financial SaaS with high isolation, strong security, low latency, and practical cost control.
 
 ## Core role
 
@@ -211,7 +211,7 @@ Provide lightweight login and registration HTML pages suitable for Static Assets
 - Use accessible forms.
 - Call the auth API endpoints with `fetch`.
 - Handle inline error states.
-- Redirect into `https://app.insighthunter.app` after successful auth.
+- Redirect into `https://app.insighthunter.dev` after successful auth.
 - Avoid unnecessary framework dependencies.
 - Be mobile-friendly.
 
@@ -220,7 +220,7 @@ Provide lightweight login and registration HTML pages suitable for Static Assets
 `wrangler.jsonc` must define only the bindings actually used, including:
 - main entrypoint
 - compatibility date
-- routes for `auth.insighthunter.app/*`
+- routes for `auth.insighthunter.dev/*`
 - observability enabled
 - static assets binding
 - D1 database binding

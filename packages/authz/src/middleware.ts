@@ -4,7 +4,7 @@ import type { IHSession, OrgRole, Permission } from "./types";
 
 type KVEnv = { KV_SESSIONS: KVNamespace };
 
-const LOGIN_URL = "https://auth.insighthunter.app/login";
+const LOGIN_URL = "https://auth.insighthunter.dev/login";
 
 // Use in HTML-rendered apps — redirects to login on failure
 export function authGuard(loginUrl = LOGIN_URL) {

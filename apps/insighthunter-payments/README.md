@@ -35,7 +35,7 @@ subscription model.
    npx wrangler d1 execute insighthunter-auth-db --file=./schema.migration.sql
    ```
 5. In Stripe Dashboard → Developers → Webhooks, add an endpoint pointing to
-   `https://payments.insighthunter.app/webhook` subscribed to:
+   `https://payments.insighthunter.dev/webhook` subscribed to:
    `checkout.session.completed`, `customer.subscription.updated`,
    `customer.subscription.deleted`. Copy its signing secret into
    `STRIPE_WEBHOOK_SECRET`.
@@ -53,14 +53,14 @@ stripe listen --forward-to localhost:8787/webhook
 Get the pricing catalog (used by the marketing site to render tier cards):
 
 ```bash
-curl https://payments.insighthunter.app/catalog
+curl https://payments.insighthunter.dev/catalog
 ```
 
 Start a checkout for upgrading to Pro (requires a valid session token from
 insighthunter-auth):
 
 ```bash
-curl -X POST https://payments.insighthunter.app/checkout \
+curl -X POST https://payments.insighthunter.dev/checkout \
   -H "Authorization: Bearer <session_token>" \
   -H "Content-Type: application/json" \
   -d '{"type":"account_tier","value":"pro"}'
@@ -75,7 +75,7 @@ Response:
 Add the Payroll module add-on:
 
 ```bash
-curl -X POST https://payments.insighthunter.app/checkout \
+curl -X POST https://payments.insighthunter.dev/checkout \
   -H "Authorization: Bearer <session_token>" \
   -H "Content-Type: application/json" \
   -d '{"type":"module_addon","value":"payroll"}'
@@ -84,7 +84,7 @@ curl -X POST https://payments.insighthunter.app/checkout \
 Open the self-service billing portal (cancel/change plan/update card):
 
 ```bash
-curl -X POST https://payments.insighthunter.app/portal \
+curl -X POST https://payments.insighthunter.dev/portal \
   -H "Authorization: Bearer <session_token>"
 ```
 

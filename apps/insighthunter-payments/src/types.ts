@@ -2,9 +2,9 @@ export interface Env {
   DB: D1Database; // SAME physical D1 as insighthunter-auth
   STRIPE_SECRET_KEY: string; // secret
   STRIPE_WEBHOOK_SECRET: string; // secret
-  AUTH_VERIFY_URL: string; // e.g. https://auth.insighthunter.app/session/verify
+  AUTH_VERIFY_URL: string; // e.g. https://auth.insighthunter.dev/session/verify
   ALLOWED_ORIGIN: string;
-  APP_BASE_URL: string; // e.g. https://app.insighthunter.app
+  APP_BASE_URL: string; // e.g. https://app.insighthunter.dev
 
   // Stripe Price IDs, one var per catalog entry (see catalog.ts priceEnvKey)
   STRIPE_PRICE_STANDARD: string;

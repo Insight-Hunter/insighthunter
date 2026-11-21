@@ -1035,7 +1035,7 @@ Use `insighthunter-auth` as the exclusive source for:
 
 ### 10.2 Dashboard
 
-Expose a PBX summary widget/API for `app.insighthunter.app`:
+Expose a PBX summary widget/API for `app.insighthunter.dev`:
 
 - Missed calls
 - Unread conversations

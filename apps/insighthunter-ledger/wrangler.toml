@@ -16,8 +16,8 @@ database_name = "insighthunter-ledger"
 database_id = "8dc66f6a-da61-4421-a092-a4845fc0db8d"
 
 [[routes]]
-pattern = "ledger.insighthunter.app/*"
-zone_name = "insighthunter.app"
+pattern = "ledger.insighthunter.dev/*"
+zone_name = "insighthunter.dev"
 
 [dev]
 inspector_port = 9238

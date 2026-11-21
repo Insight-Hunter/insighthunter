@@ -12,7 +12,7 @@ export interface Env {
 const app = new Hono<{ Bindings: Env }>();
 app.use(
   "/api/*",
-  cors({ origin: (o) => (o?.endsWith(".insighthunter.app") ? o : null), credentials: true }),
+  cors({ origin: (o) => (o?.endsWith(".insighthunter.dev") ? o : null), credentials: true }),
 );
 app.get("/health", (c) => c.json({ service: "scout", ok: true }));
 

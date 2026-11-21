@@ -4,7 +4,7 @@ import sitemap from "@astrojs/sitemap";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: "https://insighthunter.app",
+  site: "https://insighthunter.dev",
   output: "server",
   adapter: cloudflare({
     mode: "advanced",

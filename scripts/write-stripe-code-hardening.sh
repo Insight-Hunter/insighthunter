@@ -613,9 +613,9 @@ database_id = "04854880-81f5-4c02-b555-905a34492b92"
 
 [vars]
 APP_NAME = "insighthunter-main"
-MAIN_BASE_URL = "https://insighthunter.app"
-AUTH_BASE_URL = "https://auth.insighthunter.app"
-GATEWAY_BASE_URL = "https://gateway.insighthunter.app"
+MAIN_BASE_URL = "https://insighthunter.dev"
+AUTH_BASE_URL = "https://auth.insighthunter.dev"
+GATEWAY_BASE_URL = "https://gateway.insighthunter.dev"
 STRIPE_PRICE_STARTER = "price_starter_replace"
 STRIPE_PRICE_GROWTH = "price_growth_replace"
 STRIPE_PRICE_PRO = "price_pro_replace"

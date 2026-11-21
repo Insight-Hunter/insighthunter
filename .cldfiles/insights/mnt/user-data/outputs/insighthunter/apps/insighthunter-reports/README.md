@@ -1,6 +1,6 @@
 # insighthunter-reports
 
-Financial statements — `reports.insighthunter.app`. Requires Standard tier
+Financial statements — `reports.insighthunter.dev`. Requires Standard tier
 or above. Pulls from `insighthunter-bookkeeping` (forwarding the user's own
 session token, same pattern as insighthunter-insights) and formats it into
 statements a lender, investor, or accountant would recognize.
@@ -40,28 +40,28 @@ npx wrangler deploy
 Profit & Loss for the current month:
 
 ```bash
-curl https://reports.insighthunter.app/profit-loss \
+curl https://reports.insighthunter.dev/profit-loss \
   -H "Authorization: Bearer <session_token>"
 ```
 
 Profit & Loss for a specific range (epoch ms):
 
 ```bash
-curl "https://reports.insighthunter.app/profit-loss?from=1748736000000&to=1751328000000" \
+curl "https://reports.insighthunter.dev/profit-loss?from=1748736000000&to=1751328000000" \
   -H "Authorization: Bearer <session_token>"
 ```
 
 Download as CSV:
 
 ```bash
-curl -OJ "https://reports.insighthunter.app/export/csv?from=1748736000000&to=1751328000000" \
+curl -OJ "https://reports.insighthunter.dev/export/csv?from=1748736000000&to=1751328000000" \
   -H "Authorization: Bearer <session_token>"
 ```
 
 Past generated reports (every P&L call archives a snapshot):
 
 ```bash
-curl "https://reports.insighthunter.app/snapshots?type=profit_loss&limit=10" \
+curl "https://reports.insighthunter.dev/snapshots?type=profit_loss&limit=10" \
   -H "Authorization: Bearer <session_token>"
 ```
 

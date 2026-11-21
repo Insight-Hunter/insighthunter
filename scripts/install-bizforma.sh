@@ -179,7 +179,7 @@ setup_r2() {
   # Enable CORS on production bucket for browser uploads
   log "Setting R2 CORS policy..."
   $WRANGLER r2 bucket cors put "$R2_BUCKET" \
-    --rules '[{"allowedOrigins":["https://bizforma.insighthunter.app"],"allowedMethods":["GET","PUT","POST","DELETE"],"allowedHeaders":["*"],"maxAgeSeconds":3600}]' \
+    --rules '[{"allowedOrigins":["https://bizforma.insighthunter.dev"],"allowedMethods":["GET","PUT","POST","DELETE"],"allowedHeaders":["*"],"maxAgeSeconds":3600}]' \
     $REMOTE_FLAG 2>&1 || warn "CORS set failed — set manually in Cloudflare dashboard"
   success "R2 buckets ready"
 }
@@ -342,7 +342,7 @@ print_summary() {
   echo "    DO      → FormationAgent (Durable Object)"
   echo "    Crons   → 0 9 * * * | 0 0 * * *"
   echo ""
-  echo "  URL: https://bizforma.insighthunter.app"
+  echo "  URL: https://bizforma.insighthunter.dev"
   echo -e "${NC}"
 }
 

@@ -1,6 +1,6 @@
 # Insight Hunter — Dashboard
 
-`app.insighthunter.app`. The entitled application launcher and command center.
+`app.insighthunter.dev`. The entitled application launcher and command center.
 
 Every tab reads and writes real data by calling the actual module Worker that
 owns it — via Cloudflare **service bindings**, not local demo data:

@@ -13,7 +13,7 @@
     "inspector_port": 9248
   },
 
-  "routes": [{ "pattern": "invoicing.insighthunter.app/*", "zone_name": "insighthunter.app" }],
+  "routes": [{ "pattern": "invoicing.insighthunter.dev/*", "zone_name": "insighthunter.dev" }],
 
   // Shared D1 — same database as all other Workers
   "d1_databases": [
@@ -40,9 +40,9 @@
   },
 
   "vars": {
-    "AUTH_URL": "https://auth.insighthunter.app",
-    "DASHBOARD_URL": "https://app.insighthunter.app",
-    "APP_URL": "https://invoicing.insighthunter.app",
+    "AUTH_URL": "https://auth.insighthunter.dev",
+    "DASHBOARD_URL": "https://app.insighthunter.dev",
+    "APP_URL": "https://invoicing.insighthunter.dev",
     "ENVIRONMENT": "production"
   }
 

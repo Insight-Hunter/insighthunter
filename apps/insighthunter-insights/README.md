@@ -1,6 +1,6 @@
 # insighthunter-insights
 
-The AI advisory layer — `insights.insighthunter.app`. Reads a user's
+The AI advisory layer — `insights.insighthunter.dev`. Reads a user's
 bookkeeping data and generates plain-language flags: margin drift, spending
 concentration, notable trends. Requires Standard tier or above (or the
 Insights Pro add-on on Standard).
@@ -43,7 +43,7 @@ Generate fresh insights (pulls current bookkeeping data, runs AI analysis,
 stores results):
 
 ```bash
-curl -X POST https://insights.insighthunter.app/generate \
+curl -X POST https://insights.insighthunter.dev/generate \
   -H "Authorization: Bearer <session_token>"
 ```
 
@@ -68,7 +68,7 @@ Response:
 List past insights:
 
 ```bash
-curl https://insights.insighthunter.app/insights?limit=10 \
+curl https://insights.insighthunter.dev/insights?limit=10 \
   -H "Authorization: Bearer <session_token>"
 ```
 

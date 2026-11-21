@@ -9,7 +9,7 @@ enabled = true
 [vars]
 APP_NAME = "insighthunter-finops"
 ENVIRONMENT = "development"
-LEDGER_URL = "https://ledger.insighthunter.app"
+LEDGER_URL = "https://ledger.insighthunter.dev"
 
 [[d1_databases]]
 binding = "DB"

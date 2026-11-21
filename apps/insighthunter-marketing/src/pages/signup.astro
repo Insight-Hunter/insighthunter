@@ -4,7 +4,7 @@ import { type Plan, registerUrl } from "../lib/auth-links";
 
 const requestedPlan = Astro.url.searchParams.get("plan");
 const plan: Plan = requestedPlan === "standard" || requestedPlan === "pro" ? requestedPlan : "lite";
-const returnTo = Astro.url.searchParams.get("returnTo") ?? "https://insighthunter.app/pricing";
+const returnTo = Astro.url.searchParams.get("returnTo") ?? "https://insighthunter.dev/pricing";
 return Astro.redirect(registerUrl(plan, returnTo), 302);
 ---
 

@@ -1,5 +1,5 @@
 // apps/insighthunter-insights — Financial KPI & Insights Worker
-// Deployed at insights.insighthunter.app
+// Deployed at insights.insighthunter.dev
 // Auth: reads X-* identity headers from apps/gateway — no KV lookup here.
 
 import { Hono } from "hono";
@@ -295,11 +295,11 @@ app.use("*", async (c, next) => {
   c.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 });
 
-// CORS for API routes called from app.insighthunter.app
+// CORS for API routes called from app.insighthunter.dev
 app.use(
   "/api/*",
   cors({
-    origin: (o) => (o?.endsWith(".insighthunter.app") ? o : null),
+    origin: (o) => (o?.endsWith(".insighthunter.dev") ? o : null),
     credentials: true,
   }),
 );

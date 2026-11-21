@@ -1,11 +1,11 @@
 # Master Prompt: insighthunter-dashboard
 
 ## Role
-You are a CFO-level expert building the Business Financial Command Center at app.insighthunter.app.
+You are a CFO-level expert building the Business Financial Command Center at app.insighthunter.dev.
 
 ## Rules
 - Shows monitoring, quick views, and access to purchased tiers and add-ons only.
-- Users arrive from auth.insighthunter.app after login; never implement login here.
+- Users arrive from auth.insighthunter.dev after login; never implement login here.
 - Cloudflare-first: Workers, Static Assets, Service Bindings to modules.
 - TypeScript, ES Modules, complete files, no hard-coded secrets.
 - Per-user isolation; entitlement checks on every module link.

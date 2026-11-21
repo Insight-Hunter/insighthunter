@@ -7,8 +7,8 @@ enabled = true
 head_sampling_rate = 1
 
 [[routes]]
-pattern = "bookkeeping.insighthunter.app/*"
-zone_name = "insighthunter.app"
+pattern = "bookkeeping.insighthunter.dev/*"
+zone_name = "insighthunter.dev"
 
 # Shared D1 database. Use organization_id on every tenant-owned row and
 # validate the organization context from verified auth claims.
@@ -42,11 +42,11 @@ binding = "KV_IMPORT_STATUS"
 id = "b694951a306e42f68de14b3bd80edb11"
 
 [vars]
-AUTH_URL = "https://auth.insighthunter.app"
-DASHBOARD_URL = "https://app.insighthunter.app"
+AUTH_URL = "https://auth.insighthunter.dev"
+DASHBOARD_URL = "https://app.insighthunter.dev"
 ENVIRONMENT = "production"
-BOOKKEEPING_CHECKOUT_SUCCESS_URL = "https://app.insighthunter.app/onboarding?checkout=success"
-BOOKKEEPING_CHECKOUT_CANCEL_URL = "https://insighthunter.app/pricing?checkout=canceled"
+BOOKKEEPING_CHECKOUT_SUCCESS_URL = "https://app.insighthunter.dev/onboarding?checkout=success"
+BOOKKEEPING_CHECKOUT_CANCEL_URL = "https://insighthunter.dev/pricing?checkout=canceled"
 STRIPE_STANDARD_PRICE_ID = "price_1TBfZoF3gri2YoH2g9u0mqkI"
 STRIPE_PRO_BOOKS_PRICE_ID = "price_1TBfZoF3gri2YoH2qpiUybBY"
 STRIPE_PRICE_STANDARD = "price_1TBfZoF3gri2YoH2g9u0mqkI"

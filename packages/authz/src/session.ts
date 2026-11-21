@@ -7,7 +7,7 @@ export function createSessionCookie(token: string, maxAgeSeconds: number): strin
     "Secure",
     "SameSite=Lax",
     `Max-Age=${maxAgeSeconds}`,
-    "Domain=.insighthunter.app",
+    "Domain=.insighthunter.dev",
   ].join("; ");
 }
 
@@ -19,6 +19,6 @@ export function clearSessionCookie(): string {
     "Secure",
     "SameSite=Lax",
     "Max-Age=0",
-    "Domain=.insighthunter.app",
+    "Domain=.insighthunter.dev",
   ].join("; ");
 }

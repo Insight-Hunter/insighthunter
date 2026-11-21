@@ -250,7 +250,7 @@ const app = new Hono<Env>();
 app.get("/health", (c) => c.json({ ok: true, service: c.env.APP_NAME }));
 
 app.get("/login", (c) => {
-  const redirectUri = c.req.query("redirect_uri") ?? "https://insighthunter.app/auth/callback";
+  const redirectUri = c.req.query("redirect_uri") ?? "https://insighthunter.dev/auth/callback";
   const plan = c.req.query("plan") ?? "";
 
   return c.html('
@@ -270,7 +270,7 @@ app.get("/login", (c) => {
 });
 
 app.get("/register", (c) => {
-  const redirectUri = c.req.query("redirect_uri") ?? "https://insighthunter.app/auth/callback";
+  const redirectUri = c.req.query("redirect_uri") ?? "https://insighthunter.dev/auth/callback";
   const plan = c.req.query("plan") ?? "";
 
   return c.html('
@@ -292,7 +292,7 @@ app.get("/register", (c) => {
 app.post("/callback", async (c) => {
   const form = await c.req.formData();
   const email = String(form.get("email") ?? "").trim().toLowerCase();
-  const redirectUri = String(form.get("redirect_uri") ?? "https://insighthunter.app/auth/callback");
+  const redirectUri = String(form.get("redirect_uri") ?? "https://insighthunter.dev/auth/callback");
   const plan = String(form.get("plan") ?? "").trim();
 
   if (!email) {
@@ -505,8 +505,8 @@ app.get("/me", requireAuth, (c) => {
 app.get("/handoff", requireAuth, (c) => {
   const appName = c.req.query("app") ?? "main";
   const baseMap: Record<string, string> = {
-    main: "https://insighthunter.app/dashboard",
-    bizforma: "https://bizforma.insighthunter.app/"
+    main: "https://insighthunter.dev/dashboard",
+    bizforma: "https://bizforma.insighthunter.dev/"
   };
 
   const redirectTarget = baseMap[appName] ?? baseMap.main;
@@ -529,8 +529,8 @@ enabled = true
 
 [vars]
 APP_NAME = "insighthunter-gateway"
-AUTH_BASE_URL = "https://auth.insighthunter.app"
-GATEWAY_BASE_URL = "https://gateway.insighthunter.app"
+AUTH_BASE_URL = "https://auth.insighthunter.dev"
+GATEWAY_BASE_URL = "https://gateway.insighthunter.dev"
 EOF
 
 cat > "$REPO/apps/insighthunter-main/package.json" <<'EOF'
@@ -862,10 +862,10 @@ database_id = "REPLACE_WITH_MAIN_DB_ID"
 
 [vars]
 APP_NAME = "insighthunter-main"
-MAIN_BASE_URL = "https://insighthunter.app"
-AUTH_BASE_URL = "https://auth.insighthunter.app"
-GATEWAY_BASE_URL = "https://gateway.insighthunter.app"
-CHECKOUT_BASE_URL = "https://checkout.insighthunter.app/session"
+MAIN_BASE_URL = "https://insighthunter.dev"
+AUTH_BASE_URL = "https://auth.insighthunter.dev"
+GATEWAY_BASE_URL = "https://gateway.insighthunter.dev"
+CHECKOUT_BASE_URL = "https://checkout.insighthunter.dev/session"
 BILLING_PROVIDER_SECRET = "REPLACE_WITH_SECRET_REF"
 EOF
 

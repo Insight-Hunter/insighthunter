@@ -11,21 +11,21 @@ incident can never touch customer financial data.
 
 | Hostname | Application | Responsibility |
 | --- | --- | --- |
-| `insighthunter.app`, `www.insighthunter.app` | `apps/insighthunter-marketing` | Astro SSR marketing, pricing, blog, docs, signup/login hand-off |
-| `auth.insighthunter.app` | `apps/insighthunter-auth` | Registration, login, sessions, rate limiting, per-user `UserVault` provisioning |
-| `app.insighthunter.app` | `apps/insighthunter-dashboard` | Entitled application launcher and dashboard APIs |
-| `payments.insighthunter.app` | `apps/insighthunter-payments` | Stripe Checkout, billing portal, webhooks |
-| `payroll.insighthunter.app` | `apps/insighthunter-payroll` | Employee records, payroll runs, tax-provider integration |
-| `bizforma.insighthunter.app` | `apps/insighthunter-bizforma` | Business formation wizard, compliance calendar, AI advisor |
-| `pbx.insighthunter.app` | `apps/insighthunter-pbx` | Twilio-backed voice, voicemail, SMS |
-| `scout.insighthunter.app` | `apps/insighthunter-scout` | Lead/deal CRM |
+| `insighthunter.dev`, `www.insighthunter.dev` | `apps/insighthunter-marketing` | Astro SSR marketing, pricing, blog, docs, signup/login hand-off |
+| `auth.insighthunter.dev` | `apps/insighthunter-auth` | Registration, login, sessions, rate limiting, per-user `UserVault` provisioning |
+| `app.insighthunter.dev` | `apps/insighthunter-dashboard` | Entitled application launcher and dashboard APIs |
+| `payments.insighthunter.dev` | `apps/insighthunter-payments` | Stripe Checkout, billing portal, webhooks |
+| `payroll.insighthunter.dev` | `apps/insighthunter-payroll` | Employee records, payroll runs, tax-provider integration |
+| `bizforma.insighthunter.dev` | `apps/insighthunter-bizforma` | Business formation wizard, compliance calendar, AI advisor |
+| `pbx.insighthunter.dev` | `apps/insighthunter-pbx` | Twilio-backed voice, voicemail, SMS |
+| `scout.insighthunter.dev` | `apps/insighthunter-scout` | Lead/deal CRM |
 
 > `apps/insighthunter-main` is **decommissioned**. It must not be redeployed
 > or referenced. Do not resurrect its routes — see its `wrangler.toml`
 > header comment. All marketing responsibility now lives in
 > `apps/insighthunter-marketing`.
 
-## Product modules (routed through `app.insighthunter.app`, entitlement-gated)
+## Product modules (routed through `app.insighthunter.dev`, entitlement-gated)
 
 | Module | App | Status |
 | --- | --- | --- |
@@ -82,7 +82,7 @@ a new sellable feature is added to `src/data/pricing.ts` or `catalog.ts`.
 1. Marketing site shows Startup/Standard/Pro + add-ons, sends visitor to `/signup`.
 2. Auth validates input, creates account + org metadata row in D1, allocates
    a `UserVault` Durable Object ID, issues a signed session cookie.
-3. Paid selections POST to `payments.insighthunter.app`, which creates a
+3. Paid selections POST to `payments.insighthunter.dev`, which creates a
    Stripe Checkout Session using `catalog.ts` entries.
 4. A verified Stripe webhook updates subscription status and module
    entitlements in the auth D1.

@@ -27,7 +27,7 @@ export async function sendEmail(opts: {
     await opts.binding.send({
       to: [{ email: opts.to }],
       from: {
-        email: opts.from ?? "noreply@insighthunter.app",
+        email: opts.from ?? "noreply@insighthunter.dev",
         name: opts.fromName ?? "InsightHunter",
       },
       subject: opts.subject,

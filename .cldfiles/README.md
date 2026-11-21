@@ -1,6 +1,6 @@
 # insighthunter-main
 
-The public marketing site — `insighthunter.app`. Astro, deployed to
+The public marketing site — `insighthunter.dev`. Astro, deployed to
 Cloudflare Workers Static Assets. Handles: landing page, module descriptions,
 pricing (live from `insighthunter-payments`), and signup/login (against
 `insighthunter-auth`).
@@ -41,7 +41,7 @@ ever calls public API endpoints from the browser).
 has no hosted UI of its own. The login and signup **forms** live here, in
 `insighthunter-main`, and call the auth API directly via `fetch`. This keeps
 one public-facing UI surface instead of splitting it across two domains.
-`auth.insighthunter.app` remains purely the API/authorization boundary, as
+`auth.insighthunter.dev` remains purely the API/authorization boundary, as
 the architecture doc specifies — it just doesn't render pages.
 
 Flow:
@@ -49,9 +49,9 @@ Flow:
 1. `/signup` (optionally `?tier=standard` or `?addon=payroll` from a pricing
    button) → `POST auth/register` → if a paid tier/add-on was requested,
    immediately `POST payments/checkout` and redirect to Stripe; otherwise
-   redirect straight to `app.insighthunter.app/dashboard?token=...`.
+   redirect straight to `app.insighthunter.dev/dashboard?token=...`.
 2. `/login` → `POST auth/login` → redirect to
-   `app.insighthunter.app/dashboard?token=...`.
+   `app.insighthunter.dev/dashboard?token=...`.
 
 ## Known follow-up (flagged, not silently skipped)
 
@@ -59,7 +59,7 @@ Passing the session token as a `?token=` query param to the dashboard is a
 placeholder handoff — fine for getting the dashboard app built next, but the
 real version should have the dashboard worker exchange that token for a
 proper `HttpOnly; Secure; SameSite=Strict` cookie scoped to
-`.insighthunter.app` (set server-side by a redirect endpoint), so the token
+`.insighthunter.dev` (set server-side by a redirect endpoint), so the token
 never sits in browser history or a URL bar. Do this as part of building
 `insighthunter-dashboard`.
 

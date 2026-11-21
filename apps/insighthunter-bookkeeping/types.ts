@@ -1,8 +1,8 @@
 export interface Env {
   LEDGER: DurableObjectNamespace; // one BookkeepingLedger instance per user, id = userId
   AI: Ai; // Workers AI binding, used for transaction auto-categorization
-  AUTH_API_URL: string; // https://auth.insighthunter.app
-  ALLOWED_ORIGIN: string; // https://app.insighthunter.app
+  AUTH_API_URL: string; // https://auth.insighthunter.dev
+  ALLOWED_ORIGIN: string; // https://app.insighthunter.dev
 }
 
 export interface SessionPayload {
